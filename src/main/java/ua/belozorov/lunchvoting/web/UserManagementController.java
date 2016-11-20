@@ -2,15 +2,20 @@ package ua.belozorov.lunchvoting.web;
 
 import com.sun.org.apache.regexp.internal.RE;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import ua.belozorov.lunchvoting.model.User;
 import ua.belozorov.lunchvoting.service.IUserService;
 import ua.belozorov.lunchvoting.to.UserTo;
 import ua.belozorov.lunchvoting.util.UserUtils;
 
+import javax.validation.Valid;
 import java.util.Collection;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -61,14 +66,16 @@ public class UserManagementController {
     }
 
     @PutMapping("/{id}/activate")
-    public ResponseEntity activate(@PathVariable String id, boolean isActive) {
-        userService.activate(id, isActive);
+    //TODO Implement validation for Map<String, Boolean> params content
+    public ResponseEntity activate(@PathVariable String id, @RequestBody Map<String, Boolean> params) {
+        userService.activate(id,  params.get("isActive"));
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
     @PutMapping("/{id}/rights.set")
-    public ResponseEntity setRights(@PathVariable String id, @RequestBody byte rights) {
-        userService.setRoles(id, rights);
+    //TODO Implement validation for Map<String, Byte> params content
+    public ResponseEntity setRights(@PathVariable String id, @RequestBody Map<String, Byte> params) {
+        userService.setRoles(id, params.get("rights"));
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 }

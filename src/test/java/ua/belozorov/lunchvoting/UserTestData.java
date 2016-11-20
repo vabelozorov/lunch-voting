@@ -3,6 +3,8 @@ package ua.belozorov.lunchvoting;
 import ua.belozorov.lunchvoting.model.User;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Comparator;
 
 /**
@@ -17,23 +19,29 @@ public class UserTestData {
     public static String TSAR_ID;
     public static String VOTER_ID;
     public static String ADMIN_ID;
+    public static Collection<User> USERS;
 
     static {
-        TSAR = new User(0, "Царь всея приложение", "tsar@email.com", "tsarpass", (byte)3,
+        TSAR = new User("Царь всея приложение", "tsar@email.com", "tsarpass", (byte)3,
                 LocalDateTime.of(2016, 11, 16, 0, 0, 1), true);
         TSAR.setId("TestUser2");
         TSAR_ID = TSAR.getId();
 
-        VOTER = new User(0, "Синий Гном", "gnom@email.com", "gnompass", (byte) 1,
+        VOTER = new User("Синий Гном", "gnom@email.com", "gnompass", (byte) 1,
                 LocalDateTime.of(2016, 11, 17, 13, 0, 0), true);
         VOTER.setId("TestUser1");
         VOTER_ID = VOTER.getId();
 
-        ADMIN = new User(0, "Just an admin", "admin@email.com", "godpass", (byte) 2,
+        ADMIN = new User("Just an admin", "admin@email.com", "godpass", (byte) 2,
                 LocalDateTime.of(2016, 11, 16, 13, 0, 0), true);
         ADMIN.setId("TestUser3");
         ADMIN_ID = ADMIN.getId();
+        USERS = Arrays.asList(ADMIN, VOTER, TSAR);
     }
+
+
+
+
 
     public static class UserComparator implements Comparator<User>{
 

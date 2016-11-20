@@ -34,9 +34,7 @@ public class UserServiceTest extends AbstractServiceTest {
     @Test
     public void getAll() throws Exception {
         Collection<User> users = userService.getAll();
-        assertReflectionEquals(
-            Arrays.asList(ADMIN, VOTER, TSAR),
-            users.toArray(new User[users.size()])
+        assertReflectionEquals(USERS, users.toArray(new User[users.size()])
         );
     }
 
@@ -53,7 +51,7 @@ public class UserServiceTest extends AbstractServiceTest {
     @Test
     public void update() throws Exception {
         User updated = userService.get(VOTER_ID);
-        updated.setActivated(false);
+        updated.setPassword("newPassword");
         updated.setEmail("updated@email.com");
         userService.update(updated);
         assertThat(userService.get(VOTER_ID), userMatch(updated));
@@ -79,7 +77,7 @@ public class UserServiceTest extends AbstractServiceTest {
     public void setRoles() throws Exception {
         userService.setRoles(VOTER_ID, (byte) 3);
         Set<UserRole> expectedRoles = new HashSet<>();
-        expectedRoles.add(UserRole.USER);
+        expectedRoles.add(UserRole.VOTER);
         expectedRoles.add(UserRole.ADMIN);
         assertEquals(UserRole.toUserRoles(userService.get(VOTER_ID).getRoles()), expectedRoles);
     }

@@ -9,8 +9,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
 
 /**
  * <h2></h2>
@@ -34,7 +32,7 @@ public class User extends AbstractPersistableObject {
     private String password;
 
     @Column(name = "roles", nullable = false)
-    private byte roles = UserRole.USER.id();
+    private byte roles = UserRole.VOTER.id();
 
     @Column(name = "registeredDate", nullable = false)
     private LocalDateTime registeredDate = LocalDateTime.now();
@@ -61,9 +59,8 @@ public class User extends AbstractPersistableObject {
      * @param registeredDate
      * @param activated
      */
-    public User(Integer version, String name, String email, String password, byte roles,
+    public User(String name, String email, String password, byte roles,
                 LocalDateTime registeredDate, boolean activated) {
-        this.version = version;
         this.name = name;
         this.email = email;
         this.password = password;

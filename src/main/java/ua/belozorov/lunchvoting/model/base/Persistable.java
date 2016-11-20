@@ -13,10 +13,10 @@ public interface Persistable {
      */
     void setId(String id);
 
-    /**
-     * Determines whether the entity is a new or has been saved to a database.
-     * This field is managed by a JPA provider.
-     * @return true if the entity has not been persisted by the JPA provider, false otherwise.
-     */
-    boolean isNew();
+//    /**
+//     * Determines whether the entity is a new or has been saved to a database.
+//     * This field is managed by a JPA provider.
+//     * @return true if the entity has not been persisted by the JPA provider, false otherwise.
+//     */
+//    boolean isNew();
 }

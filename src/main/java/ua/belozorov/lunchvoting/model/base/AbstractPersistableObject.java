@@ -36,11 +36,11 @@ public class AbstractPersistableObject implements Persistable {
     @Id
     protected String id = IdGenerator.createId();
 
-    /**
-     * Is used to determine new|saved state of an entity
-     */
-    @Version
-    protected Integer version;
+//    /**
+//     * Is used to determine new|saved state of an entity
+//     */
+//    @Version
+//    protected Integer version;
 
     @Override
     public String getId() {
@@ -70,10 +70,10 @@ public class AbstractPersistableObject implements Persistable {
     public int hashCode() {
         return id != null ? id.hashCode() : super.hashCode();
     }
-
-
-    @Override
-    public boolean isNew() {
-        return version == null;
-    }
+//
+//
+//    @Override
+//    public boolean isNew() {
+//        return version == null;
+//    }
 }

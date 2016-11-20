@@ -12,7 +12,7 @@ public interface IUserRepository {
 
     User save(User user);
 
-    User update(User user);
+    boolean update(User user);
 
     User get(String id);
 

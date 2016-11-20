@@ -12,7 +12,7 @@ import ua.belozorov.lunchvoting.to.UserTo;
 public class UserUtils {
 
     public static UserTo convertIntoTo(User user) {
-        return new UserTo(user.getId(), user.getName(), user.getEmail(), user.getRoles(),
+        return new UserTo(user.getId(), user.getName(), user.getEmail(), "", user.getRoles(),
                 user.getRegisteredDate(), user.isActivated());
     }
 

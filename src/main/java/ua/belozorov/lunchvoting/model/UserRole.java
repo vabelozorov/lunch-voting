@@ -12,7 +12,7 @@ import java.util.Set;
  * @author vabelozorov on 15.11.16.
  */
 public enum UserRole {
-    USER((byte)1),
+    VOTER((byte)1),
     ADMIN((byte)2);
 
     private final byte id;
@@ -31,8 +31,8 @@ public enum UserRole {
             return roles;
         }
 
-        if ((bitmask & (1<<0)) == UserRole.USER.id()) {
-            roles.add(UserRole.USER);
+        if ((bitmask & (1<<0)) == UserRole.VOTER.id()) {
+            roles.add(UserRole.VOTER);
         }
         if ((bitmask & (1<<1)) == UserRole.ADMIN.id()) {
             roles.add(UserRole.ADMIN);

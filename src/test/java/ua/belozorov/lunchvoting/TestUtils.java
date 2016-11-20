@@ -1,13 +1,14 @@
 package ua.belozorov.lunchvoting;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.test.web.servlet.MvcResult;
 import ua.belozorov.lunchvoting.util.ConfiguredObjectMapper;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,8 +18,7 @@ import java.util.Map;
  * @author vabelozorov on 18.11.16.
  */
 public class TestUtils {
-    private static final ObjectMapper mapper = ConfiguredObjectMapper.getMapper();
-//    private static final ObjectMapper mapper = new ObjectMapper();
+    private static ObjectMapper mapper = ConfiguredObjectMapper.getMapper();
 
     public static String toJson(Object object) throws JsonProcessingException {
         return mapper.writeValueAsString(object);
@@ -39,7 +39,15 @@ public class TestUtils {
         return toJson(object, properties);
     }
 
+    public static String toJson(String key, String value) throws IOException {
+        return toJson(new Object(), key, value);
+    }
+
     public static <T> T mvcResultToObject(MvcResult result, Class<T> responseType) throws IOException {
         return mapper.readValue(result.getResponse().getContentAsString(), responseType);
+    }
+
+    public static <T> T mvcResultToObject(MvcResult result, TypeReference<T> ref) throws IOException {
+        return mapper.readValue(result.getResponse().getContentAsString(), ref);
     }
 }

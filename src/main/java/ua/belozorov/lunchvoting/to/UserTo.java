@@ -14,17 +14,18 @@ public class UserTo {
     private String name;
     private String email;
     private String password;
-    private byte roles = UserRole.USER.id();
+    private byte roles = UserRole.VOTER.id();
     private LocalDateTime registeredDate;
     private boolean activated;
 
     public UserTo() {
     }
 
-    public UserTo(String id, String name, String email, byte roles, LocalDateTime registeredDate, boolean activated) {
+    public UserTo(String id, String name, String email, String password, byte roles, LocalDateTime registeredDate, boolean activated) {
         this.id = id;
         this.name = name;
         this.email = email;
+        this.password = password;
         this.roles = roles;
         this.registeredDate = registeredDate;
         this.activated = activated;

@@ -25,8 +25,8 @@ public class UserRepository implements IUserRepository {
     }
 
     @Override
-    public User update(User user) {
-        return crudRepository.save(user);
+    public boolean update(User user) {
+        return crudRepository.update(user.getId(), user.getName(), user.getEmail(), user.getPassword()) != 0;
     }
 
     @Override
