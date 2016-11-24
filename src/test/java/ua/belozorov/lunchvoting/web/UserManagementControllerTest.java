@@ -5,21 +5,23 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
-import ua.belozorov.lunchvoting.TestUtils;
+import ua.belozorov.lunchvoting.JsonUtils;
 import ua.belozorov.lunchvoting.model.User;
 import ua.belozorov.lunchvoting.model.UserRole;
-import ua.belozorov.lunchvoting.service.IUserService;
+import ua.belozorov.lunchvoting.service.user.IUserService;
 import ua.belozorov.lunchvoting.to.UserTo;
-import ua.belozorov.lunchvoting.util.UserUtils;
+import ua.belozorov.lunchvoting.to.transformers.UserTransformer;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static org.hamcrest.Matchers.contains;
 import static org.junit.Assert.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
-import static ua.belozorov.lunchvoting.UserTestData.*;
+import static ua.belozorov.lunchvoting.MatcherUtils.*;
+import static ua.belozorov.lunchvoting.testdata.UserTestData.*;
 
 
 /**
@@ -29,7 +31,7 @@ import static ua.belozorov.lunchvoting.UserTestData.*;
  */
 
 public class UserManagementControllerTest extends AbstractControllerTest {
-    public static final String REST_URL = UserManagementController.REST_URL;
+    private static final String REST_URL = UserManagementController.REST_URL;
 
     @Autowired
     private IUserService userService;
@@ -40,26 +42,26 @@ public class UserManagementControllerTest extends AbstractControllerTest {
 
         MvcResult result = mockMvc
                 .perform(post(REST_URL)
-                        .content(TestUtils.toJson(userTo))
+                        .content(JsonUtils.toJson(userTo))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
                 .andReturn();
 
-        UserTo created = TestUtils.mvcResultToObject(result, UserTo.class);
+        UserTo created = JsonUtils.mvcResultToObject(result, UserTo.class);
         userTo.setId(created.getId());
         userTo.setRegisteredDate(created.getRegisteredDate());
 
-        assertThat(created, usertoMatch(userTo));
+        assertThat(created, matchByToString(userTo));
     }
 
     @Test
     public void testUpdate() throws Exception {
-        UserTo userTo = UserUtils.convertIntoTo(VOTER);
+        UserTo userTo = UserTransformer.toDto(VOTER);
         userTo.setPassword("newPassword");
         userTo.setEmail("newEmail@email.com");
 
         mockMvc.perform(put(REST_URL)
-                        .content(TestUtils.toJson(userTo))
+                        .content(JsonUtils.toJson(userTo))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
 
@@ -75,9 +77,9 @@ public class UserManagementControllerTest extends AbstractControllerTest {
                 .andExpect(status().isOk())
                 .andReturn();
 
-        UserTo actual = TestUtils.mvcResultToObject(result, UserTo.class);
-        UserTo expected = UserUtils.convertIntoTo(VOTER);
-        assertThat(actual, usertoMatch(expected));
+        UserTo actual = JsonUtils.mvcResultToObject(result, UserTo.class);
+        UserTo expected = UserTransformer.toDto(VOTER);
+        assertThat(actual, matchByToString(expected));
     }
 
     @Test
@@ -86,8 +88,8 @@ public class UserManagementControllerTest extends AbstractControllerTest {
                 .andExpect(status().isOk())
                 .andReturn();
 
-        Collection<UserTo> actual = TestUtils.mvcResultToObject(result, new TypeReference<Collection<UserTo>>() {});
-        List<UserTo> expected = USERS.stream().map(UserUtils::convertIntoTo).collect(Collectors.toList());
+        Collection<UserTo> actual = JsonUtils.mvcResultToObject(result, new TypeReference<Collection<UserTo>>() {});
+        List<UserTo> expected = USERS.stream().map(UserTransformer::toDto).sorted(Comparator.comparing(UserTo::getEmail)).collect(Collectors.toList());
 
         assertReflectionEquals(expected, actual);
     }
@@ -97,13 +99,16 @@ public class UserManagementControllerTest extends AbstractControllerTest {
         mockMvc.perform(delete(REST_URL + "/" + VOTER_ID))
                 .andExpect(status().isNoContent());
         Collection<User> actual = userService.getAll();
-        assertReflectionEquals(Arrays.asList(ADMIN, TSAR), actual);
+        assertThat(
+                actual,
+                contains(matchCollection(Arrays.asList(ADMIN, GOD), USER_COMPARATOR))
+        );
     }
 
     @Test
     public void activate() throws Exception {
         mockMvc.perform(put(REST_URL + "/" + VOTER_ID + "/activate")
-                            .content(TestUtils.toJson("isActive", "false"))
+                            .content(JsonUtils.toJson("isActive", "false"))
                             .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
 
@@ -114,7 +119,7 @@ public class UserManagementControllerTest extends AbstractControllerTest {
     @Test
     public void setRights() throws Exception {
         mockMvc.perform(put(REST_URL + "/" + VOTER_ID + "/rights.set")
-                .content(TestUtils.toJson("rights", "3"))
+                .content(JsonUtils.toJson("rights", "3"))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
 
@@ -124,5 +129,6 @@ public class UserManagementControllerTest extends AbstractControllerTest {
         expectedRoles.add(UserRole.ADMIN);
         assertEquals(UserRole.toUserRoles(user.getRoles()), expectedRoles);
     }
+
 
 }

@@ -1,4 +1,4 @@
-package ua.belozorov.lunchvoting;
+package ua.belozorov.lunchvoting.testdata;
 
 import ua.belozorov.lunchvoting.model.User;
 
@@ -13,38 +13,33 @@ import java.util.Comparator;
  * @author vabelozorov on 17.11.16.
  */
 public class UserTestData {
-    public static User TSAR;
+    public static final Comparator<User> USER_COMPARATOR = new UserComparator();
+
+    public static User GOD;
     public static User VOTER;
     public static User ADMIN;
-    public static String TSAR_ID;
+    public static String GOD_ID;
     public static String VOTER_ID;
     public static String ADMIN_ID;
     public static Collection<User> USERS;
 
     static {
-        TSAR = new User("Царь всея приложение", "tsar@email.com", "tsarpass", (byte)3,
+        GOD = new User("GOD_ID", "Царь всея приложение", "god@email.com", "godpass", (byte)3,
                 LocalDateTime.of(2016, 11, 16, 0, 0, 1), true);
-        TSAR.setId("TestUser2");
-        TSAR_ID = TSAR.getId();
+        GOD_ID = GOD.getId();
 
-        VOTER = new User("Синий Гном", "gnom@email.com", "gnompass", (byte) 1,
+        VOTER = new User("VOTER_ID", "Синий Гном", "voter@email.com", "voterpass", (byte) 1,
                 LocalDateTime.of(2016, 11, 17, 13, 0, 0), true);
-        VOTER.setId("TestUser1");
         VOTER_ID = VOTER.getId();
 
-        ADMIN = new User("Just an admin", "admin@email.com", "godpass", (byte) 2,
+        ADMIN = new User("ADMIN_ID", "Just an admin", "admin@email.com", "adminpass", (byte) 2,
                 LocalDateTime.of(2016, 11, 16, 13, 0, 0), true);
-        ADMIN.setId("TestUser3");
         ADMIN_ID = ADMIN.getId();
-        USERS = Arrays.asList(ADMIN, VOTER, TSAR);
+
+        USERS = Arrays.asList(ADMIN, VOTER, GOD);
     }
 
-
-
-
-
     public static class UserComparator implements Comparator<User>{
-
         @Override
         public int compare(User o1, User o2) {
             return (o1.getId().equals(o2.getId()) &&

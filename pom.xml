@@ -206,6 +206,12 @@
             <!--<artifactId>spring-security-test</artifactId>-->
             <!--<version>${spring-security.version}</version>-->
         <!--</dependency>-->
+        <!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.16.10</version>
+        </dependency>
 
     </dependencies>
 
@@ -268,6 +274,7 @@
                     </excludes>
                 </configuration>
             </plugin>
+
         </plugins>
     </build>
 

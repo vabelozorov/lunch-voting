@@ -11,7 +11,7 @@ public interface Persistable {
      * Expected to be invoked by a JPA provider after the entity has been fetched from a database
      * @param id entity id
      */
-    void setId(String id);
+//    void setId(String id);
 
 //    /**
 //     * Determines whether the entity is a new or has been saved to a database.

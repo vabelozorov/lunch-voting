@@ -1,18 +1,19 @@
 package ua.belozorov.lunchvoting.service;
 
-import org.hamcrest.Matcher;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import ua.belozorov.lunchvoting.ModelMatcher;
 import ua.belozorov.lunchvoting.exceptions.NotFoundException;
 import ua.belozorov.lunchvoting.model.User;
 import ua.belozorov.lunchvoting.model.UserRole;
+import ua.belozorov.lunchvoting.service.user.IUserService;
 
 import java.util.*;
 
+import static org.hamcrest.Matchers.contains;
 import static org.junit.Assert.*;
-import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
-import static ua.belozorov.lunchvoting.UserTestData.*;
+import static ua.belozorov.lunchvoting.MatcherUtils.matchCollection;
+import static ua.belozorov.lunchvoting.MatcherUtils.matchSingle;
+import static ua.belozorov.lunchvoting.testdata.UserTestData.*;
 
 /**
  * <h2></h2>
@@ -20,7 +21,6 @@ import static ua.belozorov.lunchvoting.UserTestData.*;
  * @author vabelozorov on 17.11.16.
  */
 public class UserServiceTest extends AbstractServiceTest {
-    private static final Comparator<User> USER_COMPARATOR = new UserComparator();
 
     @Autowired
     private IUserService userService;
@@ -28,13 +28,15 @@ public class UserServiceTest extends AbstractServiceTest {
     @Test
     public void get() throws Exception {
         User actual = userService.get(VOTER_ID);
-        assertThat(actual, userMatch(VOTER));
+        assertThat(actual, matchSingle(VOTER, USER_COMPARATOR));
     }
 
     @Test
     public void getAll() throws Exception {
         Collection<User> users = userService.getAll();
-        assertReflectionEquals(USERS, users.toArray(new User[users.size()])
+        assertThat(
+                Arrays.asList(ADMIN, GOD, VOTER),
+                contains(matchCollection(users, USER_COMPARATOR))
         );
     }
 
@@ -42,29 +44,29 @@ public class UserServiceTest extends AbstractServiceTest {
     public void delete() throws Exception {
         userService.delete(ADMIN_ID);
         Collection<User> users = userService.getAll();
-        assertReflectionEquals(
-            Arrays.asList(VOTER, TSAR),
-            users.toArray(new User[users.size()])
+        assertThat(
+            Arrays.asList(GOD, VOTER),
+            contains(matchCollection(users, USER_COMPARATOR))
         );
     }
 
     @Test
     public void update() throws Exception {
         User updated = userService.get(VOTER_ID);
-        updated.setPassword("newPassword");
-        updated.setEmail("updated@email.com");
+        updated = User.builder(updated).password("newPassword").email("updated@email.com").build();
         userService.update(updated);
-        assertThat(userService.get(VOTER_ID), userMatch(updated));
+        assertThat(userService.get(VOTER_ID), matchSingle(updated, USER_COMPARATOR));
     }
 
     @Test
     public void create() throws Exception {
-        User expectedUser = new User("New User", "new@email.com", "strongPassword");
-        expectedUser.setId("TestUser4");
-        expectedUser.setRoles((byte) 3);
-        User created = userService.create(expectedUser);
-        expectedUser.setId(created.getId());
-        assertThat(created, userMatch(expectedUser));
+        User expected = new User("NEW_USER_ID", "New User", "new@email.com", "strongPassword");
+        User actual = userService.create(expected);
+        expected = User.builder(expected)
+                .registeredDate(actual.getRegisteredDate())
+                .activated(true)
+                .roles(UserRole.VOTER.id()).build();
+        assertThat(actual, matchSingle(expected, USER_COMPARATOR));
     }
 
     @Test
@@ -87,12 +89,19 @@ public class UserServiceTest extends AbstractServiceTest {
         userService.get("NotExistingId");
     }
 
+    @Test //TODO
+    public void updateNotExisting() {
+
+    }
+
     @Test(expected = NotFoundException.class)
     public void deleteNotExisting() {
         userService.delete("NotExistingId");
     }
 
-    private static Matcher<User> userMatch(User user) {
-        return new ModelMatcher<>(USER_COMPARATOR, user);
+    @Test //TODO
+    public void createDuplicate() {
+
     }
+
 }

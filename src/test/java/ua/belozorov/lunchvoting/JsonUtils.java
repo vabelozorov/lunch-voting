@@ -17,7 +17,7 @@ import java.util.Map;
  *
  * @author vabelozorov on 18.11.16.
  */
-public class TestUtils {
+public class JsonUtils {
     private static ObjectMapper mapper = ConfiguredObjectMapper.getMapper();
 
     public static String toJson(Object object) throws JsonProcessingException {

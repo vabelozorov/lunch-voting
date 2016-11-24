@@ -3,6 +3,7 @@ package ua.belozorov.lunchvoting.model.base;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.Version;
+import java.util.Optional;
 
 /**
  * <h1> A base class for JPA entities</h1>
@@ -26,7 +27,7 @@ import javax.persistence.Version;
  * @see IdGenerator
  */
 @MappedSuperclass
-public class AbstractPersistableObject implements Persistable {
+public abstract class AbstractPersistableObject implements Persistable {
 
     /**
      * Is used as an ID for a JPA entity.
@@ -34,25 +35,35 @@ public class AbstractPersistableObject implements Persistable {
      * The JPA provider must not manage ID creation.
      */
     @Id
-    protected String id = IdGenerator.createId();
+    protected final String id;
 
-//    /**
-//     * Is used to determine new|saved state of an entity
-//     */
-//    @Version
-//    protected Integer version;
+    /**
+     * Is used to determine new|saved state of an entity
+     */
+    @Version
+    protected Integer version;
+
+    public AbstractPersistableObject() {
+        this(IdGenerator.createId());
+    }
+
+    public AbstractPersistableObject(String id) {
+        this.id = Optional.ofNullable(id)
+                .filter(_id -> ! _id.isEmpty())
+                .orElse(IdGenerator.createId());
+    }
 
     @Override
     public String getId() {
         return id;
     }
 
-    @Override
-    public void setId(String id) {
-        if (id != null) {
-            this.id = id;
-        }
-    }
+//    @Override
+//    public void setId(String id) {
+//        if (id != null) {
+//            this.id = id;
+//        }
+//    }
 
     @Override
     public boolean equals(Object o) {

@@ -1,19 +1,14 @@
 package ua.belozorov.lunchvoting.web;
 
-import com.sun.org.apache.regexp.internal.RE;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import ua.belozorov.lunchvoting.model.User;
-import ua.belozorov.lunchvoting.service.IUserService;
+import ua.belozorov.lunchvoting.service.user.IUserService;
 import ua.belozorov.lunchvoting.to.UserTo;
-import ua.belozorov.lunchvoting.util.UserUtils;
+import ua.belozorov.lunchvoting.to.transformers.UserTransformer;
 
-import javax.validation.Valid;
 import java.util.Collection;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -33,14 +28,14 @@ public class UserManagementController {
 
     @PostMapping
     public ResponseEntity<UserTo> create(@RequestBody UserTo userTo) {
-        User newUser = UserUtils.convertIntoUser(userTo);
-        UserTo created = UserUtils.convertIntoTo(userService.create(newUser));
+        User newUser = UserTransformer.toEntity(userTo);
+        UserTo created = UserTransformer.toDto(userService.create(newUser));
         return new ResponseEntity<>(created, HttpStatus.CREATED);
     }
 
     @PutMapping
     public ResponseEntity update(@RequestBody UserTo userTo) {
-        User user = UserUtils.convertIntoUser(userTo);
+        User user = UserTransformer.toEntity(userTo);
         userService.update(user);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
@@ -48,14 +43,16 @@ public class UserManagementController {
     @GetMapping("/{id}")
     public ResponseEntity<UserTo> get(@PathVariable String id) {
         User user = userService.get(id);
-        UserTo userTo = UserUtils.convertIntoTo(user);
+        UserTo userTo = UserTransformer.toDto(user);
         return new ResponseEntity<>(userTo, HttpStatus.OK);
     }
 
     @GetMapping
     public ResponseEntity<Collection<UserTo>> getAll() {
         Collection<User> users = userService.getAll();
-        Collection<UserTo> userTos = users.stream().map(UserUtils::convertIntoTo).collect(Collectors.toList());
+        Collection<UserTo> userTos = users.stream()
+                .map(UserTransformer::toDto)
+                .collect(Collectors.toList());
         return new ResponseEntity<>(userTos, HttpStatus.OK);
     }
 

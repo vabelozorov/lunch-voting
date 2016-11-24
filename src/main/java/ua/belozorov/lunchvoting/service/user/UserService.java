@@ -1,4 +1,4 @@
-package ua.belozorov.lunchvoting.service;
+package ua.belozorov.lunchvoting.service.user;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

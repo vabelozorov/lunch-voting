@@ -1,4 +1,4 @@
-package ua.belozorov.lunchvoting.model;
+package ua.belozorov.lunchvoting.model.lunchplace;
 
 import javax.persistence.Embeddable;
 

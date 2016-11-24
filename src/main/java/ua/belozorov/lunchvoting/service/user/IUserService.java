@@ -1,4 +1,4 @@
-package ua.belozorov.lunchvoting.service;
+package ua.belozorov.lunchvoting.service.user;
 
 import ua.belozorov.lunchvoting.model.User;
 

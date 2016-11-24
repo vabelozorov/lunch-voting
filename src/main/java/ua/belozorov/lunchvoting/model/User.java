@@ -1,14 +1,16 @@
 package ua.belozorov.lunchvoting.model;
 
+import lombok.Builder;
+import lombok.Getter;
+import org.hibernate.annotations.Immutable;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotEmpty;
 import ua.belozorov.lunchvoting.model.base.AbstractPersistableObject;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 /**
  * <h2></h2>
@@ -17,40 +19,53 @@ import java.time.LocalDateTime;
  */
 @Entity
 @Table(name = "users")
+@Getter
+@Immutable
 public class User extends AbstractPersistableObject {
 
     @Column(name = "name", nullable = false)
     @NotEmpty
-    private String name;
+    private final String name;
 
     @Column(name = "email", nullable = false)
     @Email
-    private String email;
+    private final String email;
 
     @Column(name = "password", nullable = false)
     @Length(min = 6)
-    private String password;
+    private final String password;
 
     @Column(name = "roles", nullable = false)
-    private byte roles = UserRole.VOTER.id();
+    private final byte roles;
 
-    @Column(name = "registeredDate", nullable = false)
-    private LocalDateTime registeredDate = LocalDateTime.now();
+    @Column(name = "registeredDate", nullable = false, updatable = false)
+    private final LocalDateTime registeredDate;
 
     @Column(name = "activated", nullable = false)
-    private boolean activated = true;
+    private final boolean activated;
 
-    public User() {
-    }
-
-    public User(String name, String email, String password) {
-        this.name = name;
-        this.email = email;
-        this.password = password;
+    /**
+     * Primarily for Hibernate. Constructs a User instance with default values. Providing {@code null} as an ID
+     * will result in the object retaining its auto-generated ID.
+     */
+    protected User() {
+        this(null, null, null, null);
     }
 
     /**
-     * Intended use - to create a test User which can be fully initialized by invoking a contructor
+     * For a convenient creation from a DTO.
+     *
+     * @param id
+     * @param name
+     * @param email
+     * @param password
+     */
+    public User(String id, String name, String email, String password) {
+        this(id, name, email, password,  UserRole.VOTER.id(), LocalDateTime.now(), true);
+    }
+
+    /**
+     * A constructor that accepts all available parameters except version
      *
      * @param name
      * @param email
@@ -59,8 +74,10 @@ public class User extends AbstractPersistableObject {
      * @param registeredDate
      * @param activated
      */
-    public User(String name, String email, String password, byte roles,
+    @Builder
+    public User(String id, String name, String email, String password, byte roles,
                 LocalDateTime registeredDate, boolean activated) {
+        super(id);
         this.name = name;
         this.email = email;
         this.password = password;
@@ -69,54 +86,10 @@ public class User extends AbstractPersistableObject {
         this.activated = activated;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public byte getRoles() {
-        return roles;
-    }
-
-    public void setRoles(byte roles) {
-        this.roles = roles;
-    }
-
-    public LocalDateTime getRegisteredDate() {
-        return registeredDate;
-    }
-
-    public boolean isActivated() {
-        return activated;
-    }
-
-    public void setActivated(boolean activated) {
-        this.activated = activated;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
     @Override
     public String toString() {
         return "User{" +
-                "id=" + getId() + '\'' +
+                "id=" + id + '\'' +
                 ", name='" + name + '\'' +
                 ", email='" + email + '\'' +
                 ", password='" + password + '\'' +
@@ -124,5 +97,32 @@ public class User extends AbstractPersistableObject {
                 ", registeredDate=" + registeredDate +
                 ", activated=" + activated +
                 '}';
+    }
+
+    public static UserBuilder builder(User user) {
+        return new UserBuilder(user);
+    }
+
+    public static UserBuilder builder() {
+        return new UserBuilder();
+    }
+
+    public static class UserBuilder {
+        private String id, name, email, password;
+        private byte roles;
+        private LocalDateTime registeredDate;
+        private boolean activated;
+
+        UserBuilder() { }
+
+        UserBuilder(User user) {
+            this.id = user.id;
+            this.name = user.name;
+            this.email = user.email;
+            this.password = user.password;
+            this.roles = user.roles;
+            this.registeredDate = user.registeredDate;
+            this.activated = user.activated;
+        }
     }
 }
