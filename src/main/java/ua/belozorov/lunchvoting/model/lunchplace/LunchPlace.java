@@ -3,6 +3,8 @@ package ua.belozorov.lunchvoting.model.lunchplace;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Singular;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotEmpty;
 import ua.belozorov.lunchvoting.LengthEach;
@@ -10,6 +12,7 @@ import ua.belozorov.lunchvoting.model.User;
 import ua.belozorov.lunchvoting.model.base.AbstractPersistableObject;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Objects;
@@ -44,29 +47,34 @@ public class LunchPlace extends AbstractPersistableObject {
     @Column(name = "phone")
     @LengthEach
     @OrderBy
+    @Fetch(FetchMode.JOIN)
     private final Collection<String> phones;
 
     @OneToMany(mappedBy = "lunchPlace")
-    @Singular
     private final Collection<Menu> menus;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id")
-    private final User admin;
+    private User admin;
 
     protected LunchPlace() {
-        this(null, null, null, null, Collections.emptyList(), Collections.emptyList(), null);
+        this(null, null, null, null, null, Collections.emptyList(), Collections.emptyList(), null);
     }
 
     @Builder
     public LunchPlace(String id, String name, String address, String description,
+                      Collection<String> phones, Collection<Menu> menus) {
+        this(id, null, name, address, description, phones, menus, null);
+    }
+
+    public LunchPlace(String id, Integer version, String name, String address, String description,
                       Collection<String> phones, Collection<Menu> menus, User admin) {
-        super(id);
+        super(id, version);
         this.name = name;
         this.address = address;
         this.description = description;
         this.phones = Objects.requireNonNull(phones);
-        this.menus = menus;
+        this.menus = Objects.requireNonNull(menus);
         this.admin = admin;
     }
 
@@ -80,12 +88,16 @@ public class LunchPlace extends AbstractPersistableObject {
                 '}';
     }
 
+    public void setAdmin(User admin) {
+        this.admin = admin;
+    }
+
     public static LunchPlaceBuilder builder() {
         return new LunchPlaceBuilder();
     }
 
     public static LunchPlaceBuilder builder(LunchPlace place) {
-        return new LunchPlaceBuilder(place);
+        return place == null ? new LunchPlaceBuilder() : new LunchPlaceBuilder(place);
     }
 
     public static class LunchPlaceBuilder {
@@ -93,10 +105,12 @@ public class LunchPlace extends AbstractPersistableObject {
         private Collection<String> phones;
         private Collection<Menu> menus;
         private User admin;
+        private Integer version;
 
         LunchPlaceBuilder() { }
 
         LunchPlaceBuilder(LunchPlace place) {
+            this.version = place.version;
             this.id = place.id;
             this.name = place.name;
             this.address = place.address;
@@ -104,6 +118,10 @@ public class LunchPlace extends AbstractPersistableObject {
             this.phones = place.phones;
             this.menus = place.menus;
             this.admin = place.admin;
+        }
+
+        public LunchPlace build() {
+            return new LunchPlace(this.id, this.version, this.name, this.address, this.description, this.phones, this.menus, this.admin);
         }
     }
 }

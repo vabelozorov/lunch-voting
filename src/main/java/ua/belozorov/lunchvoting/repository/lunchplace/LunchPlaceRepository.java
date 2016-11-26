@@ -1,12 +1,8 @@
 package ua.belozorov.lunchvoting.repository.lunchplace;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
-import ua.belozorov.lunchvoting.model.lunchplace.LunchPlace;
 import ua.belozorov.lunchvoting.model.User;
+import ua.belozorov.lunchvoting.model.lunchplace.LunchPlace;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.util.Collection;
 
 /**
@@ -14,42 +10,15 @@ import java.util.Collection;
  *
  * @author vabelozorov on 21.11.16.
  */
-@Repository
-public class LunchPlaceRepository implements ILunchPlaceRepository {
+public interface LunchPlaceRepository {
 
-    @Autowired
-    private CrudLunchPlaceRepository repository;
+    LunchPlace save(LunchPlace lunchPlace, String userId);
 
-    @PersistenceContext
-    private EntityManager em;
+    LunchPlace update(LunchPlace lunchPlace, String userId);
 
-    @Override
-    public LunchPlace save(LunchPlace lunchPlace, String userId) {
-        User userRef = em.getReference(User.class, userId);
-//        lunchPlace.setAdmin(userRef);
-        em.persist(lunchPlace);
-        return lunchPlace;
-    }
+    LunchPlace get(String id, String userId);
 
-    @Override
-    public boolean update(LunchPlace lunchPlace, String userId) {
-        User userRef = em.getReference(User.class, userId);
-//        lunchPlace.setAdmin(userRef);
-        return em.merge(lunchPlace) != null;
-    }
+    Collection<LunchPlace> getAll(String userId);
 
-    @Override
-    public LunchPlace get(String id, String userId) {
-        return repository.getOne(id, userId);
-    }
-
-    @Override
-    public Collection<LunchPlace> getAll(String userId) {
-        return repository.findAll(userId);
-    }
-
-    @Override
-    public boolean delete(String id, String userId) {
-        return repository.deleteById(id, userId) != 0;
-    }
+    boolean delete(String id, String userId);
 }

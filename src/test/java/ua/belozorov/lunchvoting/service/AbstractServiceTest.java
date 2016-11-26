@@ -1,5 +1,7 @@
 package ua.belozorov.lunchvoting.service;
 
+import org.junit.Rule;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
@@ -16,4 +18,7 @@ import ua.belozorov.lunchvoting.config.RootConfig;
 @RunWith(SpringJUnit4ClassRunner.class)
 @Sql(scripts = "classpath:db/populate_postgres.sql", config = @SqlConfig(encoding = "UTF-8"))
 public abstract class AbstractServiceTest {
+
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
 }

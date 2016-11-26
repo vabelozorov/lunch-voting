@@ -15,29 +15,18 @@ import java.util.Comparator;
 public class UserTestData {
     public static final Comparator<User> USER_COMPARATOR = new UserComparator();
 
-    public static User GOD;
-    public static User VOTER;
-    public static User ADMIN;
-    public static String GOD_ID;
-    public static String VOTER_ID;
-    public static String ADMIN_ID;
-    public static Collection<User> USERS;
+    public static User GOD = GOD = new User("GOD_ID", 1, "Царь всея приложение", "god@email.com", "godpass", (byte)3,
+            LocalDateTime.of(2016, 11, 16, 0, 0, 1), true);
+    public static User VOTER = new User("VOTER_ID", 1, "Синий Гном", "voter@email.com", "voterpass", (byte) 1,
+            LocalDateTime.of(2016, 11, 17, 13, 0, 0), true);
+    public static User ADMIN = new User("ADMIN_ID", 1, "Just an admin", "admin@email.com", "adminpass", (byte) 2,
+            LocalDateTime.of(2016, 11, 16, 13, 0, 0), true);
 
-    static {
-        GOD = new User("GOD_ID", "Царь всея приложение", "god@email.com", "godpass", (byte)3,
-                LocalDateTime.of(2016, 11, 16, 0, 0, 1), true);
-        GOD_ID = GOD.getId();
+    public static String GOD_ID = GOD.getId();
+    public static String VOTER_ID = VOTER.getId();
+    public static String ADMIN_ID = ADMIN.getId();
 
-        VOTER = new User("VOTER_ID", "Синий Гном", "voter@email.com", "voterpass", (byte) 1,
-                LocalDateTime.of(2016, 11, 17, 13, 0, 0), true);
-        VOTER_ID = VOTER.getId();
-
-        ADMIN = new User("ADMIN_ID", "Just an admin", "admin@email.com", "adminpass", (byte) 2,
-                LocalDateTime.of(2016, 11, 16, 13, 0, 0), true);
-        ADMIN_ID = ADMIN.getId();
-
-        USERS = Arrays.asList(ADMIN, VOTER, GOD);
-    }
+    public static Collection<User> USERS = Arrays.asList(ADMIN, VOTER, GOD);
 
     public static class UserComparator implements Comparator<User>{
         @Override

@@ -8,12 +8,12 @@ import org.springframework.web.bind.annotation.RestController;
  * Created by vabelozorov on 14.11.16.
  */
 @RestController
-@RequestMapping("/api")
-public class RootController {
-    static final String HELLO_MESSAGE = "Hello from Lunch Voting system";
+@RequestMapping(LunchPlaceController.REST_URL)
+public class MenuController {
+    static final String REST_URL = "/place";
 
     @GetMapping("/hello")
     public String hello() {
-        return HELLO_MESSAGE;
+        return "Hello";
     }
 }

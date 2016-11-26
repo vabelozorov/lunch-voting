@@ -7,10 +7,12 @@ import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotEmpty;
 import ua.belozorov.lunchvoting.model.base.AbstractPersistableObject;
+import ua.belozorov.lunchvoting.model.lunchplace.LunchPlace;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.Optional;
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * <h2></h2>
@@ -20,7 +22,6 @@ import java.util.Optional;
 @Entity
 @Table(name = "users")
 @Getter
-@Immutable
 public class User extends AbstractPersistableObject {
 
     @Column(name = "name", nullable = false)
@@ -61,11 +62,16 @@ public class User extends AbstractPersistableObject {
      * @param password
      */
     public User(String id, String name, String email, String password) {
-        this(id, name, email, password,  UserRole.VOTER.id(), LocalDateTime.now(), true);
+        this(id, null, name, email, password,  UserRole.VOTER.id(), LocalDateTime.now(), true);
     }
 
+    @Builder
+    public User(String id, String name, String email, String password, byte roles,
+                LocalDateTime registeredDate, boolean activated) {
+        this(id, null, name, email, password,roles, registeredDate, activated);
+    }
     /**
-     * A constructor that accepts all available parameters except version
+     * A constructor that accepts all available parameters
      *
      * @param name
      * @param email
@@ -74,10 +80,9 @@ public class User extends AbstractPersistableObject {
      * @param registeredDate
      * @param activated
      */
-    @Builder
-    public User(String id, String name, String email, String password, byte roles,
+    public User(String id, Integer version, String name, String email, String password, byte roles,
                 LocalDateTime registeredDate, boolean activated) {
-        super(id);
+        super(id, version);
         this.name = name;
         this.email = email;
         this.password = password;
@@ -109,6 +114,7 @@ public class User extends AbstractPersistableObject {
 
     public static class UserBuilder {
         private String id, name, email, password;
+        private Integer version;
         private byte roles;
         private LocalDateTime registeredDate;
         private boolean activated;
@@ -117,12 +123,17 @@ public class User extends AbstractPersistableObject {
 
         UserBuilder(User user) {
             this.id = user.id;
+            this.version = user.version;
             this.name = user.name;
             this.email = user.email;
             this.password = user.password;
             this.roles = user.roles;
             this.registeredDate = user.registeredDate;
             this.activated = user.activated;
+        }
+
+        public User build() {
+            return new User(this.id, this.version, this.name, this.email, this.password, this.roles, this.registeredDate, this.activated);
         }
     }
 }

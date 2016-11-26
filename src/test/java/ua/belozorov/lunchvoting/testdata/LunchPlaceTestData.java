@@ -29,20 +29,20 @@ public class LunchPlaceTestData {
     public static Collection<LunchPlace> PLACES;
 
     static {
-        PLACE1 = new LunchPlace("FirstPlaceID", "First Place", "First Address", "First Description",
+        PLACE1 = new LunchPlace("FirstPlaceID", 1, "First Place", "First Address", "First Description",
                 Collections.singletonList("0501234567"), Collections.emptyList(), ADMIN);
         PLACE1_ID = PLACE1.getId();
 
-        PLACE2 = new LunchPlace("SecondPlaceID", "Second Place", "Second Address", "Second Description",
+        PLACE2 = new LunchPlace("SecondPlaceID", 1, "Second Place", "Second Address", "Second Description",
                 Arrays.asList("0442345671", "0502345671"), Collections.emptyList(), ADMIN);
         PLACE2_ID = PLACE2.getId();
 
-        PLACE3 = new LunchPlace("ThirdPlaceID", "Third Place", "Third Address", "Third Description",
+        PLACE3 = new LunchPlace("ThirdPlaceID", 1, "Third Place", "Third Address", "Third Description",
                 Collections.singletonList("0503456712"), Collections.emptyList(), GOD);
         PLACE3_ID = PLACE3.getId();
 
-        PLACE4 = new LunchPlace("FourthPlaceID", "Fourth Place", "Fourth Address", "Fourth Description",
-                Arrays.asList("0444567123", "0504567123", "0934567123"), Collections.emptyList(), ADMIN);
+        PLACE4 = new LunchPlace("FourthPlaceID", 1, "Fourth Place", "Fourth Address", "Fourth Description",
+                Arrays.asList("0444567123", "0444671235", "0504567123", "0934567123"), Collections.emptyList(), ADMIN);
         PLACE4_ID = PLACE4.getId();
 
         PLACES = Arrays.asList(PLACE1, PLACE4, PLACE2, PLACE3);

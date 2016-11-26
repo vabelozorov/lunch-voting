@@ -1,11 +1,12 @@
-package ua.belozorov.lunchvoting.service;
+package ua.belozorov.lunchvoting.service.user;
 
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import ua.belozorov.lunchvoting.exceptions.NotFoundException;
 import ua.belozorov.lunchvoting.model.User;
 import ua.belozorov.lunchvoting.model.UserRole;
-import ua.belozorov.lunchvoting.service.user.IUserService;
+import ua.belozorov.lunchvoting.service.AbstractServiceTest;
+import ua.belozorov.lunchvoting.service.user.UserService;
 
 import java.util.*;
 
@@ -23,7 +24,7 @@ import static ua.belozorov.lunchvoting.testdata.UserTestData.*;
 public class UserServiceTest extends AbstractServiceTest {
 
     @Autowired
-    private IUserService userService;
+    private UserService userService;
 
     @Test
     public void get() throws Exception {

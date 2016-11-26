@@ -26,37 +26,4 @@ public class DbFiddling extends AbstractServiceTest {
 
     @Autowired
     private CrudLunchPlaceRepository crudLunchPlaceRepository;
-
-    @Test
-    @Transactional
-    public void checkGetReference() {
-        User user = em.getReference(User.class, "TestUser");
-//        user.setName("My New Name");
-        User merged = em.merge(user);
-        System.out.println();
-    }
-
-    @Test
-    public void oneNoHQL() {
-        LunchPlace place = getLunchPlace();
-        System.out.println();
-    }
-
-    @Test
-    public void oneHQL() {
-        LunchPlace place = getLunchPlaceWithHQL();
-        System.out.println();
-    }
-
-    @Transactional
-    private LunchPlace getLunchPlace() {
-        return crudLunchPlaceRepository.findOne(PLACE1_ID);
-    }
-
-    @Transactional
-    private LunchPlace getLunchPlaceWithHQL() {
-        return crudLunchPlaceRepository.getOne(PLACE1_ID, ADMIN_ID);
-    }
-
-
 }

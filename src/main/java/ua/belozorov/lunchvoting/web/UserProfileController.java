@@ -5,7 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ua.belozorov.lunchvoting.model.User;
-import ua.belozorov.lunchvoting.service.user.IUserService;
+import ua.belozorov.lunchvoting.service.user.UserService;
 import ua.belozorov.lunchvoting.to.UserTo;
 import ua.belozorov.lunchvoting.to.transformers.UserTransformer;
 
@@ -19,7 +19,7 @@ import ua.belozorov.lunchvoting.to.transformers.UserTransformer;
 public class UserProfileController {
 
     @Autowired
-    private IUserService userService;
+    private UserService userService;
 
     @PostMapping
     public ResponseEntity<UserTo> register(@RequestBody UserTo userTo, String password) {

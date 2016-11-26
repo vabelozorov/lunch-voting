@@ -41,16 +41,17 @@ public abstract class AbstractPersistableObject implements Persistable {
      * Is used to determine new|saved state of an entity
      */
     @Version
-    protected Integer version;
+    protected final Integer version;
 
     public AbstractPersistableObject() {
-        this(IdGenerator.createId());
+        this(IdGenerator.createId(), null);
     }
 
-    public AbstractPersistableObject(String id) {
+    public AbstractPersistableObject(String id, Integer version) {
         this.id = Optional.ofNullable(id)
                 .filter(_id -> ! _id.isEmpty())
                 .orElse(IdGenerator.createId());
+        this.version = version;
     }
 
     @Override

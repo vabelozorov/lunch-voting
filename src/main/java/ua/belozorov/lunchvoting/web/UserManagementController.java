@@ -5,7 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ua.belozorov.lunchvoting.model.User;
-import ua.belozorov.lunchvoting.service.user.IUserService;
+import ua.belozorov.lunchvoting.service.user.UserService;
 import ua.belozorov.lunchvoting.to.UserTo;
 import ua.belozorov.lunchvoting.to.transformers.UserTransformer;
 
@@ -24,7 +24,7 @@ public class UserManagementController {
     static final String REST_URL = "/api/usermgmt";
 
     @Autowired
-    private IUserService userService;
+    private UserService userService;
 
     @PostMapping
     public ResponseEntity<UserTo> create(@RequestBody UserTo userTo) {

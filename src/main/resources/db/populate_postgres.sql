@@ -20,4 +20,5 @@ INSERT INTO phones (place_id, phone) VALUES
   ('ThirdPlaceID', '0503456712'),
   ('FourthPlaceID', '0504567123'),
   ('FourthPlaceID', '0934567123'),
-  ('FourthPlaceID', '0444567123');
+  ('FourthPlaceID', '0444567123'),
+  ('FourthPlaceID', '0444671235');

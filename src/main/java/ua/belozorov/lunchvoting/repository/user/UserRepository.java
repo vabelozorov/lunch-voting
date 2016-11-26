@@ -1,56 +1,26 @@
 package ua.belozorov.lunchvoting.repository.user;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Repository;
 import ua.belozorov.lunchvoting.model.User;
 
 import java.util.Collection;
 
 /**
- * <h2></h2>
- *
- * @author vabelozorov on 16.11.16.
+ * Created by vabelozorov on 14.11.16.
  */
-@Repository
-public class UserRepository implements IUserRepository {
 
-    @Autowired
-    private CrudUserRepository crudRepository;
+public interface UserRepository {
 
+    User save(User user);
 
-    @Override
-    public User save(User user) {
-        return crudRepository.save(user);
-    }
+    boolean update(User user);
 
-    @Override
-    public boolean update(User user) {
-        return crudRepository.update(user.getId(), user.getName(), user.getEmail(), user.getPassword()) != 0;
-    }
+    User get(String id);
 
-    @Override
-    public User get(String id) {
-        return crudRepository.findOne(id);
-    }
+    Collection<User> getAll();
 
-    @Override
-    public Collection<User> getAll() {
-        return crudRepository.findAll();
-    }
+    boolean delete(String id);
 
-    @Override
-    public boolean delete(String id) {
-        return crudRepository.deleteById(id) != 0;
-    }
+    boolean activate(String id, boolean isActive);
 
-    @Override
-    public boolean activate(String id, boolean isActive) {
-        return crudRepository.activate(id, isActive) != 0;
-    }
-
-    @Override
-    public boolean setRoles(String id, byte bitmask) {
-        return crudRepository.setRoles(id, bitmask) != 0;
-    }
+    boolean setRoles(String id, byte bitmask);
 }

@@ -5,8 +5,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ua.belozorov.lunchvoting.AuthorizedUser;
-import ua.belozorov.lunchvoting.model.lunchplace.LunchPlace;
-import ua.belozorov.lunchvoting.service.lunchplace.ILunchPlaceService;
+import ua.belozorov.lunchvoting.service.lunchplace.LunchPlaceService;
+import ua.belozorov.lunchvoting.to.LunchPlaceTo;
 
 import java.util.Collection;
 
@@ -16,15 +16,16 @@ import java.util.Collection;
  * @author vabelozorov on 15.11.16.
  */
 @RestController
-@RequestMapping("/place")
+@RequestMapping(LunchPlaceController.REST_URL)
 public class LunchPlaceController {
+    static final String REST_URL = "/place";
 
     @Autowired
-    private ILunchPlaceService placeService;
+    private LunchPlaceService placeService;
 
     /**
      *
-     * @param place a LunchPlace object description in JSON format. <br/>
+     * @param placeTo a LunchPlace object description in JSON format. <br/>
      *              Mandatory fields:
      *              <ul><li>name (up to 50 characters, not empty)</li></ul>
      *              Optional fields:
@@ -36,32 +37,32 @@ public class LunchPlaceController {
      * @return LunchPlace object with id
      */
     @PostMapping
-    public ResponseEntity<LunchPlace> create(@RequestBody LunchPlace place) {
-        LunchPlace created = placeService.create(place, AuthorizedUser.adminId());
+    public ResponseEntity<LunchPlaceTo> create(@RequestBody LunchPlaceTo placeTo) {
+        LunchPlaceTo created = placeService.create(placeTo, AuthorizedUser.get());
         return new ResponseEntity<>(created, HttpStatus.CREATED);
     }
 
     @PutMapping
-    public ResponseEntity update(@RequestBody LunchPlace place) {
-        placeService.update(place, AuthorizedUser.adminId());
+    public ResponseEntity update(@RequestBody LunchPlaceTo placeTo) {
+        placeService.update(placeTo, AuthorizedUser.get());
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<LunchPlace> get(@PathVariable String id) {
-        LunchPlace place = placeService.get(id, AuthorizedUser.adminId());
-        return new ResponseEntity<>(place, HttpStatus.OK);
+    public ResponseEntity<LunchPlaceTo> get(@PathVariable String id) {
+        LunchPlaceTo placeTo = placeService.get(id, AuthorizedUser.get());
+        return new ResponseEntity<>(placeTo, HttpStatus.OK);
     }
 
     @GetMapping
-    public ResponseEntity<Collection<LunchPlace>> getAll() {
-        Collection<LunchPlace> places = placeService.getAll(AuthorizedUser.adminId());
+    public ResponseEntity<Collection<LunchPlaceTo>> getAll() {
+        Collection<LunchPlaceTo> places = placeService.getAll(AuthorizedUser.get());
         return new ResponseEntity<>(places, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity delete(@PathVariable String id) {
-        placeService.delete(id, AuthorizedUser.adminId());
+        placeService.delete(id, AuthorizedUser.get());
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 }

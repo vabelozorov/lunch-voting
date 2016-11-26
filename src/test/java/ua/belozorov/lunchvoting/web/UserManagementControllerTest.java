@@ -8,7 +8,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import ua.belozorov.lunchvoting.JsonUtils;
 import ua.belozorov.lunchvoting.model.User;
 import ua.belozorov.lunchvoting.model.UserRole;
-import ua.belozorov.lunchvoting.service.user.IUserService;
+import ua.belozorov.lunchvoting.service.user.UserService;
 import ua.belozorov.lunchvoting.to.UserTo;
 import ua.belozorov.lunchvoting.to.transformers.UserTransformer;
 
@@ -34,7 +34,7 @@ public class UserManagementControllerTest extends AbstractControllerTest {
     private static final String REST_URL = UserManagementController.REST_URL;
 
     @Autowired
-    private IUserService userService;
+    private UserService userService;
 
     @Test
     public void testCreate() throws Exception {
@@ -89,7 +89,10 @@ public class UserManagementControllerTest extends AbstractControllerTest {
                 .andReturn();
 
         Collection<UserTo> actual = JsonUtils.mvcResultToObject(result, new TypeReference<Collection<UserTo>>() {});
-        List<UserTo> expected = USERS.stream().map(UserTransformer::toDto).sorted(Comparator.comparing(UserTo::getEmail)).collect(Collectors.toList());
+        List<UserTo> expected = USERS.stream()
+                .map(UserTransformer::toDto)
+                .sorted(Comparator.comparing(UserTo::getEmail))
+                .collect(Collectors.toList());
 
         assertReflectionEquals(expected, actual);
     }
