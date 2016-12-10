@@ -89,7 +89,7 @@ public class UserManagementControllerTest extends AbstractControllerTest {
                 .andReturn();
 
         Collection<UserTo> actual = JsonUtils.mvcResultToObject(result, new TypeReference<Collection<UserTo>>() {});
-        List<UserTo> expected = USERS.stream()
+        List<UserTo> expected = VOTERS.stream()
                 .map(UserTransformer::toDto)
                 .sorted(Comparator.comparing(UserTo::getEmail))
                 .collect(Collectors.toList());
@@ -132,6 +132,4 @@ public class UserManagementControllerTest extends AbstractControllerTest {
         expectedRoles.add(UserRole.ADMIN);
         assertEquals(UserRole.toUserRoles(user.getRoles()), expectedRoles);
     }
-
-
 }

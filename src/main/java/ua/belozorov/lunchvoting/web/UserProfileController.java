@@ -24,16 +24,13 @@ public class UserProfileController {
     @PostMapping
     public ResponseEntity<UserTo> register(@RequestBody UserTo userTo, String password) {
         User newUser = UserTransformer.toEntity(userTo);
-//        newUser.setPassword(password);
         UserTo created = UserTransformer.toDto(userService.create(newUser));
         return new ResponseEntity<>(created, HttpStatus.CREATED);
     }
 
     @PutMapping
     public ResponseEntity update(@RequestBody UserTo userTo, String password) {
-        User user = UserTransformer.toEntity(userTo);
-//        user.setPassword(password);
-        userService.update(user);
+        userService.update(userTo.getId(), userTo.getName(), userTo.getEmail(), userTo.getPassword());
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 

@@ -114,7 +114,5 @@ public class LunchPlaceControllerTest extends AbstractControllerTest {
         Collection<LunchPlaceTo> expected = LunchPlaceTransformer.collectionToDto(Collections.singletonList(PLACE3));
         assertReflectionEquals(expected, actual);
     }
-
     //TODO test response codes and content during errors
-
 }

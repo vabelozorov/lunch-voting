@@ -1,5 +1,6 @@
 package ua.belozorov.lunchvoting.service.user;
 
+import org.springframework.transaction.annotation.Transactional;
 import ua.belozorov.lunchvoting.model.User;
 
 import java.util.Collection;
@@ -9,6 +10,7 @@ import java.util.Collection;
  *
  * @author vabelozorov on 15.11.16.
  */
+//TODO save() and update() should not return values
 public interface UserService {
 
     User get(String id);
@@ -17,7 +19,7 @@ public interface UserService {
 
     void delete(String id);
 
-    void update(User user);
+    void update(String id, String name, String email, String password);
 
     User create(User user);
 

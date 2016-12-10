@@ -1,9 +1,18 @@
+DROP TABLE IF EXISTS voting_config;
 DROP TABLE IF EXISTS phones;
 DROP TABLE IF EXISTS dishes;
-DROP TABLE IF EXISTS votes;
+DROP TABLE IF EXISTS entryVotes;
 DROP TABLE IF EXISTS menus;
+DROP TABLE IF EXISTS poll_items;
 DROP TABLE IF EXISTS places;
 DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS polls;
+
+CREATE TABLE IF NOT EXISTS polls (
+  id VARCHAR(36) NOT NULL PRIMARY KEY,
+  startTime TIMESTAMP NOT NULL,
+  endTime TIMESTAMP NOT NULL
+);
 
 CREATE TABLE IF NOT EXISTS users (
   id VARCHAR(36) NOT NULL PRIMARY KEY,
@@ -24,7 +33,6 @@ CREATE TABLE IF NOT EXISTS places (
   address VARCHAR,
   description VARCHAR,
   user_id VARCHAR(36) NOT NULL,
-  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
   CONSTRAINT name_user_id_unique UNIQUE (name, user_id)
 );
 
@@ -33,23 +41,29 @@ CREATE TABLE IF NOT EXISTS menus (
   version INT NOT NULL DEFAULT 0,
   effective_date TIMESTAMP NOT NULL,
   place_id VARCHAR(36) NOT NULL,
-  FOREIGN KEY (place_id) REFERENCES places(id)
+  poll_id VARCHAR(36),
+  FOREIGN KEY (place_id) REFERENCES places(id) ON DELETE CASCADE,
+  FOREIGN KEY (poll_id) REFERENCES polls(id)
 );
 
-CREATE TABLE IF NOT EXISTS votes (
+CREATE TABLE IF NOT EXISTS entryVotes (
   id VARCHAR(36) NOT NULL PRIMARY KEY,
   version INT NOT NULL DEFAULT 0,
   user_id VARCHAR(36) NOT NULL,
-  place_id VARCHAR(36) NOT NULL,
+  poll_id VARCHAR(36) NOT NULL,
+  item_id VARCHAR(36) NOT NULL,
   voteTime TIMESTAMP NOT NULL,
   FOREIGN KEY (user_id) REFERENCES users(id),
-  FOREIGN KEY (place_id) REFERENCES places(id)
+  FOREIGN KEY (poll_id) REFERENCES polls(id),
+  FOREIGN KEY (item_id) REFERENCES places(id)
 );
 
 CREATE TABLE IF NOT EXISTS dishes (
   menu_id VARCHAR(36) NOT NULL,
   name VARCHAR NOT NULL,
-  price FLOAT NOT NULL
+  price FLOAT NOT NULL,
+  CONSTRAINT entry_unique UNIQUE (menu_id, name, price),
+  FOREIGN KEY (menu_id) REFERENCES menus(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS phones (
@@ -57,5 +71,19 @@ CREATE TABLE IF NOT EXISTS phones (
   phone VARCHAR NOT NULL,
   PRIMARY KEY (place_id, phone)
 );
+
+CREATE TABLE IF NOT EXISTS poll_items (
+  id VARCHAR(36) NOT NULL PRIMARY KEY,
+  poll_id VARCHAR(36),
+  position INT,
+  item_id VARCHAR(36),
+  FOREIGN KEY (poll_id) REFERENCES polls(id),
+  FOREIGN KEY (item_id) REFERENCES places(id)
+);
+
+CREATE TABLE IF NOT EXISTS voting_config (
+  poll_start_time TIME NOT NULL DEFAULT '09:00',
+  poll_end_time TIME NOT NULL DEFAULT '12:00'
+)
 
 

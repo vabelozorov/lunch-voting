@@ -19,7 +19,7 @@ import java.util.Properties;
  * @author vabelozorov on 16.11.16.
  */
 @Configuration
-@EnableJpaRepositories(basePackages = "ua.belozorov.lunchvoting.repository")
+@EnableJpaRepositories(basePackages = "ua.belozorov.lunchvoting.repository", considerNestedRepositories = true)
 @EnableTransactionManagement
 public class DbConfig {
 
@@ -41,6 +41,7 @@ public class DbConfig {
         LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
         HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
         em.setDataSource(dataSource);
+        em.setPersistenceUnitName("AppPersistentUnit");
         em.setPackagesToScan("ua.belozorov.lunchvoting.model");
         em.setJpaVendorAdapter(vendorAdapter);
         Properties jpaProperties = new Properties();

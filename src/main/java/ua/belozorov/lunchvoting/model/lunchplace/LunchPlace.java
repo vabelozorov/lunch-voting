@@ -12,10 +12,8 @@ import ua.belozorov.lunchvoting.model.User;
 import ua.belozorov.lunchvoting.model.base.AbstractPersistableObject;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Objects;
+import java.time.LocalDate;
+import java.util.*;
 
 /**
  * <h2></h2>
@@ -42,40 +40,44 @@ public class LunchPlace extends AbstractPersistableObject {
     @Length(max = 1000)
     private final String description;
 
-    @ElementCollection(fetch = FetchType.EAGER)
+    @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name = "phones", joinColumns = @JoinColumn(name = "place_id"))
     @Column(name = "phone")
     @LengthEach
     @OrderBy
-    @Fetch(FetchMode.JOIN)
     private final Collection<String> phones;
 
-    @OneToMany(mappedBy = "lunchPlace")
+    @OneToMany(mappedBy = "lunchPlace", cascade = {CascadeType.REMOVE, CascadeType.PERSIST})
     private final Collection<Menu> menus;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "user_id")
-    private User admin;
+    @Column(name = "user_id")
+    private final String adminId;
 
     protected LunchPlace() {
-        this(null, null, null, null, null, Collections.emptyList(), Collections.emptyList(), null);
+        super(null, null);
+        this.phones = null;
+        this.menus = null;
+        this.adminId = null;
+        this.description = null;
+        this.address = null;
+        this.name = null;
+    }
+
+    public LunchPlace(String id, String name, String address, String description,
+                      Collection<String> phones, Collection<Menu> menus, String adminId) {
+        this(id, null, name, address, description, phones, menus, adminId);
     }
 
     @Builder
-    public LunchPlace(String id, String name, String address, String description,
-                      Collection<String> phones, Collection<Menu> menus) {
-        this(id, null, name, address, description, phones, menus, null);
-    }
-
     public LunchPlace(String id, Integer version, String name, String address, String description,
-                      Collection<String> phones, Collection<Menu> menus, User admin) {
+                      Collection<String> phones, Collection<Menu> menus, String adminId) {
         super(id, version);
         this.name = name;
         this.address = address;
         this.description = description;
         this.phones = Objects.requireNonNull(phones);
         this.menus = Objects.requireNonNull(menus);
-        this.admin = admin;
+        this.adminId = adminId;
     }
 
     @Override
@@ -88,23 +90,23 @@ public class LunchPlace extends AbstractPersistableObject {
                 '}';
     }
 
-    public void setAdmin(User admin) {
-        this.admin = admin;
-    }
-
     public static LunchPlaceBuilder builder() {
         return new LunchPlaceBuilder();
     }
 
     public static LunchPlaceBuilder builder(LunchPlace place) {
-        return place == null ? new LunchPlaceBuilder() : new LunchPlaceBuilder(place);
+        return new LunchPlaceBuilder(place);
+    }
+
+    public Menu createMenu(LocalDate effectiveDate, List<Dish> dishes) {
+        return new Menu(effectiveDate, dishes, this);
     }
 
     public static class LunchPlaceBuilder {
         private String id, name, address, description;
         private Collection<String> phones;
         private Collection<Menu> menus;
-        private User admin;
+        private String adminId;
         private Integer version;
 
         LunchPlaceBuilder() { }
@@ -117,11 +119,11 @@ public class LunchPlace extends AbstractPersistableObject {
             this.description = place.description;
             this.phones = place.phones;
             this.menus = place.menus;
-            this.admin = place.admin;
+            this.adminId = place.adminId;
         }
 
         public LunchPlace build() {
-            return new LunchPlace(this.id, this.version, this.name, this.address, this.description, this.phones, this.menus, this.admin);
+            return new LunchPlace(this.id, this.version, this.name, this.address, this.description, this.phones, this.menus, this.adminId);
         }
     }
 }

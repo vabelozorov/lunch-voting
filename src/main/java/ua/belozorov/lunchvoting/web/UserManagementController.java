@@ -35,8 +35,7 @@ public class UserManagementController {
 
     @PutMapping
     public ResponseEntity update(@RequestBody UserTo userTo) {
-        User user = UserTransformer.toEntity(userTo);
-        userService.update(user);
+        userService.update(userTo.getId(), userTo.getName(), userTo.getEmail(), userTo.getPassword());
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 

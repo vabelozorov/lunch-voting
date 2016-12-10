@@ -2,11 +2,15 @@ package ua.belozorov.lunchvoting.service.user;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.TransactionSystemException;
 import org.springframework.transaction.annotation.Transactional;
+import ua.belozorov.lunchvoting.exceptions.BadSyntaxException;
 import ua.belozorov.lunchvoting.exceptions.NotFoundException;
 import ua.belozorov.lunchvoting.model.User;
 import ua.belozorov.lunchvoting.repository.user.UserRepository;
 
+import javax.persistence.RollbackException;
+import javax.validation.ConstraintViolationException;
 import java.util.Collection;
 
 import static java.util.Optional.ofNullable;
@@ -44,33 +48,41 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void update(User user) {
-        if ( ! userRepository.update(user)) {
-            throw new NotFoundException(user.getId(), User.class);
+    public void update(String id, String name, String email, String password) {
+        User persistedUser = userRepository.get(id);
+        if (persistedUser == null) {
+            throw new NotFoundException(id, User.class);
         }
+        User updatedUser = User.builder(persistedUser).name(name).email(email).password(password).build();
+        userRepository.update(updatedUser);
     }
 
     @Override
     @Transactional
     public User create(User user) {
         return userRepository.save(user);
+//        try {
+//        } catch (TransactionSystemException e) {
+//            if (e.getRootCause() != null && e.getRootCause() instanceof ConstraintViolationException) {
+//                throw new BadSyntaxException(BadSyntaxException.ErrorCode.ID_EXISTS);
+//            }
+//            throw e;
+//        }
     }
 
     @Override
     @Transactional
     public void activate(String id, boolean isActive) {
-        if ( ! userRepository.activate(id, isActive)) {
-            throw new NotFoundException(id, User.class);
-        }
+        User user = ofNullable(userRepository.get(id))
+                .orElseThrow(() -> new NotFoundException(id, User.class));
+        userRepository.update(user.setActivated(isActive));
     }
 
     @Override
     @Transactional
     public void setRoles(String id, byte bitmask) {
-        if ( ! userRepository.setRoles(id, bitmask)) {
-            throw new NotFoundException(id, User.class);
-        }
+        User user = ofNullable(userRepository.get(id))
+                .orElseThrow(() -> new NotFoundException(id, User.class));
+        userRepository.update(user.setRoles(bitmask));
     }
-
-
 }

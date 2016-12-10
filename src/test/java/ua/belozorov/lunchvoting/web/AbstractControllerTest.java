@@ -10,6 +10,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import ua.belozorov.lunchvoting.AbstractTest;
 import ua.belozorov.lunchvoting.config.RootConfig;
 import ua.belozorov.lunchvoting.config.WebConfig;
 
@@ -22,9 +23,7 @@ import javax.annotation.PostConstruct;
  */
 @ContextConfiguration(classes = {RootConfig.class, WebConfig.class})
 @WebAppConfiguration
-@RunWith(SpringJUnit4ClassRunner.class)
-@Sql(scripts = "classpath:db/populate_postgres.sql", config = @SqlConfig(encoding = "UTF-8"))
-public abstract class AbstractControllerTest {
+public abstract class AbstractControllerTest extends AbstractTest {
 
 //    private static final CharacterEncodingFilter CHARACTER_ENCODING_FILTER = new CharacterEncodingFilter();
 //
@@ -46,5 +45,4 @@ public abstract class AbstractControllerTest {
 //                .apply(springSecurity())
                 .build();
     }
-
 }

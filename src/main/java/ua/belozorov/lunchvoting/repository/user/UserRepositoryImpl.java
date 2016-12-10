@@ -1,10 +1,17 @@
 package ua.belozorov.lunchvoting.repository.user;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import ua.belozorov.lunchvoting.model.User;
+import ua.belozorov.lunchvoting.repository.BaseRepository;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * <h2></h2>
@@ -12,11 +19,10 @@ import java.util.Collection;
  * @author vabelozorov on 16.11.16.
  */
 @Repository
-public class UserRepositoryImpl implements UserRepository {
+public class UserRepositoryImpl extends BaseRepository implements UserRepository {
 
     @Autowired
     private CrudUserRepository crudRepository;
-
 
     @Override
     public User save(User user) {
@@ -24,8 +30,8 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public boolean update(User user) {
-        return crudRepository.update(user.getId(), user.getName(), user.getEmail(), user.getPassword()) != 0;
+    public void update(User user) {
+        crudRepository.save(user);
     }
 
     @Override
@@ -43,13 +49,19 @@ public class UserRepositoryImpl implements UserRepository {
         return crudRepository.deleteById(id) != 0;
     }
 
-    @Override
-    public boolean activate(String id, boolean isActive) {
-        return crudRepository.activate(id, isActive) != 0;
-    }
+    /**
+     * <h2></h2>
+     *
+     * @author vabelozorov on 16.11.16.
+     */
+    public interface CrudUserRepository extends JpaRepository<User, String> {
 
-    @Override
-    public boolean setRoles(String id, byte bitmask) {
-        return crudRepository.setRoles(id, bitmask) != 0;
+        @Override
+        @Query("SELECT u FROM User u ORDER BY u.email ASC")
+        List<User> findAll();
+
+        @Modifying
+        @Query("DELETE FROM User u WHERE u.id = ?1")
+        int deleteById(String id);
     }
 }

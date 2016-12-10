@@ -1,9 +1,7 @@
 package ua.belozorov.lunchvoting.config;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.PropertyAccessor;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.annotation.*;
+
 
 /**
  * Created by vabelozorov on 14.11.16.

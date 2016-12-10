@@ -12,15 +12,13 @@ public interface UserRepository {
 
     User save(User user);
 
-    boolean update(User user);
+//    void update(String id, String name, String email, String passowrd);
+
+    void update(User user);
 
     User get(String id);
 
     Collection<User> getAll();
 
     boolean delete(String id);
-
-    boolean activate(String id, boolean isActive);
-
-    boolean setRoles(String id, byte bitmask);
 }

@@ -1,16 +1,22 @@
 package ua.belozorov.lunchvoting.service.user;
 
+import org.hamcrest.core.IsInstanceOf;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import ua.belozorov.lunchvoting.exceptions.BadSyntaxException;
+import ua.belozorov.lunchvoting.exceptions.InvalidUserRoleValueException;
 import ua.belozorov.lunchvoting.exceptions.NotFoundException;
 import ua.belozorov.lunchvoting.model.User;
 import ua.belozorov.lunchvoting.model.UserRole;
 import ua.belozorov.lunchvoting.service.AbstractServiceTest;
 import ua.belozorov.lunchvoting.service.user.UserService;
 
+import javax.validation.ConstraintViolationException;
 import java.util.*;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.isA;
 import static org.junit.Assert.*;
 import static ua.belozorov.lunchvoting.MatcherUtils.matchCollection;
 import static ua.belozorov.lunchvoting.MatcherUtils.matchSingle;
@@ -55,7 +61,7 @@ public class UserServiceTest extends AbstractServiceTest {
     public void update() throws Exception {
         User updated = userService.get(VOTER_ID);
         updated = User.builder(updated).password("newPassword").email("updated@email.com").build();
-        userService.update(updated);
+        userService.update(updated.getId(), updated.getName(), updated.getEmail(), updated.getPassword());
         assertThat(userService.get(VOTER_ID), matchSingle(updated, USER_COMPARATOR));
     }
 
@@ -85,14 +91,20 @@ public class UserServiceTest extends AbstractServiceTest {
         assertEquals(UserRole.toUserRoles(userService.get(VOTER_ID).getRoles()), expectedRoles);
     }
 
+    @Test(expected = InvalidUserRoleValueException.class)
+    public void testInvalidRolesValue() {
+        userService.setRoles(VOTER_ID, (byte) 4);
+    }
+
     @Test(expected = NotFoundException.class)
     public void getNotExisting() {
         userService.get("NotExistingId");
     }
 
-    @Test //TODO
+    @Test(expected = NotFoundException.class)
     public void updateNotExisting() {
-
+        User updated = User.builder().id("NOT_EXISTING_ID").password("newPassword").email("updated@email.com").build();
+        userService.update(updated.getId(), updated.getName(), updated.getEmail(), updated.getPassword());
     }
 
     @Test(expected = NotFoundException.class)
@@ -100,9 +112,9 @@ public class UserServiceTest extends AbstractServiceTest {
         userService.delete("NotExistingId");
     }
 
-    @Test //TODO
+    @Test(expected = BadSyntaxException.class)
     public void createDuplicate() {
-
+        User duplicate = User.builder().id(VOTER_ID).password("newPassword").email("updated@email.com").build();
+        userService.create(duplicate);
     }
-
 }

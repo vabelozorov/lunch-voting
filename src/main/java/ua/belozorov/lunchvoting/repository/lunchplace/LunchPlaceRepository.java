@@ -2,8 +2,12 @@ package ua.belozorov.lunchvoting.repository.lunchplace;
 
 import ua.belozorov.lunchvoting.model.User;
 import ua.belozorov.lunchvoting.model.lunchplace.LunchPlace;
+import ua.belozorov.lunchvoting.model.lunchplace.Menu;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * <h2></h2>
@@ -12,13 +16,17 @@ import java.util.Collection;
  */
 public interface LunchPlaceRepository {
 
-    LunchPlace save(LunchPlace lunchPlace, String userId);
+    void save(LunchPlace lunchPlace);
 
     LunchPlace update(LunchPlace lunchPlace, String userId);
 
     LunchPlace get(String id, String userId);
 
+    LunchPlace getWithPhones(String id, String userId);
+
     Collection<LunchPlace> getAll(String userId);
 
     boolean delete(String id, String userId);
+
+    List<LunchPlace> getByMenusForDate(LocalDate date);
 }

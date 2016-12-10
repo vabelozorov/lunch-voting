@@ -1,5 +1,7 @@
 package ua.belozorov.lunchvoting.model.base;
 
+import org.hibernate.validator.constraints.NotBlank;
+
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.Version;
@@ -35,6 +37,7 @@ public abstract class AbstractPersistableObject implements Persistable {
      * The JPA provider must not manage ID creation.
      */
     @Id
+    @NotBlank
     protected final String id;
 
     /**
@@ -74,13 +77,12 @@ public abstract class AbstractPersistableObject implements Persistable {
 
         AbstractPersistableObject that = (AbstractPersistableObject) o;
 
-        return id != null ? id.equals(that.id) : that.id == null;
-
+        return id.equals(that.id);
     }
 
     @Override
     public int hashCode() {
-        return id != null ? id.hashCode() : super.hashCode();
+        return id.hashCode();
     }
 //
 //

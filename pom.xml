@@ -11,29 +11,35 @@
     <name>Lunch Voting</name>
 
     <properties>
+        <!-- General -->
         <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
+        <!-- Spring -->
         <spring.version>4.3.4.RELEASE</spring.version>
         <spring-security.version>4.1.3.RELEASE</spring-security.version>
         <spring-data-jpa.version>1.10.4.RELEASE</spring-data-jpa.version>
-        <jackson-json.version>2.8.4</jackson-json.version>
-        <tomcat.version>8.0.33</tomcat.version>
 
         <!-- Logging -->
         <logback.version>1.1.7</logback.version>
         <slf4j.version>1.7.21</slf4j.version>
 
-        <!--DB-->
+        <!-- DB -->
         <postgresql.version>9.4.1211</postgresql.version>
-        <!--    Tests  -->
+
+        <!-- Tests -->
         <junit.version>4.12</junit.version>
         <hamcrest.version>1.3</hamcrest.version>
 
         <!-- Hibernate -->
         <hibernate.version>5.2.2.Final</hibernate.version>
         <hibernate-validator.version>5.2.4.Final</hibernate-validator.version>
+
+        <!-- Misc -->
+        <jackson-json.version>2.8.4</jackson-json.version>
+        <tomcat.version>8.0.33</tomcat.version>
+        <model-mapper-version>0.7.5</model-mapper-version>
     </properties>
 
     <dependencies>
@@ -211,6 +217,12 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>1.16.10</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.modelmapper</groupId>
+            <artifactId>modelmapper</artifactId>
+            <version>${model-mapper-version}</version>
         </dependency>
 
     </dependencies>

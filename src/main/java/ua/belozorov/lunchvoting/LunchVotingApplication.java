@@ -1,5 +1,7 @@
 package ua.belozorov.lunchvoting;
 
+import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 import ua.belozorov.lunchvoting.config.RootConfig;
 import ua.belozorov.lunchvoting.config.WebConfig;
@@ -23,5 +25,12 @@ public class LunchVotingApplication extends AbstractAnnotationConfigDispatcherSe
     @Override
     protected String[] getServletMappings() {
         return new String[] {"/"};
+    }
+
+    @Override
+    protected WebApplicationContext createRootApplicationContext() {
+        WebApplicationContext rootApplicationContext = super.createRootApplicationContext();
+        ((ConfigurableEnvironment)rootApplicationContext.getEnvironment()).setActiveProfiles(SPRING_PROFILES.DEVELOPMENT);
+        return rootApplicationContext;
     }
 }

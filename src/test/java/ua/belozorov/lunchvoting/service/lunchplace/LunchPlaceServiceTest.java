@@ -3,7 +3,6 @@ package ua.belozorov.lunchvoting.service.lunchplace;
 import org.hibernate.exception.ConstraintViolationException;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import ua.belozorov.lunchvoting.MatcherUtils;
 import ua.belozorov.lunchvoting.exceptions.NotFoundException;
 import ua.belozorov.lunchvoting.model.lunchplace.LunchPlace;
@@ -55,14 +54,12 @@ public class LunchPlaceServiceTest extends AbstractServiceTest {
         expectedTo.setPhones(phones);
         assertThat(actualTo, MatcherUtils.matchByToString(expectedTo));
 
-        LunchPlace expected = LunchPlace.builder(LunchPlaceTransformer.toEntity(expectedTo))
+        LunchPlace expected = LunchPlace.builder(LunchPlaceTransformer.toEntity(expectedTo, GOD_ID))
                                             .id(actualTo.getId())
                                             .phones(phones)
                                             .build();
-        expected.setAdmin(ADMIN);
-
         assertThat(
-                repository.get(actualTo.getId(), GOD_ID),
+                repository.getWithPhones(actualTo.getId(), GOD_ID),
                 matchSingle(expected, LUNCH_PLACE_COMPARATOR)
         );
     }
@@ -73,10 +70,10 @@ public class LunchPlaceServiceTest extends AbstractServiceTest {
                 Collections.singletonList("0481234567"));
         service.update(expectedTo, ADMIN);
 
-        LunchPlace expected = LunchPlaceTransformer.toEntity(expectedTo);
+        LunchPlace expected = LunchPlaceTransformer.toEntity(expectedTo, ADMIN_ID);
 
         assertThat(
-                repository.get(PLACE2_ID, ADMIN_ID),
+                repository.getWithPhones(PLACE2_ID, ADMIN_ID),
                 matchSingle(expected, LUNCH_PLACE_COMPARATOR)
         );
     }
@@ -132,5 +129,4 @@ public class LunchPlaceServiceTest extends AbstractServiceTest {
         thrown.expectCause(isA(ConstraintViolationException.class));
         service.create(expectedTo, ADMIN);
     }
-
 }

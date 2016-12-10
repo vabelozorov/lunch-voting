@@ -44,10 +44,14 @@ public class JsonUtils {
     }
 
     public static <T> T mvcResultToObject(MvcResult result, Class<T> responseType) throws IOException {
-        return mapper.readValue(result.getResponse().getContentAsString(), responseType);
+        return strToObject(result.getResponse().getContentAsString(), responseType);
     }
 
     public static <T> T mvcResultToObject(MvcResult result, TypeReference<T> ref) throws IOException {
         return mapper.readValue(result.getResponse().getContentAsString(), ref);
+    }
+
+    public static <T> T strToObject(String jsonString, Class<T> responseType) throws IOException {
+        return mapper.readValue(jsonString, responseType);
     }
 }

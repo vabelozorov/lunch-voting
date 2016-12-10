@@ -2,10 +2,13 @@ package ua.belozorov.lunchvoting.model;
 
 import lombok.Builder;
 import lombok.Getter;
+import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotEmpty;
+import org.hibernate.validator.constraints.Range;
+import ua.belozorov.lunchvoting.exceptions.InvalidUserRoleValueException;
 import ua.belozorov.lunchvoting.model.base.AbstractPersistableObject;
 import ua.belozorov.lunchvoting.model.lunchplace.LunchPlace;
 
@@ -19,9 +22,10 @@ import java.util.Collection;
  *
  * @author vabelozorov on 15.11.16.
  */
+@Getter
 @Entity
 @Table(name = "users")
-@Getter
+@DynamicUpdate
 public class User extends AbstractPersistableObject {
 
     @Column(name = "name", nullable = false)
@@ -37,6 +41,7 @@ public class User extends AbstractPersistableObject {
     private final String password;
 
     @Column(name = "roles", nullable = false)
+    @Range(max = 3)
     private final byte roles;
 
     @Column(name = "registeredDate", nullable = false, updatable = false)
@@ -47,7 +52,7 @@ public class User extends AbstractPersistableObject {
 
     /**
      * Primarily for Hibernate. Constructs a User instance with default values. Providing {@code null} as an ID
-     * will result in the object retaining its auto-generated ID.
+     * will getByPollItem in the object retaining its auto-generated ID.
      */
     protected User() {
         this(null, null, null, null);
@@ -86,9 +91,16 @@ public class User extends AbstractPersistableObject {
         this.name = name;
         this.email = email;
         this.password = password;
+        if (roles < 0 || roles > 3) {
+            throw new InvalidUserRoleValueException("Roles must be between 0 and 3 included");
+        }
         this.roles = roles;
         this.registeredDate = registeredDate;
         this.activated = activated;
+    }
+
+    public User setActivated(boolean activated) {
+        return builder(this).activated(activated).build();
     }
 
     @Override
@@ -110,6 +122,10 @@ public class User extends AbstractPersistableObject {
 
     public static UserBuilder builder() {
         return new UserBuilder();
+    }
+
+    public User setRoles(byte bitmask) {
+        return User.builder(this).roles(bitmask).build();
     }
 
     public static class UserBuilder {
