@@ -10,10 +10,7 @@ import ua.belozorov.lunchvoting.model.base.AbstractPersistableObject;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 import static java.util.Optional.ofNullable;
 
@@ -34,7 +31,8 @@ public class Menu extends AbstractPersistableObject {
     @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name = "dishes", joinColumns = @JoinColumn(name = "menu_id"))
     @NotEmpty
-    private final List<Dish> dishes;
+    @OrderBy("position")
+    private final SortedSet<Dish> dishes;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "place_id")
@@ -69,10 +67,10 @@ public class Menu extends AbstractPersistableObject {
      * @param dishes must not be empty collection or null. Empty menu does not make much sense
      * @param lunchPlace
      */
-    private Menu(String id, Integer version, LocalDate effectiveDate, List<Dish> dishes, LunchPlace lunchPlace) {
+    private Menu(String id, Integer version, LocalDate effectiveDate, Collection<Dish> dishes, LunchPlace lunchPlace) {
         super(id, version);
         this.effectiveDate = effectiveDate == null ? LocalDate.now() : effectiveDate;
-        this.dishes = Objects.requireNonNull(dishes);
+        this.dishes = Objects.requireNonNull(new TreeSet<>(dishes));
         this.lunchPlace = Objects.requireNonNull(lunchPlace);
     }
 
@@ -91,7 +89,7 @@ public class Menu extends AbstractPersistableObject {
 
     public static class MenuBuilder {
         private LocalDate effectiveDate;
-        private List<Dish> dishes;
+        private SortedSet<Dish> dishes;
         private LunchPlace lunchPlace;
         private Integer version;
         private String id;

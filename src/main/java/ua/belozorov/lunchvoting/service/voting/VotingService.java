@@ -1,7 +1,6 @@
 package ua.belozorov.lunchvoting.service.voting;
 
 import ua.belozorov.lunchvoting.model.voting.Poll;
-import ua.belozorov.lunchvoting.model.voting.PollItem;
 import ua.belozorov.lunchvoting.model.voting.PollingTimeInterval;
 
 /**
@@ -13,11 +12,11 @@ public interface VotingService {
 
     void setPollingDefaultInterval(PollingTimeInterval interval);
 
-    Poll createPollForTodayMenus();
+    String createPollForTodayMenus();
 
     PollingTimeInterval getDefaultPollInterval();
 
     void vote(String voterId, String pollId, String pollItemId);
 
-    PollItem getPollItemDetails(String pollId, String pollItemId);
+    Poll getPollItemDetails(String pollId, String pollItemId);
 }

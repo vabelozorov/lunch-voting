@@ -1,8 +1,13 @@
-DELETE FROM dishes;
-DELETE FROM menus;
+DELETE FROM voting_config;
 DELETE FROM phones;
+DELETE FROM dishes;
+DELETE FROM votes;
+DELETE FROM menus;
+DELETE FROM poll_items;
 DELETE FROM places;
 DELETE FROM users;
+DELETE FROM polls;
+
 
 INSERT INTO users (id, name, email, password, roles, registereddate, activated) VALUES
   ('VOTER_ID', 'Синий Гном', 'voter@email.com', 'voterpass', 1, '2016-11-17 13:00:00', TRUE),

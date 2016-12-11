@@ -25,24 +25,24 @@ import static ua.belozorov.lunchvoting.testdata.LunchPlaceTestData.PLACE4;
  */
 public class MenuTestData {
     public static final Menu MENU1 = PLACE4.createMenu(LocalDate.now().minusDays(1), Arrays.asList(
-            new Dish("Fish", 11.11f),
-            new Dish("Soup", 12.12f),
-            new Dish("Apple Juice", 13.11f)
+            new Dish("Fish", 11.11f, 0),
+            new Dish("Soup", 12.12f, 1),
+            new Dish("Apple Juice", 13.11f, 2)
     ));
-    public static final Menu MENU2 = PLACE4.createMenu(LocalDate.now(), Collections.singletonList(
-            new Dish("Potato", 21.12f)
+    public static final Menu MENU2 = PLACE4.createMenu(LocalDate.now().minusDays(2), Collections.singletonList(
+            new Dish("Potato", 21.12f, 1)
     ));
     public static final Menu MENU3 = PLACE4.createMenu(LocalDate.now(), Collections.singletonList(
-            new Dish("Tomato", 31.13f)
+            new Dish("Tomato", 31.13f, 1)
     ));
     public static final Menu MENU4 = PLACE4.createMenu(LocalDate.now(), Collections.singletonList(
-            new Dish("Ice cubes", 41.00f)
+            new Dish("Ice cubes", 41.00f, 1)
     ));
-    public static final Menu MENU5 = PLACE3.createMenu(LocalDate.now().minusDays(1), Collections.singletonList(
-            new Dish("Marshmallow", 51.00f)
+    public static final Menu MENU5 = PLACE3.createMenu(LocalDate.now(), Collections.singletonList(
+            new Dish("Marshmallow", 51.00f, 1)
     ));
     public static final Menu MENU6 = PLACE3.createMenu(LocalDate.now().minusDays(1),  Collections.singletonList(
-            new Dish("Green Grass", 61.00f)
+            new Dish("Green Grass", 61.00f, 1)
     ));
 
     public static final Collection<Menu> MENUS = Collections.unmodifiableCollection(
@@ -63,8 +63,8 @@ public class MenuTestData {
         private final String DELETE_TABLES = "DELETE FROM dishes;\nDELETE FROM menus;\n\n";
         private final String INSERT_MENU   = "INSERT INTO menus (id, effective_date, place_id) VALUES";
         private final String MENU_ENTRY    = "\n  ('%s', '%s', '%s'),";
-        private final String INSERT_DISH   = "INSERT INTO dishes (menu_id, name, price) VALUES";
-        private final String DISH_ENTRY    = "\n  ('%s', '%s', '%.2f'),";
+        private final String INSERT_DISH   = "INSERT INTO dishes (menu_id, name, price, position) VALUES";
+        private final String DISH_ENTRY    = "\n  ('%s', '%s', '%.2f', %d),";
         private final String STATEMENT_END = ";\n\n";
 
         public Resource convert(Collection<Menu> menus) {
@@ -75,7 +75,7 @@ public class MenuTestData {
                 String menuSqlValue = String.format(MENU_ENTRY, m.getId(), m.getEffectiveDate().format(FORMATTER), m.getLunchPlace().getId());
                 menuBuilder.append(menuSqlValue);
                 for (Dish d : m.getDishes()) {
-                    String dishSqlValue = String.format(DISH_ENTRY, m.getId(), d.getName(), d.getPrice());
+                    String dishSqlValue = String.format(DISH_ENTRY, m.getId(), d.getName(), d.getPrice(), d.getPosition());
                     dishBuilder.append(dishSqlValue);
                 }
             }

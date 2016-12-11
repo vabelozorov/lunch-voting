@@ -40,12 +40,7 @@ public class MenuControllerTest extends AbstractControllerTest {
     @Autowired
     private MenuRepository repository;
 
-    private ResourceDatabasePopulator populator = new ResourceDatabasePopulator(MenuTestData.MENU_SQL_RESOURCE);
 
-    @Before
-    public void beforeTest() {
-        DatabasePopulatorUtils.execute(populator, dataSource);
-    }
 
     @Test
     public void testCreate() throws Exception {

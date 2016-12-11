@@ -1,5 +1,7 @@
 package ua.belozorov.lunchvoting.model.voting;
 
+import lombok.AccessLevel;
+import lombok.Getter;
 import org.hibernate.annotations.*;
 import ua.belozorov.lunchvoting.exceptions.MultipleVoteException;
 import ua.belozorov.lunchvoting.exceptions.NotFoundException;
@@ -10,13 +12,13 @@ import ua.belozorov.lunchvoting.model.lunchplace.LunchPlace;
 
 import javax.persistence.*;
 import javax.persistence.Entity;
+import javax.persistence.OrderBy;
 import javax.persistence.Table;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 /**
  * <h2></h2>
@@ -26,6 +28,7 @@ import java.util.stream.Collectors;
 @Entity
 @Table(name = "polls")
 @Immutable
+@Getter(AccessLevel.PACKAGE)
 //@Getter(AccessLevel.PACKAGE)
 //@FetchProfiles({
 //        @FetchProfile(name = "POLL", fetchOverrides = {
@@ -39,8 +42,9 @@ public final class Poll extends AbstractPersistableObject {
 
     private final TimeConstraint timeConstraint;
 
-    @OneToMany(fetch = FetchType.LAZY)
-    private final List<PollItem> pollItems;
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "poll")
+    @OrderBy("position ASC")
+    private final SortedSet<PollItem> pollItems;
 
     @Transient
     private final Collection<Consumer<VoteIntention>> pollValidators;
@@ -52,7 +56,10 @@ public final class Poll extends AbstractPersistableObject {
      * Meant for Spring and JPA
      */
     protected Poll() {
-        this(null, null, null, null);
+       this.timeConstraint = null;
+       this.pollItems = null;
+       this.pollValidators = getPollValidators();
+       this.voteChangeValidators = getVoteChangeValidators();
     }
 
     public Poll(List<LunchPlace> lunchPlaces) {
@@ -78,7 +85,7 @@ public final class Poll extends AbstractPersistableObject {
         this.voteChangeValidators = getVoteChangeValidators();
     }
 
-    private List<PollItem> convertToPollItems(List<LunchPlace> lunchPlaces) {
+    private SortedSet<PollItem> convertToPollItems(List<LunchPlace> lunchPlaces) {
         if (lunchPlaces == null) {
             lunchPlaces = Collections.emptyList();
         }
@@ -86,7 +93,7 @@ public final class Poll extends AbstractPersistableObject {
         for (int i = 0; i < lunchPlaces.size(); i++) {
             pollItems.add(new PollItem(i, lunchPlaces.get(i), this));
         }
-        return Collections.unmodifiableList(pollItems);
+        return new TreeSet<>(pollItems);
     }
 
     private Collection<Consumer<VoteIntention>> getPollValidators() {
@@ -177,7 +184,7 @@ public final class Poll extends AbstractPersistableObject {
 //        return collector.getByPollItem();
 //    }
 
-    List<PollItem> getPollItems() {
+    public SortedSet<PollItem> getPollItems() {
         return this.pollItems;
     }
 }

@@ -30,7 +30,7 @@ public interface PollingRepository {
 
     PollItem getPollItem(String pollId, String pollItemId);
 
-    PollItem getPollItemWithPoll(String pollId, String pollItemId);
+    Poll getPollAndPollItem(String pollId, String pollItemId);
 
     void saveVote(Vote vote);
 

@@ -45,12 +45,12 @@ public class VotingServiceImpl implements VotingService {
      * @return Poll
      */
     @Override
-    public Poll createPollForTodayMenus() {
+    public String createPollForTodayMenus() {
         List<LunchPlace> todayMenus = lunchPlaceRepository.getByMenusForDate(LocalDate.now());
         Poll poll = new Poll(todayMenus);
         pollingRepository.savePoll(poll);
         //TODO scheduled job?
-        return pollingRepository.getPollAndEmptyPollItems(poll.getId());
+        return poll.getId();
     }
 
     @Override
@@ -71,7 +71,7 @@ public class VotingServiceImpl implements VotingService {
     }
 
     @Override
-    public PollItem getPollItemDetails(String pollId, String pollItemId) {
-        return pollingRepository.getPollItemWithPoll(pollId, pollItemId);
+    public Poll getPollItemDetails(String pollId, String pollItemId) {
+        return pollingRepository.getPollAndPollItem(pollId, pollItemId);
     }
 }

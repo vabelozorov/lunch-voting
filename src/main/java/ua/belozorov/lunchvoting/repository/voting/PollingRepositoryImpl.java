@@ -1,12 +1,17 @@
 package ua.belozorov.lunchvoting.repository.voting;
 
+import org.hibernate.jpa.QueryHints;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+import ua.belozorov.lunchvoting.model.lunchplace.LunchPlace;
+import ua.belozorov.lunchvoting.model.lunchplace.Menu;
 import ua.belozorov.lunchvoting.model.voting.Poll;
 import ua.belozorov.lunchvoting.model.voting.PollItem;
 import ua.belozorov.lunchvoting.model.voting.PollingTimeInterval;
 import ua.belozorov.lunchvoting.model.voting.Vote;
 import ua.belozorov.lunchvoting.repository.BaseRepository;
 
+import javax.persistence.EntityGraph;
 import javax.persistence.Query;
 
 /**
@@ -48,7 +53,7 @@ public class PollingRepositoryImpl extends BaseRepository implements PollingRepo
 
     @Override
     public Vote getVoteInPoll(String voterId, String pollId) {
-        return em.createQuery("SELECT v FROM Vote v WHERE v.pollId= :pollId AND v.voterId= :voterId", Vote.class)
+        return em.createQuery("SELECT v FROM Vote v WHERE v.poll.id= :pollId AND v.voterId= :voterId", Vote.class)
                 .setParameter("pollId", pollId)
                 .setParameter("voterId", voterId)
                 .getSingleResult();
@@ -57,16 +62,24 @@ public class PollingRepositoryImpl extends BaseRepository implements PollingRepo
     @Override
     public PollItem getPollItem(final String pollId, final String pollItemId) {
         return em.createQuery("SELECT pi FROM PollItem pi JOIN FETCH LunchPlace lp JOIN FETCH lp.phones " +
-        "                               WHERE pi.id= :pollItemId AND pi.poll.id= :pollId", PollItem.class)
+                "WHERE pi.id= :pollItemId AND pi.poll.id= :pollId", PollItem.class)
                 .setParameter("pollItemId", pollItemId)
                 .setParameter("pollId", pollId).getSingleResult();
+
     }
 
-    @Override
-    public PollItem getPollItemWithPoll(String pollId, String pollItemId) {
-        return em.createQuery("SELECT pi FROM PollItem pi JOIN FETCH Poll WHERE pi.id= :pollItemId AND pi.poll.id= :pollId", PollItem.class)
+    @Override//TODO NOT DONE!!!!
+    @Transactional
+    public Poll getPollAndPollItem(String pollId, String pollItemId) {
+        Poll poll = em.createQuery("SELECT p FROM Poll p " +
+                "JOIN FETCH p.pollItems pi " +
+                "JOIN fetch pi.item items " +
+                "JOIN FETCH items.menus menus " +
+                "JOIN FETCH menus.dishes " +
+                "WHERE p.id= :pollId AND pi.id= :pollItemId", Poll.class)
                 .setParameter("pollItemId", pollItemId)
                 .setParameter("pollId", pollId).getSingleResult();
+        return poll;
     }
 
     @Override

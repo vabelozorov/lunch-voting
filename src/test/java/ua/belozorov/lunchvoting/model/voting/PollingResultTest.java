@@ -3,6 +3,7 @@ package ua.belozorov.lunchvoting.model.voting;
 import org.junit.Test;
 
 import java.time.LocalDateTime;
+import java.util.Iterator;
 
 import static org.junit.Assert.assertTrue;
 import static ua.belozorov.lunchvoting.testdata.LunchPlaceTestData.PLACES;
@@ -21,8 +22,9 @@ public class PollingResultTest {
         LocalDateTime start = LocalDateTime.now();
         LocalDateTime end = start.plusHours(2);
         Poll poll = new Poll(start, end, start, PLACES);
-        String firstPollItemId = poll.getPollItems().get(0).getId();
-        String secondPollItemId = poll.getPollItems().get(1).getId();
+        Iterator<PollItem> iterator = poll.getPollItems().iterator();
+        String firstPollItemId = iterator.next().getId();
+        String secondPollItemId = iterator.next().getId();
         String [] itemIds = new String[] {firstPollItemId, secondPollItemId};
 
         VoteCollector collector = new PollVoteCollector(poll);

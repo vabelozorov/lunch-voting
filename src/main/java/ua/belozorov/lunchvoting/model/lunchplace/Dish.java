@@ -12,16 +12,21 @@ import javax.persistence.Embeddable;
  */
 @Embeddable
 @Getter
-@Setter
-public class Dish {
+public final class Dish implements Comparable<Dish> {
     private String name;
     private float price;
+    private int position;
 
     protected Dish() {
     }
 
-    public Dish(String name, float price) {
+    public Dish(String name, float price, int position) {
         this.name = name;
         this.price = price;
+    }
+
+    @Override
+    public int compareTo(final Dish o) {
+        return Integer.compare(this.position, o.position);
     }
 }

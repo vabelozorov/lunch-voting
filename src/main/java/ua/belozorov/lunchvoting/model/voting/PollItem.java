@@ -1,5 +1,6 @@
 package ua.belozorov.lunchvoting.model.voting;
 
+import lombok.AccessLevel;
 import lombok.Getter;
 import ua.belozorov.lunchvoting.model.base.AbstractPersistableObject;
 import ua.belozorov.lunchvoting.model.lunchplace.LunchPlace;
@@ -13,10 +14,10 @@ import java.util.Objects;
  *
  * @author vabelozorov on 03.12.16.
  */
-@Getter
+@Getter(AccessLevel.PACKAGE)
 @Entity
 @Table(name = "poll_items")
-final public class PollItem extends AbstractPersistableObject {
+final public class PollItem extends AbstractPersistableObject implements Comparable<PollItem> {
 
     private final int position;
 
@@ -40,5 +41,10 @@ final public class PollItem extends AbstractPersistableObject {
         this.position = position;
         this.item = Objects.requireNonNull(item, "Error during initializing PollItem. LunchPlace must not be null");
         this.poll = Objects.requireNonNull(poll, "Error during initializing PollItem. Poll must not be null");
+    }
+
+    @Override
+    public int compareTo(final PollItem o) {
+        return Integer.compare(this.position, o.position);
     }
 }

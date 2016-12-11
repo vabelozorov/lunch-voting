@@ -40,7 +40,7 @@ public class LunchPlace extends AbstractPersistableObject {
     @Length(max = 1000)
     private final String description;
 
-    @ElementCollection(fetch = FetchType.LAZY)
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "phones", joinColumns = @JoinColumn(name = "place_id"))
     @Column(name = "phone")
     @LengthEach
@@ -78,6 +78,10 @@ public class LunchPlace extends AbstractPersistableObject {
         this.phones = Objects.requireNonNull(phones);
         this.menus = Objects.requireNonNull(menus);
         this.adminId = adminId;
+    }
+
+    public LunchPlace setMenus(Collection<Menu> menus) {
+        return builder(this).menus(menus).build();
     }
 
     @Override

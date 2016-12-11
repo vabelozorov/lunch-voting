@@ -43,9 +43,9 @@ public class VotingController {
      * @return
      */
     @GetMapping()
-    public ResponseEntity<Poll> getRunningMenuPoll() {
-        Poll poll = service.createPollForTodayMenus();
-        return new ResponseEntity<>(poll, HttpStatus.OK);
+    public ResponseEntity<String> getRunningMenuPoll() {
+        String pollId = service.createPollForTodayMenus();
+        return new ResponseEntity<>(pollId, HttpStatus.OK);
     }
 
 //    @GetMapping("/{placeId}")

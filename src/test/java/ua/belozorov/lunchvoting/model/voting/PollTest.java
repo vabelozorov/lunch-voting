@@ -8,6 +8,7 @@ import ua.belozorov.lunchvoting.exceptions.VoteChangeNotAllowedException;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import static org.junit.Assert.assertTrue;
@@ -25,7 +26,8 @@ public class PollTest {
     @Test(expected = IllegalStateException.class)
     public void testVerifyWrongPollId() throws Exception {
         Poll poll = new Poll(PLACES);
-        String firstPollItemId = poll.getPollItems().get(0).getId();
+        Iterator<PollItem> iterator = poll.getPollItems().iterator();
+        String firstPollItemId = iterator.next().getId();
         VoteIntention intention = new VoteIntention(VOTER_ID, "NOT_EXISTS_ID", firstPollItemId, null);
         poll.verify(intention);
     }
@@ -51,7 +53,8 @@ public class PollTest {
             start = LocalDateTime.now().plusHours(1);
             end = start.plusHours(2);
             poll = new Poll(start, end, start, PLACES);
-            firstPollItemId = poll.getPollItems().get(0).getId();
+            Iterator<PollItem> iterator = poll.getPollItems().iterator();
+            firstPollItemId = iterator.next().getId();
             intention = new VoteIntention(VOTER_ID, poll.getId(), firstPollItemId, null);
             poll.verify(intention);
         } catch (PollNotActiveException e) {
@@ -63,7 +66,8 @@ public class PollTest {
             start = LocalDateTime.now().minusDays(1);
             end = start.plusHours(2);
             poll = new Poll(start, end, start, PLACES);
-            firstPollItemId = poll.getPollItems().get(0).getId();
+           Iterator<PollItem> iterator = poll.getPollItems().iterator();
+           firstPollItemId = iterator.next().getId();
             intention = new VoteIntention(VOTER_ID, poll.getId(), firstPollItemId, null);
             poll.verify(intention);
         } catch (PollNotActiveException e) {
@@ -78,7 +82,8 @@ public class PollTest {
         LocalDateTime start = LocalDateTime.now();
         LocalDateTime end = start.plusHours(2);
         Poll poll = new Poll(start, end, start, PLACES);
-        String firstPollItemId = poll.getPollItems().get(0).getId();
+        Iterator<PollItem> iterator = poll.getPollItems().iterator();
+        String firstPollItemId = iterator.next().getId();
         VoteIntention intention = new VoteIntention(VOTER.getId(), poll.getId(), firstPollItemId, null);
         VoteDecision decision = poll.verify(intention);
         Vote vote = decision.getVote();
@@ -95,8 +100,9 @@ public class PollTest {
         LocalDateTime start = LocalDateTime.now();
         LocalDateTime end = start.plusHours(2);
         Poll poll = new Poll(start, end, start.plusHours(1), PLACES);
-        String firstPollItemId = poll.getPollItems().get(0).getId();
-        String secondPollItemId = poll.getPollItems().get(1).getId();
+        Iterator<PollItem> iterator = poll.getPollItems().iterator();
+        String firstPollItemId = iterator.next().getId();
+        String secondPollItemId = iterator.next().getId();
         VoteIntention intention = new VoteIntention(VOTER.getId(), poll.getId(), firstPollItemId, null);
         Vote vote = poll.verify(intention).getVote();
         VoteIntention secondVoteIntention = new VoteIntention(VOTER.getId(), poll.getId(), secondPollItemId, vote);
@@ -115,8 +121,9 @@ public class PollTest {
         LocalDateTime start = LocalDateTime.now().minusHours(2);
         LocalDateTime end = start.plusHours(3);
         Poll poll = new Poll(start, end, start.plusHours(1), PLACES);
-        String firstPollItemId = poll.getPollItems().get(0).getId();
-        String secondPollItemId = poll.getPollItems().get(1).getId();
+        Iterator<PollItem> iterator = poll.getPollItems().iterator();
+        String firstPollItemId = iterator.next().getId();
+        String secondPollItemId = iterator.next().getId();
         VoteIntention intention = new VoteIntention(VOTER.getId(), poll.getId(), firstPollItemId, null);
         Vote vote = poll.verify(intention).getVote();
         VoteIntention secondVoteIntention = new VoteIntention(VOTER.getId(), poll.getId(), secondPollItemId, vote);
@@ -128,7 +135,8 @@ public class PollTest {
         LocalDateTime start = LocalDateTime.now();
         LocalDateTime end = start.plusHours(2);
         Poll poll = new Poll(start, end, start.plusHours(1), PLACES);
-        String firstPollItemId = poll.getPollItems().get(0).getId();
+        Iterator<PollItem> iterator = poll.getPollItems().iterator();
+        String firstPollItemId = iterator.next().getId();
         VoteIntention intention = new VoteIntention(VOTER.getId(), poll.getId(), firstPollItemId, null);
         Vote vote = poll.verify(intention).getVote();
         VoteIntention secondVoteIntention = new VoteIntention(VOTER.getId(), poll.getId(), firstPollItemId, vote);

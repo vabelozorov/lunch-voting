@@ -1,5 +1,9 @@
 package ua.belozorov.lunchvoting.model.voting;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+
+import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -10,11 +14,15 @@ import java.util.Objects;
  * @author vabelozorov on 09.12.16.
  */
 @Embeddable
+@Getter(AccessLevel.PACKAGE)
 final class TimeConstraint {
+    @Column(name = "start_time")
     private final LocalDateTime startTime;
 
+    @Column(name = "end_time")
     private final LocalDateTime endTime;
 
+    @Column(name = "change_time")
     private final LocalDateTime voteChangeThreshold;
 
     protected TimeConstraint() {
