@@ -9,9 +9,7 @@ import ua.belozorov.lunchvoting.model.lunchplace.LunchPlace;
 import ua.belozorov.lunchvoting.model.lunchplace.Menu;
 import ua.belozorov.lunchvoting.repository.lunchplace.LunchPlaceRepository;
 import ua.belozorov.lunchvoting.repository.lunchplace.MenuRepository;
-import ua.belozorov.lunchvoting.to.LunchPlaceTo;
 import ua.belozorov.lunchvoting.to.MenuTo;
-import ua.belozorov.lunchvoting.to.transformers.LunchPlaceTransformer;
 
 import java.util.Collection;
 
@@ -34,30 +32,26 @@ public class LunchPlaceServiceImpl implements LunchPlaceService {
 
     @Override
     @Transactional
-    public LunchPlaceTo create(LunchPlaceTo placeTo, User user) {
-        LunchPlace place = LunchPlaceTransformer.toEntity(placeTo, user.getId());
+    public String create(LunchPlace place, User user) {
         lunchPlaceRepository.save(place);
-        return LunchPlaceTransformer.toDto(lunchPlaceRepository.getWithPhones(place.getId(), place.getAdminId()));
+        return place.getId();
     }
 
     @Override
     @Transactional
-    public void update(LunchPlaceTo placeTo, User user) {
-        LunchPlace place = LunchPlaceTransformer.toEntity(placeTo, user.getId());
+    public void update(LunchPlace place, User user) {
         lunchPlaceRepository.update(place, user.getId());
     }
 
     @Override
-    public LunchPlaceTo get(String id, User user) {
-        LunchPlace place = ofNullable(lunchPlaceRepository.getWithPhones(id, user.getId()))
+    public LunchPlace get(String id, User user) {
+        return ofNullable(lunchPlaceRepository.get(id, user.getId()))
                 .orElseThrow(() -> new NotFoundException(id, LunchPlace.class));
-        return LunchPlaceTransformer.toDto(place);
     }
 
     @Override
-    public Collection<LunchPlaceTo> getAll(User user) {
-        Collection<LunchPlace> places = lunchPlaceRepository.getAll(user.getId());
-        return LunchPlaceTransformer.collectionToDto(places);
+    public Collection<LunchPlace> getAll(User user) {
+        return lunchPlaceRepository.getAll(user.getId());
     }
 
     @Override
@@ -70,12 +64,12 @@ public class LunchPlaceServiceImpl implements LunchPlaceService {
 
     @Override
     @Transactional
-    public MenuTo addMenu(String lunchPlaceId, MenuTo menuTo, User user) {
-        LunchPlace place = ofNullable(lunchPlaceRepository.getWithPhones(lunchPlaceId, user.getId()))
+    public String addMenu(String lunchPlaceId, MenuTo menuTo, User user) {
+        LunchPlace place = ofNullable(lunchPlaceRepository.get(lunchPlaceId, user.getId()))
                                 .orElseThrow(() -> new NotFoundException(lunchPlaceId, LunchPlace.class));
         Menu created = place.createMenu(menuTo.getEffectiveDate(), menuTo.getDishes());
         menuRepository.save(created);
-        return new MenuTo(created.getId(), created.getEffectiveDate(), menuTo.getDishes(), place.getId());
+        return created.getId();
     }
 
     @Override

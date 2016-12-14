@@ -39,7 +39,16 @@
         <!-- Misc -->
         <jackson-json.version>2.8.4</jackson-json.version>
         <tomcat.version>8.0.33</tomcat.version>
-        <model-mapper-version>0.7.5</model-mapper-version>
+        <guava-version>20.0</guava-version>
+        <json-assert-version>1.4.0</json-assert-version>
+
+        <!-- Enver -->
+        <hibernate.connection.driver_class>com.p6spy.engine.spy.P6SpyDriver</hibernate.connection.driver_class>
+        <hibernate.dialect>org.hibernate.dialect.PostgreSQL94Dialect</hibernate.dialect>
+        <hibernate.connection.url><![CDATA[jdbc:p6spy:postgresql://localhost:5432/lunchvoting]]></hibernate.connection.url>
+        <hibernate.connection.username>user</hibernate.connection.username>
+        <hibernate.connection.password>password</hibernate.connection.password>
+
     </properties>
 
     <dependencies>
@@ -134,6 +143,14 @@
             <!--</exclusions>-->
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/org.hibernate/hibernate-envers -->
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-envers</artifactId>
+            <version>${hibernate.version}</version>
+        </dependency>
+
+
         <dependency>
             <groupId>org.apache.tomcat</groupId>
             <artifactId>tomcat-jdbc</artifactId>
@@ -174,6 +191,13 @@
             <artifactId>jackson-datatype-jsr310</artifactId>
             <version>${jackson-json.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.monitorjbl</groupId>
+            <artifactId>spring-json-view</artifactId>
+            <version>0.14</version>
+        </dependency>
+
+
 
         <!--Test-->
         <dependency>
@@ -192,6 +216,13 @@
             <groupId>org.hamcrest</groupId>
             <artifactId>hamcrest-all</artifactId>
             <version>${hamcrest.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.skyscreamer/jsonassert -->
+        <dependency>
+            <groupId>org.skyscreamer</groupId>
+            <artifactId>jsonassert</artifactId>
+            <version>${json-assert-version}</version>
             <scope>test</scope>
         </dependency>
 
@@ -217,12 +248,13 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>1.16.10</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
-            <groupId>org.modelmapper</groupId>
-            <artifactId>modelmapper</artifactId>
-            <version>${model-mapper-version}</version>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${guava-version}</version>
         </dependency>
 
     </dependencies>
@@ -259,6 +291,18 @@
         <finalName>topjava</finalName>
         <defaultGoal>package</defaultGoal>
         <plugins>
+            <!--<plugin>-->
+                <!--<groupId>de.juplo</groupId>-->
+                <!--<artifactId>hibernate-maven-plugin</artifactId>-->
+                <!--<version>2.0.0</version>-->
+                <!--<executions>-->
+                    <!--<execution>-->
+                        <!--<goals>-->
+                            <!--<goal>create</goal>-->
+                        <!--</goals>-->
+                    <!--</execution>-->
+                <!--</executions>-->
+            <!--</plugin>-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>

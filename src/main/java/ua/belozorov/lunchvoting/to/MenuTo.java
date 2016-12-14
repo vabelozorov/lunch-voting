@@ -1,9 +1,6 @@
 package ua.belozorov.lunchvoting.to;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import ua.belozorov.lunchvoting.model.lunchplace.Dish;
 import ua.belozorov.lunchvoting.model.lunchplace.LunchPlace;
 import ua.belozorov.lunchvoting.model.lunchplace.Menu;
@@ -19,9 +16,9 @@ import java.util.List;
  */
 @Getter
 @Setter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class MenuTo {
+public final class MenuTo {
     private String id;
     private LocalDate effectiveDate;
     private List<Dish> dishes;

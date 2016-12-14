@@ -21,6 +21,7 @@ import java.util.Objects;
 public final class Vote extends AbstractPersistableObject {
 
     @NotNull
+    @Column(name = "voter_id")
     private final String voterId;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -33,6 +34,7 @@ public final class Vote extends AbstractPersistableObject {
     @NotNull
     private final Poll poll;
 
+    @Column(name = "vote_time")
     @NotNull
     private final LocalDateTime voteTime;
 

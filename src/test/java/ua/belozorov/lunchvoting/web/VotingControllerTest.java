@@ -38,6 +38,6 @@ public class VotingControllerTest extends AbstractControllerTest {
                 .andExpect(status().isOk())
                 .andReturn();
 
-        Poll poll = JsonUtils.mvcResultToObject(result, Poll.class);
+        Poll poll = jsonUtils.fromMvcResultBody(result, Poll.class);
     }
 }

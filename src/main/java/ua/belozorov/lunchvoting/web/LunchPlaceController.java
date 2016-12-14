@@ -1,14 +1,21 @@
 package ua.belozorov.lunchvoting.web;
 
+import com.monitorjbl.json.JsonResult;
+import com.monitorjbl.json.JsonView;
+import com.monitorjbl.json.Match;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import ua.belozorov.lunchvoting.AuthorizedUser;
+import ua.belozorov.lunchvoting.model.lunchplace.LunchPlace;
 import ua.belozorov.lunchvoting.service.lunchplace.LunchPlaceService;
 import ua.belozorov.lunchvoting.to.LunchPlaceTo;
+import ua.belozorov.lunchvoting.to.transformers.DtoIntoEntity;
 
-import java.util.Collection;
+import java.net.URI;
+import java.util.*;
 
 /**
  * <h2></h2>
@@ -17,11 +24,25 @@ import java.util.Collection;
  */
 @RestController
 @RequestMapping(LunchPlaceController.REST_URL)
-public class LunchPlaceController {
+public class LunchPlaceController extends AbstractController {
     static final String REST_URL = "/places";
 
+    static final List<String> EXCLUDED_FIELDS = new LinkedList<>(
+            Arrays.asList("version", "adminId", "menus")
+    );
+
+    static final List<String> INCLUDED_FIELDS = new LinkedList<>(
+            Arrays.asList("id")
+    );
+
+    private final LunchPlaceService placeService;
+
+
     @Autowired
-    private LunchPlaceService placeService;
+    public LunchPlaceController(final LunchPlaceService placeService, final JsonResult json) {
+        super(json);
+        this.placeService = placeService;
+    }
 
     /**
      *
@@ -40,9 +61,12 @@ public class LunchPlaceController {
      * @return LunchPlace object with id assigned and Http 201 code on success
      */
     @PostMapping
-    public ResponseEntity<LunchPlaceTo> create(@RequestBody LunchPlaceTo placeTo) {
-        LunchPlaceTo created = placeService.create(placeTo, AuthorizedUser.get());
-        return new ResponseEntity<>(created, HttpStatus.CREATED);
+    public ResponseEntity create(@RequestBody LunchPlaceTo placeTo) {
+        LunchPlace place = DtoIntoEntity.toLunchPlace(placeTo, AuthorizedUser.get().getId());
+        String id = placeService.create(place, AuthorizedUser.get());
+        URI uri = ServletUriComponentsBuilder.fromCurrentContextPath()
+                .path(REST_URL + "/{id}").buildAndExpand(id).toUri();
+        return ResponseEntity.created(uri).build();
     }
 
     /**
@@ -64,7 +88,8 @@ public class LunchPlaceController {
      */
     @PutMapping
     public ResponseEntity update(@RequestBody LunchPlaceTo placeTo) {
-        placeService.update(placeTo, AuthorizedUser.get());
+        LunchPlace place = DtoIntoEntity.toLunchPlace(placeTo, AuthorizedUser.get().getId());
+        placeService.update(place, AuthorizedUser.get());
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
@@ -81,16 +106,19 @@ public class LunchPlaceController {
      * @param id id of the place
      * @return
      */
-    @GetMapping("/{id}")
-    public ResponseEntity<LunchPlaceTo> get(@PathVariable String id) {
-        LunchPlaceTo placeTo = placeService.get(id, AuthorizedUser.get());
-        return new ResponseEntity<>(placeTo, HttpStatus.OK);
+    @GetMapping(value = "/{id}")
+    public ResponseEntity<LunchPlace> get(@PathVariable String id,
+                                          @RequestParam Optional<String> fields) {
+        LunchPlace place = placeService.get(id, AuthorizedUser.get());
+        jsonFilter(place, fields);
+        return ResponseEntity.ok(place);
     }
 
     @GetMapping
-    public ResponseEntity<Collection<LunchPlaceTo>> getAll() {
-        Collection<LunchPlaceTo> places = placeService.getAll(AuthorizedUser.get());
-        return new ResponseEntity<>(places, HttpStatus.OK);
+    public ResponseEntity<Collection<LunchPlace>> getAll(@RequestParam Optional<String> fields) {
+        Collection<LunchPlace> places = placeService.getAll(AuthorizedUser.get());
+        jsonFilter(places, fields);
+        return ResponseEntity.ok(places);
     }
 
     @DeleteMapping("/{id}")
@@ -99,5 +127,7 @@ public class LunchPlaceController {
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
-
+    private void jsonFilter(Object object, Optional<String> includeFieldsString) {
+        super.jsonFilter(object, includeFieldsString, INCLUDED_FIELDS, EXCLUDED_FIELDS);
+    }
 }

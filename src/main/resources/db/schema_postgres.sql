@@ -1,6 +1,6 @@
 DROP TABLE IF EXISTS voting_config;
-DROP TABLE IF EXISTS phones;
 DROP TABLE IF EXISTS dishes;
+DROP TABLE IF EXISTS phones;
 DROP TABLE IF EXISTS votes;
 DROP TABLE IF EXISTS menus;
 DROP TABLE IF EXISTS poll_items;
@@ -34,7 +34,8 @@ CREATE TABLE IF NOT EXISTS places (
   name VARCHAR NOT NULL,
   address VARCHAR,
   description VARCHAR,
-  user_id VARCHAR(36) NOT NULL,
+  user_id VARCHAR(36),
+  phones VARCHAR(500),
   CONSTRAINT name_user_id_unique UNIQUE (name, user_id),
   FOREIGN KEY (user_id) REFERENCES users(id)
 );
@@ -45,7 +46,7 @@ CREATE TABLE IF NOT EXISTS poll_items (
   version INT NOT NULL DEFAULT 0,
   poll_id VARCHAR(36) NOT NULL ,
   position INT NOT NULL,
-  item_id VARCHAR(36) NOT NULL ,
+  item_id VARCHAR(36),
   FOREIGN KEY (poll_id) REFERENCES polls(id),
   FOREIGN KEY (item_id) REFERENCES places(id)
 );
@@ -61,12 +62,12 @@ CREATE TABLE IF NOT EXISTS menus (
 CREATE TABLE IF NOT EXISTS votes (
   id VARCHAR(36) NOT NULL PRIMARY KEY,
   version INT NOT NULL DEFAULT 0,
-  user_id VARCHAR(36) NOT NULL,
+  voter_id VARCHAR(36),
   poll_id VARCHAR(36) NOT NULL,
-  item_id VARCHAR(36) NOT NULL,
-  voteTime TIMESTAMP NOT NULL,
-  FOREIGN KEY (user_id) REFERENCES users(id),
-  FOREIGN KEY (poll_id) REFERENCES polls(id),
+  item_id VARCHAR(36),
+  vote_time TIMESTAMP NOT NULL,
+  FOREIGN KEY (voter_id) REFERENCES users(id),
+  FOREIGN KEY (poll_id) REFERENCES polls(id) ON DELETE CASCADE,
   FOREIGN KEY (item_id) REFERENCES places(id)
 );
 
@@ -78,13 +79,6 @@ CREATE TABLE IF NOT EXISTS dishes (
   CONSTRAINT entry_unique UNIQUE (menu_id, name, price),
   FOREIGN KEY (menu_id) REFERENCES menus(id) ON DELETE CASCADE
 );
-
-CREATE TABLE IF NOT EXISTS phones (
-  place_id VARCHAR(36) NOT NULL,
-  phone VARCHAR NOT NULL,
-  PRIMARY KEY (place_id, phone)
-);
-
 
 CREATE TABLE IF NOT EXISTS voting_config (
   poll_start_time TIME NOT NULL DEFAULT '09:00',

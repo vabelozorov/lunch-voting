@@ -42,12 +42,12 @@ public class UserManagementControllerTest extends AbstractControllerTest {
 
         MvcResult result = mockMvc
                 .perform(post(REST_URL)
-                        .content(JsonUtils.toJson(userTo))
+                        .content(jsonUtils.toJson(userTo))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
                 .andReturn();
 
-        UserTo created = JsonUtils.mvcResultToObject(result, UserTo.class);
+        UserTo created = jsonUtils.fromMvcResultBody(result, UserTo.class);
         userTo.setId(created.getId());
         userTo.setRegisteredDate(created.getRegisteredDate());
 
@@ -61,7 +61,7 @@ public class UserManagementControllerTest extends AbstractControllerTest {
         userTo.setEmail("newEmail@email.com");
 
         mockMvc.perform(put(REST_URL)
-                        .content(JsonUtils.toJson(userTo))
+                        .content(jsonUtils.toJson(userTo))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
 
@@ -77,7 +77,7 @@ public class UserManagementControllerTest extends AbstractControllerTest {
                 .andExpect(status().isOk())
                 .andReturn();
 
-        UserTo actual = JsonUtils.mvcResultToObject(result, UserTo.class);
+        UserTo actual = jsonUtils.fromMvcResultBody(result, UserTo.class);
         UserTo expected = UserTransformer.toDto(VOTER);
         assertThat(actual, matchByToString(expected));
     }
@@ -88,7 +88,7 @@ public class UserManagementControllerTest extends AbstractControllerTest {
                 .andExpect(status().isOk())
                 .andReturn();
 
-        Collection<UserTo> actual = JsonUtils.mvcResultToObject(result, new TypeReference<Collection<UserTo>>() {});
+        Collection<UserTo> actual = jsonUtils.fromMvcResultBody(result, new TypeReference<Collection<UserTo>>() {});
         List<UserTo> expected = VOTERS.stream()
                 .map(UserTransformer::toDto)
                 .sorted(Comparator.comparing(UserTo::getEmail))
@@ -111,7 +111,7 @@ public class UserManagementControllerTest extends AbstractControllerTest {
     @Test
     public void activate() throws Exception {
         mockMvc.perform(put(REST_URL + "/" + VOTER_ID + "/activate")
-                            .content(JsonUtils.toJson("isActive", "false"))
+                            .content(jsonUtils.toJson("isActive", "false"))
                             .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
 
@@ -122,7 +122,7 @@ public class UserManagementControllerTest extends AbstractControllerTest {
     @Test
     public void setRights() throws Exception {
         mockMvc.perform(put(REST_URL + "/" + VOTER_ID + "/rights.set")
-                .content(JsonUtils.toJson("rights", "3"))
+                .content(jsonUtils.toJson("rights", "3"))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
 

@@ -40,13 +40,10 @@ public class DbConfig {
     public EntityManagerFactory entityManagerFactory(DataSource dataSource) {
         LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
         HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
+        vendorAdapter.setGenerateDdl(false);
         em.setDataSource(dataSource);
-        em.setPersistenceUnitName("AppPersistentUnit");
-        em.setPackagesToScan("ua.belozorov.lunchvoting.model");
+        em.setPackagesToScan("ua.belozorov.lunchvoting.model", "ua.belozorov.lunchvoting.util");
         em.setJpaVendorAdapter(vendorAdapter);
-        Properties jpaProperties = new Properties();
-        jpaProperties.put("hibernate.hbm2ddl.auto", env.getProperty("database.hbm2ddl.auto"));
-        em.setJpaProperties(jpaProperties);
         em.afterPropertiesSet();
         return em.getObject();
     }

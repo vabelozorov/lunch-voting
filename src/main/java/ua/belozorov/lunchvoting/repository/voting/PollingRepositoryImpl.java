@@ -1,5 +1,7 @@
 package ua.belozorov.lunchvoting.repository.voting;
 
+import org.hibernate.Hibernate;
+import org.hibernate.Session;
 import org.hibernate.jpa.QueryHints;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,7 +48,7 @@ public class PollingRepositoryImpl extends BaseRepository implements PollingRepo
 
     @Override
     public Poll getPollAndEmptyPollItems(String id) {
-        return em.createQuery("SELECT p FROM Poll p JOIN FETCH PollItem WHERE p.id= ?1", Poll.class)
+        return em.createQuery("SELECT p FROM Poll p JOIN FETCH PollItem pi WHERE p.id= ?1", Poll.class)
                 .setParameter(1, id)
                 .getSingleResult();
     }
@@ -61,24 +63,26 @@ public class PollingRepositoryImpl extends BaseRepository implements PollingRepo
 
     @Override
     public PollItem getPollItem(final String pollId, final String pollItemId) {
-        return em.createQuery("SELECT pi FROM PollItem pi JOIN FETCH LunchPlace lp JOIN FETCH lp.phones " +
+        return em.createQuery("SELECT pi FROM PollItem pi JOIN FETCH LunchPlace lp " +
                 "WHERE pi.id= :pollItemId AND pi.poll.id= :pollId", PollItem.class)
                 .setParameter("pollItemId", pollItemId)
                 .setParameter("pollId", pollId).getSingleResult();
 
     }
 
-    @Override//TODO NOT DONE!!!!
+    @Override
     @Transactional
     public Poll getPollAndPollItem(String pollId, String pollItemId) {
+
         Poll poll = em.createQuery("SELECT p FROM Poll p " +
                 "JOIN FETCH p.pollItems pi " +
-                "JOIN fetch pi.item items " +
-                "JOIN FETCH items.menus menus " +
-                "JOIN FETCH menus.dishes " +
-                "WHERE p.id= :pollId AND pi.id= :pollItemId", Poll.class)
+                "JOIN FETCH pi.item i " +
+                "JOIN FETCH i.menus m " +
+                "JOIN FETCH m.dishes " +
+                "WHERE p.id= :pollId AND pi.id = :pollItemId", Poll.class)
                 .setParameter("pollItemId", pollItemId)
                 .setParameter("pollId", pollId).getSingleResult();
+        em.clear();
         return poll;
     }
 

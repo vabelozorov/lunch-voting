@@ -46,6 +46,12 @@ public class UserRepositoryImpl extends BaseRepository implements UserRepository
 
     @Override
     public boolean delete(String id) {
+        em.createQuery("UPDATE Vote v SET v.voterId = null WHERE v.voterId = ?1")
+                .setParameter(1, id)
+                .executeUpdate();
+        em.createQuery("UPDATE LunchPlace lp SET lp.adminId = null WHERE lp.adminId = ?1")
+                .setParameter(1, id)
+                .executeUpdate();
         return crudRepository.deleteById(id) != 0;
     }
 

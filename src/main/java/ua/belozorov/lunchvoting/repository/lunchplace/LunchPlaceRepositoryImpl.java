@@ -9,7 +9,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import ua.belozorov.lunchvoting.exceptions.NotFoundException;
 import ua.belozorov.lunchvoting.model.lunchplace.LunchPlace;
-import ua.belozorov.lunchvoting.model.lunchplace.Menu;
 import ua.belozorov.lunchvoting.repository.BaseRepository;
 
 import javax.persistence.EntityManager;
@@ -31,17 +30,14 @@ public class LunchPlaceRepositoryImpl extends BaseRepository implements LunchPla
     @Autowired
     private CrudLunchPlaceRepository repository;
 
-    @PersistenceContext(name = "AppPersistentUnit")
-    private EntityManager em;
-
     @Override
     public void save(LunchPlace place) {
         reliablePersist(place);
     }
 
     @Override
-    public LunchPlace update(LunchPlace place, String userId) {
-        LunchPlace saved = ofNullable(getWithPhones(place.getId(), userId))
+    public void update(LunchPlace place, String userId) {
+        LunchPlace saved = ofNullable(get(place.getId(), userId))
                                 .orElseThrow(() -> new NotFoundException(place));
         saved = LunchPlace.builder(saved)
                 .name(place.getName())
@@ -49,22 +45,12 @@ public class LunchPlaceRepositoryImpl extends BaseRepository implements LunchPla
                 .description(place.getDescription())
                 .phones(place.getPhones())
                 .build();
-        return em.merge(saved);
-        /*
-        This unfortunately produces some weird UPDATE cross join syntactically wrong SQL statement (check CrudRepo)
-         */
-//        return repository.update(place.getName(), place.getAddress(), place.getDescription(), place.getPhones(),
-//                place.getId(), userId) != 0;
+        em.merge(saved);
     }
 
     @Override
     public LunchPlace get(String id, String userId) {
-        return repository.getOne(id, userId);
-    }
-
-    @Override
-    public LunchPlace getWithPhones(String id, String userId) {
-        return repository.getWithPhones(id, userId);
+        return repository.get(id, userId);
     }
 
     @Override
@@ -73,7 +59,11 @@ public class LunchPlaceRepositoryImpl extends BaseRepository implements LunchPla
     }
 
     @Override
+
     public boolean delete(String id, String userId) {
+        em.createQuery("UPDATE PollItem pi SET pi.item = null WHERE pi.item.id = ?1")
+                .setParameter(1, id)
+                .executeUpdate();
         return repository.deleteById(id, userId) != 0;
     }
 
@@ -90,10 +80,10 @@ public class LunchPlaceRepositoryImpl extends BaseRepository implements LunchPla
      */
     public interface CrudLunchPlaceRepository extends JpaRepository<LunchPlace, String> {
 
-        @Query("SELECT lp FROM LunchPlace lp JOIN FETCH lp.phones WHERE lp.id= :id and lp.adminId= :userId")
-        LunchPlace getWithPhones(@Param("id") String id, @Param("userId") String userId);
+        @Query("SELECT lp FROM LunchPlace lp WHERE lp.id= :id and lp.adminId= :userId")
+        LunchPlace get(@Param("id") String id, @Param("userId") String userId);
 
-        @Query("SELECT DISTINCT lp FROM LunchPlace lp JOIN FETCH lp.phones WHERE lp.adminId= ?1 ORDER BY lp.name ASC")
+        @Query("SELECT DISTINCT lp FROM LunchPlace lp WHERE lp.adminId= ?1 ORDER BY lp.name ASC")
         List<LunchPlace> findAll(String userId);
 
         @Modifying

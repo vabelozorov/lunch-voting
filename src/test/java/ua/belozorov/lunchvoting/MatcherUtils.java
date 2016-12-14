@@ -26,7 +26,7 @@ public class MatcherUtils {
         return new ModelMatcher<>(expected);
     }
 
-    public static <T> Matcher<T> matchSingle(T user, Comparator<T> comparator) {
-        return new ModelMatcher<>(comparator, user);
+    public static <T> Matcher<T> matchSingle(T expected, Comparator<T> comparator) {
+        return new ModelMatcher<>(comparator, expected);
     }
 }

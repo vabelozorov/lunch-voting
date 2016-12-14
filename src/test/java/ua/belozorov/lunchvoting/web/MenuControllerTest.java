@@ -1,19 +1,12 @@
 package ua.belozorov.lunchvoting.web;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
-import org.springframework.jdbc.datasource.init.DatabasePopulatorUtils;
-import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.test.web.servlet.MvcResult;
 import ua.belozorov.lunchvoting.JsonUtils;
-import ua.belozorov.lunchvoting.repository.lunchplace.LunchPlaceRepository;
 import ua.belozorov.lunchvoting.repository.lunchplace.MenuRepository;
 import ua.belozorov.lunchvoting.service.lunchplace.LunchPlaceService;
-import ua.belozorov.lunchvoting.testdata.MenuTestData;
-import ua.belozorov.lunchvoting.to.MenuTo;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -58,20 +51,15 @@ public class MenuControllerTest extends AbstractControllerTest {
             );
         };
 
-        String sentContent = JsonUtils.toJson(sent);
+        String sentContent = jsonUtils.toJson(sent);
 
         MvcResult result = mockMvc.perform(post(REST_URL + "/" + PLACE4_ID + "/menus/")
                 .content(sentContent)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
                 .andReturn();
-        MenuTo actual = JsonUtils.mvcResultToObject(result, MenuTo.class);
-        MenuTo expected = JsonUtils.strToObject(sentContent, MenuTo.class);
-        expected.setId(actual.getId());
-        expected.setLunchPlaceId(PLACE4_ID);
-
-        assertReflectionEquals(expected, actual);
-        assertTrue(expected.getId() != null && ! expected.getId().isEmpty());
+        String  uri = jsonUtils.locationFromMvcResult(result);
+        String id = getCreatedId(uri);
     }
 
     @Test

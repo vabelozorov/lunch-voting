@@ -17,13 +17,13 @@ import java.util.Objects;
 @Getter(AccessLevel.PACKAGE)
 @Entity
 @Table(name = "poll_items")
-final public class PollItem extends AbstractPersistableObject implements Comparable<PollItem> {
+public final class PollItem extends AbstractPersistableObject {
 
     private final int position;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @NotNull
     @JoinColumn(name = "item_id")
+//    @Getter(onMethod = @__({@Nullable}))
     private final LunchPlace item;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -41,10 +41,5 @@ final public class PollItem extends AbstractPersistableObject implements Compara
         this.position = position;
         this.item = Objects.requireNonNull(item, "Error during initializing PollItem. LunchPlace must not be null");
         this.poll = Objects.requireNonNull(poll, "Error during initializing PollItem. Poll must not be null");
-    }
-
-    @Override
-    public int compareTo(final PollItem o) {
-        return Integer.compare(this.position, o.position);
     }
 }

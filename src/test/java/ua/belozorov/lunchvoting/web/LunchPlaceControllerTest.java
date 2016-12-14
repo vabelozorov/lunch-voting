@@ -2,19 +2,16 @@ package ua.belozorov.lunchvoting.web;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.junit.Test;
+import org.skyscreamer.jsonassert.JSONAssert;
+import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
 import ua.belozorov.lunchvoting.AuthorizedUser;
-import ua.belozorov.lunchvoting.JsonUtils;
-import ua.belozorov.lunchvoting.model.User;
 import ua.belozorov.lunchvoting.model.lunchplace.LunchPlace;
 import ua.belozorov.lunchvoting.service.lunchplace.LunchPlaceService;
-import ua.belozorov.lunchvoting.service.user.UserService;
 import ua.belozorov.lunchvoting.to.LunchPlaceTo;
-import ua.belozorov.lunchvoting.to.UserTo;
-import ua.belozorov.lunchvoting.to.transformers.LunchPlaceTransformer;
-import ua.belozorov.lunchvoting.to.transformers.UserTransformer;
+import ua.belozorov.lunchvoting.to.transformers.DtoIntoEntity;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -24,13 +21,11 @@ import static org.hamcrest.Matchers.contains;
 import static org.junit.Assert.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
-import static ua.belozorov.lunchvoting.MatcherUtils.matchByToString;
 import static ua.belozorov.lunchvoting.MatcherUtils.matchCollection;
+import static ua.belozorov.lunchvoting.MatcherUtils.matchSingle;
 import static ua.belozorov.lunchvoting.testdata.LunchPlaceTestData.*;
-import static ua.belozorov.lunchvoting.testdata.UserTestData.*;
 import static ua.belozorov.lunchvoting.testdata.UserTestData.GOD;
-import static ua.belozorov.lunchvoting.testdata.UserTestData.USER_COMPARATOR;
+import static ua.belozorov.lunchvoting.testdata.UserTestData.GOD_ID;
 
 /**
  * <h2></h2>
@@ -46,73 +41,118 @@ public class LunchPlaceControllerTest extends AbstractControllerTest {
     @Test
     public void testCreate() throws Exception {
         List<String> phones = Arrays.asList("0661234567", "0441234567");
-        LunchPlaceTo expected = new LunchPlaceTo(null, "New PLace", "New Street 12/12", "New Description", phones);
+        LunchPlaceTo to = new LunchPlaceTo(null, "New PLace", "New Street 12/12", "New Description", phones);
 
         MvcResult result = mockMvc.perform(post(REST_URL)
-                .content(JsonUtils.toJson(expected))
+                .content(jsonUtils.toJson(to))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
                 .andReturn();
 
-        LunchPlaceTo actual = JsonUtils.mvcResultToObject(result, LunchPlaceTo.class);
-        phones = phones.stream().sorted().collect(Collectors.toList());
-        expected.setId(actual.getId());
-        expected.setPhones(phones);
+        String uri = jsonUtils.locationFromMvcResult(result);
+        String id = getCreatedId(uri);
 
-        assertReflectionEquals(expected, actual);
+        LunchPlace saved = DtoIntoEntity.toLunchPlace(to.toBuilder().id(id).build(), AuthorizedUser.get().getId());
+        String expectedJson = jsonUtils.removeFields(saved, LunchPlaceController.EXCLUDED_FIELDS);
+
+        String actualJson = mockMvc.perform(get(uri))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+
+        assertJson(expectedJson, actualJson);
     }
 
     @Test
     public void testUpdate() throws Exception {
         List<String> phones = Arrays.asList("0661234567", "0441234567");
-        LunchPlaceTo expected = new LunchPlaceTo(PLACE4_ID, "Updated PLace", "Updated Street 12/12", "Updated Description", phones);
-
-        phones = phones.stream().sorted().collect(Collectors.toList());
-        expected.setPhones(phones);
+        LunchPlaceTo to = new LunchPlaceTo(PLACE4_ID, "Updated PLace", "Updated Street 12/12", "Updated Description", phones);
 
         mockMvc.perform(put(REST_URL)
-                .content(JsonUtils.toJson(expected))
+                .content(jsonUtils.toJson(to))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
 
-        LunchPlaceTo actual = placeService.get(PLACE4_ID, GOD);
-        assertReflectionEquals(expected, actual);
+        LunchPlace expected = DtoIntoEntity.toLunchPlace(to, GOD_ID);
+        assertThat(
+                placeService.get(PLACE4_ID, GOD),
+                matchSingle(expected, LUNCH_PLACE_COMPARATOR)
+        );
     }
 
     @Test
     public void testGet() throws Exception {
-        MvcResult result = mockMvc.perform(get(REST_URL + "/" + PLACE4_ID))
-                .andExpect(status().isOk()).andReturn();
+        String actualJson = mockMvc.perform(get(REST_URL + "/" + PLACE4_ID))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
 
-        LunchPlaceTo actual = JsonUtils.mvcResultToObject(result, LunchPlaceTo.class);
-        LunchPlaceTo expected = LunchPlaceTransformer.toDto(PLACE4);
+        String expectedJson = jsonUtils.removeFields(PLACE4, LunchPlaceController.EXCLUDED_FIELDS);
+        assertJson(expectedJson, actualJson);
+    }
 
-        assertThat(actual, matchByToString(expected));
+    @Test
+    public void testGetWithFields() throws Exception {
+        String actualJson = mockMvc.perform(get(REST_URL + "/" + PLACE4_ID)
+                    .param("fields", "name,description"))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+
+        Map<String, String> properties = new HashMap<>();
+        properties.put("id", PLACE4_ID);
+        properties.put("name", PLACE4.getName());
+        properties.put("description", PLACE4.getDescription());
+        String expectedJson = jsonUtils.toJson(properties);
+
+        assertJson(expectedJson, actualJson);
     }
 
     @Test
     public void getAll() throws Exception {
-        MvcResult result = mockMvc.perform(get(REST_URL))
+        String actualJson = mockMvc.perform(get(REST_URL))
                 .andExpect(status().isOk())
-                .andReturn();
+                .andReturn().getResponse().getContentAsString();
 
-        Collection<LunchPlaceTo> actual = JsonUtils.mvcResultToObject(result, new TypeReference<Collection<LunchPlaceTo>>() {});
-        List<LunchPlaceTo> expected = Stream.of(PLACE3, PLACE4)
-                .map(LunchPlaceTransformer::toDto)
-                .sorted(Comparator.comparing(LunchPlaceTo::getName))
+        List<LunchPlace> places = Stream.of(PLACE3, PLACE4)
+                .sorted(Comparator.comparing(LunchPlace::getName))
                 .collect(Collectors.toList());
 
-        assertReflectionEquals(expected, actual);
+        String expectedJson = jsonUtils.removeFieldsFromCollection(places, LunchPlaceController.EXCLUDED_FIELDS);
+
+        assertJson(expectedJson, actualJson);
+    }
+
+    @Test
+    public void testGetAllWithFields() throws Exception {
+        String actualJson = mockMvc.perform(get(REST_URL)
+                    .param("fields", "name,description"))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+
+        List<LunchPlace> places = Stream.of(PLACE3, PLACE4)
+                .sorted(Comparator.comparing(LunchPlace::getName))
+                .collect(Collectors.toList());
+        List<Map<String,String>> placesValues = new ArrayList<>();
+        for (LunchPlace lp : places) {
+            Map<String, String> properties = new HashMap<>();
+            properties.put("id", lp.getId());
+            properties.put("name", lp.getName());
+            properties.put("description", lp.getDescription());
+            placesValues.add(properties);
+        }
+        String expectedJson = jsonUtils.toJson(placesValues);
+
+        assertJson(expectedJson, actualJson);
     }
 
     @Test
     public void testDelete() throws Exception {
         mockMvc.perform(delete(REST_URL + "/" + PLACE4_ID))
                 .andExpect(status().isNoContent());
+        Collection<LunchPlace> actual = placeService.getAll(AuthorizedUser.get());
 
-        Collection<LunchPlaceTo> actual = placeService.getAll(AuthorizedUser.get());
-        Collection<LunchPlaceTo> expected = LunchPlaceTransformer.collectionToDto(Collections.singletonList(PLACE3));
-        assertReflectionEquals(expected, actual);
+        assertThat(
+                actual,
+                contains(matchCollection(Collections.singletonList(PLACE3), LUNCH_PLACE_COMPARATOR))
+        );
     }
     //TODO test response codes and content during errors
 }

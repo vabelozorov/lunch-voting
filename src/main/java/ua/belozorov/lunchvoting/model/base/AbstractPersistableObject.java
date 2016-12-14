@@ -51,9 +51,7 @@ public abstract class AbstractPersistableObject implements Persistable {
     }
 
     public AbstractPersistableObject(String id, Integer version) {
-        this.id = Optional.ofNullable(id)
-                .filter(_id -> ! _id.isEmpty())
-                .orElse(IdGenerator.createId());
+        this.id = id == null ? IdGenerator.createId() : id;
         this.version = version;
     }
 
@@ -61,13 +59,6 @@ public abstract class AbstractPersistableObject implements Persistable {
     public String getId() {
         return id;
     }
-
-//    @Override
-//    public void setId(String id) {
-//        if (id != null) {
-//            this.id = id;
-//        }
-//    }
 
     @Override
     public boolean equals(Object o) {

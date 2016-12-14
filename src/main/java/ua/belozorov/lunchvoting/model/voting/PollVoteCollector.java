@@ -60,6 +60,6 @@ public final class PollVoteCollector implements VoteCollector {
                                 )
                         )
                 );
-        return new PollingResult<>(Collections.unmodifiableMap(resultMap), this.poll);
+        return new PollingResult<>(resultMap, this.poll);
     }
 }

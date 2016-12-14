@@ -1,9 +1,6 @@
 package ua.belozorov.lunchvoting.to;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.Singular;
-import lombok.ToString;
+import lombok.*;
 import ua.belozorov.lunchvoting.model.lunchplace.LunchPlace;
 import ua.belozorov.lunchvoting.model.lunchplace.Menu;
 
@@ -18,18 +15,22 @@ import java.util.Objects;
  * @author vabelozorov on 21.11.16.
  */
 @Getter
-@Setter
 @ToString(doNotUseGetters = true)
-public class LunchPlaceTo {
-    private String id;
-    private String name;
-    private String address;
-    private String description;
-    private Collection<String> phones = new ArrayList<>();
-    private Collection<Menu> menu = new ArrayList<>();
-    private Menu todayMenu;
+public final class LunchPlaceTo {
+    private final String id;
+    private final String name;
+    private final String address;
+    private final String description;
+    private final Collection<String> phones;
+    private final Collection<MenuTo> menus;
 
-    public LunchPlaceTo() {
+    protected LunchPlaceTo() {
+        id = null;
+        name = null;
+        address = null;
+        description = null;
+        phones = null;
+        menus = null;
     }
 
     public LunchPlaceTo(String id, String name, String address, String description, Collection<String> phones) {
@@ -38,5 +39,16 @@ public class LunchPlaceTo {
         this.address = address;
         this.description = description;
         this.phones = Objects.requireNonNull(phones);
+        this.menus = Collections.emptyList();
+    }
+
+    @Builder(toBuilder = true)
+    public LunchPlaceTo(String id, String name, String address, String description, Collection<String> phones, Collection<MenuTo> menus) {
+        this.id = id;
+        this.name = name;
+        this.address = address;
+        this.description = description;
+        this.phones = phones;
+        this.menus = menus;
     }
 }

@@ -1,6 +1,10 @@
 package ua.belozorov.lunchvoting.web;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.json.JSONException;
 import org.junit.runner.RunWith;
+import org.skyscreamer.jsonassert.JSONAssert;
+import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
@@ -11,17 +15,20 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import ua.belozorov.lunchvoting.AbstractTest;
+import ua.belozorov.lunchvoting.JsonUtils;
+import ua.belozorov.lunchvoting.TestConfig;
 import ua.belozorov.lunchvoting.config.RootConfig;
 import ua.belozorov.lunchvoting.config.WebConfig;
 
 import javax.annotation.PostConstruct;
+import java.util.Arrays;
 
 //import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 
 /**
  * Created by vabelozorov on 15.11.16.
  */
-@ContextConfiguration(classes = {RootConfig.class, WebConfig.class})
+@ContextConfiguration(classes = {RootConfig.class, WebConfig.class, TestConfig.class})
 @WebAppConfiguration
 public abstract class AbstractControllerTest extends AbstractTest {
 
@@ -33,16 +40,21 @@ public abstract class AbstractControllerTest extends AbstractTest {
 //    }
 
     @Autowired
-    protected WebApplicationContext webApplicationContext;
+    JsonUtils jsonUtils;
 
-    protected MockMvc mockMvc;
+    MockMvc mockMvc;
 
-    @PostConstruct
-    private void postConstruct() {
-        mockMvc = MockMvcBuilders
-                .webAppContextSetup(webApplicationContext)
-//                .addFilter(CHARACTER_ENCODING_FILTER)
-//                .apply(springSecurity())
-                .build();
+    @Autowired
+    public void setMockMvc(WebApplicationContext webApplicationContext) {
+        this.mockMvc = MockMvcBuilders
+                .webAppContextSetup(webApplicationContext).build();
+    }
+
+    void assertJson(String expected, String actual) throws JSONException {
+        JSONAssert.assertEquals(expected, actual, JSONCompareMode.NON_EXTENSIBLE);
+    }
+
+    String getCreatedId(String uri) {
+        return Arrays.stream(uri.split("/")).reduce((a, b) -> b).orElse(null);
     }
 }

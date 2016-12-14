@@ -12,7 +12,7 @@ public class PollingResult<I> implements VoteStatistics<I> {
     private final Poll poll;
 
     PollingResult(Map<I, ResultEntry> results, Poll poll) {
-        this.results = results;
+        this.results = Collections.unmodifiableMap(results);
         this.poll = poll;
     }
 

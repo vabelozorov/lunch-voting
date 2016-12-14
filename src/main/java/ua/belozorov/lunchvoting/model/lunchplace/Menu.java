@@ -1,9 +1,13 @@
 package ua.belozorov.lunchvoting.model.lunchplace;
 
+import com.google.common.collect.ImmutableSortedSet;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
+import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
+import org.hibernate.envers.Audited;
 import org.hibernate.validator.constraints.NotEmpty;
 import ua.belozorov.lunchvoting.model.base.AbstractPersistableObject;
 
@@ -22,7 +26,9 @@ import static java.util.Optional.ofNullable;
 @Entity
 @Table(name = "menus")
 @Getter
-public class Menu extends AbstractPersistableObject {
+//@Audited
+@DynamicUpdate
+public final class Menu extends AbstractPersistableObject {
 
     @Column(name = "effective_date", nullable = false)
     @NotNull
@@ -31,13 +37,13 @@ public class Menu extends AbstractPersistableObject {
     @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name = "dishes", joinColumns = @JoinColumn(name = "menu_id"))
     @NotEmpty
-    @OrderBy("position")
-    private final SortedSet<Dish> dishes;
+    @Getter(AccessLevel.NONE)
+    private final Set<Dish> dishes;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "place_id")
     @NotNull
-    private LunchPlace lunchPlace;
+    private final LunchPlace lunchPlace;
 
     /**
      *  For JPA only
@@ -49,13 +55,9 @@ public class Menu extends AbstractPersistableObject {
         lunchPlace = null;
     }
 
+    @Builder
     Menu(LocalDate effectiveDate, List<Dish> dishes, LunchPlace lunchPlace) {
         this(null, null, effectiveDate, dishes, lunchPlace);
-    }
-
-    @Builder
-    Menu(String id, LocalDate effectiveDate, List<Dish> dishes, LunchPlace lunchPlace) {
-        this(id, null, effectiveDate, dishes, lunchPlace);
     }
 
     /**
@@ -69,12 +71,16 @@ public class Menu extends AbstractPersistableObject {
      */
     private Menu(String id, Integer version, LocalDate effectiveDate, Collection<Dish> dishes, LunchPlace lunchPlace) {
         super(id, version);
-        this.effectiveDate = effectiveDate == null ? LocalDate.now() : effectiveDate;
-        this.dishes = Objects.requireNonNull(new TreeSet<>(dishes));
+        this.effectiveDate = Objects.requireNonNull(effectiveDate, "effectiveDate must not be null");
+        this.dishes = Objects.requireNonNull(new HashSet<>(dishes));
         this.lunchPlace = Objects.requireNonNull(lunchPlace);
     }
 
-//
+    public Set<Dish> getDishes() {
+        return ImmutableSortedSet.<Dish>naturalOrder().addAll(this.dishes).build();
+    }
+
+    //
 //    Menu setDishes(List<Dish> dishes) {
 //        return builder(this).dishes(dishes).build();
 //    }
@@ -89,7 +95,7 @@ public class Menu extends AbstractPersistableObject {
 
     public static class MenuBuilder {
         private LocalDate effectiveDate;
-        private SortedSet<Dish> dishes;
+        private Collection<Dish> dishes;
         private LunchPlace lunchPlace;
         private Integer version;
         private String id;

@@ -3,13 +3,12 @@ package ua.belozorov.lunchvoting.service.lunchplace;
 import org.hibernate.exception.ConstraintViolationException;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import ua.belozorov.lunchvoting.MatcherUtils;
 import ua.belozorov.lunchvoting.exceptions.NotFoundException;
 import ua.belozorov.lunchvoting.model.lunchplace.LunchPlace;
 import ua.belozorov.lunchvoting.repository.lunchplace.LunchPlaceRepository;
 import ua.belozorov.lunchvoting.service.AbstractServiceTest;
 import ua.belozorov.lunchvoting.to.LunchPlaceTo;
-import ua.belozorov.lunchvoting.to.transformers.LunchPlaceTransformer;
+import ua.belozorov.lunchvoting.to.transformers.DtoIntoEntity;
 
 import javax.persistence.PersistenceException;
 import java.util.Arrays;
@@ -45,62 +44,58 @@ public class LunchPlaceServiceTest extends AbstractServiceTest {
     @Test
     public void create() throws Exception {
         List<String> phones = Arrays.asList("0661234567", "0441234567", "0123456789", "1234567890");
-        LunchPlaceTo expectedTo = new LunchPlaceTo(null, "New Place", "New Address", "New Description", phones);
-        LunchPlaceTo actualTo = service.create(expectedTo, GOD);
+        LunchPlaceTo to = new LunchPlaceTo(null, "New Place", "New Address", "New Description", phones);
+        String id = service.create(DtoIntoEntity.toLunchPlace(to, GOD_ID), GOD);
 
         phones = phones.stream().sorted().collect(Collectors.toList());
 
-        expectedTo.setId(actualTo.getId());
-        expectedTo.setPhones(phones);
-        assertThat(actualTo, MatcherUtils.matchByToString(expectedTo));
+        LunchPlace actual = service.get(id, GOD);
 
-        LunchPlace expected = LunchPlace.builder(LunchPlaceTransformer.toEntity(expectedTo, GOD_ID))
-                                            .id(actualTo.getId())
-                                            .phones(phones)
-                                            .build();
+        LunchPlace expected = LunchPlace.builder()
+                .id(id).name(to.getName()).address(to.getAddress()).description(to.getDescription()).phones(phones).adminId(GOD_ID)
+                .build();
+
         assertThat(
-                repository.getWithPhones(actualTo.getId(), GOD_ID),
+                actual,
                 matchSingle(expected, LUNCH_PLACE_COMPARATOR)
         );
     }
 
     @Test
     public void update() throws Exception {
-        LunchPlaceTo expectedTo = new LunchPlaceTo(PLACE2_ID, PLACE2.getName(), "Updated Address", PLACE2.getDescription(),
+        LunchPlaceTo to = new LunchPlaceTo(PLACE2_ID, PLACE2.getName(), "Updated Address", PLACE2.getDescription(),
                 Collections.singletonList("0481234567"));
-        service.update(expectedTo, ADMIN);
+        service.update(DtoIntoEntity.toLunchPlace(to, ADMIN_ID), ADMIN);
 
-        LunchPlace expected = LunchPlaceTransformer.toEntity(expectedTo, ADMIN_ID);
+        LunchPlace expected = DtoIntoEntity.toLunchPlace(to, ADMIN_ID);
 
         assertThat(
-                repository.getWithPhones(PLACE2_ID, ADMIN_ID),
+                repository.get(PLACE2_ID, ADMIN_ID),
                 matchSingle(expected, LUNCH_PLACE_COMPARATOR)
         );
     }
 
     @Test
     public void get() throws Exception {
-        LunchPlaceTo actual = service.get(PLACE1_ID, ADMIN);
-        assertThat(actual, matchByToString(LunchPlaceTransformer.toDto(PLACE1)));
+        LunchPlace actual = service.get(PLACE4_ID, GOD);
+        assertThat(actual, matchByToString(PLACE4));
     }
 
     @Test
     public void getAll() throws Exception {
-        Collection<LunchPlaceTo> actual = service.getAll(GOD);
-        assertReflectionEquals(
-                LunchPlaceTransformer.collectionToDto(Arrays.asList(PLACE4, PLACE3)),
-                actual
+        Collection<LunchPlace> actual = service.getAll(GOD);
+        assertThat(
+                actual,
+                contains(matchCollection(Arrays.asList(PLACE4, PLACE3), LUNCH_PLACE_COMPARATOR))
         );
     }
 
     @Test
     public void delete() throws Exception {
+        int initialSize = service.getAll(ADMIN).size();
         service.delete(PLACE1_ID, ADMIN);
-        Collection<LunchPlace> actual = repository.getAll(ADMIN_ID);
-        assertThat(
-                actual,
-                contains(matchCollection(Collections.singletonList(PLACE2), LUNCH_PLACE_COMPARATOR))
-        );
+        Collection<LunchPlace> all = service.getAll(ADMIN);
+        assertTrue(all.size() == initialSize - 1 && all.stream().noneMatch(place -> place.getId().equals(PLACE1_ID)));
     }
 
     @Test(expected = NotFoundException.class)
@@ -110,9 +105,9 @@ public class LunchPlaceServiceTest extends AbstractServiceTest {
 
     @Test(expected = NotFoundException.class)
     public void updateNotExisting() {
-        LunchPlaceTo expectedTo = new LunchPlaceTo("NOT_EXISTING_ID", PLACE2.getName(), "Updated Address", PLACE2.getDescription(),
+        LunchPlaceTo expected = new LunchPlaceTo("NOT_EXISTING_ID", PLACE2.getName(), "Updated Address", PLACE2.getDescription(),
                 Collections.singletonList("0481234567"));
-        service.update(expectedTo, ADMIN);
+        service.update(DtoIntoEntity.toLunchPlace(expected, ADMIN_ID), ADMIN);
     }
 
     @Test(expected = NotFoundException.class)
@@ -127,6 +122,6 @@ public class LunchPlaceServiceTest extends AbstractServiceTest {
 
         thrown.expect(PersistenceException.class);
         thrown.expectCause(isA(ConstraintViolationException.class));
-        service.create(expectedTo, ADMIN);
+        service.create(DtoIntoEntity.toLunchPlace(expectedTo,ADMIN_ID), ADMIN);
     }
 }

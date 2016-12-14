@@ -18,11 +18,9 @@ public interface LunchPlaceRepository {
 
     void save(LunchPlace lunchPlace);
 
-    LunchPlace update(LunchPlace lunchPlace, String userId);
+    void update(LunchPlace lunchPlace, String userId);
 
     LunchPlace get(String id, String userId);
-
-    LunchPlace getWithPhones(String id, String userId);
 
     Collection<LunchPlace> getAll(String userId);
 

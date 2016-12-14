@@ -44,7 +44,7 @@ public final class Poll extends AbstractPersistableObject {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "poll")
     @OrderBy("position ASC")
-    private final SortedSet<PollItem> pollItems;
+    private final Set<PollItem> pollItems;
 
     @Transient
     private final Collection<Consumer<VoteIntention>> pollValidators;
@@ -85,7 +85,7 @@ public final class Poll extends AbstractPersistableObject {
         this.voteChangeValidators = getVoteChangeValidators();
     }
 
-    private SortedSet<PollItem> convertToPollItems(List<LunchPlace> lunchPlaces) {
+    private Set<PollItem> convertToPollItems(List<LunchPlace> lunchPlaces) {
         if (lunchPlaces == null) {
             lunchPlaces = Collections.emptyList();
         }
@@ -93,7 +93,7 @@ public final class Poll extends AbstractPersistableObject {
         for (int i = 0; i < lunchPlaces.size(); i++) {
             pollItems.add(new PollItem(i, lunchPlaces.get(i), this));
         }
-        return new TreeSet<>(pollItems);
+        return new LinkedHashSet<>(pollItems);
     }
 
     private Collection<Consumer<VoteIntention>> getPollValidators() {
@@ -184,7 +184,7 @@ public final class Poll extends AbstractPersistableObject {
 //        return collector.getByPollItem();
 //    }
 
-    public SortedSet<PollItem> getPollItems() {
+    public Set<PollItem> getPollItems() {
         return this.pollItems;
     }
 }

@@ -41,8 +41,20 @@ public class LunchPlaceTestData {
             return (o1.getId().equals(o2.getId())
                     && o1.getName().equals(o2.getName())
                     && o1.getDescription().equals(o2.getDescription())
-                    && new ArrayList<String>(o1.getPhones()).equals(new ArrayList<>(o2.getPhones()))
+                    && new ArrayList<>(o1.getPhones()).equals(new ArrayList<>(o2.getPhones()))
                   &&   o1.getAdminId().equals(o2.getAdminId())
+            ) ? 0 : -1;
+        }
+    }
+
+    public static class WebLunchPlaceComparator implements Comparator<LunchPlace> {
+
+        @Override
+        public int compare(LunchPlace o1, LunchPlace o2) {
+            return (o1.getId().equals(o2.getId())
+                    && o1.getName().equals(o2.getName())
+                    && o1.getDescription().equals(o2.getDescription())
+                    && new ArrayList<>(o1.getPhones()).equals(new ArrayList<>(o2.getPhones()))
             ) ? 0 : -1;
         }
     }

@@ -1,17 +1,26 @@
 package ua.belozorov.lunchvoting.model.lunchplace;
 
+import com.google.common.collect.ImmutableSortedSet;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Singular;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
+import org.hibernate.annotations.*;
+import org.hibernate.envers.Audited;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotEmpty;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import ua.belozorov.lunchvoting.LengthEach;
 import ua.belozorov.lunchvoting.model.User;
 import ua.belozorov.lunchvoting.model.base.AbstractPersistableObject;
+import ua.belozorov.lunchvoting.util.SetToStringConverter;
 
 import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.OrderBy;
+import javax.persistence.Table;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -25,6 +34,8 @@ import java.util.*;
         uniqueConstraints = @UniqueConstraint(name = "name_user_id_unique", columnNames = {"name", "user_id"})
 )
 @Getter
+//@Audited
+@DynamicUpdate
 public class LunchPlace extends AbstractPersistableObject {
 
     @Column(name = "name", nullable = false)
@@ -40,23 +51,25 @@ public class LunchPlace extends AbstractPersistableObject {
     @Length(max = 1000)
     private final String description;
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "phones", joinColumns = @JoinColumn(name = "place_id"))
-    @Column(name = "phone")
-    @LengthEach
+    @Column(name = "phones")
+    @LengthEach//TODO
     @OrderBy
-    private final Collection<String> phones;
+    @Convert(converter = SetToStringConverter.class)
+    @SuppressWarnings("JpaAttributeTypeInspection")
+    @Getter(AccessLevel.NONE)
+    private final Set<String> phones;
 
-    @OneToMany(mappedBy = "lunchPlace", cascade = {CascadeType.REMOVE, CascadeType.PERSIST})
-    private final Collection<Menu> menus;
+    @OneToMany(mappedBy = "lunchPlace")
+    private final Set<Menu> menus;
 
     @Column(name = "user_id")
+    //TODO Constraint forbids deleting a LP - think & fix
     private final String adminId;
 
     protected LunchPlace() {
         super(null, null);
-        this.phones = null;
-        this.menus = null;
+        this.phones = Collections.emptySet();
+        this.menus = Collections.emptySet();
         this.adminId = null;
         this.description = null;
         this.address = null;
@@ -69,15 +82,25 @@ public class LunchPlace extends AbstractPersistableObject {
     }
 
     @Builder
-    public LunchPlace(String id, Integer version, String name, String address, String description,
-                      Collection<String> phones, Collection<Menu> menus, String adminId) {
+    public LunchPlace(@Nullable String id, @Nullable Integer version, @NotNull String name, @NotNull String address, @NotNull String description,
+                      @NotNull Collection<String> phones, @NotNull Collection<Menu> menus, @NotNull String adminId) {
         super(id, version);
         this.name = name;
         this.address = address;
         this.description = description;
-        this.phones = Objects.requireNonNull(phones);
-        this.menus = Objects.requireNonNull(menus);
+        this.phones = new HashSet<>(phones);
+        this.menus = new LinkedHashSet<>(menus);
         this.adminId = adminId;
+//        this.name = Objects.requireNonNull(name, "name must not be null");
+//        this.address = Objects.requireNonNull(address, "address must not be null");
+//        this.description = Objects.requireNonNull(description, "description must not be null");
+//        this.phones = phones == null ? new HashSet<>() : new HashSet<>(phones);
+//        this.menus = menus == null ? new LinkedHashSet<>() : new LinkedHashSet<>(menus);
+//        this.adminId = Objects.requireNonNull(adminId, "adminId must not be null");
+    }
+
+    public @NotNull Set<String> getPhones() {
+        return ImmutableSortedSet.<String>naturalOrder().addAll(phones).build();
     }
 
     public LunchPlace setMenus(Collection<Menu> menus) {
@@ -91,6 +114,7 @@ public class LunchPlace extends AbstractPersistableObject {
                 ", address='" + address + '\'' +
                 ", description='" + description + '\'' +
                 ", phones=" + phones +
+                ", adminId='" + adminId + '\'' +
                 '}';
     }
 
@@ -108,8 +132,8 @@ public class LunchPlace extends AbstractPersistableObject {
 
     public static class LunchPlaceBuilder {
         private String id, name, address, description;
-        private Collection<String> phones;
-        private Collection<Menu> menus;
+        private Collection<String> phones = Collections.emptySet();
+        private Collection<Menu> menus = Collections.emptySet();
         private String adminId;
         private Integer version;
 

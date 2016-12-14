@@ -10,7 +10,7 @@ import javax.persistence.PersistenceContext;
  */
 public abstract class BaseRepository {
 
-    @PersistenceContext(name = "AppPersistentUnit")
+    @PersistenceContext
     protected EntityManager em;
 
     protected <T> void reliablePersist(T persistable) {

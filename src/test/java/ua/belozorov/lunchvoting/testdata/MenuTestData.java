@@ -25,15 +25,15 @@ import static ua.belozorov.lunchvoting.testdata.LunchPlaceTestData.PLACE4;
  */
 public class MenuTestData {
     public static final Menu MENU1 = PLACE4.createMenu(LocalDate.now().minusDays(1), Arrays.asList(
-            new Dish("Fish", 11.11f, 0),
-            new Dish("Soup", 12.12f, 1),
-            new Dish("Apple Juice", 13.11f, 2)
+            new Dish("Fish", 11.00f, 0),
+            new Dish("Soup", 12.00f, 1),
+            new Dish("Apple Juice", 13.00f, 2)
     ));
     public static final Menu MENU2 = PLACE4.createMenu(LocalDate.now().minusDays(2), Collections.singletonList(
-            new Dish("Potato", 21.12f, 1)
+            new Dish("Potato", 21.00f, 1)
     ));
     public static final Menu MENU3 = PLACE4.createMenu(LocalDate.now(), Collections.singletonList(
-            new Dish("Tomato", 31.13f, 1)
+            new Dish("Tomato", 31.00f, 1)
     ));
     public static final Menu MENU4 = PLACE4.createMenu(LocalDate.now(), Collections.singletonList(
             new Dish("Ice cubes", 41.00f, 1)

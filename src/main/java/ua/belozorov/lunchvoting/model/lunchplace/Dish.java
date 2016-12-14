@@ -2,6 +2,7 @@ package ua.belozorov.lunchvoting.model.lunchplace;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.Immutable;
 
 import javax.persistence.Embeddable;
 
@@ -12,17 +13,22 @@ import javax.persistence.Embeddable;
  */
 @Embeddable
 @Getter
+@Immutable
 public final class Dish implements Comparable<Dish> {
-    private String name;
-    private float price;
-    private int position;
+    private final String name;
+    private final float price;
+    private final int position;
 
     protected Dish() {
+        name = null;
+        price = 0;
+        position = 0;
     }
 
     public Dish(String name, float price, int position) {
         this.name = name;
         this.price = price;
+        this.position = position;
     }
 
     @Override
