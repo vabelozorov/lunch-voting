@@ -257,6 +257,13 @@
             <version>${guava-version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations</artifactId>
+            <version>15.0</version>
+            <scope> compile</scope>
+        </dependency>
+
     </dependencies>
 
     <dependencyManagement>

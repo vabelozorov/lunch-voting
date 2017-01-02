@@ -3,6 +3,7 @@ package ua.belozorov.lunchvoting.service.lunchplace;
 import org.hibernate.exception.ConstraintViolationException;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import ua.belozorov.lunchvoting.AuthorizedUser;
 import ua.belozorov.lunchvoting.exceptions.NotFoundException;
 import ua.belozorov.lunchvoting.model.lunchplace.LunchPlace;
 import ua.belozorov.lunchvoting.repository.lunchplace.LunchPlaceRepository;
@@ -11,6 +12,7 @@ import ua.belozorov.lunchvoting.to.LunchPlaceTo;
 import ua.belozorov.lunchvoting.to.transformers.DtoIntoEntity;
 
 import javax.persistence.PersistenceException;
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -88,6 +90,36 @@ public class LunchPlaceServiceTest extends AbstractServiceTest {
                 actual,
                 contains(matchCollection(Arrays.asList(PLACE4, PLACE3), LUNCH_PLACE_COMPARATOR))
         );
+    }
+
+    @Test
+    public void testGetMultipleNoIds() throws Exception {
+        Collection<LunchPlace> actual = service.getMultiple(Collections.emptyList(), GOD);
+        assertThat(
+                actual,
+                contains(matchCollection(Arrays.asList(PLACE4, PLACE3), LUNCH_PLACE_COMPARATOR))
+        );
+    }
+
+    @Test
+    public void testGetMultiple() throws Exception {
+        Collection<LunchPlace> actual = service.getMultiple(Arrays.asList(PLACE3_ID, PLACE4_ID), GOD);
+        assertThat(
+                actual,
+                contains(matchCollection(Arrays.asList(PLACE4, PLACE3), LUNCH_PLACE_COMPARATOR))
+        );
+    }
+
+    @Test(expected = NotFoundException.class)
+    public void testGetMultipleExceptionOnNotExistingIds() throws Exception {
+        service.getMultiple(Arrays.asList(PLACE3_ID, "NOT_EXISTS_ID"), GOD);
+    }
+
+    @Test
+    public void testGetMultipleWithMenu() throws Exception {
+        LocalDate now = LocalDate.now();
+        Collection<LunchPlace> withMenu = service.getMultipleWithMenu(Arrays.asList(PLACE3_ID, PLACE4_ID), now, now, AuthorizedUser.get());
+        assertTrue(withMenu.stream().mapToLong(lp -> lp.getMenus().size()).sum() == 3);
     }
 
     @Test

@@ -13,5 +13,4 @@ public interface VoteStatistics<I> {
     Map<I, Integer> countPerItem();
 
     Map<I, List<Vote>> votesPerItem();
-
 }

@@ -1,8 +1,5 @@
 package ua.belozorov.lunchvoting.web;
 
-import com.monitorjbl.json.JsonResult;
-import com.monitorjbl.json.JsonView;
-import com.monitorjbl.json.Match;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,23 +21,27 @@ import java.util.*;
  */
 @RestController
 @RequestMapping(LunchPlaceController.REST_URL)
-public class LunchPlaceController extends AbstractController {
+public class LunchPlaceController  {
     static final String REST_URL = "/places";
 
-    static final List<String> EXCLUDED_FIELDS = new LinkedList<>(
-            Arrays.asList("version", "adminId", "menus")
-    );
+    static final Set<String> MANDATORY_EXCLUDE = new HashSet<>(Arrays.asList("version", "adminId"));
 
-    static final List<String> INCLUDED_FIELDS = new LinkedList<>(
-            Arrays.asList("id")
-    );
+    static final Set<String> MANDATORY_INCLUDE = new HashSet<>(Arrays.asList("id"));
+
+    static final Set<String> DEFAULT_INCLUDE = new HashSet<>();
+    static {
+        DEFAULT_INCLUDE.addAll(MANDATORY_INCLUDE);
+        DEFAULT_INCLUDE.add("name");
+    }
 
     private final LunchPlaceService placeService;
 
+    private final JsonFieldsFilter jsonFilter;
+
 
     @Autowired
-    public LunchPlaceController(final LunchPlaceService placeService, final JsonResult json) {
-        super(json);
+    public LunchPlaceController(LunchPlaceService placeService, JsonFieldsFilter jsonFilter) {
+        this.jsonFilter = jsonFilter;
         this.placeService = placeService;
     }
 
@@ -65,7 +66,7 @@ public class LunchPlaceController extends AbstractController {
         LunchPlace place = DtoIntoEntity.toLunchPlace(placeTo, AuthorizedUser.get().getId());
         String id = placeService.create(place, AuthorizedUser.get());
         URI uri = ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path(REST_URL + "/{id}").buildAndExpand(id).toUri();
+                        .path(REST_URL + "/{id}").buildAndExpand(id).toUri();
         return ResponseEntity.created(uri).build();
     }
 
@@ -107,18 +108,34 @@ public class LunchPlaceController extends AbstractController {
      * @return
      */
     @GetMapping(value = "/{id}")
-    public ResponseEntity<LunchPlace> get(@PathVariable String id,
-                                          @RequestParam Optional<String> fields) {
-        LunchPlace place = placeService.get(id, AuthorizedUser.get());
-        jsonFilter(place, fields);
+    public ResponseEntity<LunchPlace> get(@PathVariable String id, LunchPlaceQueryParams params) {
+        params.setIds(new String[]{id});
+        RefinedFields refinedFields = new LunchPlaceRefinedFields(params.getFields());
+        Collection<LunchPlace> places = this.getLunchPlacesOptimally(params, refinedFields);
+        LunchPlace place = places.iterator().next();
+        jsonFilter.filter(place, refinedFields);
         return ResponseEntity.ok(place);
     }
 
     @GetMapping
-    public ResponseEntity<Collection<LunchPlace>> getAll(@RequestParam Optional<String> fields) {
-        Collection<LunchPlace> places = placeService.getAll(AuthorizedUser.get());
-        jsonFilter(places, fields);
+    public ResponseEntity<Collection<LunchPlace>> getLunchPlaces(LunchPlaceQueryParams params) {
+        RefinedFields refinedFields = new LunchPlaceRefinedFields(params.getFields());
+        Collection<LunchPlace> places = this.getLunchPlacesOptimally(params, refinedFields);
+        jsonFilter.filter(places, refinedFields);
         return ResponseEntity.ok(places);
+    }
+
+    private Collection<LunchPlace> getLunchPlacesOptimally(LunchPlaceQueryParams params, RefinedFields refinedFields) {
+        Collection<LunchPlace> places;
+
+        // Conditions on which LP objects have to have 'menus' field loaded from DB
+        if (params.hasDates() || refinedFields.contains("menus")) {
+            places = placeService.getMultipleWithMenu(params.getIds(), params.getStartDate(), params.getEndDate(), AuthorizedUser.get());
+        // LP w/o its associations is enough
+        } else  {
+            places = placeService.getMultiple(params.getIds(), AuthorizedUser.get());
+        }
+        return places;
     }
 
     @DeleteMapping("/{id}")
@@ -127,7 +144,41 @@ public class LunchPlaceController extends AbstractController {
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
-    private void jsonFilter(Object object, Optional<String> includeFieldsString) {
-        super.jsonFilter(object, includeFieldsString, INCLUDED_FIELDS, EXCLUDED_FIELDS);
+    private final static class LunchPlaceRefinedFields implements RefinedFields {
+        private final Set<String> originalFields = new HashSet<>();
+        private final Set<String> refinedFields = new HashSet<>();
+        private final Map<String, String> fieldReplacements = new HashMap<>();
+
+        private LunchPlaceRefinedFields(Set<String> fields) {
+            this.fieldReplacements.put("menus", "menus.*");
+            this.originalFields.addAll(fields);
+            this.refinedFields.addAll(this.prepareFields(this.originalFields));
+        }
+
+        private Set<String> prepareFields(Set<String> fields) {
+            Set<String> result = new HashSet<>(fields);
+            if (result.isEmpty()) {
+                result.addAll(DEFAULT_INCLUDE);
+            }
+            MANDATORY_EXCLUDE.forEach(result::remove);
+            MANDATORY_INCLUDE.forEach(result::add);
+
+            this.fieldReplacements.forEach((k,v) -> {
+                    if (result.remove(k)) {
+                        result.add(v);
+                    }
+            });
+            return result;
+        }
+
+        @Override
+        public Set<String> get() {
+            return Collections.unmodifiableSet(refinedFields);
+        }
+
+        @Override
+        public boolean contains(String field) {
+            return originalFields.contains(field);
+        }
     }
 }

@@ -4,6 +4,7 @@ import java.util.*;
 
 /**
  * <h2></h2>
+ * @param <I> represents grouping item (key)
  *
  * @author vabelozorov on 29.11.16.
  */

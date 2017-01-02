@@ -24,6 +24,10 @@ public interface LunchPlaceRepository {
 
     Collection<LunchPlace> getAll(String userId);
 
+    Collection<LunchPlace> getMultiple(Collection<String> placeIds);
+
+    Collection<LunchPlace> getWithMenu(Collection<String> placeIds, LocalDate startDate, LocalDate endDate);
+
     boolean delete(String id, String userId);
 
     List<LunchPlace> getByMenusForDate(LocalDate date);

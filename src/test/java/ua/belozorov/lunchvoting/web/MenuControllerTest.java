@@ -33,8 +33,6 @@ public class MenuControllerTest extends AbstractControllerTest {
     @Autowired
     private MenuRepository repository;
 
-
-
     @Test
     public void testCreate() throws Exception {
         Object sent = new Object() {

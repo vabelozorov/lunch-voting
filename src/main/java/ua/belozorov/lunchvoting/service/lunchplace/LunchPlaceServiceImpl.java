@@ -11,7 +11,11 @@ import ua.belozorov.lunchvoting.repository.lunchplace.LunchPlaceRepository;
 import ua.belozorov.lunchvoting.repository.lunchplace.MenuRepository;
 import ua.belozorov.lunchvoting.to.MenuTo;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 import static java.util.Optional.ofNullable;
 
@@ -50,8 +54,33 @@ public class LunchPlaceServiceImpl implements LunchPlaceService {
     }
 
     @Override
+    public Collection<LunchPlace> getMultipleWithMenu(Collection<String> placeIds, LocalDate startDate, LocalDate endDate, User user) {
+        return this.checkAllPresent(placeIds, lunchPlaceRepository.getWithMenu(placeIds, startDate, endDate));
+    }
+
+    @Override
     public Collection<LunchPlace> getAll(User user) {
         return lunchPlaceRepository.getAll(user.getId());
+    }
+
+    @Override
+    public Collection<LunchPlace> getMultiple(Collection<String> placeIds, User user) {
+        if (placeIds.isEmpty()) {
+            return lunchPlaceRepository.getAll(user.getId());
+        } else {
+            Collection<LunchPlace> places = lunchPlaceRepository.getMultiple(placeIds);
+            // if not all LP entities got found...
+            return this.checkAllPresent(placeIds, places);
+        }
+    }
+
+    private Collection<LunchPlace> checkAllPresent(Collection<String> placeIds, Collection<LunchPlace> result) {
+        if (result.size() != placeIds.size()) {
+            ArrayList<String> ids = new ArrayList<>(placeIds);
+            result.forEach(place -> ids.remove(place.getId()));
+            throw new NotFoundException(ids, LunchPlace.class);
+        }
+        return result;
     }
 
     @Override

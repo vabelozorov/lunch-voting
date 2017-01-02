@@ -1,18 +1,19 @@
 package ua.belozorov.lunchvoting.web;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import org.junit.Test;
-import org.skyscreamer.jsonassert.JSONAssert;
-import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cglib.core.Local;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
 import ua.belozorov.lunchvoting.AuthorizedUser;
+import ua.belozorov.lunchvoting.DateTimeFormatters;
 import ua.belozorov.lunchvoting.model.lunchplace.LunchPlace;
+import ua.belozorov.lunchvoting.model.lunchplace.Menu;
 import ua.belozorov.lunchvoting.service.lunchplace.LunchPlaceService;
 import ua.belozorov.lunchvoting.to.LunchPlaceTo;
 import ua.belozorov.lunchvoting.to.transformers.DtoIntoEntity;
 
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -24,6 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static ua.belozorov.lunchvoting.MatcherUtils.matchCollection;
 import static ua.belozorov.lunchvoting.MatcherUtils.matchSingle;
 import static ua.belozorov.lunchvoting.testdata.LunchPlaceTestData.*;
+import static ua.belozorov.lunchvoting.testdata.MenuTestData.*;
 import static ua.belozorov.lunchvoting.testdata.UserTestData.GOD;
 import static ua.belozorov.lunchvoting.testdata.UserTestData.GOD_ID;
 
@@ -53,9 +55,11 @@ public class LunchPlaceControllerTest extends AbstractControllerTest {
         String id = getCreatedId(uri);
 
         LunchPlace saved = DtoIntoEntity.toLunchPlace(to.toBuilder().id(id).build(), AuthorizedUser.get().getId());
-        String expectedJson = jsonUtils.removeFields(saved, LunchPlaceController.EXCLUDED_FIELDS);
+        String expectedJson = jsonUtils.removeFields(saved, LunchPlaceController.MANDATORY_EXCLUDE);
 
-        String actualJson = mockMvc.perform(get(uri))
+        String actualJson = mockMvc.perform(get(uri)
+                    .param("fields", "name,address,description,phones,menus")
+                )
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
 
@@ -85,22 +89,98 @@ public class LunchPlaceControllerTest extends AbstractControllerTest {
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
 
-        String expectedJson = jsonUtils.removeFields(PLACE4, LunchPlaceController.EXCLUDED_FIELDS);
+        Map<String, String> properties = new HashMap<>();
+        properties.put("id", PLACE4_ID);
+        properties.put("name", PLACE4.getName());
+
+        String expectedJson = jsonUtils.toJson(properties);
         assertJson(expectedJson, actualJson);
     }
 
     @Test
     public void testGetWithFields() throws Exception {
         String actualJson = mockMvc.perform(get(REST_URL + "/" + PLACE4_ID)
-                    .param("fields", "name,description"))
+                .param("fields", "name,description,menus"))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
 
-        Map<String, String> properties = new HashMap<>();
-        properties.put("id", PLACE4_ID);
-        properties.put("name", PLACE4.getName());
-        properties.put("description", PLACE4.getDescription());
-        String expectedJson = jsonUtils.toJson(properties);
+        Object obj = new Object() {
+            String id = PLACE4.getId();
+            String name = PLACE4.getName();
+            String description = PLACE4.getDescription();
+            Set<Menu> menus = new HashSet<>(Arrays.asList(MENU1, MENU2, MENU3, MENU4));
+        };
+        String expectedJson = jsonUtils.toJson(obj);
+
+        assertJson(expectedJson, actualJson);
+    }
+
+    @Test
+    public void testGetByMenuDates() throws Exception {
+        String actualJson = mockMvc.perform(get(REST_URL + "/" + PLACE4_ID)
+                    .param("startDate", LocalDate.now().format(DateTimeFormatters.WEB_DATE_FORMATTER))
+                    .param("fields", "menus")
+                )
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+
+        Object obj = new Object() {
+            String id = PLACE4.getId();
+            Set<Menu> menus = new HashSet<>(Arrays.asList(MENU3, MENU4));
+        };
+
+        String expectedJson = jsonUtils.toJson(obj);
+
+        assertJson(expectedJson, actualJson);
+    }
+
+    @Test
+    public void testGetMultiple() throws Exception {
+        String actualJson = mockMvc.perform(get(REST_URL)
+                        .param("ids", PLACE3_ID + "," + PLACE4_ID))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+
+        List<LunchPlace> places = Stream.of(PLACE3, PLACE4)
+                .sorted(Comparator.comparing(LunchPlace::getName))
+                .collect(Collectors.toList());
+
+        List<Map<String,String>> placesValues = new ArrayList<>();
+        for (LunchPlace lp : places) {
+            Map<String, String> properties = new HashMap<>();
+            properties.put("id", lp.getId());
+            properties.put("name", lp.getName());
+            placesValues.add(properties);
+        }
+
+        String expectedJson = jsonUtils.toJson(placesValues);
+
+        assertJson(expectedJson, actualJson);
+    }
+
+    @Test
+    public void testGetMultipleByMenuDates() throws Exception {
+        String actualJson = mockMvc.perform(get(REST_URL)
+                    .param("ids", PLACE3_ID + "," + PLACE4_ID)
+                    .param("fields", "menus, name")
+                    .param("startDate", LocalDate.now().minusDays(2).format(DateTimeFormatters.WEB_DATE_FORMATTER))
+                    .param("endDate", LocalDate.now().minusDays(1).format(DateTimeFormatters.WEB_DATE_FORMATTER))
+                )
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+
+        Object obj1 = new Object() {
+            String id = PLACE3.getId();
+            String name = PLACE3.getName();
+            Set<Menu> menus = new HashSet<>(Arrays.asList(MENU6));
+        };
+        Object obj2 = new Object() {
+            String id = PLACE4.getId();
+            String name = PLACE4.getName();
+            Set<Menu> menus = new HashSet<>(Arrays.asList(MENU1,MENU2));
+        };
+
+        String expectedJson = jsonUtils.toJson(Arrays.asList(obj1, obj2));
 
         assertJson(expectedJson, actualJson);
     }
@@ -115,7 +195,15 @@ public class LunchPlaceControllerTest extends AbstractControllerTest {
                 .sorted(Comparator.comparing(LunchPlace::getName))
                 .collect(Collectors.toList());
 
-        String expectedJson = jsonUtils.removeFieldsFromCollection(places, LunchPlaceController.EXCLUDED_FIELDS);
+        List<Map<String,String>> placesValues = new ArrayList<>();
+        for (LunchPlace lp : places) {
+            Map<String, String> properties = new HashMap<>();
+            properties.put("id", lp.getId());
+            properties.put("name", lp.getName());
+            placesValues.add(properties);
+        }
+
+        String expectedJson = jsonUtils.toJson(placesValues);
 
         assertJson(expectedJson, actualJson);
     }
@@ -141,6 +229,17 @@ public class LunchPlaceControllerTest extends AbstractControllerTest {
         String expectedJson = jsonUtils.toJson(placesValues);
 
         assertJson(expectedJson, actualJson);
+    }
+
+    @Test
+    public void testGetMultipleOneNotExists() throws Exception {
+        mockMvc.perform(get(REST_URL)
+                .param("ids", PLACE3_ID + "," + "NOT_EXISTS_ID")
+                .param("fields", "menus, name")
+                .param("startDate", LocalDate.now().minusDays(2).format(DateTimeFormatters.WEB_DATE_FORMATTER))
+                .param("endDate", LocalDate.now().minusDays(1).format(DateTimeFormatters.WEB_DATE_FORMATTER))
+        )
+                .andExpect(status().isBadRequest());
     }
 
     @Test

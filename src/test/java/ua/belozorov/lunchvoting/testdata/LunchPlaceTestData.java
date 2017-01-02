@@ -5,6 +5,7 @@ import ua.belozorov.lunchvoting.model.lunchplace.Menu;
 
 import java.util.*;
 
+import static ua.belozorov.lunchvoting.testdata.MenuTestData.*;
 import static ua.belozorov.lunchvoting.testdata.UserTestData.*;
 
 /**
@@ -23,8 +24,6 @@ public class LunchPlaceTestData {
             Collections.singletonList("0503456712"), Collections.emptyList(), GOD_ID);
     public static LunchPlace PLACE4 = new LunchPlace("FourthPlaceID", 1, "Fourth Place", "Fourth Address", "Fourth Description",
             Arrays.asList("0444567123", "0444671235", "0504567123", "0934567123"), Collections.emptyList(), GOD_ID);
-
-//    public static Menu MENU1_1 =
 
 
     public static String PLACE1_ID = PLACE1.getId();

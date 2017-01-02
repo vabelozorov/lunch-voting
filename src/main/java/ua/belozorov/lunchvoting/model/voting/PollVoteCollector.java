@@ -16,8 +16,17 @@ import java.util.stream.Collectors;
 public final class PollVoteCollector implements VoteCollector {
     private final List<Vote> votes = new ArrayList<>();
     private final Poll poll;
+    private final Collector<Vote, ArrayList<Vote>, PollingResult.ResultEntry> POLL_RESULT_COLLECTOR = Collector.of(
+            ArrayList<Vote>::new,
+            ArrayList<Vote>::add,
+            (current, previous) -> {
+                current.addAll(previous);
+                return current;
+            },
+            PollingResult.ResultEntry::new
+    );
 
-    PollVoteCollector(final Poll poll) {
+    PollVoteCollector(Poll poll) {
         this.poll = poll;
     }
 
@@ -49,15 +58,7 @@ public final class PollVoteCollector implements VoteCollector {
                 .collect(
                         Collectors.groupingBy(
                                 classifier,
-                                Collector.of(
-                                        ArrayList<Vote>::new,
-                                        ArrayList<Vote>::add,
-                                        (current, previous) -> {
-                                            current.addAll(previous);
-                                            return current;
-                                        },
-                                        PollingResult.ResultEntry::new
-                                )
+                                POLL_RESULT_COLLECTOR
                         )
                 );
         return new PollingResult<>(resultMap, this.poll);

@@ -4,7 +4,6 @@ import com.google.common.collect.ImmutableSortedSet;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Singular;
 import org.hibernate.annotations.*;
 import org.hibernate.envers.Audited;
 import org.hibernate.validator.constraints.Length;
@@ -12,7 +11,6 @@ import org.hibernate.validator.constraints.NotEmpty;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ua.belozorov.lunchvoting.LengthEach;
-import ua.belozorov.lunchvoting.model.User;
 import ua.belozorov.lunchvoting.model.base.AbstractPersistableObject;
 import ua.belozorov.lunchvoting.util.SetToStringConverter;
 
@@ -36,7 +34,7 @@ import java.util.*;
 @Getter
 //@Audited
 @DynamicUpdate
-public class LunchPlace extends AbstractPersistableObject {
+public final class LunchPlace extends AbstractPersistableObject {
 
     @Column(name = "name", nullable = false)
     @NotEmpty
@@ -63,7 +61,6 @@ public class LunchPlace extends AbstractPersistableObject {
     private final Set<Menu> menus;
 
     @Column(name = "user_id")
-    //TODO Constraint forbids deleting a LP - think & fix
     private final String adminId;
 
     protected LunchPlace() {

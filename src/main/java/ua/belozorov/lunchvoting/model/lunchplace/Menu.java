@@ -1,5 +1,6 @@
 package ua.belozorov.lunchvoting.model.lunchplace;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.collect.ImmutableSortedSet;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -43,6 +44,7 @@ public final class Menu extends AbstractPersistableObject {
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "place_id")
     @NotNull
+    @JsonIgnore
     private final LunchPlace lunchPlace;
 
     /**

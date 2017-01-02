@@ -89,7 +89,7 @@ public class UserManagementControllerTest extends AbstractControllerTest {
                 .andReturn();
 
         Collection<UserTo> actual = jsonUtils.fromMvcResultBody(result, new TypeReference<Collection<UserTo>>() {});
-        List<UserTo> expected = VOTERS.stream()
+        List<UserTo> expected = USERS.stream()
                 .map(UserTransformer::toDto)
                 .sorted(Comparator.comparing(UserTo::getEmail))
                 .collect(Collectors.toList());

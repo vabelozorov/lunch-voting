@@ -1,12 +1,16 @@
 package ua.belozorov.lunchvoting.service.lunchplace;
 
+import org.jetbrains.annotations.Nullable;
 import org.springframework.transaction.annotation.Transactional;
 import ua.belozorov.lunchvoting.model.User;
 import ua.belozorov.lunchvoting.model.lunchplace.LunchPlace;
 import ua.belozorov.lunchvoting.to.LunchPlaceTo;
 import ua.belozorov.lunchvoting.to.MenuTo;
 
+import java.time.LocalDate;
 import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 
 /**
  * <h2></h2>
@@ -21,7 +25,19 @@ public interface LunchPlaceService {
 
     LunchPlace get(String id, User user);
 
+    /**
+     *
+     * @param placeIds
+     * @param startDate
+     * @param endDate
+     * @param user
+     * @return
+     */
+    Collection<LunchPlace> getMultipleWithMenu(Collection<String> placeIds, @Nullable LocalDate startDate, @Nullable LocalDate endDate, User user);
+
     Collection<LunchPlace> getAll(User user);
+
+    Collection<LunchPlace> getMultiple(Collection<String> placeIds, User user);
 
     void delete(String id, User user);
 

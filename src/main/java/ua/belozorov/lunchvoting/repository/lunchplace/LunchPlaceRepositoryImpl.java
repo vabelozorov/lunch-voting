@@ -1,7 +1,7 @@
 package ua.belozorov.lunchvoting.repository.lunchplace;
 
+import org.hibernate.jpa.QueryHints;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -11,8 +11,8 @@ import ua.belozorov.lunchvoting.exceptions.NotFoundException;
 import ua.belozorov.lunchvoting.model.lunchplace.LunchPlace;
 import ua.belozorov.lunchvoting.repository.BaseRepository;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
+import javax.annotation.PostConstruct;
+import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
@@ -27,8 +27,12 @@ import static java.util.Optional.ofNullable;
 @Repository
 public class LunchPlaceRepositoryImpl extends BaseRepository implements LunchPlaceRepository {
 
+    private final CrudLunchPlaceRepository repository;
+
     @Autowired
-    private CrudLunchPlaceRepository repository;
+    public LunchPlaceRepositoryImpl(CrudLunchPlaceRepository repository) {
+        this.repository = repository;
+    }
 
     @Override
     public void save(LunchPlace place) {
@@ -59,7 +63,45 @@ public class LunchPlaceRepositoryImpl extends BaseRepository implements LunchPla
     }
 
     @Override
+    public Collection<LunchPlace> getMultiple(Collection<String> placeIds) {
+        String sql = "SELECT lp FROM LunchPlace lp WHERE lp.id IN :placeIds ORDER BY lp.name";
+        return em.createQuery(sql, LunchPlace.class)
+            .setParameter("placeIds", placeIds)
+            .getResultList();
+    }
 
+    @Override
+    public List<LunchPlace> getWithMenu(Collection<String> placeIds, LocalDate startDate, LocalDate endDate) {
+        String sql = "SELECT DISTINCT lp FROM LunchPlace lp " +
+                "LEFT JOIN FETCH lp.menus menus " +
+                "LEFT JOIN FETCH menus.dishes";
+
+        boolean addedWhere = false;
+        if (startDate != null || endDate != null) {
+            sql += (addedWhere ? " AND" : " WHERE") + " (menus.effectiveDate BETWEEN :startDate AND :endDate)";
+            addedWhere = true;
+        }
+        if ( ! placeIds.isEmpty()) {
+            sql += (addedWhere ? " AND" : " WHERE") + " lp.id IN :placeIds";
+            addedWhere = true;
+        }
+        sql += " ORDER BY lp.name";
+
+        TypedQuery<LunchPlace> query = em.createQuery(sql, LunchPlace.class)
+                .setHint(QueryHints.HINT_PASS_DISTINCT_THROUGH, false);
+
+        if ( ! placeIds.isEmpty()) {
+            query.setParameter("placeIds", placeIds);
+        }
+        if (startDate != null || endDate != null) {
+            query.setParameter("startDate", startDate == null ? LocalDate.ofEpochDay(0) : startDate);
+            query.setParameter("endDate", endDate == null ? LocalDate.now() : endDate);
+        }
+
+        return query.getResultList();
+    }
+
+    @Override
     public boolean delete(String id, String userId) {
         em.createQuery("UPDATE PollItem pi SET pi.item = null WHERE pi.item.id = ?1")
                 .setParameter(1, id)
@@ -71,7 +113,6 @@ public class LunchPlaceRepositoryImpl extends BaseRepository implements LunchPla
     public List<LunchPlace> getByMenusForDate(final LocalDate date) {
         return repository.getByMenusForDate(date);
     }
-
 
     /**
      * <h2>Spring Data JPA repository</h2>
@@ -89,10 +130,6 @@ public class LunchPlaceRepositoryImpl extends BaseRepository implements LunchPla
         @Modifying
         @Query("DELETE FROM LunchPlace lp WHERE lp.id= :id AND lp.adminId= :userId")
         int deleteById(@Param("id") String id, @Param("userId") String userId);
-
-        @EntityGraph(attributePaths = {"menus"})
-        @Query("SELECT lp FROM LunchPlace lp WHERE lp.id= :id and lp.adminId= :userId")
-        LunchPlace getWithMenus(@Param("id") String id, @Param("userId") String userId);
 
         @Query("SELECT lp FROM LunchPlace lp WHERE lp.id= :id AND lp.adminId= :userId")
         LunchPlace getOne(@Param("id") String id, @Param("userId") String userId);
