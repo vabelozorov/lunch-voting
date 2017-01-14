@@ -23,13 +23,13 @@ public final class PollItem extends AbstractPersistableObject {
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id")
-//    @Getter(onMethod = @__({@Nullable}))
+    @Getter
     private final LunchPlace item;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "poll_id")
     @NotNull
-    private final Poll poll;
+    private final LunchPlacePoll poll;
 
     protected PollItem() {
         position = 0;
@@ -37,7 +37,7 @@ public final class PollItem extends AbstractPersistableObject {
         poll = null;
     }
 
-    public PollItem(int position, LunchPlace item, Poll poll) {
+    public PollItem(int position, LunchPlace item, LunchPlacePoll poll) {
         this.position = position;
         this.item = Objects.requireNonNull(item, "Error during initializing PollItem. LunchPlace must not be null");
         this.poll = Objects.requireNonNull(poll, "Error during initializing PollItem. Poll must not be null");

@@ -1,12 +1,13 @@
 package ua.belozorov.lunchvoting.model.voting;
 
 import org.junit.Test;
+import ua.belozorov.lunchvoting.AbstractTest;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Iterator;
 
 import static org.junit.Assert.assertTrue;
-import static ua.belozorov.lunchvoting.testdata.LunchPlaceTestData.PLACES;
 import static ua.belozorov.lunchvoting.testdata.UserTestData.*;
 
 /**
@@ -15,13 +16,14 @@ import static ua.belozorov.lunchvoting.testdata.UserTestData.*;
  * @author vabelozorov on 09.12.16.
  */
 //TODO Split
-public class PollingResultTest {
+public class PollingResultTest extends AbstractTest {
 
     @Test
     public void testPollingResult() throws Exception {
         LocalDateTime start = LocalDateTime.now();
         LocalDateTime end = start.plusHours(2);
-        Poll poll = new Poll(start, end, start, PLACES);
+        LocalDate menuDate = LocalDate.now();
+        LunchPlacePoll poll = new LunchPlacePoll(start, end, start, placeTestData.getPlaces(), menuDate);
         Iterator<PollItem> iterator = poll.getPollItems().iterator();
         String firstPollItemId = iterator.next().getId();
         String secondPollItemId = iterator.next().getId();

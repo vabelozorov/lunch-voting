@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import ua.belozorov.lunchvoting.model.lunchplace.LunchPlace;
 import ua.belozorov.lunchvoting.repository.lunchplace.LunchPlaceRepository;
-import ua.belozorov.lunchvoting.repository.lunchplace.LunchPlaceRepositoryImpl;
 import ua.belozorov.lunchvoting.service.AbstractServiceTest;
 
 import javax.persistence.EntityManager;
@@ -16,8 +15,6 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import static org.junit.Assert.assertTrue;
-import static ua.belozorov.lunchvoting.testdata.LunchPlaceTestData.*;
-import static ua.belozorov.lunchvoting.testdata.UserTestData.GOD_ID;
 
 /**
  * <h2></h2>

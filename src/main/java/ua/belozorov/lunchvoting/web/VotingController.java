@@ -4,8 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ua.belozorov.lunchvoting.model.voting.Poll;
-import ua.belozorov.lunchvoting.model.voting.PollingTimeInterval;
 import ua.belozorov.lunchvoting.service.voting.VotingService;
 
 /**
@@ -20,17 +18,6 @@ public class VotingController {
 
     @Autowired
     private VotingService service;
-
-    @PutMapping("/defaultPollInterval")
-    public ResponseEntity setPollDefaultTimeInternal(@RequestBody PollingTimeInterval interval) {
-        service.setPollingDefaultInterval(interval);
-        return ResponseEntity.ok().build();
-    }
-
-    @GetMapping("/defaultPollInterval")
-    public ResponseEntity<PollingTimeInterval> setPollDefaultTimeInternal() {
-        return ResponseEntity.ok(service.getDefaultPollInterval());
-    }
 
     @PostMapping
     public ResponseEntity vote(String placeId) {

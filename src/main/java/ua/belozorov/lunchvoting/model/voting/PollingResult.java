@@ -10,9 +10,9 @@ import java.util.*;
  */
 public class PollingResult<I> implements VoteStatistics<I> {
     private final Map<I, ResultEntry> results;
-    private final Poll poll;
+    private final LunchPlacePoll poll;
 
-    PollingResult(Map<I, ResultEntry> results, Poll poll) {
+    PollingResult(Map<I, ResultEntry> results, LunchPlacePoll poll) {
         this.results = Collections.unmodifiableMap(results);
         this.poll = poll;
     }

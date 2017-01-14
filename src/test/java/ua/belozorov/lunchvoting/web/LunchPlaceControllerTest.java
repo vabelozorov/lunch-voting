@@ -2,7 +2,6 @@ package ua.belozorov.lunchvoting.web;
 
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cglib.core.Local;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
 import ua.belozorov.lunchvoting.AuthorizedUser;
@@ -24,8 +23,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static ua.belozorov.lunchvoting.MatcherUtils.matchCollection;
 import static ua.belozorov.lunchvoting.MatcherUtils.matchSingle;
-import static ua.belozorov.lunchvoting.testdata.LunchPlaceTestData.*;
-import static ua.belozorov.lunchvoting.testdata.MenuTestData.*;
+import static ua.belozorov.lunchvoting.model.lunchplace.LunchPlaceTestData.*;
+import static ua.belozorov.lunchvoting.model.lunchplace.MenuTestData.*;
 import static ua.belozorov.lunchvoting.testdata.UserTestData.GOD;
 import static ua.belozorov.lunchvoting.testdata.UserTestData.GOD_ID;
 
@@ -39,6 +38,11 @@ public class LunchPlaceControllerTest extends AbstractControllerTest {
 
     @Autowired
     private LunchPlaceService placeService;
+
+    private final LunchPlace PLACE3 = super.placeTestData.getPlace3();
+    private final String PLACE3_ID = PLACE3.getId();
+    private final LunchPlace PLACE4 = super.placeTestData.getPlace4();
+    private final String PLACE4_ID = PLACE4.getId();
 
     @Test
     public void testCreate() throws Exception {
@@ -108,7 +112,9 @@ public class LunchPlaceControllerTest extends AbstractControllerTest {
             String id = PLACE4.getId();
             String name = PLACE4.getName();
             String description = PLACE4.getDescription();
-            Set<Menu> menus = new HashSet<>(Arrays.asList(MENU1, MENU2, MENU3, MENU4));
+            Set<Menu> menus = new HashSet<>(Arrays.asList(
+                    placeTestData.getMenu1(), placeTestData.getMenu2(),
+                    placeTestData.getMenu3(), placeTestData.getMenu4()));
         };
         String expectedJson = jsonUtils.toJson(obj);
 
@@ -126,7 +132,7 @@ public class LunchPlaceControllerTest extends AbstractControllerTest {
 
         Object obj = new Object() {
             String id = PLACE4.getId();
-            Set<Menu> menus = new HashSet<>(Arrays.asList(MENU3, MENU4));
+            Set<Menu> menus = new HashSet<>(Arrays.asList(placeTestData.getMenu3(), placeTestData.getMenu4()));
         };
 
         String expectedJson = jsonUtils.toJson(obj);
@@ -172,12 +178,12 @@ public class LunchPlaceControllerTest extends AbstractControllerTest {
         Object obj1 = new Object() {
             String id = PLACE3.getId();
             String name = PLACE3.getName();
-            Set<Menu> menus = new HashSet<>(Arrays.asList(MENU6));
+            Set<Menu> menus = new HashSet<>(Arrays.asList(placeTestData.getMenu6()));
         };
         Object obj2 = new Object() {
             String id = PLACE4.getId();
             String name = PLACE4.getName();
-            Set<Menu> menus = new HashSet<>(Arrays.asList(MENU1,MENU2));
+            Set<Menu> menus = new HashSet<>(Arrays.asList(placeTestData.getMenu1(), placeTestData.getMenu2()));
         };
 
         String expectedJson = jsonUtils.toJson(Arrays.asList(obj1, obj2));

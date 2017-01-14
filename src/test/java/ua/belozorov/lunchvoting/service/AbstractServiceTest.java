@@ -3,6 +3,7 @@ package ua.belozorov.lunchvoting.service;
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
 import org.springframework.test.context.ContextConfiguration;
+import ua.belozorov.lunchvoting.AbstractSpringTest;
 import ua.belozorov.lunchvoting.AbstractTest;
 import ua.belozorov.lunchvoting.config.RootConfig;
 
@@ -12,7 +13,7 @@ import ua.belozorov.lunchvoting.config.RootConfig;
  * @author vabelozorov on 17.11.16.
  */
 @ContextConfiguration(classes = {RootConfig.class})
-public abstract class AbstractServiceTest extends AbstractTest {
+public abstract class AbstractServiceTest extends AbstractSpringTest {
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();

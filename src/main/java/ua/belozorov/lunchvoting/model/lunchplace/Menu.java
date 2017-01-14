@@ -58,7 +58,7 @@ public final class Menu extends AbstractPersistableObject {
     }
 
     @Builder
-    Menu(LocalDate effectiveDate, List<Dish> dishes, LunchPlace lunchPlace) {
+    public Menu(LocalDate effectiveDate, List<Dish> dishes, LunchPlace lunchPlace) {
         this(null, null, effectiveDate, dishes, lunchPlace);
     }
 

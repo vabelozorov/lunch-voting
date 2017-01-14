@@ -8,9 +8,13 @@ import ua.belozorov.lunchvoting.model.lunchplace.LunchPlace;
 import ua.belozorov.lunchvoting.model.voting.*;
 import ua.belozorov.lunchvoting.repository.lunchplace.LunchPlaceRepository;
 import ua.belozorov.lunchvoting.repository.voting.PollingRepository;
+import ua.belozorov.lunchvoting.util.ExceptionUtils;
 
 import java.time.LocalDate;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import static java.util.Optional.ofNullable;
 
@@ -29,34 +33,28 @@ public class VotingServiceImpl implements VotingService {
     @Autowired
     private PollingRepository pollingRepository;
 
-    @Override
-    @Transactional
-    public void setPollingDefaultInterval(PollingTimeInterval interval) {
-        pollingRepository.setPollingInternal(interval);
-    }
-
-    @Override
-    public PollingTimeInterval getDefaultPollInterval() {
-        return pollingRepository.getPollingInterval();
-    }
 
     /**
      * Create a poll where poll items are composed of all currently available menus for today date.
      * @return Poll
      */
     @Override
+    @Transactional
+    //TODO scheduled job?
     public String createPollForTodayMenus() {
-        List<LunchPlace> todayMenus = lunchPlaceRepository.getByMenusForDate(LocalDate.now());
-        Poll poll = new Poll(todayMenus);
+        LocalDate menuDate = LocalDate.now();
+        List<LunchPlace> places = lunchPlaceRepository.getIfMenuForDate(menuDate);
+        LunchPlacePoll poll = new LunchPlacePoll(places, menuDate);
         pollingRepository.savePoll(poll);
-        //TODO scheduled job?
         return poll.getId();
     }
 
     @Override
     public void vote(String voterId, String pollId, String pollItemId) {
+        ExceptionUtils.checkAllNotNull(voterId, pollId, pollItemId);
+
         Poll poll = ofNullable(pollingRepository.getPollAndEmptyPollItems(pollId))
-                                .orElseThrow(() -> new NotFoundException(pollId, Poll.class));
+                                .orElseThrow(() -> new NotFoundException(pollId, LunchPlacePoll.class));
         final Vote existingVote = pollingRepository.getVoteInPoll(voterId, pollId);
         VoteDecision decision = poll.verify(new VoteIntention(voterId, pollId, pollItemId, existingVote));
 
@@ -71,7 +69,20 @@ public class VotingServiceImpl implements VotingService {
     }
 
     @Override
+    public Poll getPollFullDetails(String pollId) {
+        Objects.requireNonNull(pollId);
+        return pollingRepository.getFullPoll(pollId);
+    }
+
+    @Override
     public Poll getPollItemDetails(String pollId, String pollItemId) {
-        return pollingRepository.getPollAndPollItem(pollId, pollItemId);
+        return this.getPollItemDetails(pollId, Collections.singletonList(pollItemId));
+    }
+
+    @Override
+    public Poll getPollItemDetails(String pollId, Collection<String> pollItemIds) {
+        ExceptionUtils.requireNonNullNotEmpty(pollItemIds);
+        Objects.requireNonNull(pollId);
+        return pollingRepository.getPollAndPollItem(pollId, pollItemIds);
     }
 }

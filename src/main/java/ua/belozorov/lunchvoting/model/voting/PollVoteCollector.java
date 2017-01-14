@@ -1,7 +1,6 @@
 package ua.belozorov.lunchvoting.model.voting;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -15,7 +14,7 @@ import java.util.stream.Collectors;
  */
 public final class PollVoteCollector implements VoteCollector {
     private final List<Vote> votes = new ArrayList<>();
-    private final Poll poll;
+    private final LunchPlacePoll poll;
     private final Collector<Vote, ArrayList<Vote>, PollingResult.ResultEntry> POLL_RESULT_COLLECTOR = Collector.of(
             ArrayList<Vote>::new,
             ArrayList<Vote>::add,
@@ -26,7 +25,7 @@ public final class PollVoteCollector implements VoteCollector {
             PollingResult.ResultEntry::new
     );
 
-    PollVoteCollector(Poll poll) {
+    PollVoteCollector(LunchPlacePoll poll) {
         this.poll = poll;
     }
 

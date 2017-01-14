@@ -32,7 +32,7 @@ public final class Vote extends AbstractPersistableObject {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "poll_id")
     @NotNull
-    private final Poll poll;
+    private final LunchPlacePoll poll;
 
     @Column(name = "vote_time")
     @NotNull
@@ -53,7 +53,7 @@ public final class Vote extends AbstractPersistableObject {
      * @param voterId string value conforming to UUID format representing an ID of a voting subject. Must not be null
      * @param pollItem must not be null
      */
-    Vote(String voterId, Poll poll, PollItem pollItem, LocalDateTime voteTime) {
+    Vote(String voterId, LunchPlacePoll poll, PollItem pollItem, LocalDateTime voteTime) {
         this(null, null, voterId, poll, pollItem, voteTime);
     }
 
@@ -64,7 +64,7 @@ public final class Vote extends AbstractPersistableObject {
      * @param voterId string value conforming to UUID format representing an ID of a voting subject. Must not be null
      * @param pollItem must not be null
      */
-    Vote(String id, Integer version, String voterId, Poll poll, PollItem pollItem, LocalDateTime voteTime) {
+    Vote(String id, Integer version, String voterId, LunchPlacePoll poll, PollItem pollItem, LocalDateTime voteTime) {
         super(id, version);
         this.voterId = Objects.requireNonNull(voterId);
         this.poll = Objects.requireNonNull(poll);

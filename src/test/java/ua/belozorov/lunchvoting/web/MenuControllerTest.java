@@ -4,7 +4,6 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
-import ua.belozorov.lunchvoting.JsonUtils;
 import ua.belozorov.lunchvoting.repository.lunchplace.MenuRepository;
 import ua.belozorov.lunchvoting.service.lunchplace.LunchPlaceService;
 
@@ -15,9 +14,7 @@ import static org.junit.Assert.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
-import static ua.belozorov.lunchvoting.testdata.LunchPlaceTestData.PLACE4_ID;
-import static ua.belozorov.lunchvoting.testdata.MenuTestData.MENU1_ID;
+import static ua.belozorov.lunchvoting.model.lunchplace.LunchPlaceTestData.*;
 
 /**
  * <h2></h2>
@@ -51,7 +48,7 @@ public class MenuControllerTest extends AbstractControllerTest {
 
         String sentContent = jsonUtils.toJson(sent);
 
-        MvcResult result = mockMvc.perform(post(REST_URL + "/" + PLACE4_ID + "/menus/")
+        MvcResult result = mockMvc.perform(post(REST_URL + "/" + placeTestData.getPlace4Id() + "/menus/")
                 .content(sentContent)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
@@ -62,9 +59,9 @@ public class MenuControllerTest extends AbstractControllerTest {
 
     @Test
     public void testDelete() throws Exception {
-        assertFalse(repository.getMenu(MENU1_ID) == null);
-        mockMvc.perform(delete(REST_URL + "/" + PLACE4_ID + "/menus/" + MENU1_ID))
+        assertFalse(repository.getMenu(placeTestData.getMenu1Id()) == null);
+        mockMvc.perform(delete(REST_URL + "/" + placeTestData.getPlace4Id() + "/menus/" + placeTestData.getMenu1Id()))
                     .andExpect(status().isNoContent());
-        assertTrue(repository.getMenu(MENU1_ID) == null);
+        assertTrue(repository.getMenu(placeTestData.getMenu1Id()) == null);
     }
 }

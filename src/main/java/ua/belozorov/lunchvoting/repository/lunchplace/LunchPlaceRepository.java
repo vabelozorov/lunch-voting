@@ -30,5 +30,5 @@ public interface LunchPlaceRepository {
 
     boolean delete(String id, String userId);
 
-    List<LunchPlace> getByMenusForDate(LocalDate date);
+    List<LunchPlace> getIfMenuForDate(LocalDate date);
 }

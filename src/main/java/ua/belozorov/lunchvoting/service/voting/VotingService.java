@@ -1,7 +1,9 @@
 package ua.belozorov.lunchvoting.service.voting;
 
+import ua.belozorov.lunchvoting.model.voting.LunchPlacePoll;
 import ua.belozorov.lunchvoting.model.voting.Poll;
-import ua.belozorov.lunchvoting.model.voting.PollingTimeInterval;
+
+import java.util.Collection;
 
 /**
  * <h2></h2>
@@ -10,13 +12,41 @@ import ua.belozorov.lunchvoting.model.voting.PollingTimeInterval;
  */
 public interface VotingService {
 
-    void setPollingDefaultInterval(PollingTimeInterval interval);
+    /**
+     * Creates a Poll instance where PollItems are a set of LunchPlace instances and each such instance has a Menu
+     * for today
+     * @return ID of the created Poll instance
+     */
+   String createPollForTodayMenus();
 
-    String createPollForTodayMenus();
-
-    PollingTimeInterval getDefaultPollInterval();
-
+    /**
+     * Handles the voting
+     * @param voterId non-null, existing voterId
+     * @param pollId non-null, existing pollId
+     * @param pollItemId non-null, existing pollItemId
+     */
     void vote(String voterId, String pollId, String pollItemId);
 
+    /**
+     * Returns fully initialized Poll instance
+     * @param pollId non-null, valid pollId
+     * @return
+     */
+    Poll getPollFullDetails(String pollId);
+
+    /**
+     * Returns a Poll instance with one selected PollItem with complete information about its item
+     * @param pollId non-null, valid pollId
+     * @param pollItemId non-null, size > 0
+     * @return
+     */
     Poll getPollItemDetails(String pollId, String pollItemId);
+
+    /**
+     * Returns a Poll instance with a subset of PollItems, each having a complete information about its item
+     * @param pollId non-null, valid pollId
+     * @param pollItemIds non-null, size > 0
+     * @return Poll instance
+     */
+    Poll getPollItemDetails(String pollId, Collection<String> pollItemIds);
 }

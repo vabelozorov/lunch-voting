@@ -96,7 +96,7 @@ public class LunchPlaceServiceImpl implements LunchPlaceService {
     public String addMenu(String lunchPlaceId, MenuTo menuTo, User user) {
         LunchPlace place = ofNullable(lunchPlaceRepository.get(lunchPlaceId, user.getId()))
                                 .orElseThrow(() -> new NotFoundException(lunchPlaceId, LunchPlace.class));
-        Menu created = place.createMenu(menuTo.getEffectiveDate(), menuTo.getDishes());
+        Menu created = new Menu(menuTo.getEffectiveDate(), menuTo.getDishes(), place);
         menuRepository.save(created);
         return created.getId();
     }

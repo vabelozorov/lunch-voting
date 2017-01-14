@@ -14,6 +14,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import ua.belozorov.lunchvoting.AbstractSpringTest;
 import ua.belozorov.lunchvoting.AbstractTest;
 import ua.belozorov.lunchvoting.JsonUtils;
 import ua.belozorov.lunchvoting.TestConfig;
@@ -30,7 +31,7 @@ import java.util.Arrays;
  */
 @ContextConfiguration(classes = {RootConfig.class, WebConfig.class, TestConfig.class})
 @WebAppConfiguration
-public abstract class AbstractControllerTest extends AbstractTest {
+public abstract class AbstractControllerTest extends AbstractSpringTest {
 
 //    private static final CharacterEncodingFilter CHARACTER_ENCODING_FILTER = new CharacterEncodingFilter();
 //

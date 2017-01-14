@@ -110,8 +110,14 @@ public class LunchPlaceRepositoryImpl extends BaseRepository implements LunchPla
     }
 
     @Override
-    public List<LunchPlace> getByMenusForDate(final LocalDate date) {
-        return repository.getByMenusForDate(date);
+    public List<LunchPlace> getIfMenuForDate(final LocalDate date) {
+        List<LunchPlace> places = em.createQuery("SELECT DISTINCT lp FROM LunchPlace lp " +
+                "INNER JOIN FETCH lp.menus m " +
+                "LEFT JOIN FETCH m.dishes " +
+                "WHERE m.effectiveDate= :date", LunchPlace.class)
+                .setParameter("date", date).getResultList();
+        em.clear();
+        return places;
     }
 
     /**
@@ -134,7 +140,11 @@ public class LunchPlaceRepositoryImpl extends BaseRepository implements LunchPla
         @Query("SELECT lp FROM LunchPlace lp WHERE lp.id= :id AND lp.adminId= :userId")
         LunchPlace getOne(@Param("id") String id, @Param("userId") String userId);
 
-        @Query("SELECT lp FROM LunchPlace lp INNER JOIN Menu m WHERE m.effectiveDate= ?1")
-        List<LunchPlace> getByMenusForDate(LocalDate date);
+//        @Query(
+//                "SELECT DISTINCT lp FROM LunchPlace lp " +
+//                        "INNER JOIN FETCH lp.menus m " +
+//                        "LEFT JOIN FETCH m.dishes " +
+//                        "WHERE m.effectiveDate= ?1")
+//        List<LunchPlace> getByMenusForDate(LocalDate date);
     }
 }

@@ -1,9 +1,11 @@
 package ua.belozorov.lunchvoting.repository.voting;
 
+import ua.belozorov.lunchvoting.model.voting.LunchPlacePoll;
 import ua.belozorov.lunchvoting.model.voting.Poll;
 import ua.belozorov.lunchvoting.model.voting.PollItem;
-import ua.belozorov.lunchvoting.model.voting.PollingTimeInterval;
 import ua.belozorov.lunchvoting.model.voting.Vote;
+
+import java.util.Collection;
 
 /**
  * <h2></h2>
@@ -12,13 +14,9 @@ import ua.belozorov.lunchvoting.model.voting.Vote;
  */
 public interface PollingRepository {
 
-    void setPollingInternal(PollingTimeInterval internal);
+    void savePoll(LunchPlacePoll poll);
 
-    PollingTimeInterval getPollingInterval();
-
-    void savePoll(Poll poll);
-
-    Poll getPollAndEmptyPollItems(String id);
+    LunchPlacePoll getPollAndEmptyPollItems(String id);
 
     /**
      * Searches for a voter's vote assuming that only one vote from a voter can be given in a particular poll
@@ -30,7 +28,11 @@ public interface PollingRepository {
 
     PollItem getPollItem(String pollId, String pollItemId);
 
-    Poll getPollAndPollItem(String pollId, String pollItemId);
+    LunchPlacePoll getPollAndPollItem(String pollId, Collection<String> pollItemId);
+
+    LunchPlacePoll getPollAndPollItem(String pollId, String pollItemId);
+
+    LunchPlacePoll getFullPoll(String pollId);
 
     void saveVote(Vote vote);
 

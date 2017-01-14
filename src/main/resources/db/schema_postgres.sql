@@ -13,7 +13,8 @@ CREATE TABLE IF NOT EXISTS polls (
   version INT NOT NULL DEFAULT 0,
   start_time TIMESTAMP NOT NULL,
   end_time TIMESTAMP NOT NULL,
-  change_time TIMESTAMP NOT NULL
+  change_time TIMESTAMP NOT NULL,
+  menuDate TIMESTAMP NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS users (
@@ -40,11 +41,10 @@ CREATE TABLE IF NOT EXISTS places (
   FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
-
 CREATE TABLE IF NOT EXISTS poll_items (
   id VARCHAR(36) NOT NULL PRIMARY KEY,
   version INT NOT NULL DEFAULT 0,
-  poll_id VARCHAR(36) NOT NULL ,
+  poll_id VARCHAR(36) NOT NULL,
   position INT NOT NULL,
   item_id VARCHAR(36),
   FOREIGN KEY (poll_id) REFERENCES polls(id),
