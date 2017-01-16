@@ -1,5 +1,6 @@
 package ua.belozorov.lunchvoting.model.voting;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -13,4 +14,8 @@ public interface VoteStatistics<I> {
     Map<I, Integer> countPerItem();
 
     Map<I, List<Vote>> votesPerItem();
+
+    List<I> getWinners();
+
+    List<Vote> votesForItem(I item);
 }

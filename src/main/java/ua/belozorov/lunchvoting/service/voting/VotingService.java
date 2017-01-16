@@ -1,7 +1,6 @@
 package ua.belozorov.lunchvoting.service.voting;
 
-import ua.belozorov.lunchvoting.model.voting.LunchPlacePoll;
-import ua.belozorov.lunchvoting.model.voting.Poll;
+import ua.belozorov.lunchvoting.model.voting.*;
 
 import java.util.Collection;
 
@@ -24,8 +23,9 @@ public interface VotingService {
      * @param voterId non-null, existing voterId
      * @param pollId non-null, existing pollId
      * @param pollItemId non-null, existing pollItemId
+     * @throws javax.persistence.NoResultException if a pollEntity is not found
      */
-    void vote(String voterId, String pollId, String pollItemId);
+    Vote vote(String voterId, String pollId, String pollItemId);
 
     /**
      * Returns fully initialized Poll instance
@@ -49,4 +49,11 @@ public interface VotingService {
      * @return Poll instance
      */
     Poll getPollItemDetails(String pollId, Collection<String> pollItemIds);
+
+    /**
+     * Returns vote
+     * @param pollId
+     * @return
+     */
+    VoteStatistics<PollItem> getPollResultPerItem(String pollId);
 }

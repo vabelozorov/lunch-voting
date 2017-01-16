@@ -2,12 +2,10 @@ package ua.belozorov.lunchvoting.model.voting;
 
 import org.junit.Test;
 import ua.belozorov.lunchvoting.AbstractTest;
-import ua.belozorov.lunchvoting.exceptions.MultipleVoteException;
-import ua.belozorov.lunchvoting.exceptions.NotFoundException;
-import ua.belozorov.lunchvoting.exceptions.PollNotActiveException;
-import ua.belozorov.lunchvoting.exceptions.VoteChangeNotAllowedException;
+import ua.belozorov.lunchvoting.exceptions.*;
 import ua.belozorov.lunchvoting.model.lunchplace.Dish;
 import ua.belozorov.lunchvoting.model.lunchplace.LunchPlace;
+import ua.belozorov.lunchvoting.model.lunchplace.LunchPlaceTestData;
 import ua.belozorov.lunchvoting.model.lunchplace.Menu;
 
 import java.time.LocalDate;
@@ -24,26 +22,17 @@ import static ua.belozorov.lunchvoting.testdata.UserTestData.VOTER_ID;
  * @author vabelozorov on 09.12.16.
  */
 public class PollTest extends AbstractTest {
-    private final List<LunchPlace> places = placeTestData.getPlaces();
-
-    @Test(expected = IllegalStateException.class)
-    public void testVerifyWrongPollId() throws Exception {
-        LunchPlacePoll poll = new LunchPlacePoll(this.places, LocalDate.now());
-        Iterator<PollItem> iterator = poll.getPollItems().iterator();
-        String firstPollItemId = iterator.next().getId();
-        VoteIntention intention = new VoteIntention(VOTER_ID, "NOT_EXISTS_ID", firstPollItemId, null);
-        poll.verify(intention);
-    }
+    private final List<LunchPlace> places = LunchPlaceTestData.getWithFilteredMenu(LocalDate.now(), testPlaces.getPlace3(), testPlaces.getPlace4());
 
     @Test(expected = NotFoundException.class)
     public void testVerifyWrongPollItemId() throws Exception {
         LunchPlacePoll poll = new LunchPlacePoll(this.places, LocalDate.now());
-        VoteIntention intention = new VoteIntention(VOTER_ID, poll.getId(), "NOT_EXISTS_ID", null);
+        VoteIntention intention = new VoteIntention(VOTER_ID, "NOT_EXISTS_ITEM_ID", null);
         poll.verify(intention);
     }
 
     @Test
-    public void testVerifyVotingForInactivePoll() throws Exception {
+    public void failsWhenVotingForInactivePoll() throws Exception {
         List<RuntimeException> exceptions = new ArrayList<>();
 
         LocalDateTime start = null;
@@ -59,7 +48,7 @@ public class PollTest extends AbstractTest {
             poll = new LunchPlacePoll(start, end, start, this.places, menuDate);
             Iterator<PollItem> iterator = poll.getPollItems().iterator();
             firstPollItemId = iterator.next().getId();
-            intention = new VoteIntention(VOTER_ID, poll.getId(), firstPollItemId, null);
+            intention = new VoteIntention(VOTER_ID, firstPollItemId, null);
             poll.verify(intention);
         } catch (PollNotActiveException e) {
             exceptions.add(e);
@@ -72,7 +61,7 @@ public class PollTest extends AbstractTest {
             poll = new LunchPlacePoll(start, end, start, this.places, menuDate);
            Iterator<PollItem> iterator = poll.getPollItems().iterator();
            firstPollItemId = iterator.next().getId();
-            intention = new VoteIntention(VOTER_ID, poll.getId(), firstPollItemId, null);
+            intention = new VoteIntention(VOTER_ID, firstPollItemId, null);
             poll.verify(intention);
         } catch (PollNotActiveException e) {
             exceptions.add(e);
@@ -82,14 +71,16 @@ public class PollTest extends AbstractTest {
     }
 
     @Test
-    public void testVerifyVoteAccepted() throws Exception {
+    public void acceptsVote() throws Exception {
         LocalDateTime start = LocalDateTime.now();
         LocalDateTime end = start.plusHours(2);
         LocalDate menuDate = LocalDate.now();
+
         LunchPlacePoll poll = new LunchPlacePoll(start, end, start, this.places, menuDate);
         Iterator<PollItem> iterator = poll.getPollItems().iterator();
         String firstPollItemId = iterator.next().getId();
-        VoteIntention intention = new VoteIntention(VOTER.getId(), poll.getId(), firstPollItemId, null);
+
+        VoteIntention intention = new VoteIntention(VOTER.getId(), firstPollItemId, null);
         VoteDecision decision = poll.verify(intention);
         Vote vote = decision.getVote();
 
@@ -101,7 +92,7 @@ public class PollTest extends AbstractTest {
     }
 
     @Test
-    public void testVerifyVoteUpdated() throws Exception {
+    public void updatesVote() throws Exception {
         LocalDateTime start = LocalDateTime.now();
         LocalDateTime end = start.plusHours(2);
         LocalDate menuDate = LocalDate.now();
@@ -109,9 +100,9 @@ public class PollTest extends AbstractTest {
         Iterator<PollItem> iterator = poll.getPollItems().iterator();
         String firstPollItemId = iterator.next().getId();
         String secondPollItemId = iterator.next().getId();
-        VoteIntention intention = new VoteIntention(VOTER.getId(), poll.getId(), firstPollItemId, null);
+        VoteIntention intention = new VoteIntention(VOTER.getId(), firstPollItemId, null);
         Vote vote = poll.verify(intention).getVote();
-        VoteIntention secondVoteIntention = new VoteIntention(VOTER.getId(), poll.getId(), secondPollItemId, vote);
+        VoteIntention secondVoteIntention = new VoteIntention(VOTER.getId(), secondPollItemId, vote);
         VoteDecision decision = poll.verify(secondVoteIntention);
         Vote voteForUpdate = decision.getVote();
 
@@ -123,22 +114,24 @@ public class PollTest extends AbstractTest {
     }
 
     @Test(expected = VoteChangeNotAllowedException.class)
-    public void testVerifyVoteUpdateTooLate() throws Exception {
+    public void failsWhenUpdateIsAfterTimeThreshold() throws Exception {
         LocalDateTime start = LocalDateTime.now().minusHours(2);
         LocalDateTime end = start.plusHours(3);
         LocalDate menuDate = LocalDate.now();
-        LunchPlacePoll poll = new LunchPlacePoll(start, end, start.plusHours(1), this.places, menuDate);
+
+        LunchPlacePoll poll = new LunchPlacePoll(start, end, start.plusHours(1),this.places, menuDate);
         Iterator<PollItem> iterator = poll.getPollItems().iterator();
         String firstPollItemId = iterator.next().getId();
         String secondPollItemId = iterator.next().getId();
-        VoteIntention intention = new VoteIntention(VOTER.getId(), poll.getId(), firstPollItemId, null);
+
+        VoteIntention intention = new VoteIntention(VOTER.getId(), firstPollItemId, null);
         Vote vote = poll.verify(intention).getVote();
-        VoteIntention secondVoteIntention = new VoteIntention(VOTER.getId(), poll.getId(), secondPollItemId, vote);
+        VoteIntention secondVoteIntention = new VoteIntention(VOTER.getId(), secondPollItemId, vote);
         poll.verify(secondVoteIntention);
     }
 
     @Test(expected = MultipleVoteException.class)
-    public void testVerifyOnlyOneVoteAllowed() throws Exception {
+    public void failsOnSecondVoteAttempt() throws Exception {
         LocalDateTime start = LocalDateTime.now();
         LocalDateTime end = start.plusHours(2);
         LocalDate menuDate = LocalDate.now();
@@ -147,19 +140,19 @@ public class PollTest extends AbstractTest {
         Iterator<PollItem> iterator = poll.getPollItems().iterator();
         String firstPollItemId = iterator.next().getId();
 
-        VoteIntention intention = new VoteIntention(VOTER.getId(), poll.getId(), firstPollItemId, null);
+        VoteIntention intention = new VoteIntention(VOTER.getId(), firstPollItemId, null);
         Vote vote = poll.verify(intention).getVote();
-        VoteIntention secondVoteIntention = new VoteIntention(VOTER.getId(), poll.getId(), firstPollItemId, vote);
+        VoteIntention secondVoteIntention = new VoteIntention(VOTER.getId(), firstPollItemId, vote);
         poll.verify(secondVoteIntention);
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test(expected = LunchPlaceWithoutMenuException.class)
     public void lunchPlaceWithEmptyMenusGetsRejected() throws Exception {
         LunchPlace place = new LunchPlace("ID", "Name", "Address", "Description", new ArrayList<String>(), new ArrayList<Menu>(), "AdminId");
         new LunchPlacePoll(Arrays.asList(place), LocalDate.now());
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test(expected = MenuDateMismatchException.class)
     public void lunchPlaceWithWrongMenuDateGetsRejected() throws Exception {
         LunchPlace place = new LunchPlace("ID", "Name", "Address", "Description", new ArrayList<String>(), new ArrayList<Menu>(), "AdminId");
         Menu menu = new Menu(LocalDate.now().minusDays(1), new ArrayList<Dish>(), place);

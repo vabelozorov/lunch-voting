@@ -78,8 +78,8 @@ public final class LunchPlace extends AbstractPersistableObject {
         this(id, null, name, address, description, phones, menus, adminId);
     }
 
-    @Builder
-    public LunchPlace(@Nullable String id, @Nullable Integer version, @NotNull String name, @NotNull String address, @NotNull String description,
+    @Builder(toBuilder = true)
+    LunchPlace(@Nullable String id, @Nullable Integer version, @NotNull String name, @NotNull String address, @NotNull String description,
                       @NotNull Collection<String> phones, @NotNull Collection<Menu> menus, @NotNull String adminId) {
         super(id, version);
         this.name = name;
@@ -101,7 +101,8 @@ public final class LunchPlace extends AbstractPersistableObject {
     }
 
     public LunchPlace setMenus(Collection<Menu> menus) {
-        return builder(this).menus(menus).build();
+//        return builder(this).menus(menus).build();
+        return this.toBuilder().menus(menus).build();
     }
 
     @Override
@@ -119,9 +120,9 @@ public final class LunchPlace extends AbstractPersistableObject {
         return new LunchPlaceBuilder();
     }
 
-    public static LunchPlaceBuilder builder(LunchPlace place) {
-        return new LunchPlaceBuilder(place);
-    }
+//    public static LunchPlaceBuilder builder(LunchPlace place) {
+//        return new LunchPlaceBuilder(place);
+//    }
 
     public Menu createMenu(LocalDate effectiveDate, List<Dish> dishes) {
         return new Menu(effectiveDate, dishes, this);

@@ -43,7 +43,7 @@ public class LunchPlaceRepositoryImpl extends BaseRepository implements LunchPla
     public void update(LunchPlace place, String userId) {
         LunchPlace saved = ofNullable(get(place.getId(), userId))
                                 .orElseThrow(() -> new NotFoundException(place));
-        saved = LunchPlace.builder(saved)
+        saved = saved.toBuilder()
                 .name(place.getName())
                 .address(place.getAddress())
                 .description(place.getDescription())

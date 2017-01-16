@@ -68,7 +68,7 @@ CREATE TABLE IF NOT EXISTS votes (
   vote_time TIMESTAMP NOT NULL,
   FOREIGN KEY (voter_id) REFERENCES users(id),
   FOREIGN KEY (poll_id) REFERENCES polls(id) ON DELETE CASCADE,
-  FOREIGN KEY (item_id) REFERENCES places(id)
+  FOREIGN KEY (item_id) REFERENCES poll_items(id)
 );
 
 CREATE TABLE IF NOT EXISTS dishes (

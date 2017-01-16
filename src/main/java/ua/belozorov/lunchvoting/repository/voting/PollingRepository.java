@@ -1,5 +1,6 @@
 package ua.belozorov.lunchvoting.repository.voting;
 
+import org.jetbrains.annotations.Nullable;
 import ua.belozorov.lunchvoting.model.voting.LunchPlacePoll;
 import ua.belozorov.lunchvoting.model.voting.Poll;
 import ua.belozorov.lunchvoting.model.voting.PollItem;

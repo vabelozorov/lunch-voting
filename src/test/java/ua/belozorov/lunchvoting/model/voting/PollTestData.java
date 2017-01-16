@@ -1,54 +1,56 @@
 package ua.belozorov.lunchvoting.model.voting;
 
+import lombok.Getter;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
-import ua.belozorov.lunchvoting.AbstractTest;
 import ua.belozorov.lunchvoting.model.lunchplace.LunchPlace;
 import ua.belozorov.lunchvoting.model.lunchplace.LunchPlaceTestData;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.stream.Collectors;
-
-import static ua.belozorov.lunchvoting.model.lunchplace.LunchPlaceTestData.*;
 
 /**
  * <h2></h2>
  *
  * @author vabelozorov on 11.12.16.
  */
+@Getter
 public class PollTestData {
-    private final LunchPlacePoll poll1;
+    public static final  Comparator<LunchPlacePoll> POLL_COMPARATOR = new PollComparator();
+
+    private final LunchPlacePoll poll2;
     private final Resource pollSqlResource;
 
-    private Comparator<LunchPlacePoll> pollComparator = new PollComparator();
+    public  PollTestData(LunchPlaceTestData placeTestData) {
+        LocalDateTime now = LocalDateTime.now();
 
-    public PollTestData(LunchPlaceTestData placeTestData) {
         LocalDate menuDate = LocalDate.now().minusDays(2);
         LunchPlace place1 = placeTestData.getPlace1();
         LunchPlace place2 = placeTestData.getPlace2();
 
-        place1 = LunchPlaceTestData.getWithFilteredMenu(place1, menuDate);
-        place2 = LunchPlaceTestData.getWithFilteredMenu(place2, menuDate);
+        place1 = LunchPlaceTestData.getWithFilteredMenu(menuDate, place1);
+        place2 = LunchPlaceTestData.getWithFilteredMenu(menuDate, place2);
 
-        this.poll1 = new LunchPlacePoll(
+        this.poll2 = new LunchPlacePoll(
+                now.minusHours(2),
+                now.plusHours(2),
+                now.plusMinutes(10),
                 Arrays.asList(place1, place2),
                 menuDate
         );
-        this.pollSqlResource = new PollToResourceConverter().convert(Collections.singletonList(poll1));
+
+        this.pollSqlResource = new PollToResourceConverter().convert(Collections.singletonList(poll2));
     }
 
-    public LunchPlacePoll getPoll1() {
-        return poll1;
+    public PollItem getPOll2PollItem1() {
+        return this.poll2.getPollItems().iterator().next();
     }
-
-    public Resource getPollSqlResource() {
-        return pollSqlResource;
-    }
-
-    public Comparator<LunchPlacePoll> getPollComparator() {
-        return pollComparator;
+    public PollItem getPOll2PollItem2() {
+        Iterator<PollItem> iterator = this.poll2.getPollItems().iterator();
+        iterator.next();
+        return iterator.next();
     }
 
     private static class PollComparator implements Comparator<LunchPlacePoll> {
@@ -87,6 +89,7 @@ public class PollTestData {
             return new HashSet<>(o1).equals(new HashSet<>(o2)) ? 0 : -1;
         }
     }
+
 
     private static class PollToResourceConverter {
         private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");

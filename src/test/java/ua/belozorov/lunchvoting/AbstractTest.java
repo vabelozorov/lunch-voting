@@ -1,11 +1,9 @@
 package ua.belozorov.lunchvoting;
 
-import org.junit.runner.RunWith;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import ua.belozorov.lunchvoting.model.lunchplace.LunchPlaceTestData;
 import ua.belozorov.lunchvoting.model.voting.PollTestData;
-
+import ua.belozorov.lunchvoting.model.voting.VoteTestData;
 
 
 /**
@@ -15,12 +13,13 @@ import ua.belozorov.lunchvoting.model.voting.PollTestData;
  */
 public abstract class AbstractTest {
 
-    protected final LunchPlaceTestData placeTestData = new LunchPlaceTestData();
-    protected final PollTestData pollTestData = new PollTestData(placeTestData);
+    protected final LunchPlaceTestData testPlaces = new LunchPlaceTestData();
+    protected final PollTestData testPolls = new PollTestData(testPlaces);
+    protected final VoteTestData testVotes = new VoteTestData(testPolls);
 
     protected final ResourceDatabasePopulator populator = new ResourceDatabasePopulator(
-            placeTestData.getMenuSqlResource(),
-            pollTestData.getPollSqlResource()
+            testPlaces.getMenuSqlResource(),
+            testPolls.getPollSqlResource()
     );
 
 }

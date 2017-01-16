@@ -13,7 +13,7 @@ import static java.util.Optional.ofNullable;
 public final class ExceptionUtils {
     public static <T> Collection<T> requireNonNullNotEmpty(Collection<T> collection) {
         return ofNullable(collection)
-                .filter(c -> c != null && c.isEmpty())
+                .filter(c -> c != null && ! c.isEmpty())
                 .orElseThrow(() -> new NullPointerException("Collection must not be null or empty"));
     }
 

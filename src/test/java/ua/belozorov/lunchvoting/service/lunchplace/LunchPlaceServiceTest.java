@@ -65,7 +65,7 @@ public class LunchPlaceServiceTest extends AbstractServiceTest {
 
     @Test
     public void update() throws Exception {
-        LunchPlace place2 = placeTestData.getPlace2();
+        LunchPlace place2 = testPlaces.getPlace2();
         LunchPlaceTo to = new LunchPlaceTo(place2.getId(), place2.getName(), "Updated Address", place2.getDescription(),
                 Collections.singletonList("0481234567"));
         service.update(DtoIntoEntity.toLunchPlace(to, ADMIN_ID), ADMIN);
@@ -80,8 +80,8 @@ public class LunchPlaceServiceTest extends AbstractServiceTest {
 
     @Test
     public void get() throws Exception {
-        LunchPlace actual = service.get(placeTestData.getPlace4Id(), GOD);
-        assertThat(actual, matchByToString(placeTestData.getPlace4()));
+        LunchPlace actual = service.get(testPlaces.getPlace4Id(), GOD);
+        assertThat(actual, matchByToString(testPlaces.getPlace4()));
     }
 
     @Test
@@ -89,7 +89,7 @@ public class LunchPlaceServiceTest extends AbstractServiceTest {
         Collection<LunchPlace> actual = service.getAll(GOD);
         assertThat(
                 actual,
-                contains(matchCollection(Arrays.asList(placeTestData.getPlace4(), placeTestData.getPlace3()), LUNCH_PLACE_COMPARATOR))
+                contains(matchCollection(Arrays.asList(testPlaces.getPlace4(), testPlaces.getPlace3()), LUNCH_PLACE_COMPARATOR))
         );
     }
 
@@ -98,40 +98,40 @@ public class LunchPlaceServiceTest extends AbstractServiceTest {
         Collection<LunchPlace> actual = service.getMultiple(Collections.emptyList(), GOD);
         assertThat(
                 actual,
-                contains(matchCollection(Arrays.asList(placeTestData.getPlace4(), placeTestData.getPlace3()), LUNCH_PLACE_COMPARATOR))
+                contains(matchCollection(Arrays.asList(testPlaces.getPlace4(), testPlaces.getPlace3()), LUNCH_PLACE_COMPARATOR))
         );
     }
 
     @Test
     public void testGetMultiple() throws Exception {
         Collection<LunchPlace> actual = service.getMultiple(
-                Arrays.asList(placeTestData.getPlace3Id(), placeTestData.getPlace4Id()),
+                Arrays.asList(testPlaces.getPlace3Id(), testPlaces.getPlace4Id()),
                 GOD
         );
         assertThat(
                 actual,
-                contains(matchCollection(Arrays.asList(placeTestData.getPlace4(), placeTestData.getPlace3()), LUNCH_PLACE_COMPARATOR))
+                contains(matchCollection(Arrays.asList(testPlaces.getPlace4(), testPlaces.getPlace3()), LUNCH_PLACE_COMPARATOR))
         );
     }
 
     @Test(expected = NotFoundException.class)
     public void testGetMultipleExceptionOnNotExistingIds() throws Exception {
-        service.getMultiple(Arrays.asList(placeTestData.getPlace3Id(), "NOT_EXISTS_ID"), GOD);
+        service.getMultiple(Arrays.asList(testPlaces.getPlace3Id(), "NOT_EXISTS_ID"), GOD);
     }
 
     @Test
     public void testGetMultipleWithMenu() throws Exception {
         LocalDate now = LocalDate.now();
-        Collection<LunchPlace> withMenu = service.getMultipleWithMenu(Arrays.asList(placeTestData.getPlace3Id(), placeTestData.getPlace4Id()), now, now, AuthorizedUser.get());
+        Collection<LunchPlace> withMenu = service.getMultipleWithMenu(Arrays.asList(testPlaces.getPlace3Id(), testPlaces.getPlace4Id()), now, now, AuthorizedUser.get());
         assertTrue(withMenu.stream().mapToLong(lp -> lp.getMenus().size()).sum() == 3);
     }
 
     @Test
     public void delete() throws Exception {
         int initialSize = service.getAll(ADMIN).size();
-        service.delete(placeTestData.getPlace1Id(), ADMIN);
+        service.delete(testPlaces.getPlace1Id(), ADMIN);
         Collection<LunchPlace> all = service.getAll(ADMIN);
-        assertTrue(all.size() == initialSize - 1 && all.stream().noneMatch(place -> place.getId().equals(placeTestData.getPlace1Id())));
+        assertTrue(all.size() == initialSize - 1 && all.stream().noneMatch(place -> place.getId().equals(testPlaces.getPlace1Id())));
     }
 
     @Test(expected = NotFoundException.class)
@@ -141,7 +141,7 @@ public class LunchPlaceServiceTest extends AbstractServiceTest {
 
     @Test(expected = NotFoundException.class)
     public void updateNotExisting() {
-        LunchPlaceTo expected = new LunchPlaceTo("NOT_EXISTING_ID", placeTestData.getPlace2().getName(), "Updated Address", placeTestData.getPlace2().getDescription(),
+        LunchPlaceTo expected = new LunchPlaceTo("NOT_EXISTING_ID", testPlaces.getPlace2().getName(), "Updated Address", testPlaces.getPlace2().getDescription(),
                 Collections.singletonList("0481234567"));
         service.update(DtoIntoEntity.toLunchPlace(expected, ADMIN_ID), ADMIN);
     }
@@ -154,7 +154,7 @@ public class LunchPlaceServiceTest extends AbstractServiceTest {
     @Test
     public void createDuplicate() {
         List<String> phones = Arrays.asList("0661234567", "0441234567");
-        LunchPlaceTo expectedTo = new LunchPlaceTo(placeTestData.getPlace1Id(), "New Place", "New Address", "New Description", phones);
+        LunchPlaceTo expectedTo = new LunchPlaceTo(testPlaces.getPlace1Id(), "New Place", "New Address", "New Description", phones);
 
         thrown.expect(PersistenceException.class);
         thrown.expectCause(isA(ConstraintViolationException.class));

@@ -1,5 +1,6 @@
 package ua.belozorov.lunchvoting.model.voting;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
 
@@ -10,11 +11,13 @@ import java.util.function.Function;
  */
 public interface VoteCollector {
 
-     VoteCollector collect(List<Vote> votes);
+     VoteCollector collect(Collection<Vote> votes);
 
      VoteCollector collect(Vote vote);
 
-     <I> VoteStatistics<I> result(Function<Vote, I> voteClassifier);
+    PollingResult<PollItem> getByPollItem();
+
+    <I> VoteStatistics<I> result(Function<Vote, I> voteClassifier);
 
      static Function<Vote, PollItem> pollItemClassifier() {
          return Vote::getPollItem;

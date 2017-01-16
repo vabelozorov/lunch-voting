@@ -9,6 +9,7 @@ import ua.belozorov.lunchvoting.repository.BaseRepository;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 /**
  * <h2></h2>
@@ -25,26 +26,32 @@ public class PollingRepositoryImpl extends BaseRepository implements PollingRepo
 
     @Override
     public LunchPlacePoll getPollAndEmptyPollItems(String id) {
-        return em.createQuery("SELECT p FROM LunchPlacePoll p JOIN FETCH PollItem pi WHERE p.id= ?1", LunchPlacePoll.class)
+        List<LunchPlacePoll> polls = em.createQuery(
+                "SELECT p FROM LunchPlacePoll p " +
+                        "JOIN FETCH PollItem pi ON pi.poll.id = p.id " +
+                        "WHERE p.id= ?1", LunchPlacePoll.class)
                 .setParameter(1, id)
-                .getSingleResult();
+                .getResultList();
+        return super.nullOrFirst(polls);
     }
 
     @Override
     public Vote getVoteInPoll(String voterId, String pollId) {
-        return em.createQuery("SELECT v FROM Vote v WHERE v.poll.id= :pollId AND v.voterId= :voterId", Vote.class)
+        List<Vote> votes = em.createQuery("SELECT v FROM Vote v WHERE v.poll.id= :pollId AND v.voterId= :voterId", Vote.class)
                 .setParameter("pollId", pollId)
                 .setParameter("voterId", voterId)
-                .getSingleResult();
+                .getResultList();
+        return super.nullOrFirst(votes);
     }
 
     @Override
     public PollItem getPollItem(final String pollId, final String pollItemId) {
-        return em.createQuery("SELECT pi FROM PollItem pi JOIN FETCH LunchPlace lp " +
+        List<PollItem> items = em.createQuery("SELECT pi FROM PollItem pi JOIN FETCH LunchPlace lp " +
                 "WHERE pi.id= :pollItemId AND pi.poll.id= :pollId", PollItem.class)
                 .setParameter("pollItemId", pollItemId)
-                .setParameter("pollId", pollId).getSingleResult();
-
+                .setParameter("pollId", pollId)
+                .getResultList();
+        return super.nullOrFirst(items);
     }
 
     @Override
@@ -53,16 +60,17 @@ public class PollingRepositoryImpl extends BaseRepository implements PollingRepo
         if (pollItemIds.size() < 1) {
             throw new IllegalStateException("PollItemIds size must be greater than 0");
         }
-        LunchPlacePoll poll = em.createQuery("SELECT p FROM LunchPlacePoll p " +
+        List<LunchPlacePoll> polls = em.createQuery("SELECT p FROM LunchPlacePoll p " +
                 "INNER JOIN FETCH p.pollItems pi " +
                 "INNER JOIN FETCH pi.item i " +
                 "INNER JOIN FETCH i.menus m " +
                 "INNER JOIN FETCH m.dishes " +
                 "WHERE p.id= :pollId AND pi.id IN :pollItemIds", LunchPlacePoll.class)
                 .setParameter("pollItemIds", pollItemIds)
-                .setParameter("pollId", pollId).getSingleResult();
+                .setParameter("pollId", pollId)
+                .getResultList();
         em.clear();
-        return poll;
+        return super.nullOrFirst(polls);
     }
 
     @Override
@@ -72,16 +80,16 @@ public class PollingRepositoryImpl extends BaseRepository implements PollingRepo
 
     @Override
     public LunchPlacePoll getFullPoll(String pollId) {
-        LunchPlacePoll poll = em.createQuery("SELECT p FROM LunchPlacePoll p " +
+        List<LunchPlacePoll> polls = em.createQuery("SELECT p FROM LunchPlacePoll p " +
                 "LEFT JOIN FETCH p.pollItems pi " +
                 "LEFT JOIN FETCH pi.item i " +
                 "LEFT JOIN FETCH i.menus m " +
                 "LEFT JOIN FETCH m.dishes " +
                 "WHERE p.id= :pollId AND m.effectiveDate= p.menuDate", LunchPlacePoll.class)
                 .setParameter("pollId", pollId)
-                .getSingleResult();
+                .getResultList();
         em.clear();
-        return poll;
+        return super.nullOrFirst(polls);
     }
 
     @Override

@@ -103,19 +103,24 @@ public class LunchPlaceTestData {
         this.places = Arrays.asList(place1, place2, place3, place4);
         Collections.sort(this.places, Comparator.comparing(LunchPlace::getName));
 
-        this.menus = Arrays.asList(menu1, menu2, menu3, menu4, menu5, menu6);
+        this.menus = Arrays.asList(menu1, menu2, menu3, menu4, menu5, menu6, menu7, menu8);
 
         this.menuSqlResource = new MenuToResourceConverter().convert(this.menus);
     }
 
-    public static LunchPlace getWithFilteredMenu(LunchPlace place, LocalDate date) {
-        return place.setMenus(place.getMenus().stream()
-                .filter(m -> m.getEffectiveDate().equals(date))
-                .collect(Collectors.toSet())
-        );
+    public static LunchPlace getWithFilteredMenu(LocalDate date, LunchPlace place) {
+        return place.toBuilder().menus(
+                place.getMenus().stream()
+                        .filter(m -> m.getEffectiveDate().equals(date))
+                        .collect(Collectors.toSet())
+        ).build();
     }
 
-    public static class LunchPlaceComparator implements Comparator<LunchPlace> {
+    public static List<LunchPlace> getWithFilteredMenu(LocalDate date, LunchPlace... places) {
+        return Arrays.stream(places).map(place -> getWithFilteredMenu(date, place)).collect(Collectors.toList());
+    }
+
+        public static class LunchPlaceComparator implements Comparator<LunchPlace> {
 
         @Override
         public int compare(LunchPlace o1, LunchPlace o2) {

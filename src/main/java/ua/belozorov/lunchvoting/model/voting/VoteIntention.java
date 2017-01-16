@@ -14,19 +14,13 @@ import java.util.Objects;
 @Getter(AccessLevel.PACKAGE)
 public final class VoteIntention {
     private final String voterId;
-    private final String pollId;
     private final String pollItemId;
     private final Vote existingVote;
     private final LocalDateTime madeTime = LocalDateTime.now();
 
-    public VoteIntention(String voterId, String pollId, String pollItemId, Vote existingVote) {
+    public VoteIntention(String voterId, String pollItemId, Vote existingVote) {
         this.voterId = Objects.requireNonNull(voterId, "voterId must not be null");
-        this.pollId = Objects.requireNonNull(pollId, "pollId must not be null");
         this.pollItemId = Objects.requireNonNull(pollItemId, "pollItemId must not be null");
-
-        if ( existingVote != null && ! existingVote.getPoll().getId().equals(this.pollId)) {
-            throw new IllegalStateException("Existing vote has been madeTime for another poll");
-        }
         this.existingVote = existingVote;
     }
 

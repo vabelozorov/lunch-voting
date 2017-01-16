@@ -14,7 +14,6 @@ import static org.junit.Assert.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static ua.belozorov.lunchvoting.model.lunchplace.LunchPlaceTestData.*;
 
 /**
  * <h2></h2>
@@ -48,7 +47,7 @@ public class MenuControllerTest extends AbstractControllerTest {
 
         String sentContent = jsonUtils.toJson(sent);
 
-        MvcResult result = mockMvc.perform(post(REST_URL + "/" + placeTestData.getPlace4Id() + "/menus/")
+        MvcResult result = mockMvc.perform(post(REST_URL + "/" + testPlaces.getPlace4Id() + "/menus/")
                 .content(sentContent)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
@@ -59,9 +58,9 @@ public class MenuControllerTest extends AbstractControllerTest {
 
     @Test
     public void testDelete() throws Exception {
-        assertFalse(repository.getMenu(placeTestData.getMenu1Id()) == null);
-        mockMvc.perform(delete(REST_URL + "/" + placeTestData.getPlace4Id() + "/menus/" + placeTestData.getMenu1Id()))
+        assertFalse(repository.getMenu(testPlaces.getMenu1Id()) == null);
+        mockMvc.perform(delete(REST_URL + "/" + testPlaces.getPlace4Id() + "/menus/" + testPlaces.getMenu1Id()))
                     .andExpect(status().isNoContent());
-        assertTrue(repository.getMenu(placeTestData.getMenu1Id()) == null);
+        assertTrue(repository.getMenu(testPlaces.getMenu1Id()) == null);
     }
 }

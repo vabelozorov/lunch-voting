@@ -2,12 +2,16 @@ package ua.belozorov.lunchvoting.model.voting;
 
 import org.junit.Test;
 import ua.belozorov.lunchvoting.AbstractTest;
+import ua.belozorov.lunchvoting.model.lunchplace.LunchPlace;
+import ua.belozorov.lunchvoting.model.lunchplace.LunchPlaceTestData;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Iterator;
+import java.util.List;
 
 import static org.junit.Assert.assertTrue;
+import static ua.belozorov.lunchvoting.model.lunchplace.LunchPlaceTestData.*;
 import static ua.belozorov.lunchvoting.testdata.UserTestData.*;
 
 /**
@@ -15,33 +19,28 @@ import static ua.belozorov.lunchvoting.testdata.UserTestData.*;
  *
  * @author vabelozorov on 09.12.16.
  */
-//TODO Split
+//TODO Looks a little complicated
 public class PollingResultTest extends AbstractTest {
+    private final List<LunchPlace> places = getWithFilteredMenu(LocalDate.now(), testPlaces.getPlace3(), testPlaces.getPlace4());
 
     @Test
     public void testPollingResult() throws Exception {
-        LocalDateTime start = LocalDateTime.now();
-        LocalDateTime end = start.plusHours(2);
-        LocalDate menuDate = LocalDate.now();
-        LunchPlacePoll poll = new LunchPlacePoll(start, end, start, placeTestData.getPlaces(), menuDate);
-        Iterator<PollItem> iterator = poll.getPollItems().iterator();
-        String firstPollItemId = iterator.next().getId();
-        String secondPollItemId = iterator.next().getId();
-        String [] itemIds = new String[] {firstPollItemId, secondPollItemId};
 
-        VoteCollector collector = new PollVoteCollector(poll);
-        for (int i = 0; i < VOTERS.size(); i++) {
-            VoteIntention intention = new VoteIntention(VOTERS.get(i).getId(), poll.getId(), itemIds[i & 1], null);
-            Vote vote = poll.verify(intention).getVote();
-            collector.collect(vote);
-        }
+        VoteCollector collector = new PollVoteCollector(testPolls.getPoll2());
+        collector.collect(testVotes.getVotes());
 
         VoteStatistics<PollItem> result1 = collector.result(VoteCollector.pollItemClassifier());
-        assertTrue(result1.countPerItem().get(poll.pollItemById(firstPollItemId)) == 3);
-        assertTrue(result1.countPerItem().get(poll.pollItemById(secondPollItemId)) == 2);
+        assertTrue(result1.countPerItem().get(testPolls.getPOll2PollItem1()) == 3);
+        assertTrue(result1.countPerItem().get(testPolls.getPOll2PollItem2()) == 2);
 
         VoteStatistics<String> result2 = collector.result(VoteCollector.voterIdClassifier());
         assertTrue(result2.countPerItem().get(VOTER_ID) == 1);
         assertTrue(result2.countPerItem().get(VOTER1_ID) == 1);
+    }
+
+    @Test
+    public void testInstanceOfNull() throws Exception {
+        Object possiblyNull = null;
+        System.out.println(null instanceof Object);
     }
 }

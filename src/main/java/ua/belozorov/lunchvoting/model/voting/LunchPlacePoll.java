@@ -1,12 +1,10 @@
 package ua.belozorov.lunchvoting.model.voting;
 
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import org.hibernate.annotations.*;
-import ua.belozorov.lunchvoting.exceptions.MultipleVoteException;
-import ua.belozorov.lunchvoting.exceptions.NotFoundException;
-import ua.belozorov.lunchvoting.exceptions.PollNotActiveException;
-import ua.belozorov.lunchvoting.exceptions.VoteChangeNotAllowedException;
+import ua.belozorov.lunchvoting.exceptions.*;
 import ua.belozorov.lunchvoting.model.base.AbstractPersistableObject;
 import ua.belozorov.lunchvoting.model.lunchplace.LunchPlace;
 import ua.belozorov.lunchvoting.model.lunchplace.Menu;
@@ -59,8 +57,8 @@ public final class LunchPlacePoll extends AbstractPersistableObject implements P
         this.menuDate = null;
         this.timeConstraint = null;
         this.pollItems = null;
-        this.pollValidators = getPollValidators();
-        this.voteChangeValidators = getVoteChangeValidators();
+        this.pollValidators = this.getPollValidators();
+        this.voteChangeValidators = this.getVoteChangeValidators();
     }
 
     public LunchPlacePoll(List<LunchPlace> lunchPlaces, LocalDate menuDate) {
@@ -73,20 +71,20 @@ public final class LunchPlacePoll extends AbstractPersistableObject implements P
         );
     }
 
-        /**
-         * Primary constructor
-         * @param startTime time from which the poll starts to accept votes.
-         * @param endTime starting from this time votes will be rejected.
-         * @param voteChangeTimeThreshold time until which (included) a voter is allowed to change his/her mind.
-         * @param lunchPlaces items to vote for. If null, the empty list is assumed.
-         */
+    /**
+     * Primary constructor
+     * @param startTime time from which the poll starts to accept votes.
+     * @param endTime starting from this time votes will be rejected.
+     * @param voteChangeTimeThreshold time until which (included) a voter is allowed to change his/her mind.
+     * @param lunchPlaces items to vote for. If null, the empty list is assumed.
+     */
     public LunchPlacePoll(LocalDateTime startTime, LocalDateTime endTime, LocalDateTime voteChangeTimeThreshold, List<LunchPlace> lunchPlaces, LocalDate menuDate) {
         this.checkLunchPlaceDate(lunchPlaces, menuDate);
         this.menuDate = menuDate;
         this.timeConstraint = new TimeConstraint(startTime, endTime, voteChangeTimeThreshold);
-        this.pollItems = convertToPollItems(lunchPlaces);
-        this.pollValidators = getPollValidators();
-        this.voteChangeValidators = getVoteChangeValidators();
+        this.pollItems = this.convertToPollItems(lunchPlaces);
+        this.pollValidators = this.getPollValidators();
+        this.voteChangeValidators = this.getVoteChangeValidators();
     }
 
     private Set<PollItem> convertToPollItems(List<LunchPlace> lunchPlaces) {
@@ -103,11 +101,11 @@ public final class LunchPlacePoll extends AbstractPersistableObject implements P
     private void checkLunchPlaceDate(List<LunchPlace> places, LocalDate date) {
         for (LunchPlace place : places) {
             if (place.getMenus().isEmpty()) {
-                throw new IllegalStateException("LunchPlace without Menu");
+                throw new LunchPlaceWithoutMenuException();
             } else {
                 for (Menu m : place.getMenus()) {
                     if ( ! m.getEffectiveDate().equals(date)) {
-                        throw new IllegalStateException("LunchPlace instance has a menu with an unexpected date");
+                        throw new MenuDateMismatchException();
                     }
                 }
             }
@@ -116,7 +114,6 @@ public final class LunchPlacePoll extends AbstractPersistableObject implements P
 
     private Collection<Consumer<VoteIntention>> getPollValidators() {
         Collection<Consumer<VoteIntention>> validators = new ArrayList<>();
-        validators.add(this::belongsToMe);
         validators.add(this::hasPollItem);
         validators.add(this::isRunning);
         validators.add(this::oneVote);
@@ -163,13 +160,6 @@ public final class LunchPlacePoll extends AbstractPersistableObject implements P
         }
     }
 
-    private void belongsToMe(VoteIntention intention) {
-        String intentionPollId = intention.getPollId();
-        if ( ! intentionPollId.equals(this.getId())) {
-            throw new IllegalStateException(String.format("Wrong pollId %s: mine is %s", intentionPollId, this.getId()));
-        }
-    }
-
     private void hasPollItem(VoteIntention intention) {
         String intentionPollItemId = intention.getPollItemId();
         this.pollItems.stream()
@@ -205,6 +195,4 @@ public final class LunchPlacePoll extends AbstractPersistableObject implements P
     public Set<PollItem> getPollItems() {
         return this.pollItems;
     }
-
-
 }

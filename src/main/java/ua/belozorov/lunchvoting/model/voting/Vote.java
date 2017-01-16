@@ -9,6 +9,8 @@ import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+import static java.util.Optional.ofNullable;
+
 /**
  * <h2></h2>
  *
@@ -70,5 +72,19 @@ public final class Vote extends AbstractPersistableObject {
         this.poll = Objects.requireNonNull(poll);
         this.pollItem = Objects.requireNonNull(pollItem);
         this.voteTime = voteTime;
+    }
+
+    public Vote setVoteTime(LocalDateTime voteTime) {
+        return new Vote(this.id, this.version, this.voterId, this.poll, this.pollItem, voteTime);
+    }
+
+    @Override
+    public String toString() {
+        return "Vote{" +
+                "voterId='" + voterId + '\'' +
+                "pollid='" + ofNullable(poll.getId()).orElse(null)+ '\'' +
+                "pollItemId='" + ofNullable(pollItem.getId()).orElse(null) + '\'' +
+                "voteTime='" +voteTime + '\'' +
+                '}';
     }
 }
