@@ -3,6 +3,9 @@ package ua.belozorov.lunchvoting.model.lunchplace;
 import lombok.Getter;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
+import ua.belozorov.lunchvoting.util.SetToStringConverter;
+import ua.belozorov.objtosql.SimpleObjectToSqlConverter;
+import ua.belozorov.objtosql.StringSqlColumn;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -20,6 +23,7 @@ import static ua.belozorov.lunchvoting.testdata.UserTestData.*;
 public class LunchPlaceTestData {
 
     public static final Comparator<LunchPlace> LUNCH_PLACE_COMPARATOR = new LunchPlaceComparator();
+    private final Resource lunchPlaceSqlResource;
 
     private LunchPlace place1 = new LunchPlace("FirstPlaceID", 1, "First Place", "First Address", "First Description",
             Collections.singletonList("0501234567"), Collections.emptyList(), ADMIN_ID);
@@ -105,6 +109,18 @@ public class LunchPlaceTestData {
 
         this.menus = Arrays.asList(menu1, menu2, menu3, menu4, menu5, menu6, menu7, menu8);
 
+        String sql = new SimpleObjectToSqlConverter<LunchPlace>(
+          "places",
+          Arrays.asList(
+              new StringSqlColumn<>("id", LunchPlace::getId),
+              new StringSqlColumn<>("name", LunchPlace::getName),
+              new StringSqlColumn<>("address", LunchPlace::getAddress),
+              new StringSqlColumn<>("description", LunchPlace::getDescription),
+              new StringSqlColumn<>("user_id", LunchPlace::getAdminId),
+              new StringSqlColumn<>("phones", lp -> new SetToStringConverter().convertToDatabaseColumn(lp.getPhones()))
+          )
+        ).convert(this.places);
+        this.lunchPlaceSqlResource = new ByteArrayResource(sql.getBytes(), "LunchPlaces");
         this.menuSqlResource = new MenuToResourceConverter().convert(this.menus);
     }
 
@@ -169,7 +185,7 @@ public class LunchPlaceTestData {
             menuBuilder.deleteCharAt(menuBuilder.length() - 1).append(STATEMENT_END);
             dishBuilder.deleteCharAt(dishBuilder.length() - 1).append(STATEMENT_END);
             String sql = menuBuilder.append(dishBuilder).toString();
-            return new ByteArrayResource(sql.getBytes());
+            return new ByteArrayResource(sql.getBytes(), "Menus & Dishes");
         }
     }
 }

@@ -5,11 +5,13 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import ua.belozorov.lunchvoting.model.lunchplace.LunchPlace;
 import ua.belozorov.lunchvoting.model.lunchplace.LunchPlaceTestData;
+import ua.belozorov.objtosql.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * <h2></h2>
@@ -22,6 +24,7 @@ public class PollTestData {
 
     private final LunchPlacePoll poll2;
     private final Resource pollSqlResource;
+    private final Resource pollItemSqlResource;
 
     public  PollTestData(LunchPlaceTestData placeTestData) {
         LocalDateTime now = LocalDateTime.now();
@@ -41,7 +44,33 @@ public class PollTestData {
                 menuDate
         );
 
-        this.pollSqlResource = new PollToResourceConverter().convert(Collections.singletonList(poll2));
+        String pollSql = new SimpleObjectToSqlConverter<>(
+                "polls",
+                Arrays.asList(
+                        new StringSqlColumn<>("id", LunchPlacePoll::getId),
+                        new DateTimeSqlColumn<>("start_time", lpp -> lpp.getTimeConstraint().getStartTime()),
+                        new DateTimeSqlColumn<>("end_time", lpp -> lpp.getTimeConstraint().getEndTime()),
+                        new DateTimeSqlColumn<>("change_time", lpp -> lpp.getTimeConstraint().getVoteChangeThreshold()),
+                        new DateSqlColumn<>("menu_date", LunchPlacePoll::getMenuDate)
+                )
+        ).convert(Collections.singletonList(poll2));
+        this.pollSqlResource = new ByteArrayResource(pollSql.getBytes(), "Polls");
+
+        String pollItemsSql = new SimpleObjectToSqlConverter<>(
+                "poll_items",
+                Arrays.asList(
+                        new StringSqlColumn<>("id", PollItem::getId),
+                        new StringSqlColumn<>("poll_id", pi -> pi.getPoll().getId()),
+                        new IntegerSqlColumn<>("position", PollItem::getPosition),
+                        new StringSqlColumn<>("item_id",pi -> pi.getItem().getId())
+                )
+        ).convert(
+                Arrays.asList(poll2).stream()
+                    .flatMap(p -> p.getPollItems().stream())
+                    .collect(Collectors.toList())
+        );
+        this.pollItemSqlResource = new ByteArrayResource(pollItemsSql.getBytes(), "PollItems");
+
     }
 
     public PollItem getPOll2PollItem1() {
@@ -87,43 +116,6 @@ public class PollTestData {
                 }
             }
             return new HashSet<>(o1).equals(new HashSet<>(o2)) ? 0 : -1;
-        }
-    }
-
-
-    private static class PollToResourceConverter {
-        private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        private static final String DELETE_TABLES = "DELETE FROM polls;\nDELETE FROM poll_items;\n\n";
-        private static final String INSERT_POLL = "INSERT INTO polls (id, start_time, end_time, change_time, menuDate) VALUES";
-        private static final String POLL_ENTRY = "\n  ('%s', '%s', '%s', '%s', '%s'),";
-        private static final String INSERT_POLL_ITEM = "INSERT INTO poll_items (id, poll_id, position, item_id) VALUES";
-        private static final String POLL_ITEM_ENTRY = "\n  ('%s', '%s', '%d', '%s'),";
-        private static final String STATEMENT_END = ";\n\n";
-
-        Resource convert(Collection<LunchPlacePoll> polls) {
-            StringBuilder pollBuilder = new StringBuilder(DELETE_TABLES).append(INSERT_POLL);
-            StringBuilder pollItemBuilder = new StringBuilder(INSERT_POLL_ITEM);
-
-            for (LunchPlacePoll p : polls) {
-                TimeConstraint timeConstraint = p.getTimeConstraint();
-                String pollSqlValue = String.format(POLL_ENTRY,
-                        p.getId(),
-                        timeConstraint.getStartTime().format(DATE_TIME_FORMATTER),
-                        timeConstraint.getEndTime().format(DATE_TIME_FORMATTER),
-                        timeConstraint.getVoteChangeThreshold().format(DATE_TIME_FORMATTER),
-                        p.getMenuDate().format(DATE_FORMATTER)
-                );
-                pollBuilder.append(pollSqlValue);
-                for (PollItem pi : p.getPollItems()) {
-                    String pollItemSqlValue = String.format(POLL_ITEM_ENTRY, pi.getId(), p.getId(), pi.getPosition(), pi.getItem().getId());
-                    pollItemBuilder.append(pollItemSqlValue);
-                }
-            }
-            pollBuilder.deleteCharAt(pollBuilder.length() - 1).append(STATEMENT_END);
-            pollItemBuilder.deleteCharAt(pollItemBuilder.length() - 1).append(STATEMENT_END);
-            String sql = pollBuilder.append(pollItemBuilder).toString();
-            return new ByteArrayResource(sql.getBytes());
         }
     }
 }

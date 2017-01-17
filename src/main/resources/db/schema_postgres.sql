@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS polls (
   start_time TIMESTAMP NOT NULL,
   end_time TIMESTAMP NOT NULL,
   change_time TIMESTAMP NOT NULL,
-  menuDate TIMESTAMP NOT NULL
+  menu_date TIMESTAMP NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS users (
@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS users (
   email VARCHAR NOT NULL,
   password VARCHAR NOT NULL,
   roles INT NOT NULL,
-  registeredDate TIMESTAMP NOT NULL,
+  registered_date TIMESTAMP NOT NULL,
   activated BOOL NOT NULL,
   CONSTRAINT email_unique_idx UNIQUE (email)
 );

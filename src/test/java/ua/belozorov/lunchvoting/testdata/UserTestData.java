@@ -1,18 +1,23 @@
 package ua.belozorov.lunchvoting.testdata;
 
+import lombok.Getter;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
+import ua.belozorov.lunchvoting.AbstractTest;
 import ua.belozorov.lunchvoting.model.User;
+import ua.belozorov.objtosql.*;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * <h2></h2>
  *
  * @author vabelozorov on 17.11.16.
  */
+@Getter
 public class UserTestData {
     public static final Comparator<User> USER_COMPARATOR = new UserComparator();
 
@@ -39,10 +44,30 @@ public class UserTestData {
     public static String VOTER3_ID = VOTER3.getId();
     public static String VOTER4_ID = VOTER4.getId();
 
-    public static List<User> USERS = Arrays.asList(ADMIN, VOTER, GOD);
+    public static List<User> ALL_USERS = Stream.of(ADMIN, VOTER, VOTER1, VOTER2, VOTER3, VOTER4, GOD)
+            .sorted(Comparator.comparing(User::getEmail)).collect(Collectors.toList());
+
     public static List<User> VOTERS = Arrays.asList(VOTER, VOTER1, VOTER2, VOTER3, VOTER4);
 
-    public static class UserComparator implements Comparator<User>{
+    private final Resource userSqlResource;
+
+    public UserTestData() {
+        String sql = new SimpleObjectToSqlConverter<>(
+                "users",
+                Arrays.asList(
+                        new StringSqlColumn<>("id", User::getId),
+                        new StringSqlColumn<>("name", User::getName),
+                        new StringSqlColumn<>("email", User::getEmail),
+                        new StringSqlColumn<>("password", User::getPassword),
+                        new IntegerSqlColumn<>("roles", u -> (int)u.getRoles()),
+                        new DateTimeSqlColumn<>("registered_date", User::getRegisteredDate),
+                        new BooleanSqlColumn<>("activated", User::isActivated)
+                )
+        ).convert(ALL_USERS);
+        this.userSqlResource = new ByteArrayResource(sql.getBytes(), "Users");
+    }
+
+    private static class UserComparator implements Comparator<User>{
         @Override
         public int compare(User o1, User o2) {
             return (o1.getId().equals(o2.getId()) &&

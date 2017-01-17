@@ -17,7 +17,7 @@ public interface PollingRepository {
 
     void savePoll(LunchPlacePoll poll);
 
-    LunchPlacePoll getPollAndEmptyPollItems(String id);
+    LunchPlacePoll getPollWithVotesAndEmptyPollItems(String id);
 
     /**
      * Searches for a voter's vote assuming that only one vote from a voter can be given in a particular poll

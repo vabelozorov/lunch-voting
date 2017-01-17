@@ -70,11 +70,11 @@ public class VotingServiceImplTest extends AbstractServiceTest {
 
     @Test
     public void votesFirstTime() throws Exception {
-        LunchPlacePoll poll1 = testPolls.getPoll2();
-        PollItem item = poll1.getPollItems().iterator().next();
-        Vote returned = votingService.vote(VOTER_ID, poll1.getId(), item.getId());
+        LunchPlacePoll poll = testPolls.getPoll2();
+        PollItem item = poll.getPollItems().iterator().next();
+        Vote returned = votingService.vote(VOTER_ID, poll.getId(), item.getId());
         Vote expected = testVotes.getVote1().setVoteTime(returned.getVoteTime());
-        Vote actual = repository.getVoteInPoll(VOTER_ID, poll1.getId());
+        Vote actual = repository.getVoteInPoll(VOTER_ID, poll.getId());
         assertThat(returned, matchSingle(expected, VOTE_COMPARATOR));
         assertThat(actual, matchSingle(expected, VOTE_COMPARATOR));
     }

@@ -264,6 +264,13 @@
             <scope> compile</scope>
         </dependency>
 
+        <dependency>
+            <groupId>ua.belozorov</groupId>
+            <artifactId>obj-to-sql</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
     <dependencyManagement>
@@ -295,7 +302,7 @@
     </profiles>
 
     <build>
-        <finalName>topjava</finalName>
+        <finalName>lunch-voting</finalName>
         <defaultGoal>package</defaultGoal>
         <plugins>
             <!--<plugin>-->

@@ -19,6 +19,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -41,7 +42,11 @@ public final class LunchPlacePoll extends AbstractPersistableObject implements P
     @OrderBy("position ASC")
     private final Set<PollItem> pollItems;
 
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "poll", cascade = CascadeType.ALL)
+    private final Set<Vote> votes;
+
     @Getter
+    @Column(name = "menu_date")
     private final LocalDate menuDate;
 
     @Transient
@@ -59,6 +64,7 @@ public final class LunchPlacePoll extends AbstractPersistableObject implements P
         this.pollItems = null;
         this.pollValidators = this.getPollValidators();
         this.voteChangeValidators = this.getVoteChangeValidators();
+        this.votes = null;
     }
 
     public LunchPlacePoll(List<LunchPlace> lunchPlaces, LocalDate menuDate) {
@@ -80,9 +86,21 @@ public final class LunchPlacePoll extends AbstractPersistableObject implements P
      */
     public LunchPlacePoll(LocalDateTime startTime, LocalDateTime endTime, LocalDateTime voteChangeTimeThreshold, List<LunchPlace> lunchPlaces, LocalDate menuDate) {
         this.checkLunchPlaceDate(lunchPlaces, menuDate);
-        this.menuDate = menuDate;
-        this.timeConstraint = new TimeConstraint(startTime, endTime, voteChangeTimeThreshold);
+        this.timeConstraint = new TimeConstraint(startTime, endTime,voteChangeTimeThreshold);
         this.pollItems = this.convertToPollItems(lunchPlaces);
+        this.menuDate = menuDate;
+        this.votes = new HashSet<>();
+        this.pollValidators = this.getPollValidators();
+        this.voteChangeValidators = this.getVoteChangeValidators();
+    }
+
+    private LunchPlacePoll(String id, Integer version, TimeConstraint timeConstraint,
+                           Set<PollItem> pollItems, LocalDate menuDate, Set<Vote> votes) {
+        super(id, version);
+        this.timeConstraint = timeConstraint;
+        this.pollItems = pollItems;
+        this.menuDate = menuDate;
+        this.votes = votes;
         this.pollValidators = this.getPollValidators();
         this.voteChangeValidators = this.getVoteChangeValidators();
     }
@@ -124,6 +142,16 @@ public final class LunchPlacePoll extends AbstractPersistableObject implements P
         Collection<Consumer<VoteIntention>> validators = new ArrayList<>();
         validators.add(this::voteChange);
         return Collections.unmodifiableCollection(validators);
+    }
+
+    public LunchPlacePoll addVote(Vote vote) {
+        this.votes.add(vote);
+        return this;
+    }
+
+    public LunchPlacePoll addVotes(Set<Vote> votes) {
+        this.votes.addAll(votes);
+        return this;
     }
 
     public VoteDecision verify(VoteIntention intention) {
@@ -193,6 +221,56 @@ public final class LunchPlacePoll extends AbstractPersistableObject implements P
 //    }
 
     public Set<PollItem> getPollItems() {
-        return this.pollItems;
+        return Collections.unmodifiableSet(this.pollItems);
     }
+
+    Set<Vote> getVotes() {
+        return Collections.unmodifiableSet(this.votes);
+    }
+
+//    public LunchPlacePollBuilder toBuilder() {
+//        return new LunchPlacePollBuilder(this);
+//    }
+//
+//    public static class LunchPlacePollBuilder {
+//        private String id;
+//        private Integer version;
+//        private TimeConstraint timeConstraint;
+//        private Set<PollItem> pollItems;
+//        private Set<Vote> votes;
+//        private LocalDate menuDate;
+//
+//        private LunchPlacePollBuilder(LunchPlacePoll poll) {
+//            this.id = poll.id;
+//            this.version = poll.version;
+//            this.timeConstraint = poll.timeConstraint;
+//            this.pollItems = poll.pollItems;
+//            this.votes = poll.votes;
+//            this.menuDate = poll.menuDate;
+//        }
+//
+//        LunchPlacePollBuilder timeConstraint(TimeConstraint timeConstraint) {
+//            this.timeConstraint = timeConstraint;
+//            return this;
+//        }
+//
+//        LunchPlacePollBuilder pollItems(Set<PollItem> pollItems) {
+//            this.pollItems = pollItems;
+//            return this;
+//        }
+//
+//        public LunchPlacePollBuilder votes(Set<Vote> votes) {
+//            this.votes = votes;
+//            return this;
+//        }
+//
+//        public LunchPlacePollBuilder menuDate(LocalDate date) {
+//            this.menuDate = date;
+//            return this;
+//        }
+//
+//        public LunchPlacePoll build() {
+//            return new LunchPlacePoll(id, version, timeConstraint, pollItems, menuDate, votes);
+//        }
+//    }
 }

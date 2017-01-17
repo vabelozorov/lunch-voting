@@ -5,7 +5,6 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
-import ua.belozorov.lunchvoting.JsonUtils;
 import ua.belozorov.lunchvoting.model.User;
 import ua.belozorov.lunchvoting.model.UserRole;
 import ua.belozorov.lunchvoting.service.user.UserService;
@@ -89,7 +88,7 @@ public class UserManagementControllerTest extends AbstractControllerTest {
                 .andReturn();
 
         Collection<UserTo> actual = jsonUtils.fromMvcResultBody(result, new TypeReference<Collection<UserTo>>() {});
-        List<UserTo> expected = USERS.stream()
+        List<UserTo> expected = ALL_USERS.stream()
                 .map(UserTransformer::toDto)
                 .sorted(Comparator.comparing(UserTo::getEmail))
                 .collect(Collectors.toList());

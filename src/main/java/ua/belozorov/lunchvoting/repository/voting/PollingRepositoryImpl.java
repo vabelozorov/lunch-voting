@@ -25,10 +25,11 @@ public class PollingRepositoryImpl extends BaseRepository implements PollingRepo
     }
 
     @Override
-    public LunchPlacePoll getPollAndEmptyPollItems(String id) {
+    public LunchPlacePoll getPollWithVotesAndEmptyPollItems(String id) {
         List<LunchPlacePoll> polls = em.createQuery(
                 "SELECT p FROM LunchPlacePoll p " +
-                        "JOIN FETCH PollItem pi ON pi.poll.id = p.id " +
+                        "LEFT JOIN FETCH p.pollItems " +
+                        "LEFT JOIN FETCH p.votes " +
                         "WHERE p.id= ?1", LunchPlacePoll.class)
                 .setParameter(1, id)
                 .getResultList();

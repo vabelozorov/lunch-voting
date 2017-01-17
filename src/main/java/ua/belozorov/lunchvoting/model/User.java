@@ -44,7 +44,7 @@ public class User extends AbstractPersistableObject {
     @Range(max = 3)
     private final byte roles;
 
-    @Column(name = "registeredDate", nullable = false, updatable = false)
+    @Column(name = "registered_date", nullable = false, updatable = false)
     private final LocalDateTime registeredDate;
 
     @Column(name = "activated", nullable = false)

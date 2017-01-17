@@ -54,7 +54,7 @@ public class VotingServiceImpl implements VotingService {
     public Vote vote(String voterId, String pollId, String pollItemId) {
         ExceptionUtils.checkAllNotNull(voterId, pollId, pollItemId);
 
-        Poll poll = ofNullable(pollingRepository.getPollAndEmptyPollItems(pollId))
+        Poll poll = ofNullable(pollingRepository.getPollWithVotesAndEmptyPollItems(pollId))
                 .orElseThrow(() -> new NotFoundException(pollId, LunchPlacePoll.class));
         final Vote existingVote = pollingRepository.getVoteInPoll(voterId, pollId);
         VoteDecision decision = poll.verify(new VoteIntention(voterId, pollItemId, existingVote));
