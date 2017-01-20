@@ -1,12 +1,11 @@
 package ua.belozorov.lunchvoting.repository.voting;
 
-import org.jetbrains.annotations.Nullable;
-import ua.belozorov.lunchvoting.model.voting.LunchPlacePoll;
-import ua.belozorov.lunchvoting.model.voting.Poll;
-import ua.belozorov.lunchvoting.model.voting.PollItem;
-import ua.belozorov.lunchvoting.model.voting.Vote;
+import ua.belozorov.lunchvoting.model.voting.polling.LunchPlacePoll;
+import ua.belozorov.lunchvoting.model.voting.polling.PollItem;
+import ua.belozorov.lunchvoting.model.voting.polling.Vote;
 
 import java.util.Collection;
+import java.util.Set;
 
 /**
  * <h2></h2>
@@ -38,4 +37,8 @@ public interface PollingRepository {
     void saveVote(Vote vote);
 
     void removeVote(Vote vote);
+
+    void removeVotes(Set<Vote> forRemoval);
+
+    void replaceVote(Set<Vote> forRemoval, Vote acceptedVote);
 }

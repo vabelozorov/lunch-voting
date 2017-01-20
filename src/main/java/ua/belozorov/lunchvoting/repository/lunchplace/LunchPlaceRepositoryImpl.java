@@ -11,7 +11,6 @@ import ua.belozorov.lunchvoting.exceptions.NotFoundException;
 import ua.belozorov.lunchvoting.model.lunchplace.LunchPlace;
 import ua.belozorov.lunchvoting.repository.BaseRepository;
 
-import javax.annotation.PostConstruct;
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.Collection;

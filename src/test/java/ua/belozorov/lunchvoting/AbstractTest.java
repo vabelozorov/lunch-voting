@@ -1,11 +1,15 @@
 package ua.belozorov.lunchvoting;
 
+import org.junit.Rule;
+import org.junit.rules.ExpectedException;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import ua.belozorov.lunchvoting.model.lunchplace.LunchPlaceTestData;
-import ua.belozorov.lunchvoting.model.voting.PollTestData;
-import ua.belozorov.lunchvoting.model.voting.VoteTestData;
+import ua.belozorov.lunchvoting.model.voting.polling.PollTestData;
+import ua.belozorov.lunchvoting.model.voting.polling.VoteTestData;
 import ua.belozorov.lunchvoting.testdata.UserTestData;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 
@@ -15,6 +19,8 @@ import java.time.format.DateTimeFormatter;
  * @author vabelozorov on 02.12.16.
  */
 public abstract class AbstractTest {
+    public static final LocalDateTime NOW_DATE_TIME = LocalDateTime.now();
+    public static final LocalDate NOW_DATE = LocalDate.now();
     public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
@@ -23,13 +29,8 @@ public abstract class AbstractTest {
     protected final PollTestData testPolls = new PollTestData(testPlaces);
     protected final VoteTestData testVotes = new VoteTestData(testPolls);
 
-    protected final ResourceDatabasePopulator populator = new ResourceDatabasePopulator(
-            testUsers.getUserSqlResource(),
-            testPlaces.getLunchPlaceSqlResource(),
-            testPlaces.getMenuSqlResource(),
-            testPolls.getPollSqlResource(),
-            testPolls.getPollItemSqlResource(),
-            testVotes.getVoteSqlResource()
-    );
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
+
 
 }

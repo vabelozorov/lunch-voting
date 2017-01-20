@@ -3,10 +3,10 @@ package ua.belozorov.lunchvoting.service.voting;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import ua.belozorov.lunchvoting.model.lunchplace.LunchPlace;
-import ua.belozorov.lunchvoting.model.voting.LunchPlacePoll;
-import ua.belozorov.lunchvoting.model.voting.Poll;
-import ua.belozorov.lunchvoting.model.voting.PollItem;
-import ua.belozorov.lunchvoting.model.voting.Vote;
+import ua.belozorov.lunchvoting.model.voting.polling.LunchPlacePoll;
+import ua.belozorov.lunchvoting.model.voting.polling.Poll;
+import ua.belozorov.lunchvoting.model.voting.polling.PollItem;
+import ua.belozorov.lunchvoting.model.voting.polling.Vote;
 import ua.belozorov.lunchvoting.repository.voting.PollingRepository;
 import ua.belozorov.lunchvoting.service.AbstractServiceTest;
 
@@ -17,9 +17,9 @@ import java.util.stream.Collectors;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static ua.belozorov.lunchvoting.MatcherUtils.matchSingle;
-import static ua.belozorov.lunchvoting.model.voting.PollTestData.POLL_COMPARATOR;
-import static ua.belozorov.lunchvoting.model.voting.VoteTestData.VOTE_COMPARATOR;
-import static ua.belozorov.lunchvoting.testdata.UserTestData.VOTER_ID;
+import static ua.belozorov.lunchvoting.model.voting.polling.PollTestData.POLL_COMPARATOR;
+import static ua.belozorov.lunchvoting.model.voting.polling.VoteTestData.VOTE_COMPARATOR;
+import static ua.belozorov.lunchvoting.testdata.UserTestData.GOD_ID;
 
 
 /**
@@ -70,65 +70,60 @@ public class VotingServiceImplTest extends AbstractServiceTest {
 
     @Test
     public void votesFirstTime() throws Exception {
-        LunchPlacePoll poll = testPolls.getPoll2();
-        PollItem item = poll.getPollItems().iterator().next();
-        Vote returned = votingService.vote(VOTER_ID, poll.getId(), item.getId());
-        Vote expected = testVotes.getVote1().setVoteTime(returned.getVoteTime());
-        Vote actual = repository.getVoteInPoll(VOTER_ID, poll.getId());
-        assertThat(returned, matchSingle(expected, VOTE_COMPARATOR));
-        assertThat(actual, matchSingle(expected, VOTE_COMPARATOR));
+        LunchPlacePoll poll = testPolls.getActivePoll();
+        PollItem item = testPolls.getActivePollPollItem1();
+        Vote returned = votingService.vote(GOD_ID, poll.getId(), item.getId());
+        Vote actual = repository.getVoteInPoll(GOD_ID, poll.getId());
+        assertThat(actual, matchSingle(returned, VOTE_COMPARATOR));
     }
 
     @Test
     public void updatesVoteBeforeTimeThreshold() throws Exception {
-        LunchPlacePoll poll = testPolls.getPoll2();
-        Iterator<PollItem> iterator = poll.getPollItems().iterator();
-        PollItem item1 = iterator.next();
-        PollItem item2 = iterator.next();
+        LunchPlacePoll poll = testPolls.getActivePoll();
+        PollItem item1 = testPolls.getActivePollPollItem1();
+        PollItem item2 = testPolls.getActivePollPollItem2();
 
-        Vote firstVote = votingService.vote(VOTER_ID, poll.getId(), item1.getId());
-        Vote actual = repository.getVoteInPoll(VOTER_ID, poll.getId());
+        Vote firstVote = votingService.vote(GOD_ID, poll.getId(), item1.getId());
+        Vote actual = repository.getVoteInPoll(GOD_ID, poll.getId());
         assertTrue(firstVote.getId().equals(actual.getId()));
 
         Thread.sleep(100);
-        Vote secondVote = votingService.vote(VOTER_ID, poll.getId(), item2.getId());
+        Vote secondVote = votingService.vote(GOD_ID, poll.getId(), item2.getId());
         assertTrue(secondVote.getId().equals(
-                repository.getVoteInPoll(VOTER_ID, poll.getId())
-                        .getId()
+                repository.getVoteInPoll(GOD_ID, poll.getId())
+                                .getId()
         ));
     }
 
     @Test
     public void getPollWithWholeHierarchy() throws Exception {
-        LunchPlacePoll poll = (LunchPlacePoll)votingService.getPollFullDetails(testPolls.getPoll2().getId());
+        LunchPlacePoll poll = (LunchPlacePoll)votingService.getPollFullDetails(testPolls.getActivePoll().getId());
         assertThat(poll, matchSingle(poll, POLL_COMPARATOR));
         assertTrue(poll.getPollItems().stream()
                 .flatMap(pi -> pi.getItem().getMenus().stream())
                 .flatMap(m -> m.getDishes().stream())
-                .count() == 2
+                .count() == 3
         );
     }
 
     @Test
     public void getPollAndOnePollItemDetailed1() throws Exception {
-        LunchPlacePoll poll = testPolls.getPoll2();
-        Iterator<PollItem> iterator = poll.getPollItems().iterator();
-        PollItem item1 = iterator.next();
-        Poll actual = votingService.getPollItemDetails(poll.getId(), item1.getId());
-        assertTrue(actual.getPollItems().iterator().next().getId().equals(item1.getId()));
+        LunchPlacePoll poll = testPolls.getActivePoll();
+        String item1Id = testPolls.getActivePollPollItem1().getId();
+        Poll actual = votingService.getPollItemDetails(poll.getId(), item1Id);
+        assertTrue(actual.getPollItems().iterator().next().getId().equals(item1Id));
         assertTrue(actual.getPollItems().stream()
-                .flatMap(pi -> pi.getItem().getMenus().stream())
-                .flatMap(m -> m.getDishes().stream())
+                            .flatMap(pi -> pi.getItem().getMenus().stream())
+                            .flatMap(m -> m.getDishes().stream())
                 .count() == 1
         );
     }
 
     @Test
     public void getPollAndMultiplePollItemsDetailed() throws Exception {
-        LunchPlacePoll poll = testPolls.getPoll2();
-        Iterator<PollItem> iterator = poll.getPollItems().iterator();
-        PollItem item1 = iterator.next();
-        PollItem item2 = iterator.next();
+        LunchPlacePoll poll = testPolls.getActivePoll();
+        PollItem item1 = testPolls.getActivePollPollItem1();
+        PollItem item2 = testPolls.getActivePollPollItem2();
         List<String> itemIds = Arrays.asList(item1.getId(), item2.getId());
 
         Poll actual = votingService.getPollItemDetails(poll.getId(), itemIds);
@@ -140,7 +135,7 @@ public class VotingServiceImplTest extends AbstractServiceTest {
         assertTrue(actual.getPollItems().stream()
                 .flatMap(pi -> pi.getItem().getMenus().stream())
                 .flatMap(m -> m.getDishes().stream())
-                .count() == 2
+                .count() == 3
         );
     }
 

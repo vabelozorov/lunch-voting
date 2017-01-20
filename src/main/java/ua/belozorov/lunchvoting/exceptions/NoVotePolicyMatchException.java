@@ -1,18 +1,18 @@
 package ua.belozorov.lunchvoting.exceptions;
 
-import lombok.Getter;
 import ua.belozorov.lunchvoting.model.voting.polling.VoteIntention;
+
+import static javafx.scene.input.KeyCode.X;
 
 /**
  * <h2></h2>
  *
- * @author vabelozorov on 04.12.16.
+ * @author vabelozorov on 19.01.17.
  */
-@Getter
-public class PollNotActiveException extends RuntimeException {
+public class NoVotePolicyMatchException extends RuntimeException {
     private final VoteIntention intention;
 
-    public PollNotActiveException(final VoteIntention intention) {
+    public NoVotePolicyMatchException(VoteIntention intention) {
         this.intention = intention;
     }
 }

@@ -1,7 +1,7 @@
 package ua.belozorov.lunchvoting.exceptions;
 
 import lombok.Getter;
-import ua.belozorov.lunchvoting.model.voting.VoteIntention;
+import ua.belozorov.lunchvoting.model.voting.polling.VoteIntention;
 
 /**
  * <h2></h2>

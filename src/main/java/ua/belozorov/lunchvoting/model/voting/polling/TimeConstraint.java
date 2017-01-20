@@ -1,4 +1,4 @@
-package ua.belozorov.lunchvoting.model.voting;
+package ua.belozorov.lunchvoting.model.voting.polling;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -15,7 +15,7 @@ import java.util.Objects;
  */
 @Embeddable
 @Getter(AccessLevel.PACKAGE)
-final class TimeConstraint {
+public final class TimeConstraint {
     @Column(name = "start_time")
     private final LocalDateTime startTime;
 
@@ -45,12 +45,12 @@ final class TimeConstraint {
         }
     }
 
-    boolean isInTimeToChangeVote(LocalDateTime dateTime) {
+    public boolean isInTimeToChangeVote(LocalDateTime dateTime) {
         return ! (dateTime.isBefore(startTime) || dateTime.isAfter(voteChangeThreshold));
     }
 
     @SuppressWarnings("JpaAttributeMemberSignatureInspection")
-    boolean isPollActive(LocalDateTime dateTime) {
+    public boolean isPollActive(LocalDateTime dateTime) {
         return ! dateTime.isBefore(startTime) && dateTime.isBefore(endTime);
     }
 }

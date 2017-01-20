@@ -1,4 +1,4 @@
-package ua.belozorov.lunchvoting.model.voting;
+package ua.belozorov.lunchvoting.model.voting.polling;
 
 import lombok.Getter;
 import org.springframework.core.io.ByteArrayResource;
@@ -7,12 +7,7 @@ import ua.belozorov.objtosql.DateTimeSqlColumn;
 import ua.belozorov.objtosql.SimpleObjectToSqlConverter;
 import ua.belozorov.objtosql.StringSqlColumn;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
-
-import static ua.belozorov.lunchvoting.testdata.UserTestData.VOTERS;
-import static ua.belozorov.lunchvoting.testdata.UserTestData.VOTER_ID;
 
 /**
  * <h2></h2>
@@ -22,26 +17,21 @@ import static ua.belozorov.lunchvoting.testdata.UserTestData.VOTER_ID;
 @Getter
 public class VoteTestData {
     public static final Comparator<Vote> VOTE_COMPARATOR = new VoteComparator();
-    private final Vote vote1;
 
-    private final Set<Vote> votes = new HashSet<>();
+    private final Set<Vote> votesForActivePoll = new HashSet<>();
     private final Resource voteSqlResource;
+    private final Set<Vote> votesForPollNoUpdate = new HashSet<>();
 
-    public VoteTestData(PollTestData pollTestData) {
-        LunchPlacePoll poll = pollTestData.getPoll2();
-        this.vote1 = new Vote(VOTER_ID, poll, poll.getPollItems().iterator().next(), LocalDateTime.now());
+    public VoteTestData(PollTestData testPolls) {
+        this.votesForActivePoll.addAll(testPolls.getActivePoll().getVotes());
+        this.votesForPollNoUpdate.addAll(testPolls.getActivePollNoUpdate().getVotes());
 
-        Iterator<PollItem> iterator = poll.getPollItems().iterator();
-        PollItem firstPollItem = iterator.next();
-        PollItem secondPollItem = iterator.next();
-        PollItem[] items = new PollItem[]{firstPollItem, secondPollItem};
+        String sql = this.toSql(this.votesForActivePoll);
+        this.voteSqlResource = new ByteArrayResource(sql.getBytes(), "Votes");
+    }
 
-        this.votes.add(vote1);
-        for (int i = 0; i < VOTERS.size(); i++) {
-            this.votes.add(new Vote(VOTERS.get(i).getId(), poll, items[i & 1], LocalDateTime.now().plusMinutes(i * 7)));
-        }
-
-        String sql = new SimpleObjectToSqlConverter<>(
+    private String toSql(Set<Vote> votes) {
+        return new SimpleObjectToSqlConverter<>(
                 "votes",
                 Arrays.asList(
                         new StringSqlColumn<>("id", Vote::getId),
@@ -50,9 +40,7 @@ public class VoteTestData {
                         new StringSqlColumn<>("item_id", v -> v.getPollItem().getId()),
                         new DateTimeSqlColumn<>("vote_time", Vote::getVoteTime)
                 )
-        ).convert(new ArrayList<>(this.votes));
-
-         this.voteSqlResource = new ByteArrayResource(sql.getBytes(), "Votes");
+        ).convert(new ArrayList<>(this.votesForActivePoll));
     }
 
     private static class VoteComparator implements Comparator<Vote> {

@@ -3,11 +3,9 @@ package ua.belozorov.lunchvoting.model.voting;
 import org.junit.Test;
 import ua.belozorov.lunchvoting.AbstractTest;
 import ua.belozorov.lunchvoting.model.lunchplace.LunchPlace;
-import ua.belozorov.lunchvoting.model.lunchplace.LunchPlaceTestData;
+import ua.belozorov.lunchvoting.model.voting.polling.PollItem;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Iterator;
 import java.util.List;
 
 import static org.junit.Assert.assertTrue;
@@ -26,12 +24,12 @@ public class PollingResultTest extends AbstractTest {
     @Test
     public void testPollingResult() throws Exception {
 
-        VoteCollector collector = new PollVoteCollector(testPolls.getPoll2());
-        collector.collect(testVotes.getVotes());
+        VoteCollector collector = new PollVoteCollector(testPolls.getActivePoll());
+        collector.collect(testVotes.getVotesForActivePoll());
 
         VoteStatistics<PollItem> result1 = collector.result(VoteCollector.pollItemClassifier());
-        assertTrue(result1.countPerItem().get(testPolls.getPOll2PollItem1()) == 3);
-        assertTrue(result1.countPerItem().get(testPolls.getPOll2PollItem2()) == 2);
+        assertTrue(result1.countPerItem().get(testPolls.getActivePollPollItem1()) == 3);
+        assertTrue(result1.countPerItem().get(testPolls.getActivePollPollItem2()) == 2);
 
         VoteStatistics<String> result2 = collector.result(VoteCollector.voterIdClassifier());
         assertTrue(result2.countPerItem().get(VOTER_ID) == 1);

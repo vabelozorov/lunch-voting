@@ -6,12 +6,15 @@ import org.springframework.core.io.Resource;
 import ua.belozorov.lunchvoting.util.SetToStringConverter;
 import ua.belozorov.objtosql.SimpleObjectToSqlConverter;
 import ua.belozorov.objtosql.StringSqlColumn;
+import ua.belozorov.objtosql.ToSqlConverter;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import static ua.belozorov.lunchvoting.AbstractTest.NOW_DATE;
 import static ua.belozorov.lunchvoting.testdata.UserTestData.*;
 
 /**
@@ -40,43 +43,53 @@ public class LunchPlaceTestData {
     private final String place4Id;
 
     private final Menu menu1 = new Menu(
-            LocalDate.now().minusDays(1),
+            NOW_DATE.minusDays(1),
             Arrays.asList(new Dish("Fish", 11.00f, 0), new Dish("Soup", 12.00f, 1), new Dish("Apple Juice", 13.00f, 2)),
             place4
     );
     private final Menu menu2 = new Menu(
-            LocalDate.now().minusDays(2),
+            NOW_DATE.minusDays(2),
             Collections.singletonList(new Dish("Potato", 21.00f, 1)),
             place4
     );
     private final Menu menu3 = new Menu(
-            LocalDate.now(),
+            NOW_DATE,
             Collections.singletonList(new Dish("Tomato", 31.00f, 1)),
             place4
     );
     private final Menu menu4 = new Menu(
-            LocalDate.now(),
+            NOW_DATE,
             Collections.singletonList(new Dish("Ice cubes", 41.00f, 1)),
             place4
     );
     private final Menu menu5 = new Menu(
-            LocalDate.now(),
+            NOW_DATE,
             Collections.singletonList(new Dish("Marshmallow", 51.00f, 1)),
             place3
     );
     private final Menu menu6 = new Menu(
-            LocalDate.now().minusDays(1),
+            NOW_DATE.minusDays(1),
             Collections.singletonList(new Dish("Green Grass", 61.00f, 1)),
             place3
     );
     private final Menu menu7 = new Menu(
-            LocalDate.now().minusDays(2),
+            NOW_DATE.minusDays(2),
             Collections.singletonList(new Dish("Chipotled eggs", 71.00f, 1)),
             place1
     );
     private final Menu menu8 = new Menu(
-            LocalDate.now().minusDays(2),
+            NOW_DATE.plusDays(2),
             Collections.singletonList(new Dish("Chipotled chicken", 81.00f, 1)),
+            place1
+    );
+    private final Menu menu9 = new Menu(
+            NOW_DATE.minusDays(2),
+            Collections.singletonList(new Dish("Cucumber salad", 81.00f, 1)),
+            place2
+    );
+    private final Menu menu10 = new Menu(
+            NOW_DATE.plusDays(2),
+            Collections.singletonList(new Dish("Coconut shell", 81.00f, 1)),
             place2
     );
 
@@ -94,8 +107,8 @@ public class LunchPlaceTestData {
     private final Resource menuSqlResource;
 
     public LunchPlaceTestData() {
-        this.place1 = this.place1.setMenus(Arrays.asList(menu7));
-        this.place2 = this.place2.setMenus(Arrays.asList(menu8));
+        this.place1 = this.place1.setMenus(Arrays.asList(menu7, menu8));
+        this.place2 = this.place2.setMenus(Arrays.asList(menu9, menu10));
         this.place3 = this.place3.setMenus(Arrays.asList(menu5, menu6));
         this.place4 = this.place4.setMenus(Arrays.asList(menu1, menu2, menu3, menu4));
 
@@ -104,12 +117,13 @@ public class LunchPlaceTestData {
         this.place3Id = place3.getId();
         this.place4Id = place4.getId();
 
-        this.places = Arrays.asList(place1, place2, place3, place4);
-        Collections.sort(this.places, Comparator.comparing(LunchPlace::getName));
+        this.places = Stream.of(place1, place2, place3, place4)
+                                .sorted(Comparator.comparing(LunchPlace::getName))
+                                .collect(Collectors.toList());
 
-        this.menus = Arrays.asList(menu1, menu2, menu3, menu4, menu5, menu6, menu7, menu8);
+        this.menus = Arrays.asList(menu1, menu2, menu3, menu4, menu5, menu6, menu7, menu8, menu9, menu10);
 
-        String sql = new SimpleObjectToSqlConverter<LunchPlace>(
+        String sql = new SimpleObjectToSqlConverter<>(
           "places",
           Arrays.asList(
               new StringSqlColumn<>("id", LunchPlace::getId),
@@ -121,7 +135,7 @@ public class LunchPlaceTestData {
           )
         ).convert(this.places);
         this.lunchPlaceSqlResource = new ByteArrayResource(sql.getBytes(), "LunchPlaces");
-        this.menuSqlResource = new MenuToResourceConverter().convert(this.menus);
+        this.menuSqlResource = new ByteArrayResource(new MenuToResourceConverter().convert(this.menus).getBytes(), "Menus & Dishes");
     }
 
     public static LunchPlace getWithFilteredMenu(LocalDate date, LunchPlace place) {
@@ -161,7 +175,7 @@ public class LunchPlaceTestData {
         }
     }
 
-    public static class MenuToResourceConverter {
+    public static class MenuToResourceConverter implements ToSqlConverter<Menu> {
         private final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         private final String DELETE_TABLES = "DELETE FROM dishes;\nDELETE FROM menus;\n\n";
         private final String INSERT_MENU   = "INSERT INTO menus (id, effective_date, place_id) VALUES";
@@ -170,7 +184,7 @@ public class LunchPlaceTestData {
         private final String DISH_ENTRY    = "\n  ('%s', '%s', '%.2f', %d),";
         private final String STATEMENT_END = ";\n\n";
 
-        public Resource convert(Collection<Menu> menus) {
+        public String convert(List<Menu> menus) {
             StringBuilder menuBuilder = new StringBuilder(DELETE_TABLES).append(INSERT_MENU);
             StringBuilder dishBuilder = new StringBuilder(INSERT_DISH);
 
@@ -184,8 +198,7 @@ public class LunchPlaceTestData {
             }
             menuBuilder.deleteCharAt(menuBuilder.length() - 1).append(STATEMENT_END);
             dishBuilder.deleteCharAt(dishBuilder.length() - 1).append(STATEMENT_END);
-            String sql = menuBuilder.append(dishBuilder).toString();
-            return new ByteArrayResource(sql.getBytes(), "Menus & Dishes");
+            return menuBuilder.append(dishBuilder).toString();
         }
     }
 }

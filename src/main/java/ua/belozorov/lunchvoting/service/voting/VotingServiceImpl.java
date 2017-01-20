@@ -6,6 +6,11 @@ import org.springframework.transaction.annotation.Transactional;
 import ua.belozorov.lunchvoting.exceptions.NotFoundException;
 import ua.belozorov.lunchvoting.model.lunchplace.LunchPlace;
 import ua.belozorov.lunchvoting.model.voting.*;
+import ua.belozorov.lunchvoting.model.voting.polling.LunchPlacePoll;
+import ua.belozorov.lunchvoting.model.voting.polling.Poll;
+import ua.belozorov.lunchvoting.model.voting.polling.PollItem;
+import ua.belozorov.lunchvoting.model.voting.polling.Vote;
+import ua.belozorov.lunchvoting.model.voting.polling.votedecisions.VotePolicyDecision;
 import ua.belozorov.lunchvoting.repository.lunchplace.LunchPlaceRepository;
 import ua.belozorov.lunchvoting.repository.voting.PollingRepository;
 import ua.belozorov.lunchvoting.util.ExceptionUtils;
@@ -33,7 +38,6 @@ public class VotingServiceImpl implements VotingService {
     @Autowired
     private PollingRepository pollingRepository;
 
-
     /**
      * Create a poll where poll items are composed of all currently available menus for today date.
      * @return Poll
@@ -53,22 +57,18 @@ public class VotingServiceImpl implements VotingService {
     @Transactional
     public Vote vote(String voterId, String pollId, String pollItemId) {
         ExceptionUtils.checkAllNotNull(voterId, pollId, pollItemId);
-
         Poll poll = ofNullable(pollingRepository.getPollWithVotesAndEmptyPollItems(pollId))
-                .orElseThrow(() -> new NotFoundException(pollId, LunchPlacePoll.class));
-        final Vote existingVote = pollingRepository.getVoteInPoll(voterId, pollId);
-        VoteDecision decision = poll.verify(new VoteIntention(voterId, pollItemId, existingVote));
-
-        Vote vote = decision.getVote();
+                            .orElseThrow(() -> new NotFoundException(pollId, LunchPlacePoll.class));
+        VotePolicyDecision decision = poll.registerVote(voterId, pollItemId);
+        Vote acceptedVote = decision.getAcceptedVote();
         if (decision.isAccept()) {
-            pollingRepository.saveVote(vote);
+            pollingRepository.saveVote(acceptedVote);
         } else if (decision.isUpdate()) {
-            pollingRepository.removeVote(existingVote);
-            pollingRepository.saveVote(vote);
+            pollingRepository.replaceVote(decision.votesToBeRemoved(), acceptedVote);
         } else {
-            throw new IllegalStateException("Unexpected VoteDecision state");
+            throw new IllegalStateException("Unknown vote decision");
         }
-        return vote;
+        return acceptedVote;
     }
 
     @Override

@@ -2,10 +2,8 @@ package ua.belozorov.lunchvoting.repository.voting;
 
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import ua.belozorov.lunchvoting.model.voting.LunchPlacePoll;
+import ua.belozorov.lunchvoting.model.voting.polling.LunchPlacePoll;
 import ua.belozorov.lunchvoting.service.AbstractServiceTest;
-
-import static org.junit.Assert.*;
 
 /**
  * <h2></h2>
@@ -19,7 +17,7 @@ public class PollingRepositoryImplTest extends AbstractServiceTest {
 
     @Test
     public void testGetPollWithVotesAndEmptyPollItems() throws Exception {
-        LunchPlacePoll poll = repository.getPollWithVotesAndEmptyPollItems(testPolls.getPoll2().getId());
+        LunchPlacePoll poll = repository.getPollWithVotesAndEmptyPollItems(testPolls.getActivePoll().getId());
         System.out.println();
     }
 

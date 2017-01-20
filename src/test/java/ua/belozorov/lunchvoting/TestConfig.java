@@ -11,7 +11,6 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 public class TestConfig {
-
     @Bean
     public JsonUtils jsonUtils(ObjectMapper objectMapper) {
         return new JsonUtils(objectMapper);

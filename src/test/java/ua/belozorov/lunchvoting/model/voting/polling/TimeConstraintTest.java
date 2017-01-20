@@ -1,7 +1,8 @@
-package ua.belozorov.lunchvoting.model.voting;
+package ua.belozorov.lunchvoting.model.voting.polling;
 
 import org.junit.Assert;
 import org.junit.Test;
+import ua.belozorov.lunchvoting.model.voting.polling.TimeConstraint;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;

@@ -1,4 +1,4 @@
-package ua.belozorov.lunchvoting.model.voting;
+package ua.belozorov.lunchvoting.model.voting.polling;
 
 import lombok.Getter;
 import org.springframework.core.io.ByteArrayResource;
@@ -9,9 +9,15 @@ import ua.belozorov.objtosql.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static ua.belozorov.lunchvoting.AbstractTest.NOW_DATE;
+import static ua.belozorov.lunchvoting.AbstractTest.NOW_DATE_TIME;
+import static ua.belozorov.lunchvoting.model.lunchplace.LunchPlaceTestData.*;
+import static ua.belozorov.lunchvoting.testdata.UserTestData.VOTERS;
+import static ua.belozorov.lunchvoting.testdata.UserTestData.VOTER_ID;
 
 /**
  * <h2></h2>
@@ -22,27 +28,70 @@ import java.util.stream.Collectors;
 public class PollTestData {
     public static final  Comparator<LunchPlacePoll> POLL_COMPARATOR = new PollComparator();
 
-    private final LunchPlacePoll poll2;
+    private LunchPlacePoll activePoll;
     private final Resource pollSqlResource;
     private final Resource pollItemSqlResource;
+    private final LunchPlacePoll pastPoll;
+    private final LunchPlacePoll futurePoll;
+    private LunchPlacePoll activePollNoUpdate;
 
     public  PollTestData(LunchPlaceTestData placeTestData) {
-        LocalDateTime now = LocalDateTime.now();
+        LocalDate menuDatePast = NOW_DATE.minusDays(2);
+        LocalDate menuDateToday = NOW_DATE;
+        LocalDate menuDateFuture = NOW_DATE.plusDays(2);
 
-        LocalDate menuDate = LocalDate.now().minusDays(2);
-        LunchPlace place1 = placeTestData.getPlace1();
-        LunchPlace place2 = placeTestData.getPlace2();
-
-        place1 = LunchPlaceTestData.getWithFilteredMenu(menuDate, place1);
-        place2 = LunchPlaceTestData.getWithFilteredMenu(menuDate, place2);
-
-        this.poll2 = new LunchPlacePoll(
-                now.minusHours(2),
-                now.plusHours(2),
-                now.plusMinutes(10),
-                Arrays.asList(place1, place2),
-                menuDate
+        this.activePollNoUpdate = new LunchPlacePoll(
+                NOW_DATE_TIME.minusHours(2),
+                NOW_DATE_TIME.plusHours(2),
+                NOW_DATE_TIME.minusMinutes(10),
+                Arrays.asList(
+                        getWithFilteredMenu(menuDateToday, placeTestData.getPlace3()),
+                        getWithFilteredMenu(menuDateToday, placeTestData.getPlace4())
+                ),
+                menuDateToday
         );
+        this.pastPoll = new LunchPlacePoll(
+                NOW_DATE_TIME.minusDays(2).minusHours(2),
+                NOW_DATE_TIME.minusDays(2).plusHours(2),
+                NOW_DATE_TIME.minusDays(2).plusMinutes(10),
+                Arrays.asList(
+                        getWithFilteredMenu(menuDatePast, placeTestData.getPlace1()),
+                        getWithFilteredMenu(menuDatePast, placeTestData.getPlace2())
+                ),
+                menuDatePast
+        );
+        this.futurePoll = new LunchPlacePoll(
+                NOW_DATE_TIME.plusDays(1).minusHours(2),
+                NOW_DATE_TIME.plusDays(1).plusHours(2),
+                NOW_DATE_TIME.plusDays(1).plusMinutes(10),
+                Arrays.asList(
+                        getWithFilteredMenu(menuDateFuture, placeTestData.getPlace1()),
+                        getWithFilteredMenu(menuDateFuture, placeTestData.getPlace2())
+                ),
+                menuDateFuture
+        );
+        this.activePoll = new LunchPlacePoll(
+                NOW_DATE_TIME.minusHours(2),
+                NOW_DATE_TIME.plusHours(2),
+                NOW_DATE_TIME.plusMinutes(10),
+                Arrays.asList(
+                        getWithFilteredMenu(menuDateToday, placeTestData.getPlace3()),
+                        getWithFilteredMenu(menuDateToday, placeTestData.getPlace4())
+                ),
+                menuDateToday
+        );
+        PollItem[] items = new PollItem[]{this.getActivePollPollItem1(), this.getActivePollPollItem2()};
+        Set<Vote> votes = new HashSet<>();
+        for (int i = 0; i < VOTERS.size(); i++) {
+            votes.add(activePoll.registerVote(VOTERS.get(i).getId(), items[i & 1].getId()).getAcceptedVote());
+            try {Thread.sleep(10);} catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        this.activePoll = this.activePoll.toBuilder().votes(votes).build();
+
+        Vote vote = this.activePollNoUpdate.registerVote(VOTER_ID, this.activePollNoUpdate.getPollItems().iterator().next().getId()).getAcceptedVote();
+        this.activePollNoUpdate = this.activePollNoUpdate.toBuilder().votes(Collections.singleton(vote)).build();
 
         String pollSql = new SimpleObjectToSqlConverter<>(
                 "polls",
@@ -53,7 +102,7 @@ public class PollTestData {
                         new DateTimeSqlColumn<>("change_time", lpp -> lpp.getTimeConstraint().getVoteChangeThreshold()),
                         new DateSqlColumn<>("menu_date", LunchPlacePoll::getMenuDate)
                 )
-        ).convert(Collections.singletonList(poll2));
+        ).convert(Arrays.asList(pastPoll, activePoll, futurePoll));
         this.pollSqlResource = new ByteArrayResource(pollSql.getBytes(), "Polls");
 
         String pollItemsSql = new SimpleObjectToSqlConverter<>(
@@ -65,19 +114,19 @@ public class PollTestData {
                         new StringSqlColumn<>("item_id",pi -> pi.getItem().getId())
                 )
         ).convert(
-                Arrays.asList(poll2).stream()
+                Stream.of(activePoll, pastPoll, futurePoll)
                     .flatMap(p -> p.getPollItems().stream())
                     .collect(Collectors.toList())
         );
         this.pollItemSqlResource = new ByteArrayResource(pollItemsSql.getBytes(), "PollItems");
-
     }
 
-    public PollItem getPOll2PollItem1() {
-        return this.poll2.getPollItems().iterator().next();
+    public PollItem getActivePollPollItem1() {
+        return this.activePoll.getPollItems().iterator().next();
     }
-    public PollItem getPOll2PollItem2() {
-        Iterator<PollItem> iterator = this.poll2.getPollItems().iterator();
+
+    public PollItem getActivePollPollItem2() {
+        Iterator<PollItem> iterator = this.activePoll.getPollItems().iterator();
         iterator.next();
         return iterator.next();
     }

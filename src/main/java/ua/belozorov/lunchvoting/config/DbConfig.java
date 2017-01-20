@@ -42,7 +42,7 @@ public class DbConfig {
         HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
         vendorAdapter.setGenerateDdl(false);
         em.setDataSource(dataSource);
-        em.setPackagesToScan("ua.belozorov.lunchvoting.model", "ua.belozorov.lunchvoting.util");
+        em.setPackagesToScan("ua.belozorov.lunchvoting.model", "ua.belozorov.lunchvoting.util", "ua.belozorov.lunchvoting.model.voting.polling");
         em.setJpaVendorAdapter(vendorAdapter);
         em.afterPropertiesSet();
         return em.getObject();

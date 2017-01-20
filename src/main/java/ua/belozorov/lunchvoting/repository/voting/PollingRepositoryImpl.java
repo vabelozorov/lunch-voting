@@ -2,14 +2,16 @@ package ua.belozorov.lunchvoting.repository.voting;
 
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-import ua.belozorov.lunchvoting.model.voting.LunchPlacePoll;
-import ua.belozorov.lunchvoting.model.voting.PollItem;
-import ua.belozorov.lunchvoting.model.voting.Vote;
+import ua.belozorov.lunchvoting.model.voting.polling.LunchPlacePoll;
+import ua.belozorov.lunchvoting.model.voting.polling.PollItem;
+import ua.belozorov.lunchvoting.model.voting.polling.Vote;
 import ua.belozorov.lunchvoting.repository.BaseRepository;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * <h2></h2>
@@ -56,17 +58,16 @@ public class PollingRepositoryImpl extends BaseRepository implements PollingRepo
     }
 
     @Override
-    @Transactional
     public LunchPlacePoll getPollAndPollItem(String pollId, Collection<String> pollItemIds) {
-        if (pollItemIds.size() < 1) {
-            throw new IllegalStateException("PollItemIds size must be greater than 0");
+        if (pollItemIds.isEmpty()) {
+            throw new IllegalStateException("PollItemIds must not be empty");
         }
         List<LunchPlacePoll> polls = em.createQuery("SELECT p FROM LunchPlacePoll p " +
                 "INNER JOIN FETCH p.pollItems pi " +
                 "INNER JOIN FETCH pi.item i " +
                 "INNER JOIN FETCH i.menus m " +
-                "INNER JOIN FETCH m.dishes " +
-                "WHERE p.id= :pollId AND pi.id IN :pollItemIds", LunchPlacePoll.class)
+                "LEFT JOIN FETCH m.dishes " +
+                "WHERE p.id= :pollId AND pi.id IN :pollItemIds AND m.effectiveDate= p.menuDate", LunchPlacePoll.class)
                 .setParameter("pollItemIds", pollItemIds)
                 .setParameter("pollId", pollId)
                 .getResultList();
@@ -101,5 +102,18 @@ public class PollingRepositoryImpl extends BaseRepository implements PollingRepo
     @Override
     public void removeVote(final Vote vote) {
         em.remove(vote);
+    }
+
+    @Override
+    public void removeVotes(Set<Vote> forRemoval) {
+        List<String> ids = forRemoval.stream().map(Vote::getId).collect(Collectors.toList());
+        em.createQuery("DELETE FROM Vote v WHERE v.id IN :ids")
+                .setParameter("ids", ids).executeUpdate();
+    }
+
+    @Override
+    public void replaceVote(final Set<Vote> forRemoval, final Vote acceptedVote) {
+        this.removeVotes(forRemoval);
+        this.saveVote(acceptedVote);
     }
 }

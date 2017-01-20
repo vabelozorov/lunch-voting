@@ -1,4 +1,4 @@
-package ua.belozorov.lunchvoting.model.voting;
+package ua.belozorov.lunchvoting.model.voting.polling;
 
 import lombok.Getter;
 import org.hibernate.annotations.Immutable;

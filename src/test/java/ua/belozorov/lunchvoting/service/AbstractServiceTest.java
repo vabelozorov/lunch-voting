@@ -15,6 +15,4 @@ import ua.belozorov.lunchvoting.config.RootConfig;
 @ContextConfiguration(classes = {RootConfig.class})
 public abstract class AbstractServiceTest extends AbstractSpringTest {
 
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
 }

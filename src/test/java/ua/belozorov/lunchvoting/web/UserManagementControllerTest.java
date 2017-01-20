@@ -101,9 +101,13 @@ public class UserManagementControllerTest extends AbstractControllerTest {
         mockMvc.perform(delete(REST_URL + "/" + VOTER_ID))
                 .andExpect(status().isNoContent());
         Collection<User> actual = userService.getAll();
+        Collection<User> expected = ALL_USERS.stream()
+                                                .filter(u -> !u.getId().equals(VOTER_ID))
+                                                .collect(Collectors.toList());
+
         assertThat(
                 actual,
-                contains(matchCollection(Arrays.asList(ADMIN, GOD), USER_COMPARATOR))
+                contains(matchCollection(expected, USER_COMPARATOR))
         );
     }
 

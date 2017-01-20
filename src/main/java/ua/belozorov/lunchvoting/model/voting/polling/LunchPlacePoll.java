@@ -1,13 +1,17 @@
-package ua.belozorov.lunchvoting.model.voting;
+package ua.belozorov.lunchvoting.model.voting.polling;
 
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
-import org.hibernate.annotations.*;
 import ua.belozorov.lunchvoting.exceptions.*;
 import ua.belozorov.lunchvoting.model.base.AbstractPersistableObject;
 import ua.belozorov.lunchvoting.model.lunchplace.LunchPlace;
 import ua.belozorov.lunchvoting.model.lunchplace.Menu;
+import ua.belozorov.lunchvoting.model.voting.polling.votedecisions.VotePolicyDecision;
+import ua.belozorov.lunchvoting.model.voting.polling.votepolicies.AcceptPolicy;
+import ua.belozorov.lunchvoting.model.voting.polling.votepolicies.CommonPolicy;
+import ua.belozorov.lunchvoting.model.voting.polling.votepolicies.VoteForAnotherUpdatePolicy;
+import ua.belozorov.lunchvoting.model.voting.polling.votepolicies.VotePolicy;
 
 import javax.persistence.*;
 import javax.persistence.CascadeType;
@@ -18,9 +22,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * <h2></h2>
@@ -29,7 +31,6 @@ import java.util.stream.Stream;
  */
 @Entity
 @Table(name = "polls")
-@Immutable
 @Getter(AccessLevel.PACKAGE)
 public final class LunchPlacePoll extends AbstractPersistableObject implements Poll {
     private static final LocalTime DEFAULT_START_TIME = LocalTime.of(9, 0);
@@ -45,15 +46,11 @@ public final class LunchPlacePoll extends AbstractPersistableObject implements P
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "poll", cascade = CascadeType.ALL)
     private final Set<Vote> votes;
 
-    @Getter
     @Column(name = "menu_date")
     private final LocalDate menuDate;
 
     @Transient
-    private final Collection<Consumer<VoteIntention>> pollValidators;
-
-    @Transient
-    private final Collection<Consumer<VoteIntention>> voteChangeValidators;
+    private final List<VotePolicy> policies;
 
     /**
      * Meant for Spring and JPA
@@ -62,9 +59,8 @@ public final class LunchPlacePoll extends AbstractPersistableObject implements P
         this.menuDate = null;
         this.timeConstraint = null;
         this.pollItems = null;
-        this.pollValidators = this.getPollValidators();
-        this.voteChangeValidators = this.getVoteChangeValidators();
         this.votes = null;
+        this.policies = new ArrayList<>();
     }
 
     public LunchPlacePoll(List<LunchPlace> lunchPlaces, LocalDate menuDate) {
@@ -90,30 +86,34 @@ public final class LunchPlacePoll extends AbstractPersistableObject implements P
         this.pollItems = this.convertToPollItems(lunchPlaces);
         this.menuDate = menuDate;
         this.votes = new HashSet<>();
-        this.pollValidators = this.getPollValidators();
-        this.voteChangeValidators = this.getVoteChangeValidators();
+        this.policies = this.registerPolicies();
     }
 
-    private LunchPlacePoll(String id, Integer version, TimeConstraint timeConstraint,
+    @Builder(toBuilder = true)
+    LunchPlacePoll(String id, Integer version, TimeConstraint timeConstraint,
                            Set<PollItem> pollItems, LocalDate menuDate, Set<Vote> votes) {
         super(id, version);
         this.timeConstraint = timeConstraint;
         this.pollItems = pollItems;
         this.menuDate = menuDate;
         this.votes = votes;
-        this.pollValidators = this.getPollValidators();
-        this.voteChangeValidators = this.getVoteChangeValidators();
+        this.policies = this.registerPolicies();
+    }
+
+    @PostLoad
+    private void init() {
+        this.policies.addAll(this.registerPolicies());
     }
 
     private Set<PollItem> convertToPollItems(List<LunchPlace> lunchPlaces) {
         if (lunchPlaces == null) {
             lunchPlaces = Collections.emptyList();
         }
-        List<PollItem> pollItems = new ArrayList<>();
+        Set<PollItem> pollItems = new LinkedHashSet<>();
         for (int i = 0; i < lunchPlaces.size(); i++) {
             pollItems.add(new PollItem(i, lunchPlaces.get(i), this));
         }
-        return new LinkedHashSet<>(pollItems);
+        return Collections.unmodifiableSet(pollItems);
     }
 
     private void checkLunchPlaceDate(List<LunchPlace> places, LocalDate date) {
@@ -130,78 +130,49 @@ public final class LunchPlacePoll extends AbstractPersistableObject implements P
         }
     }
 
-    private Collection<Consumer<VoteIntention>> getPollValidators() {
-        Collection<Consumer<VoteIntention>> validators = new ArrayList<>();
-        validators.add(this::hasPollItem);
-        validators.add(this::isRunning);
-        validators.add(this::oneVote);
-        return Collections.unmodifiableCollection(validators);
+    private List<VotePolicy> registerPolicies() {
+        List<VotePolicy> policies = new ArrayList<>();
+        policies.add(new CommonPolicy(this.timeConstraint));
+        policies.add(new AcceptPolicy());
+        policies.add(new VoteForAnotherUpdatePolicy(this.timeConstraint));
+        return policies;
     }
 
-    private Collection<Consumer<VoteIntention>> getVoteChangeValidators() {
-        Collection<Consumer<VoteIntention>> validators = new ArrayList<>();
-        validators.add(this::voteChange);
-        return Collections.unmodifiableCollection(validators);
-    }
-
-    public LunchPlacePoll addVote(Vote vote) {
+    private LunchPlacePoll addVote(Vote vote) {
         this.votes.add(vote);
         return this;
     }
 
-    public LunchPlacePoll addVotes(Set<Vote> votes) {
+    private LunchPlacePoll addVotes(Set<Vote> votes) {
         this.votes.addAll(votes);
         return this;
     }
 
-    public VoteDecision verify(VoteIntention intention) {
-        pollValidators.forEach(validator -> validator.accept(intention));
-        if (intention.isForAnotherItem()) {
-            voteChangeValidators.forEach(validator -> validator.accept(intention));
-            Vote vote = new Vote(intention.getVoterId(), this, this.pollItemById(intention.getPollItemId()), intention.getMadeTime());
-            return VoteDecision.update(vote);
-        } else if ( ! intention.hasVotedEarlier()) {
-            Vote vote = new Vote(intention.getVoterId(), this, this.pollItemById(intention.getPollItemId()), intention.getMadeTime());
-            return VoteDecision.accept(vote);
-        } else {
-            throw new IllegalStateException("Unexpected state during vote verification");
-        }
+    private void replaceVotes(Collection<Vote> oldVotes, Vote newVote) {
+        oldVotes.forEach(this.votes::remove);
+        this.votes.add(newVote);
     }
 
-    private void oneVote(VoteIntention intention) {
-        if (intention.isForTheSameItem()) {
-            throw new MultipleVoteException(intention);
-        }
-    }
+    @Override
+    public VotePolicyDecision registerVote(String voterId, String pollItemId) {
+        Set<Vote> votersVotes = this.votes.stream()
+                                            .filter(v -> v.getVoterId().equals(voterId))
+                                            .collect(Collectors.toSet());
+        VoteIntention intention = new VoteIntentionImpl(voterId, this.pollItemById(pollItemId), votersVotes);
 
-    private void voteChange(VoteIntention intention) {
-        LocalDateTime voteTime = intention.getMadeTime();
-        if ( ! this.timeConstraint.isInTimeToChangeVote(voteTime)) {
-            throw new VoteChangeNotAllowedException(intention);
-        }
-    }
-
-    private void isRunning(VoteIntention intention) {
-        LocalDateTime voteTime = intention.getMadeTime();
-        if ( ! this.timeConstraint.isPollActive(voteTime)) {
-            throw new PollNotActiveException(intention);
-        }
-    }
-
-    private void hasPollItem(VoteIntention intention) {
-        String intentionPollItemId = intention.getPollItemId();
-        this.pollItems.stream()
-                .map(PollItem::getId)
-                .filter(intentionPollItemId::equals)
+        return this.policies.stream()
+                .map(policy -> policy.checkCompliance(intention))
+                .filter(vd -> ! vd.isContinue())
                 .findFirst()
-                .orElseThrow(() -> new NotFoundException(intentionPollItemId, PollItem.class));
+                .orElseThrow(() -> new NoVotePolicyMatchException(intention));
     }
 
     PollItem pollItemById(String id) {
         Objects.requireNonNull(id, "PollItemId must not be null");
         return pollItems.stream()
                 .filter(pollItem -> id.equals(pollItem.getId()))
-                .findFirst().orElseThrow(() -> new IllegalStateException(String.format("Poll %s does not contain item %s", this.getId(), id)));
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException(String.format("Poll %s does not contain item %s", this.getId(), id)));
     }
 //
 //    public PollingResult getPollResult(Set<Vote> votes) {
@@ -220,8 +191,14 @@ public final class LunchPlacePoll extends AbstractPersistableObject implements P
 //        return collector.getByPollItem();
 //    }
 
+    @Override
     public Set<PollItem> getPollItems() {
-        return Collections.unmodifiableSet(this.pollItems);
+        return this.pollItems;
+    }
+
+    @Override
+    public LocalDate getMenuDate() {
+        return this.menuDate;
     }
 
     Set<Vote> getVotes() {

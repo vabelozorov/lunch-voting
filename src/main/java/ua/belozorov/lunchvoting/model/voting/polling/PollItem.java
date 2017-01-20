@@ -1,4 +1,4 @@
-package ua.belozorov.lunchvoting.model.voting;
+package ua.belozorov.lunchvoting.model.voting.polling;
 
 import lombok.AccessLevel;
 import lombok.Getter;

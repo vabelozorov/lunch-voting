@@ -1,11 +1,8 @@
 package ua.belozorov.lunchvoting.repository.lunchplace;
 
-import ua.belozorov.lunchvoting.model.User;
 import ua.belozorov.lunchvoting.model.lunchplace.LunchPlace;
-import ua.belozorov.lunchvoting.model.lunchplace.Menu;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 

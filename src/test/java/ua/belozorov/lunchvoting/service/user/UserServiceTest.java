@@ -13,6 +13,7 @@ import ua.belozorov.lunchvoting.service.user.UserService;
 
 import javax.validation.ConstraintViolationException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.contains;
@@ -42,7 +43,7 @@ public class UserServiceTest extends AbstractServiceTest {
     public void getAll() throws Exception {
         Collection<User> users = userService.getAll();
         assertThat(
-                Arrays.asList(ADMIN, GOD, VOTER),
+                ALL_USERS,
                 contains(matchCollection(users, USER_COMPARATOR))
         );
     }
@@ -52,7 +53,9 @@ public class UserServiceTest extends AbstractServiceTest {
         userService.delete(ADMIN_ID);
         Collection<User> users = userService.getAll();
         assertThat(
-            Arrays.asList(GOD, VOTER),
+            ALL_USERS.stream()
+                    .filter(u -> !u.getId().equals(ADMIN_ID))
+                    .collect(Collectors.toList()),
             contains(matchCollection(users, USER_COMPARATOR))
         );
     }

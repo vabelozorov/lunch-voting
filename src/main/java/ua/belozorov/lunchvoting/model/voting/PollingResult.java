@@ -1,5 +1,8 @@
 package ua.belozorov.lunchvoting.model.voting;
 
+import ua.belozorov.lunchvoting.model.voting.polling.LunchPlacePoll;
+import ua.belozorov.lunchvoting.model.voting.polling.Vote;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
