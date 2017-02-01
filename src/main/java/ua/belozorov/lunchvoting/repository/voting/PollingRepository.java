@@ -41,4 +41,8 @@ public interface PollingRepository {
     void removeVotes(Set<Vote> forRemoval);
 
     void replaceVote(Set<Vote> forRemoval, Vote acceptedVote);
+
+    LunchPlacePoll getPollEmptyPollItemsAndVotes(String pollId);
+
+    Collection<String> getVotedByVoter(String pollId, String voterId);
 }

@@ -114,7 +114,8 @@ public class LunchPlaceRepositoryImpl extends BaseRepository implements LunchPla
                 "INNER JOIN FETCH lp.menus m " +
                 "LEFT JOIN FETCH m.dishes " +
                 "WHERE m.effectiveDate= :date", LunchPlace.class)
-                .setParameter("date", date).getResultList();
+                .setParameter("date", date)
+                .getResultList();
         em.clear();
         return places;
     }

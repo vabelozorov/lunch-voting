@@ -2,7 +2,9 @@ package ua.belozorov.lunchvoting.service.voting;
 
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import ua.belozorov.lunchvoting.model.base.AbstractPersistableObject;
 import ua.belozorov.lunchvoting.model.lunchplace.LunchPlace;
+import ua.belozorov.lunchvoting.model.voting.VotingResult;
 import ua.belozorov.lunchvoting.model.voting.polling.LunchPlacePoll;
 import ua.belozorov.lunchvoting.model.voting.polling.Poll;
 import ua.belozorov.lunchvoting.model.voting.polling.PollItem;
@@ -20,6 +22,7 @@ import static ua.belozorov.lunchvoting.MatcherUtils.matchSingle;
 import static ua.belozorov.lunchvoting.model.voting.polling.PollTestData.POLL_COMPARATOR;
 import static ua.belozorov.lunchvoting.model.voting.polling.VoteTestData.VOTE_COMPARATOR;
 import static ua.belozorov.lunchvoting.testdata.UserTestData.GOD_ID;
+import static ua.belozorov.lunchvoting.testdata.UserTestData.VOTER_ID;
 
 
 /**
@@ -37,7 +40,7 @@ public class VotingServiceImplTest extends AbstractServiceTest {
 
     @Test
     public void createsPollForTodayMenus() throws Exception {
-        String pollId = votingService.createPollForTodayMenus();
+        String pollId = ((AbstractPersistableObject)votingService.createPollForTodayMenus()).getId();
         Poll poll = votingService.getPollFullDetails(pollId);
 
         Set<LunchPlace> places = poll.getPollItems().stream()
@@ -102,7 +105,7 @@ public class VotingServiceImplTest extends AbstractServiceTest {
         assertTrue(poll.getPollItems().stream()
                 .flatMap(pi -> pi.getItem().getMenus().stream())
                 .flatMap(m -> m.getDishes().stream())
-                .count() == 3
+                .count() == 6
         );
     }
 
@@ -115,7 +118,7 @@ public class VotingServiceImplTest extends AbstractServiceTest {
         assertTrue(actual.getPollItems().stream()
                             .flatMap(pi -> pi.getItem().getMenus().stream())
                             .flatMap(m -> m.getDishes().stream())
-                .count() == 1
+                .count() == 2
         );
     }
 
@@ -135,9 +138,25 @@ public class VotingServiceImplTest extends AbstractServiceTest {
         assertTrue(actual.getPollItems().stream()
                 .flatMap(pi -> pi.getItem().getMenus().stream())
                 .flatMap(m -> m.getDishes().stream())
-                .count() == 3
+                .count() == 6
         );
     }
 
+    @Test
+    public void getVotedByVoterId() {
+        Collection<String> ids = votingService.getVotedForVoter(testPolls.getActivePoll().getId(), VOTER_ID);
+        List<String> expected = Arrays.asList(testPolls.getActivePoll().getPollItems().get(0).getId());
 
+        assertTrue(ids.equals(expected));
+    }
+
+    @Test
+    public void getPollResult() throws Exception {
+        VotingResult<PollItem> pollResult = votingService.getPollResult(testPolls.getActivePoll().getId());
+        PollItem pollItem1 = testPolls.getActivePollPollItem1();
+
+        assertTrue(pollResult.getWinners().equals(Arrays.asList(pollItem1)));
+        assertTrue(pollResult.countPerItem().get(pollItem1) == 3);
+        assertTrue(pollResult.countPerItem().get(testPolls.getActivePollPollItem2()) == 2);
+    }
 }

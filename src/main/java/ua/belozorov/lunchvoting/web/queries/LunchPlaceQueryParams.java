@@ -1,4 +1,4 @@
-package ua.belozorov.lunchvoting.web;
+package ua.belozorov.lunchvoting.web.queries;
 
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -17,7 +17,7 @@ import java.util.Set;
  * @author vabelozorov on 29.12.16.
  */
 @Setter(AccessLevel.PUBLIC)
-final class LunchPlaceQueryParams {
+public final class LunchPlaceQueryParams {
 
     @Getter(AccessLevel.NONE)
     private String[] ids = new String[0];
@@ -32,35 +32,35 @@ final class LunchPlaceQueryParams {
     protected LunchPlaceQueryParams() {
     }
 
-    boolean allEmpty() {
+    public boolean allEmpty() {
         return ids.length == 0 && startDate == null && endDate == null && fields.length == 0;
     }
 
-    boolean onlyIds() {
+    public boolean onlyIds() {
         return ids.length != 0 && startDate == null && endDate == null && fields.length == 0;
     }
 
-    @NotNull Set<String> getIds() {
+    @NotNull public  Set<String> getIds() {
         return toSet(ids);
     }
 
-    LocalDate getStartDate() {
+    public LocalDate getStartDate() {
         return startDate;
     }
 
-    LocalDate getEndDate() {
+    public LocalDate getEndDate() {
         return endDate;
     }
 
-    @NotNull Set<String> getFields() {
+    @NotNull public Set<String> getFields() {
         return toSet(fields);
     }
 
-    boolean hasDates() {
+    public boolean hasDates() {
         return startDate != null || endDate != null;
     }
 
-    @NotNull Set<String> getFieldsOrDefault(Set<String> defaultFields) {
+    @NotNull public Set<String> getFieldsOrDefault(Set<String> defaultFields) {
         return fields.length == 0 ? defaultFields : getFields();
     }
 

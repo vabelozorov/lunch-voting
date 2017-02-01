@@ -10,11 +10,11 @@ import java.util.Map;
  * @param <I> classification item of VoteStatistics implementation
  * @author vabelozorov on 10.12.16.
  */
-public interface VoteStatistics<I> {
+public interface VotingResult<I> {
 
     Map<I, Integer> countPerItem();
 
-    Map<I, List<Vote>> votesPerItem();
+    Map<I, List<Vote>> votesForItem();
 
     List<I> getWinners();
 

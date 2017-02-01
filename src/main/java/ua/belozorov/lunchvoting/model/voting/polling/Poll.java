@@ -3,6 +3,7 @@ package ua.belozorov.lunchvoting.model.voting.polling;
 import ua.belozorov.lunchvoting.model.voting.polling.votedecisions.VotePolicyDecision;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -12,6 +13,7 @@ import java.util.Set;
  */
 public interface Poll {
     VotePolicyDecision registerVote(String voterId, String pollItemId);
-    Set<PollItem> getPollItems();
+    List<PollItem> getPollItems();
     LocalDate getMenuDate();
+    Set<Vote> getVotes();
 }

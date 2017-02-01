@@ -7,6 +7,7 @@ import ua.belozorov.lunchvoting.model.lunchplace.Dish;
 import ua.belozorov.lunchvoting.model.lunchplace.LunchPlace;
 import ua.belozorov.lunchvoting.model.lunchplace.LunchPlaceTestData;
 import ua.belozorov.lunchvoting.model.lunchplace.Menu;
+import ua.belozorov.lunchvoting.model.voting.polling.votedecisions.VotePolicyDecision;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -40,7 +41,7 @@ public class PollTest extends AbstractTest {
         try {
             LunchPlacePoll pastPoll = testPolls.getPastPoll();
             pastPoll
-                    .registerVote(VOTER_ID, pastPoll.getPollItems().iterator().next().getId());
+                    .registerVote(VOTER_ID, pastPoll.getPollItems().get(0).getId());
         } catch (PollNotActiveException e) {
             exceptions.add(e);
         }
@@ -48,7 +49,7 @@ public class PollTest extends AbstractTest {
         // voting before poll start time
        try {
            LunchPlacePoll futurePoll = testPolls.getFuturePoll();
-           futurePoll.registerVote(VOTER_ID, futurePoll.getPollItems().iterator().next().getId());
+           futurePoll.registerVote(VOTER_ID, futurePoll.getPollItems().get(0).getId());
         } catch (PollNotActiveException e) {
             exceptions.add(e);
         }
@@ -69,10 +70,11 @@ public class PollTest extends AbstractTest {
     @Test
     public void updatesVote() throws Exception {
         LunchPlacePoll poll = testPolls.getActivePoll();
-        Vote previousVote = poll.getVotes().stream()
-                .filter(vote -> vote.getVoterId().equals(VOTER_ID))
-                .findFirst().get();
-        Vote vote = poll.registerVote(VOTER_ID, testPolls.getActivePollPollItem2().getId()).getAcceptedVote();
+        VotePolicyDecision decision = poll.registerVote(VOTER_ID, testPolls.getActivePollPollItem2().getId());
+
+        assertTrue(decision.isUpdate());
+
+        Vote vote = decision.getAcceptedVote();
 
         assertTrue(vote.getPoll().equals(poll));
         assertTrue(vote.getPollItem().equals( testPolls.getActivePollPollItem2()));
@@ -82,9 +84,7 @@ public class PollTest extends AbstractTest {
     @Test(expected = VoteChangeNotAllowedException.class)
     public void failsUpdateWhenItIsAfterTimeThreshold() throws Exception {
         LunchPlacePoll poll = testPolls.getActivePollNoUpdate();
-        Iterator<PollItem> iterator = poll.getPollItems().iterator();
-        iterator.next();
-        poll.registerVote(VOTER_ID, iterator.next().getId());
+        poll.registerVote(VOTER_ID, poll.getPollItems().get(1).getId());
     }
 
     @Test(expected = MultipleVotePerItemException.class)

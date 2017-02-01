@@ -19,7 +19,7 @@ public interface VotingService {
      * for today
      * @return ID of the created Poll instance
      */
-   String createPollForTodayMenus();
+   Poll createPollForTodayMenus();
 
     /**
      * Handles the voting
@@ -54,9 +54,18 @@ public interface VotingService {
     Poll getPollItemDetails(String pollId, Collection<String> pollItemIds);
 
     /**
-     * Returns vote
-     * @param pollId
+     *
+     * @param pollId existing pollId
      * @return
      */
-    VoteStatistics<PollItem> getPollResultPerItem(String pollId);
+    VotingResult<PollItem> getPollResult(String pollId);
+
+     /**
+      *
+      * @param pollId existing pollId
+      * @param voterId existing voterId
+      * @return Collection of PollItem ids for which the voter with id {@code voterId} has voted or empty collection
+      * if no vote has been made or voterId/pollId does not exist
+      */
+     Collection<String> getVotedForVoter(String pollId, String voterId);
 }

@@ -40,8 +40,9 @@ public final class LunchPlacePoll extends AbstractPersistableObject implements P
     private final TimeConstraint timeConstraint;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "poll", cascade = CascadeType.PERSIST)
-    @OrderBy("position ASC")
-    private final Set<PollItem> pollItems;
+//    @OrderBy("position ASC")
+    @OrderColumn(name = "position")
+    private final List<PollItem> pollItems;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "poll", cascade = CascadeType.ALL)
     private final Set<Vote> votes;
@@ -91,7 +92,7 @@ public final class LunchPlacePoll extends AbstractPersistableObject implements P
 
     @Builder(toBuilder = true)
     LunchPlacePoll(String id, Integer version, TimeConstraint timeConstraint,
-                           Set<PollItem> pollItems, LocalDate menuDate, Set<Vote> votes) {
+                           List<PollItem> pollItems, LocalDate menuDate, Set<Vote> votes) {
         super(id, version);
         this.timeConstraint = timeConstraint;
         this.pollItems = pollItems;
@@ -105,15 +106,15 @@ public final class LunchPlacePoll extends AbstractPersistableObject implements P
         this.policies.addAll(this.registerPolicies());
     }
 
-    private Set<PollItem> convertToPollItems(List<LunchPlace> lunchPlaces) {
+    private List<PollItem> convertToPollItems(List<LunchPlace> lunchPlaces) {
         if (lunchPlaces == null) {
             lunchPlaces = Collections.emptyList();
         }
-        Set<PollItem> pollItems = new LinkedHashSet<>();
+        List<PollItem> pollItems = new ArrayList<>();
         for (int i = 0; i < lunchPlaces.size(); i++) {
-            pollItems.add(new PollItem(i, lunchPlaces.get(i), this));
+            pollItems.add(new PollItem(lunchPlaces.get(i), this));
         }
-        return Collections.unmodifiableSet(pollItems);
+        return Collections.unmodifiableList(pollItems);
     }
 
     private void checkLunchPlaceDate(List<LunchPlace> places, LocalDate date) {
@@ -192,7 +193,7 @@ public final class LunchPlacePoll extends AbstractPersistableObject implements P
 //    }
 
     @Override
-    public Set<PollItem> getPollItems() {
+    public List<PollItem> getPollItems() {
         return this.pollItems;
     }
 
@@ -201,7 +202,8 @@ public final class LunchPlacePoll extends AbstractPersistableObject implements P
         return this.menuDate;
     }
 
-    Set<Vote> getVotes() {
+    @Override
+    public Set<Vote> getVotes() {
         return Collections.unmodifiableSet(this.votes);
     }
 

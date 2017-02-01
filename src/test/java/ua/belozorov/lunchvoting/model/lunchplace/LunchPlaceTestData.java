@@ -29,11 +29,11 @@ public class LunchPlaceTestData {
     private final Resource lunchPlaceSqlResource;
 
     private LunchPlace place1 = new LunchPlace("FirstPlaceID", 1, "First Place", "First Address", "First Description",
-            Collections.singletonList("0501234567"), Collections.emptyList(), ADMIN_ID);
+            Arrays.asList("0501234567"), Collections.emptyList(), ADMIN_ID);
     private LunchPlace place2 = new LunchPlace("SecondPlaceID", 1, "Second Place", "Second Address", "Second Description",
             Arrays.asList("0442345671", "0502345671"), Collections.emptyList(), ADMIN_ID);
     private LunchPlace place3 = new LunchPlace("ThirdPlaceID", 1, "Third Place", "Third Address", "Third Description",
-            Collections.singletonList("0503456712"), Collections.emptyList(), GOD_ID);
+            Arrays.asList("0503456712"), Collections.emptyList(), GOD_ID);
     private LunchPlace place4 = new LunchPlace("FourthPlaceID", 1, "Fourth Place", "Fourth Address", "Fourth Description",
             Arrays.asList("0444567123", "0444671235", "0504567123", "0934567123"), Collections.emptyList(), GOD_ID);
 
@@ -49,47 +49,47 @@ public class LunchPlaceTestData {
     );
     private final Menu menu2 = new Menu(
             NOW_DATE.minusDays(2),
-            Collections.singletonList(new Dish("Potato", 21.00f, 1)),
+            Arrays.asList(new Dish("Potato", 21.00f, 0), new Dish("Kartoha", 21.00f, 1)),
             place4
     );
     private final Menu menu3 = new Menu(
             NOW_DATE,
-            Collections.singletonList(new Dish("Tomato", 31.00f, 1)),
+            Arrays.asList(new Dish("Tomato", 31.00f, 0), new Dish("Pamidor", 31.00f, 1)),
             place4
     );
     private final Menu menu4 = new Menu(
             NOW_DATE,
-            Collections.singletonList(new Dish("Ice cubes", 41.00f, 1)),
+            Arrays.asList(new Dish("Ice cubes", 41.00f, 0), new Dish("Lyodik", 41.00f, 1)),
             place4
     );
     private final Menu menu5 = new Menu(
             NOW_DATE,
-            Collections.singletonList(new Dish("Marshmallow", 51.00f, 1)),
+            Arrays.asList(new Dish("Marshmallow", 51.00f, 0), new Dish("Zhevachka", 51.00f, 1)),
             place3
     );
     private final Menu menu6 = new Menu(
             NOW_DATE.minusDays(1),
-            Collections.singletonList(new Dish("Green Grass", 61.00f, 1)),
+            Arrays.asList(new Dish("Green Grass", 61.00f, 0), new Dish("Travka", 61.00f, 1)),
             place3
     );
     private final Menu menu7 = new Menu(
             NOW_DATE.minusDays(2),
-            Collections.singletonList(new Dish("Chipotled eggs", 71.00f, 1)),
+            Arrays.asList(new Dish("Chipotled eggs", 71.00f, 0), new Dish("Jajca bobo", 71.00f, 1)),
             place1
     );
     private final Menu menu8 = new Menu(
             NOW_DATE.plusDays(2),
-            Collections.singletonList(new Dish("Chipotled chicken", 81.00f, 1)),
+            Arrays.asList(new Dish("Chipotled chicken", 81.00f, 0), new Dish("Cypa bobo", 81.00f, 1)),
             place1
     );
     private final Menu menu9 = new Menu(
             NOW_DATE.minusDays(2),
-            Collections.singletonList(new Dish("Cucumber salad", 81.00f, 1)),
+            Arrays.asList(new Dish("Cucumber salad", 81.00f, 0), new Dish("Agurchiki", 81.00f, 1)),
             place2
     );
     private final Menu menu10 = new Menu(
             NOW_DATE.plusDays(2),
-            Collections.singletonList(new Dish("Coconut shell", 81.00f, 1)),
+            Arrays.asList(new Dish("Coconut shell", 81.00f, 0), new Dish("Nesjedobno", 81.00f, 1)),
             place2
     );
 
@@ -150,7 +150,7 @@ public class LunchPlaceTestData {
         return Arrays.stream(places).map(place -> getWithFilteredMenu(date, place)).collect(Collectors.toList());
     }
 
-        public static class LunchPlaceComparator implements Comparator<LunchPlace> {
+    public static class LunchPlaceComparator implements Comparator<LunchPlace> {
 
         @Override
         public int compare(LunchPlace o1, LunchPlace o2) {

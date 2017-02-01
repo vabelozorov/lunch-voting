@@ -1,8 +1,10 @@
 package ua.belozorov.lunchvoting.repository.voting;
 
+import org.hibernate.jpa.QueryHints;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import ua.belozorov.lunchvoting.model.voting.polling.LunchPlacePoll;
+import ua.belozorov.lunchvoting.model.voting.polling.Poll;
 import ua.belozorov.lunchvoting.model.voting.polling.PollItem;
 import ua.belozorov.lunchvoting.model.voting.polling.Vote;
 import ua.belozorov.lunchvoting.repository.BaseRepository;
@@ -82,13 +84,15 @@ public class PollingRepositoryImpl extends BaseRepository implements PollingRepo
 
     @Override
     public LunchPlacePoll getFullPoll(String pollId) {
-        List<LunchPlacePoll> polls = em.createQuery("SELECT p FROM LunchPlacePoll p " +
-                "LEFT JOIN FETCH p.pollItems pi " +
-                "LEFT JOIN FETCH pi.item i " +
-                "LEFT JOIN FETCH i.menus m " +
+        List<LunchPlacePoll> polls = em.createQuery("SELECT DISTINCT p FROM LunchPlacePoll p " +
+                "INNER JOIN FETCH p.pollItems pi " +
+                "INNER JOIN FETCH pi.item i " +
+                "INNER JOIN FETCH i.menus m " +
                 "LEFT JOIN FETCH m.dishes " +
+                "LEFT JOIN FETCH p.votes " +
                 "WHERE p.id= :pollId AND m.effectiveDate= p.menuDate", LunchPlacePoll.class)
                 .setParameter("pollId", pollId)
+                .setHint(QueryHints.HINT_PASS_DISTINCT_THROUGH, false)
                 .getResultList();
         em.clear();
         return super.nullOrFirst(polls);
@@ -115,5 +119,28 @@ public class PollingRepositoryImpl extends BaseRepository implements PollingRepo
     public void replaceVote(final Set<Vote> forRemoval, final Vote acceptedVote) {
         this.removeVotes(forRemoval);
         this.saveVote(acceptedVote);
+    }
+
+    @Override
+    public LunchPlacePoll getPollEmptyPollItemsAndVotes(String pollId) {
+        String sql = "SELECT p FROM LunchPlacePoll p " +
+                "INNER JOIN FETCH p.pollItems pi " +
+                "LEFT JOIN FETCH p.votes " +
+                "WHERE p.id= :id";
+        List<LunchPlacePoll> polls = em.createQuery(sql, LunchPlacePoll.class)
+                .setParameter("id", pollId).getResultList();
+        return super.nullOrFirst(polls);
+    }
+
+    @Override
+    public Collection<String> getVotedByVoter(String pollId, String voterId) {
+        String sql = "SELECT vi.pollItem.id FROM LunchPlacePoll p " +
+                "INNER JOIN p.votes vi " +
+                "WHERE p.id= :pollId AND vi.voterId= :voterId";
+        List<String> ids = em.createQuery(sql, String.class)
+                .setParameter("pollId", pollId)
+                .setParameter("voterId", voterId)
+                .getResultList();
+        return ids;
     }
 }

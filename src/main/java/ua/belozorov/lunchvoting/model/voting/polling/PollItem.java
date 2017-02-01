@@ -19,7 +19,8 @@ import java.util.Objects;
 @Table(name = "poll_items")
 public final class PollItem extends AbstractPersistableObject {
 
-    private final int position;
+    @Column(name = "position")
+    private int position;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id")
@@ -32,14 +33,19 @@ public final class PollItem extends AbstractPersistableObject {
     private final LunchPlacePoll poll;
 
     protected PollItem() {
-        position = 0;
+//        position = 0;
         item = null;
         poll = null;
     }
 
-    public PollItem(int position, LunchPlace item, LunchPlacePoll poll) {
-        this.position = position;
+    public PollItem(LunchPlace item, LunchPlacePoll poll) {
         this.item = Objects.requireNonNull(item, "Error during initializing PollItem. LunchPlace must not be null");
         this.poll = Objects.requireNonNull(poll, "Error during initializing PollItem. Poll must not be null");
     }
+
+//    public PollItem(int position, LunchPlace item, LunchPlacePoll poll) {
+//        this.position = position;
+//        this.item = Objects.requireNonNull(item, "Error during initializing PollItem. LunchPlace must not be null");
+//        this.poll = Objects.requireNonNull(poll, "Error during initializing PollItem. Poll must not be null");
+//    }
 }

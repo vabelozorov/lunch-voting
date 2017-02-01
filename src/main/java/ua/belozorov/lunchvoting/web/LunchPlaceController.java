@@ -10,6 +10,7 @@ import ua.belozorov.lunchvoting.model.lunchplace.LunchPlace;
 import ua.belozorov.lunchvoting.service.lunchplace.LunchPlaceService;
 import ua.belozorov.lunchvoting.to.LunchPlaceTo;
 import ua.belozorov.lunchvoting.to.transformers.DtoIntoEntity;
+import ua.belozorov.lunchvoting.web.queries.LunchPlaceQueryParams;
 
 import java.net.URI;
 import java.util.*;
@@ -22,7 +23,7 @@ import java.util.*;
 @RestController
 @RequestMapping(LunchPlaceController.REST_URL)
 public class LunchPlaceController  {
-    static final String REST_URL = "/places";
+    static final String REST_URL = "/api/places";
 
     static final Set<String> MANDATORY_EXCLUDE = new HashSet<>(Arrays.asList("version", "adminId"));
 
@@ -36,11 +37,10 @@ public class LunchPlaceController  {
 
     private final LunchPlaceService placeService;
 
-    private final JsonFieldsFilter jsonFilter;
-
+    private final LunchPlaceJsonFilter jsonFilter;
 
     @Autowired
-    public LunchPlaceController(LunchPlaceService placeService, JsonFieldsFilter jsonFilter) {
+    public LunchPlaceController(LunchPlaceService placeService, LunchPlaceJsonFilter jsonFilter) {
         this.jsonFilter = jsonFilter;
         this.placeService = placeService;
     }
@@ -113,7 +113,7 @@ public class LunchPlaceController  {
         RefinedFields refinedFields = new LunchPlaceRefinedFields(params.getFields());
         Collection<LunchPlace> places = this.getLunchPlacesOptimally(params, refinedFields);
         LunchPlace place = places.iterator().next();
-        jsonFilter.filter(place, refinedFields);
+        jsonFilter.includingFilter(place, refinedFields);
         return ResponseEntity.ok(place);
     }
 
@@ -121,7 +121,7 @@ public class LunchPlaceController  {
     public ResponseEntity<Collection<LunchPlace>> getLunchPlaces(LunchPlaceQueryParams params) {
         RefinedFields refinedFields = new LunchPlaceRefinedFields(params.getFields());
         Collection<LunchPlace> places = this.getLunchPlacesOptimally(params, refinedFields);
-        jsonFilter.filter(places, refinedFields);
+        jsonFilter.includingFilter(places, refinedFields);
         return ResponseEntity.ok(places);
     }
 

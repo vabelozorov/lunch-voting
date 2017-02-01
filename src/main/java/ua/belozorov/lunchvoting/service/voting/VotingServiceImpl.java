@@ -36,7 +36,7 @@ public class VotingServiceImpl implements VotingService {
     private LunchPlaceRepository lunchPlaceRepository;
 
     @Autowired
-    private PollingRepository pollingRepository;
+    private PollingRepository pollRepository;
 
     /**
      * Create a poll where poll items are composed of all currently available menus for today date.
@@ -45,26 +45,26 @@ public class VotingServiceImpl implements VotingService {
     @Override
     @Transactional
     //TODO scheduled job?
-    public String createPollForTodayMenus() {
+    public Poll createPollForTodayMenus() {
         LocalDate menuDate = LocalDate.now();
         List<LunchPlace> places = lunchPlaceRepository.getIfMenuForDate(menuDate);
         LunchPlacePoll poll = new LunchPlacePoll(places, menuDate);
-        pollingRepository.savePoll(poll);
-        return poll.getId();
+        pollRepository.savePoll(poll);
+        return poll;
     }
 
     @Override
     @Transactional
     public Vote vote(String voterId, String pollId, String pollItemId) {
         ExceptionUtils.checkAllNotNull(voterId, pollId, pollItemId);
-        Poll poll = ofNullable(pollingRepository.getPollWithVotesAndEmptyPollItems(pollId))
+        Poll poll = ofNullable(pollRepository.getPollWithVotesAndEmptyPollItems(pollId))
                             .orElseThrow(() -> new NotFoundException(pollId, LunchPlacePoll.class));
         VotePolicyDecision decision = poll.registerVote(voterId, pollItemId);
         Vote acceptedVote = decision.getAcceptedVote();
         if (decision.isAccept()) {
-            pollingRepository.saveVote(acceptedVote);
+            pollRepository.saveVote(acceptedVote);
         } else if (decision.isUpdate()) {
-            pollingRepository.replaceVote(decision.votesToBeRemoved(), acceptedVote);
+            pollRepository.replaceVote(decision.votesToBeRemoved(), acceptedVote);
         } else {
             throw new IllegalStateException("Unknown vote decision");
         }
@@ -74,7 +74,7 @@ public class VotingServiceImpl implements VotingService {
     @Override
     public Poll getPollFullDetails(String pollId) {
         Objects.requireNonNull(pollId);
-        return pollingRepository.getFullPoll(pollId);
+        return pollRepository.getFullPoll(pollId);
     }
 
     @Override
@@ -86,11 +86,22 @@ public class VotingServiceImpl implements VotingService {
     public Poll getPollItemDetails(String pollId, Collection<String> pollItemIds) {
         ExceptionUtils.requireNonNullNotEmpty(pollItemIds);
         Objects.requireNonNull(pollId);
-        return pollingRepository.getPollAndPollItem(pollId, pollItemIds);
+        return pollRepository.getPollAndPollItem(pollId, pollItemIds);
     }
 
     @Override
-    public VoteStatistics<PollItem> getPollResultPerItem(String pollId) {
-        return null;
+    public VotingResult<PollItem> getPollResult(String pollId) {
+        ExceptionUtils.checkAllNotNull(pollId);
+
+        LunchPlacePoll poll = ofNullable(pollRepository.getPollEmptyPollItemsAndVotes(pollId)).
+                orElseThrow(() -> new NotFoundException(pollId, LunchPlacePoll.class));
+        PollVoteResult<PollItem> pollResult = new PollVoteResult<>(poll, Vote::getPollItem);
+        return pollResult;
+    }
+
+    @Override
+    public Collection<String> getVotedForVoter(String pollId, String voterId) {
+        ExceptionUtils.checkAllNotNull(pollId, voterId);
+        return pollRepository.getVotedByVoter(pollId, voterId);
     }
 }

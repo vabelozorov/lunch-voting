@@ -24,5 +24,4 @@ public class DtoIntoEntity {
         return new LunchPlace(to.getId(), to.getName(), to.getAddress(),
                 to.getDescription(), to.getPhones(), Collections.emptyList(), adminId);
     }
-
 }

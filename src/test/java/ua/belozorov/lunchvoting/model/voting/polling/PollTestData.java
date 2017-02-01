@@ -10,6 +10,7 @@ import ua.belozorov.objtosql.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -90,7 +91,7 @@ public class PollTestData {
         }
         this.activePoll = this.activePoll.toBuilder().votes(votes).build();
 
-        Vote vote = this.activePollNoUpdate.registerVote(VOTER_ID, this.activePollNoUpdate.getPollItems().iterator().next().getId()).getAcceptedVote();
+        Vote vote = this.activePollNoUpdate.registerVote(VOTER_ID, this.activePollNoUpdate.getPollItems().get(0).getId()).getAcceptedVote();
         this.activePollNoUpdate = this.activePollNoUpdate.toBuilder().votes(Collections.singleton(vote)).build();
 
         String pollSql = new SimpleObjectToSqlConverter<>(
@@ -105,12 +106,13 @@ public class PollTestData {
         ).convert(Arrays.asList(pastPoll, activePoll, futurePoll));
         this.pollSqlResource = new ByteArrayResource(pollSql.getBytes(), "Polls");
 
+        AtomicInteger position = new AtomicInteger(0);
         String pollItemsSql = new SimpleObjectToSqlConverter<>(
                 "poll_items",
                 Arrays.asList(
                         new StringSqlColumn<>("id", PollItem::getId),
                         new StringSqlColumn<>("poll_id", pi -> pi.getPoll().getId()),
-                        new IntegerSqlColumn<>("position", PollItem::getPosition),
+                        new IntegerSqlColumn<>("position", (pi) -> position.getAndIncrement()),
                         new StringSqlColumn<>("item_id",pi -> pi.getItem().getId())
                 )
         ).convert(
@@ -122,13 +124,11 @@ public class PollTestData {
     }
 
     public PollItem getActivePollPollItem1() {
-        return this.activePoll.getPollItems().iterator().next();
+        return this.activePoll.getPollItems().get(0);
     }
 
     public PollItem getActivePollPollItem2() {
-        Iterator<PollItem> iterator = this.activePoll.getPollItems().iterator();
-        iterator.next();
-        return iterator.next();
+        return this.activePoll.getPollItems().get(1);
     }
 
     private static class PollComparator implements Comparator<LunchPlacePoll> {
@@ -147,7 +147,7 @@ public class PollTestData {
         public int compare(PollItem o1, PollItem o2) {
             return (o1.getId().equals(o2.getId())
                     && o1.getItem().getId().equals(o2.getItem().getId())
-            && o1.getPosition() == o2.getPosition()
+//            && o1.getPosition() == o2.getPosition()
             && o1.getPoll().getId().equals(o2.getPoll().getId())) ? 0 : -1;
         }
     }
