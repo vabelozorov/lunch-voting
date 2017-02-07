@@ -1,6 +1,7 @@
 package ua.belozorov.lunchvoting.web;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,22 +26,13 @@ import java.util.*;
 public class LunchPlaceController  {
     static final String REST_URL = "/api/places";
 
-    static final Set<String> MANDATORY_EXCLUDE = new HashSet<>(Arrays.asList("version", "adminId"));
-
-    static final Set<String> MANDATORY_INCLUDE = new HashSet<>(Arrays.asList("id"));
-
-    static final Set<String> DEFAULT_INCLUDE = new HashSet<>();
-    static {
-        DEFAULT_INCLUDE.addAll(MANDATORY_INCLUDE);
-        DEFAULT_INCLUDE.add("name");
-    }
-
     private final LunchPlaceService placeService;
 
-    private final LunchPlaceJsonFilter jsonFilter;
+    private final JsonFilter jsonFilter;
 
     @Autowired
-    public LunchPlaceController(LunchPlaceService placeService, LunchPlaceJsonFilter jsonFilter) {
+    public LunchPlaceController(LunchPlaceService placeService,
+                                @Qualifier("lunchPlaceJsonFilter") JsonFilter jsonFilter) {
         this.jsonFilter = jsonFilter;
         this.placeService = placeService;
     }
@@ -129,7 +121,7 @@ public class LunchPlaceController  {
         Collection<LunchPlace> places;
 
         // Conditions on which LP objects have to have 'menus' field loaded from DB
-        if (params.hasDates() || refinedFields.contains("menus")) {
+        if (params.hasDates() || refinedFields.containsOriginal("menus")) {
             places = placeService.getMultipleWithMenu(params.getIds(), params.getStartDate(), params.getEndDate(), AuthorizedUser.get());
         // LP w/o its associations is enough
         } else  {
@@ -144,18 +136,25 @@ public class LunchPlaceController  {
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
+
     private final static class LunchPlaceRefinedFields implements RefinedFields {
+        static final Set<String> MANDATORY_EXCLUDE = new HashSet<>(Arrays.asList("version", "adminId"));
+        static final Set<String> MANDATORY_INCLUDE = new HashSet<>(Arrays.asList("id"));
+        static final Set<String> DEFAULT_INCLUDE = new HashSet<>();
+        static {
+            DEFAULT_INCLUDE.addAll(MANDATORY_INCLUDE);
+            DEFAULT_INCLUDE.add("name");
+        }
+
         private final Set<String> originalFields = new HashSet<>();
-        private final Set<String> refinedFields = new HashSet<>();
         private final Map<String, String> fieldReplacements = new HashMap<>();
 
         private LunchPlaceRefinedFields(Set<String> fields) {
-            this.fieldReplacements.put("menus", "menus.*");
             this.originalFields.addAll(fields);
-            this.refinedFields.addAll(this.prepareFields(this.originalFields));
+            this.fieldReplacements.put("menus", "menus.*");
         }
 
-        private Set<String> prepareFields(Set<String> fields) {
+        private Set<String> refine(Set<String> fields) {
             Set<String> result = new HashSet<>(fields);
             if (result.isEmpty()) {
                 result.addAll(DEFAULT_INCLUDE);
@@ -173,11 +172,11 @@ public class LunchPlaceController  {
 
         @Override
         public Set<String> get() {
-            return Collections.unmodifiableSet(refinedFields);
+            return Collections.unmodifiableSet(this.refine(this.originalFields));
         }
 
         @Override
-        public boolean contains(String field) {
+        public boolean containsOriginal(String field) {
             return originalFields.contains(field);
         }
     }

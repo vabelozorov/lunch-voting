@@ -41,7 +41,7 @@ public class PollTest extends AbstractTest {
         try {
             LunchPlacePoll pastPoll = testPolls.getPastPoll();
             pastPoll
-                    .registerVote(VOTER_ID, pastPoll.getPollItems().get(0).getId());
+                    .registerVote(GOD_ID, pastPoll.getPollItems().get(0).getId());
         } catch (PollNotActiveException e) {
             exceptions.add(e);
         }
@@ -49,7 +49,7 @@ public class PollTest extends AbstractTest {
         // voting before poll start time
        try {
            LunchPlacePoll futurePoll = testPolls.getFuturePoll();
-           futurePoll.registerVote(VOTER_ID, futurePoll.getPollItems().get(0).getId());
+           futurePoll.registerVote(GOD_ID, futurePoll.getPollItems().get(0).getId());
         } catch (PollNotActiveException e) {
             exceptions.add(e);
         }
@@ -93,17 +93,14 @@ public class PollTest extends AbstractTest {
         poll.registerVote(VOTER_ID, testPolls.getActivePollPollItem1().getId());
     }
 
-    @Test(expected = LunchPlaceWithoutMenuException.class)
-    public void lunchPlaceWithEmptyMenusGetsRejected() throws Exception {
+    @Test(expected = NoMenusForMenuDateException.class)
+    public void failsWhenLunchPlaceDoesNotHaveMenuWithMenuDate() throws Exception {
         LunchPlace place = new LunchPlace("ID", "Name", "Address", "Description", new ArrayList<String>(), new ArrayList<Menu>(), "AdminId");
-        new LunchPlacePoll(Arrays.asList(place), LocalDate.now());
+        new LunchPlacePoll(Arrays.asList(place), NOW_DATE);
     }
 
-    @Test(expected = MenuDateMismatchException.class)
-    public void lunchPlaceWithWrongMenuDateGetsRejected() throws Exception {
-        LunchPlace place = new LunchPlace("ID", "Name", "Address", "Description", new ArrayList<String>(), new ArrayList<Menu>(), "AdminId");
-        Menu menu = new Menu(LocalDate.now().minusDays(1), new ArrayList<Dish>(), place);
-        place = place.setMenus(Arrays.asList(menu));
-        new LunchPlacePoll(Arrays.asList(place), LocalDate.now());
+    @Test(expected = NoPollItemsException.class)
+    public void failsWhenLunchPlacesAreEmpty() throws Exception {
+        new LunchPlacePoll(new ArrayList<>(), NOW_DATE);
     }
 }

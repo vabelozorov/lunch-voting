@@ -12,6 +12,7 @@ import ua.belozorov.lunchvoting.model.voting.polling.votepolicies.AcceptPolicy;
 import ua.belozorov.lunchvoting.model.voting.polling.votepolicies.CommonPolicy;
 import ua.belozorov.lunchvoting.model.voting.polling.votepolicies.VoteForAnotherUpdatePolicy;
 import ua.belozorov.lunchvoting.model.voting.polling.votepolicies.VotePolicy;
+import ua.belozorov.lunchvoting.util.ExceptionUtils;
 
 import javax.persistence.*;
 import javax.persistence.CascadeType;
@@ -40,7 +41,6 @@ public final class LunchPlacePoll extends AbstractPersistableObject implements P
     private final TimeConstraint timeConstraint;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "poll", cascade = CascadeType.PERSIST)
-//    @OrderBy("position ASC")
     @OrderColumn(name = "position")
     private final List<PollItem> pollItems;
 
@@ -79,10 +79,12 @@ public final class LunchPlacePoll extends AbstractPersistableObject implements P
      * @param startTime time from which the poll starts to accept votes.
      * @param endTime starting from this time votes will be rejected.
      * @param voteChangeTimeThreshold time until which (included) a voter is allowed to change his/her mind.
-     * @param lunchPlaces items to vote for. If null, the empty list is assumed.
+     * @param lunchPlaces non-null, non-empty list of items to vote for
      */
     public LunchPlacePoll(LocalDateTime startTime, LocalDateTime endTime, LocalDateTime voteChangeTimeThreshold, List<LunchPlace> lunchPlaces, LocalDate menuDate) {
-        this.checkLunchPlaceDate(lunchPlaces, menuDate);
+        ExceptionUtils.requireNonNullNotEmpty(lunchPlaces, NoPollItemsException::new);
+        this.checkMenuDate(lunchPlaces, menuDate);
+
         this.timeConstraint = new TimeConstraint(startTime, endTime,voteChangeTimeThreshold);
         this.pollItems = this.convertToPollItems(lunchPlaces);
         this.menuDate = menuDate;
@@ -107,26 +109,19 @@ public final class LunchPlacePoll extends AbstractPersistableObject implements P
     }
 
     private List<PollItem> convertToPollItems(List<LunchPlace> lunchPlaces) {
-        if (lunchPlaces == null) {
-            lunchPlaces = Collections.emptyList();
-        }
         List<PollItem> pollItems = new ArrayList<>();
-        for (int i = 0; i < lunchPlaces.size(); i++) {
-            pollItems.add(new PollItem(lunchPlaces.get(i), this));
+        for (LunchPlace lunchPlace : lunchPlaces) {
+            pollItems.add(new PollItem(lunchPlace, this));
         }
         return Collections.unmodifiableList(pollItems);
     }
 
-    private void checkLunchPlaceDate(List<LunchPlace> places, LocalDate date) {
-        for (LunchPlace place : places) {
-            if (place.getMenus().isEmpty()) {
-                throw new LunchPlaceWithoutMenuException();
-            } else {
-                for (Menu m : place.getMenus()) {
-                    if ( ! m.getEffectiveDate().equals(date)) {
-                        throw new MenuDateMismatchException();
-                    }
-                }
+    private void checkMenuDate(List<LunchPlace> lunchPlaces, LocalDate menuDate) {
+        for(LunchPlace lp : lunchPlaces) {
+            if (lp.getMenus().stream()
+                .filter(menu -> menu.getEffectiveDate().equals(menuDate))
+                .count() == 0 ) {
+                throw new NoMenusForMenuDateException();
             }
         }
     }
@@ -180,7 +175,7 @@ public final class LunchPlacePoll extends AbstractPersistableObject implements P
 //        Set<String> pollItemIds = pollItems.stream().map(PollItem::getId).collect(Collectors.toSet());
 //        PollingResult.VoteCollector collector = PollingResult.getCollector(this.getId());
 //        for (Vote vote : votes) {
-//            if (vote.getPoll().equals(this.getId()) && pollItemIds.contains(vote.getPollItem())) {
+//            if (vote.get().equals(this.getId()) && pollItemIds.containsOriginal(vote.getPollItem())) {
 //                collector.collect(vote);
 //            } else {
 //                throw new IllegalStateException(
@@ -207,7 +202,22 @@ public final class LunchPlacePoll extends AbstractPersistableObject implements P
         return Collections.unmodifiableSet(this.votes);
     }
 
-//    public LunchPlacePollBuilder toBuilder() {
+    @Override
+    public String toString() {
+        return "LunchPlacePoll{" +
+                "id=" + id +
+                "timeConstraint=" + timeConstraint +
+                ", menuDate=" + menuDate +
+                '}';
+    }
+
+    @Override
+    public int compareTo(Poll o) {
+        int r = this.getMenuDate().compareTo(o.getMenuDate());
+        return r != 0 ? (-1)*r : this.getId().compareTo(o.getId());
+    }
+
+    //    public LunchPlacePollBuilder toBuilder() {
 //        return new LunchPlacePollBuilder(this);
 //    }
 //

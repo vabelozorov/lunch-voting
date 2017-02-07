@@ -13,10 +13,10 @@ public class VoteTo {
     private String pollId;
     private String itemId;
 
-    public VoteTo(Vote vote) {
+    public VoteTo(Vote vote, boolean includePollId) {
         this.id = vote.getId();
         this.voterId = vote.getVoterId();
-        this.pollId = vote.getPoll().getId();
+        this.pollId = includePollId ? vote.getPoll().getId() : null;
         this.itemId = vote.getPollItem().getId();
     }
 }

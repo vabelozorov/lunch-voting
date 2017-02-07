@@ -265,6 +265,13 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>ua.belozorov</groupId>
+            <artifactId>obj-to-map</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
     <dependencyManagement>

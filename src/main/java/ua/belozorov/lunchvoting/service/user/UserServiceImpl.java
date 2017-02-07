@@ -61,13 +61,6 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public User create(User user) {
         return userRepository.save(user);
-//        try {
-//        } catch (TransactionSystemException e) {
-//            if (e.getRootCause() != null && e.getRootCause() instanceof ConstraintViolationException) {
-//                throw new BadSyntaxException(BadSyntaxException.ErrorCode.ID_EXISTS);
-//            }
-//            throw e;
-//        }
     }
 
     @Override

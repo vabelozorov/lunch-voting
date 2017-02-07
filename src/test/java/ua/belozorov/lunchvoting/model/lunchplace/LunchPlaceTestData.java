@@ -3,6 +3,7 @@ package ua.belozorov.lunchvoting.model.lunchplace;
 import lombok.Getter;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
+import ua.belozorov.lunchvoting.EqualsComparator;
 import ua.belozorov.lunchvoting.util.SetToStringConverter;
 import ua.belozorov.objtosql.SimpleObjectToSqlConverter;
 import ua.belozorov.objtosql.StringSqlColumn;
@@ -25,7 +26,7 @@ import static ua.belozorov.lunchvoting.testdata.UserTestData.*;
 @Getter
 public class LunchPlaceTestData {
 
-    public static final Comparator<LunchPlace> LUNCH_PLACE_COMPARATOR = new LunchPlaceComparator();
+    public static final EqualsComparator<LunchPlace> LUNCH_PLACE_COMPARATOR = new LunchPlaceComparator();
     private final Resource lunchPlaceSqlResource;
 
     private LunchPlace place1 = new LunchPlace("FirstPlaceID", 1, "First Place", "First Address", "First Description",
@@ -150,28 +151,26 @@ public class LunchPlaceTestData {
         return Arrays.stream(places).map(place -> getWithFilteredMenu(date, place)).collect(Collectors.toList());
     }
 
-    public static class LunchPlaceComparator implements Comparator<LunchPlace> {
+    public static class LunchPlaceComparator implements EqualsComparator<LunchPlace> {
 
         @Override
-        public int compare(LunchPlace o1, LunchPlace o2) {
-            return (o1.getId().equals(o2.getId())
+        public boolean compare(LunchPlace o1, LunchPlace o2) {
+            return o1.getId().equals(o2.getId())
                     && o1.getName().equals(o2.getName())
                     && o1.getDescription().equals(o2.getDescription())
                     && new ArrayList<>(o1.getPhones()).equals(new ArrayList<>(o2.getPhones()))
-                  &&   o1.getAdminId().equals(o2.getAdminId())
-            ) ? 0 : -1;
+                    && o1.getAdminId().equals(o2.getAdminId());
         }
     }
 
-    public static class WebLunchPlaceComparator implements Comparator<LunchPlace> {
+    public static class WebLunchPlaceComparator implements EqualsComparator<LunchPlace> {
 
         @Override
-        public int compare(LunchPlace o1, LunchPlace o2) {
-            return (o1.getId().equals(o2.getId())
+        public boolean compare(LunchPlace o1, LunchPlace o2) {
+            return o1.getId().equals(o2.getId())
                     && o1.getName().equals(o2.getName())
                     && o1.getDescription().equals(o2.getDescription())
-                    && new ArrayList<>(o1.getPhones()).equals(new ArrayList<>(o2.getPhones()))
-            ) ? 0 : -1;
+                    && new ArrayList<>(o1.getPhones()).equals(new ArrayList<>(o2.getPhones()));
         }
     }
 

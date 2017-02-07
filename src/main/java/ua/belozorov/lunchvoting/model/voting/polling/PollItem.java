@@ -1,9 +1,10 @@
 package ua.belozorov.lunchvoting.model.voting.polling;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
 import lombok.Getter;
 import ua.belozorov.lunchvoting.model.base.AbstractPersistableObject;
-import ua.belozorov.lunchvoting.model.lunchplace.LunchPlace;
+import ua.belozorov.lunchvoting.model.base.Persistable;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -20,32 +21,27 @@ import java.util.Objects;
 public final class PollItem extends AbstractPersistableObject {
 
     @Column(name = "position")
+    @Getter(AccessLevel.NONE)
     private int position;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "item_id")
     @Getter
-    private final LunchPlace item;
+    @Column(name = "item_id")
+    private final String itemId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "poll_id")
     @NotNull
+    @JsonIgnore
     private final LunchPlacePoll poll;
 
     protected PollItem() {
-//        position = 0;
-        item = null;
+        itemId = null;
         poll = null;
     }
 
-    public PollItem(LunchPlace item, LunchPlacePoll poll) {
-        this.item = Objects.requireNonNull(item, "Error during initializing PollItem. LunchPlace must not be null");
+    public PollItem(Persistable item, LunchPlacePoll poll) {
+        Objects.requireNonNull(item, "Error during initializing PollItem. Itemid must not be null");
+        this.itemId = item.getId();
         this.poll = Objects.requireNonNull(poll, "Error during initializing PollItem. Poll must not be null");
     }
-
-//    public PollItem(int position, LunchPlace item, LunchPlacePoll poll) {
-//        this.position = position;
-//        this.item = Objects.requireNonNull(item, "Error during initializing PollItem. LunchPlace must not be null");
-//        this.poll = Objects.requireNonNull(poll, "Error during initializing PollItem. Poll must not be null");
-//    }
 }

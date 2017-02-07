@@ -20,10 +20,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.isA;
 import static org.junit.Assert.*;
-import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
 import static ua.belozorov.lunchvoting.MatcherUtils.matchByToString;
 import static ua.belozorov.lunchvoting.MatcherUtils.matchCollection;
 import static ua.belozorov.lunchvoting.MatcherUtils.matchSingle;

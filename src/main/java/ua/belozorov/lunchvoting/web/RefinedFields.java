@@ -3,11 +3,23 @@ package ua.belozorov.lunchvoting.web;
 import java.util.Set;
 
 /**
- * <h2></h2>
+ * Given a set of object fields that a user wishes to include in JSON response,
+ * an instance makes mandatory removal, addition or replacement of predefined fields
  *
  * @author vabelozorov on 31.12.16.
  */
 interface RefinedFields {
+
+    /**
+     * @return Returns a set of object fields as String objects after refining
+     */
     Set<String> get();
-    boolean contains(String field);
+
+    /**
+     *
+     * @param field
+     * @return True if a given field was present in the set of fields initially passed to the instance,
+     * otherwise false
+     */
+    boolean containsOriginal(String field);
 }

@@ -4,6 +4,7 @@ import org.springframework.format.Formatter;
 
 import java.text.ParseException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
@@ -15,6 +16,7 @@ import java.util.Locale;
  */
 public class DateTimeFormatters {
     public static final DateTimeFormatter WEB_DATE_FORMATTER =  DateTimeFormatter.ISO_LOCAL_DATE;
+    public static final DateTimeFormatter WEB_DATE_TIME_FORMATTER =  DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public static class LocalDateFormatter implements Formatter<LocalDate> {
 
@@ -28,17 +30,17 @@ public class DateTimeFormatters {
             return lt.format(WEB_DATE_FORMATTER);
         }
     }
-//
-//    public static class LocalTimeFormatter implements Formatter<LocalTime> {
-//
-//        @Override
-//        public LocalTime parse(String text, Locale locale) throws ParseException {
-//            return TimeUtil.parseLocalTime(text);
-//        }
-//
-//        @Override
-//        public String print(LocalTime lt, Locale locale) {
-//            return lt.format(DateTimeFormatter.ISO_LOCAL_TIME);
-//        }
-//    }
+
+    public static class LocalDateTimeFormatter implements Formatter<LocalDateTime> {
+
+        @Override
+        public LocalDateTime parse(String text, Locale locale) throws ParseException {
+            return LocalDateTime.parse(text, WEB_DATE_TIME_FORMATTER);
+        }
+
+        @Override
+        public String print(LocalDateTime ldt, Locale locale) {
+            return ldt.format(WEB_DATE_TIME_FORMATTER);
+        }
+    }
 }

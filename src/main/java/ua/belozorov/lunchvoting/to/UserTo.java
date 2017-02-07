@@ -1,5 +1,11 @@
 package ua.belozorov.lunchvoting.to;
 
+import org.hibernate.validator.constraints.Email;
+import org.hibernate.validator.constraints.Length;
+import org.hibernate.validator.constraints.NotBlank;
+import org.hibernate.validator.constraints.NotEmpty;
+import ua.belozorov.lunchvoting.exceptions.BadSyntaxException;
+import ua.belozorov.lunchvoting.exceptions.WrongRequestException;
 import ua.belozorov.lunchvoting.model.UserRole;
 
 import java.time.LocalDateTime;
@@ -10,15 +16,30 @@ import java.time.LocalDateTime;
  * @author vabelozorov on 15.11.16.
  */
 public class UserTo {
+    @NotBlank(groups = {Update.class})
     private String id;
+
+    @NotBlank(groups = {Create.class, Update.class})
     private String name;
+
+    @Email(groups = {Create.class, Update.class})
+    @NotBlank(groups = {Create.class, Update.class})
     private String email;
+
+    @Length(min = 6, groups = {Create.class, Update.class})
     private String password;
+
     private byte roles = UserRole.VOTER.id();
     private LocalDateTime registeredDate;
     private boolean activated;
 
-    public UserTo() {
+    protected UserTo() {
+    }
+
+    public UserTo(String name, String email, String password) {
+        this.name = name;
+        this.email = email;
+        this.password = password;
     }
 
     public UserTo(String id, String name, String email, String password, byte roles, LocalDateTime registeredDate, boolean activated) {
@@ -98,4 +119,14 @@ public class UserTo {
                 ", activated=" + activated +
                 '}';
     }
+
+    public void validateForObjectUpdate() {
+        if (id ==null || name == null || password == null || email == null) {
+            throw new WrongRequestException();
+        }
+    }
+
+    public interface Create {}
+
+    public interface Update {}
 }

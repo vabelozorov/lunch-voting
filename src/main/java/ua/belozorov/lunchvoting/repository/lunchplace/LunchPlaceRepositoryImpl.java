@@ -102,18 +102,18 @@ public class LunchPlaceRepositoryImpl extends BaseRepository implements LunchPla
 
     @Override
     public boolean delete(String id, String userId) {
-        em.createQuery("UPDATE PollItem pi SET pi.item = null WHERE pi.item.id = ?1")
+        em.createQuery("UPDATE PollItem pi SET pi.itemId = null WHERE pi.itemId = ?1")
                 .setParameter(1, id)
                 .executeUpdate();
         return repository.deleteById(id, userId) != 0;
     }
 
     @Override
-    public List<LunchPlace> getIfMenuForDate(final LocalDate date) {
+    public List<LunchPlace> getIfMenuForDate(LocalDate date) {
         List<LunchPlace> places = em.createQuery("SELECT DISTINCT lp FROM LunchPlace lp " +
                 "INNER JOIN FETCH lp.menus m " +
-                "LEFT JOIN FETCH m.dishes " +
-                "WHERE m.effectiveDate= :date", LunchPlace.class)
+                "WHERE m.effectiveDate= :date " +
+                "ORDER BY lp.name", LunchPlace.class)
                 .setParameter("date", date)
                 .getResultList();
         em.clear();
@@ -139,12 +139,5 @@ public class LunchPlaceRepositoryImpl extends BaseRepository implements LunchPla
 
         @Query("SELECT lp FROM LunchPlace lp WHERE lp.id= :id AND lp.adminId= :userId")
         LunchPlace getOne(@Param("id") String id, @Param("userId") String userId);
-
-//        @Query(
-//                "SELECT DISTINCT lp FROM LunchPlace lp " +
-//                        "INNER JOIN FETCH lp.menus m " +
-//                        "LEFT JOIN FETCH m.dishes " +
-//                        "WHERE m.effectiveDate= ?1")
-//        List<LunchPlace> getByMenusForDate(LocalDate date);
     }
 }

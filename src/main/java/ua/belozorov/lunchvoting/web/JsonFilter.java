@@ -1,6 +1,7 @@
 package ua.belozorov.lunchvoting.web;
 
-import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * <h2></h2>
@@ -10,5 +11,5 @@ import java.util.List;
 public interface JsonFilter {
     void includingFilter(Object object, RefinedFields fields);
 
-    void excludingFilter(Object object, List<String> excludeFields);
+    void excludingFilter(Object object, Map<Class<?>, Set<String>> filterMap);
 }

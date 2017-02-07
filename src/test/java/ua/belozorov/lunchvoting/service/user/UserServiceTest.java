@@ -3,6 +3,7 @@ package ua.belozorov.lunchvoting.service.user;
 import org.hamcrest.core.IsInstanceOf;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import ua.belozorov.lunchvoting.exceptions.BadSyntaxException;
 import ua.belozorov.lunchvoting.exceptions.InvalidUserRoleValueException;
 import ua.belozorov.lunchvoting.exceptions.NotFoundException;
@@ -115,9 +116,9 @@ public class UserServiceTest extends AbstractServiceTest {
         userService.delete("NotExistingId");
     }
 
-    @Test(expected = BadSyntaxException.class)
+    @Test(expected = DataIntegrityViolationException.class)
     public void createDuplicate() {
-        User duplicate = User.builder().id(VOTER_ID).password("newPassword").email("updated@email.com").build();
+        User duplicate = User.builder(VOTER).id("XXX").email("god@email.com").build();
         userService.create(duplicate);
     }
 }

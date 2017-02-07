@@ -1,10 +1,14 @@
 package ua.belozorov.lunchvoting.repository.voting;
 
 import ua.belozorov.lunchvoting.model.voting.polling.LunchPlacePoll;
+import ua.belozorov.lunchvoting.model.voting.polling.Poll;
 import ua.belozorov.lunchvoting.model.voting.polling.PollItem;
 import ua.belozorov.lunchvoting.model.voting.polling.Vote;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -12,11 +16,19 @@ import java.util.Set;
  *
  * @author vabelozorov on 30.11.16.
  */
-public interface PollingRepository {
+public interface PollRepository {
 
     void savePoll(LunchPlacePoll poll);
 
-    LunchPlacePoll getPollWithVotesAndEmptyPollItems(String id);
+    boolean removePoll(String id);
+
+    LunchPlacePoll get(String id);
+
+    LunchPlacePoll getWithVotes(String id);
+
+    List<LunchPlacePoll> getAllPolls();
+
+    List<LunchPlacePoll> getPollByActivePeriod(LocalDateTime startDate, LocalDateTime endDate);
 
     /**
      * Searches for a voter's vote assuming that only one vote from a voter can be given in a particular poll
@@ -26,14 +38,6 @@ public interface PollingRepository {
      */
     Vote getVoteInPoll(String voterId, String pollId);
 
-    PollItem getPollItem(String pollId, String pollItemId);
-
-    LunchPlacePoll getPollAndPollItem(String pollId, Collection<String> pollItemId);
-
-    LunchPlacePoll getPollAndPollItem(String pollId, String pollItemId);
-
-    LunchPlacePoll getFullPoll(String pollId);
-
     void saveVote(Vote vote);
 
     void removeVote(Vote vote);
@@ -42,7 +46,15 @@ public interface PollingRepository {
 
     void replaceVote(Set<Vote> forRemoval, Vote acceptedVote);
 
-    LunchPlacePoll getPollEmptyPollItemsAndVotes(String pollId);
-
     Collection<String> getVotedByVoter(String pollId, String voterId);
+
+    LunchPlacePoll getPollAndPollItemsAndVotes(String pollId);
+
+    List<LunchPlacePoll> getFuturePolls();
+
+    List<LunchPlacePoll> getPastPolls();
+
+    Collection<Vote> getVotesForPoll(String pollId);
+
+    Boolean isActive(String id);
 }

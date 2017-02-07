@@ -4,6 +4,7 @@ import lombok.Getter;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import ua.belozorov.lunchvoting.AbstractTest;
+import ua.belozorov.lunchvoting.EqualsComparator;
 import ua.belozorov.lunchvoting.model.User;
 import ua.belozorov.objtosql.*;
 
@@ -19,7 +20,7 @@ import java.util.stream.Stream;
  */
 @Getter
 public class UserTestData {
-    public static final Comparator<User> USER_COMPARATOR = new UserComparator();
+    public static final EqualsComparator<User> USER_COMPARATOR = new UserComparator();
 
     public static User GOD = GOD = new User("GOD_ID", "Царь всея приложение", "god@email.com", "godpass", (byte)3,
             LocalDateTime.of(2016, 11, 16, 0, 0, 1), true);
@@ -67,16 +68,16 @@ public class UserTestData {
         this.userSqlResource = new ByteArrayResource(sql.getBytes(), "Users");
     }
 
-    private static class UserComparator implements Comparator<User>{
+    private static class UserComparator implements EqualsComparator<User>{
         @Override
-        public int compare(User o1, User o2) {
-            return (o1.getId().equals(o2.getId()) &&
+        public boolean compare(User o1, User o2) {
+            return  o1.getId().equals(o2.getId()) &&
                     o1.getName().equals(o2.getName()) &&
                     o1.getEmail().equals(o2.getEmail()) &&
                     o1.getPassword().equals(o2.getPassword()) &&
                     o1.getRegisteredDate().isEqual(o2.getRegisteredDate()) &&
                     o1.getRoles() == o2.getRoles() &&
-                    o1.isActivated() == o2.isActivated() ) ? 0 : -1;
+                    o1.isActivated() == o2.isActivated();
         }
     }
 }

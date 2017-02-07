@@ -21,8 +21,6 @@ import java.time.format.DateTimeFormatter;
 public abstract class AbstractTest {
     public static final LocalDateTime NOW_DATE_TIME = LocalDateTime.now();
     public static final LocalDate NOW_DATE = LocalDate.now();
-    public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-    public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     protected final UserTestData testUsers = new UserTestData();
     protected final LunchPlaceTestData testPlaces = new LunchPlaceTestData();

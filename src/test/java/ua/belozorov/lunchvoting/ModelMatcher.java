@@ -12,11 +12,11 @@ import java.util.Objects;
  * @author vabelozorov on 17.11.16.
  */
 public class ModelMatcher<T> extends BaseMatcher<T>{
-    private final static Comparator DEFAULT_COMPARATOR = (o1, o2) -> String.valueOf(o1).equals(String.valueOf(o2)) ? 0 : -1;
-    private Comparator<T> comparator;
+    private final static EqualsComparator DEFAULT_COMPARATOR = (o1, o2) -> String.valueOf(o1).equals(String.valueOf(o2));
+    private EqualsComparator<T> comparator;
     private T expected;
 
-    public ModelMatcher(Comparator<T> comparator, T expected) {
+    public ModelMatcher(EqualsComparator<T> comparator, T expected) {
         Objects.requireNonNull(comparator);
         Objects.requireNonNull(expected);
 
@@ -32,7 +32,7 @@ public class ModelMatcher<T> extends BaseMatcher<T>{
     @Override
     @SuppressWarnings("unchecked")
     public boolean matches(Object actual) {
-        return comparator.compare(this.expected, (T) actual) == 0;
+        return comparator.compare(this.expected, (T) actual);
     }
 
     @Override

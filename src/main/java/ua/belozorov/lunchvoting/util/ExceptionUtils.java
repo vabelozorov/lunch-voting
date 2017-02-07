@@ -2,6 +2,7 @@ package ua.belozorov.lunchvoting.util;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.function.Supplier;
 
 import static java.util.Optional.ofNullable;
 
@@ -12,9 +13,17 @@ import static java.util.Optional.ofNullable;
  */
 public final class ExceptionUtils {
     public static <T> Collection<T> requireNonNullNotEmpty(Collection<T> collection) {
+        return requireNonNullNotEmpty(
+                collection,
+                () -> new NullPointerException("Collection must not be null or empty")
+        );
+    }
+
+    public static <T> Collection<T> requireNonNullNotEmpty(Collection<T> collection,
+                                                           Supplier<? extends RuntimeException> ex) {
         return ofNullable(collection)
-                .filter(c -> c != null && ! c.isEmpty())
-                .orElseThrow(() -> new NullPointerException("Collection must not be null or empty"));
+                .filter(c -> ! c.isEmpty())
+                .orElseThrow(ex);
     }
 
     public static <T> Collection<T> requireNonNullNotEmpty(T[] array) {

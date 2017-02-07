@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
  */
 public class MatcherUtils {
 
-    public static <T> List<Matcher<? super T>> matchCollection(Collection<T> expected, Comparator<T> comparator) {
+    public static <T> List<Matcher<? super T>> matchCollection(Collection<T> expected, EqualsComparator<T> comparator) {
         return expected.stream()
                 .map(entity -> new ModelMatcher<>(comparator, entity))
                 .collect(Collectors.toList());
@@ -26,7 +26,7 @@ public class MatcherUtils {
         return new ModelMatcher<>(expected);
     }
 
-    public static <T> Matcher<T> matchSingle(T expected, Comparator<T> comparator) {
+    public static <T> Matcher<T> matchSingle(T expected, EqualsComparator<T> comparator) {
         return new ModelMatcher<>(comparator, expected);
     }
 }

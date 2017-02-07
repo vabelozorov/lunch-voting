@@ -1,5 +1,6 @@
 package ua.belozorov.lunchvoting.model.voting.polling;
 
+import ua.belozorov.lunchvoting.model.base.Persistable;
 import ua.belozorov.lunchvoting.model.voting.polling.votedecisions.VotePolicyDecision;
 
 import java.time.LocalDate;
@@ -11,7 +12,7 @@ import java.util.Set;
  *
  * @author vabelozorov on 12.01.17.
  */
-public interface Poll {
+public interface Poll extends Comparable<Poll>, Persistable {
     VotePolicyDecision registerVote(String voterId, String pollItemId);
     List<PollItem> getPollItems();
     LocalDate getMenuDate();

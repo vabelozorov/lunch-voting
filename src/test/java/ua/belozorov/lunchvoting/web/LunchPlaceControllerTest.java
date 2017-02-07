@@ -58,7 +58,7 @@ public class LunchPlaceControllerTest extends AbstractControllerTest {
         String id = getCreatedId(uri);
 
         LunchPlace saved = DtoIntoEntity.toLunchPlace(to.toBuilder().id(id).build(), AuthorizedUser.get().getId());
-        String expectedJson = jsonUtils.removeFields(saved, LunchPlaceController.MANDATORY_EXCLUDE);
+        String expectedJson = jsonUtils.removeFields(saved, new HashSet<>(Arrays.asList("version", "adminId")));
 
         String actualJson = mockMvc.perform(get(uri)
                     .param("fields", "name,address,description,phones,menus")

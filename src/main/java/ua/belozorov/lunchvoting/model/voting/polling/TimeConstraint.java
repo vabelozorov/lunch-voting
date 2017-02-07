@@ -53,4 +53,13 @@ public final class TimeConstraint {
     public boolean isPollActive(LocalDateTime dateTime) {
         return ! dateTime.isBefore(startTime) && dateTime.isBefore(endTime);
     }
+
+    @Override
+    public String toString() {
+        return "TimeConstraint{" +
+                "startTime=" + startTime +
+                ", endTime=" + endTime +
+                ", voteChangeThreshold=" + voteChangeThreshold +
+                '}';
+    }
 }

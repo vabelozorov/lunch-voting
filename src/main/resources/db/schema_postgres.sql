@@ -47,7 +47,7 @@ CREATE TABLE IF NOT EXISTS poll_items (
   poll_id VARCHAR(36) NOT NULL,
   position INT NOT NULL,
   item_id VARCHAR(36),
-  FOREIGN KEY (poll_id) REFERENCES polls(id),
+  FOREIGN KEY (poll_id) REFERENCES polls(id) ON DELETE CASCADE,
   FOREIGN KEY (item_id) REFERENCES places(id)
 );
 

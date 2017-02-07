@@ -13,6 +13,9 @@ public class BadSyntaxException extends RuntimeException {
         super(code.getMessage());
     }
 
+    public BadSyntaxException() {
+    }
+
     public enum ErrorCode {
         ID_EXISTS(BadSyntaxException.ID_EXISTS),
         LUNCHPLACE_ID_MISSING(BadSyntaxException.LUNCHPLACE_ID_MISSING);

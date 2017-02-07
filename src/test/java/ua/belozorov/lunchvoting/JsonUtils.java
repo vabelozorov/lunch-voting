@@ -77,8 +77,7 @@ public class JsonUtils {
 
     public String removeFields(String jsonString, Collection<String> fieldNames) throws IOException {
         ObjectNode jsonNode = (ObjectNode) mapper.readTree(jsonString);
-        jsonNode.remove(fieldNames);
-        return jsonNode.toString();
+        return jsonNode.remove(fieldNames).toString();
     }
 
     public String removeFields(Object object, Collection<String> fieldNames) throws IOException {

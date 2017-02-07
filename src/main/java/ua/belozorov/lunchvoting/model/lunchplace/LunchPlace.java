@@ -1,5 +1,6 @@
 package ua.belozorov.lunchvoting.model.lunchplace;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.collect.ImmutableSortedSet;
 import lombok.AccessLevel;
 import lombok.Builder;
