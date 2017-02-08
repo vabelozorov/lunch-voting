@@ -1,6 +1,7 @@
 package ua.belozorov.lunchvoting.to;
 
 import lombok.*;
+import org.hibernate.validator.constraints.NotBlank;
 import ua.belozorov.lunchvoting.model.lunchplace.LunchPlace;
 import ua.belozorov.lunchvoting.model.lunchplace.Menu;
 
@@ -17,7 +18,10 @@ import java.util.Objects;
 @Getter
 @ToString(doNotUseGetters = true)
 public final class LunchPlaceTo {
+
     private final String id;
+
+    @NotBlank
     private final String name;
     private final String address;
     private final String description;

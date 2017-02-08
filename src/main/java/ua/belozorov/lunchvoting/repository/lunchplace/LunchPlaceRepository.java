@@ -13,7 +13,7 @@ import java.util.List;
  */
 public interface LunchPlaceRepository {
 
-    void save(LunchPlace lunchPlace);
+    LunchPlace save(LunchPlace lunchPlace);
 
     void update(LunchPlace lunchPlace, String userId);
 

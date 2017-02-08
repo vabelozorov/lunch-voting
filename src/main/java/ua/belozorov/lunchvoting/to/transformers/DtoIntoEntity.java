@@ -16,11 +16,7 @@ import java.util.stream.Collectors;
  */
 public class DtoIntoEntity {
 
-    public static LunchPlace toLunchPlace(@NotNull("DTO must not be null") LunchPlaceTo to,
-                                          @NotNull("AdminID must not be null") String adminId) {
-//        Objects.requireNonNull(to, "DTO must not be null");
-//        Objects.requireNonNull(adminId, "AdminID must not be null");
-
+    public static LunchPlace toLunchPlace(LunchPlaceTo to, String adminId) {
         return new LunchPlace(to.getId(), to.getName(), to.getAddress(),
                 to.getDescription(), to.getPhones(), Collections.emptyList(), adminId);
     }

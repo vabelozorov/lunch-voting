@@ -16,7 +16,7 @@ import javax.sql.DataSource;
  *
  * @author vabelozorov on 08.02.17.
  */
-@PropertySource("classpath:db/postgres.properties")
+@PropertySource("classpath:db/db-connection.properties")
 public class DataSourceConfig {
     @Autowired
     private Environment env;

@@ -41,7 +41,7 @@ public final class UserManagementController {
     }
 
     /**
-     * Creates a new User instance via a HTTP POST request. Three non-empty parameters must be present in the request:
+     * Creates a new User object via a HTTP POST request. Three non-empty parameters must be present in the request:
      * {@code name, password, email}. Other parameters are ignored.
      * @param userTo represents request parameters and must contain non-empty {@code name, password, email} fields
      * @return ResponseEntity instance with the following values upon successful completion of the request:

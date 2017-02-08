@@ -16,6 +16,8 @@ import ua.belozorov.lunchvoting.web.queries.LunchPlaceQueryParams;
 import java.net.URI;
 import java.util.*;
 
+import static ua.belozorov.lunchvoting.util.ControllerUtils.toMap;
+
 /**
  * <h2></h2>
  *
@@ -38,7 +40,7 @@ public class LunchPlaceController  {
     }
 
     /**
-     *
+     * Creates a new LunchPlace object via HTTP POST request.
      * @param placeTo a LunchPlace object description in JSON format. <br/>
      *              Mandatory fields:
      *              <ul>
@@ -55,11 +57,13 @@ public class LunchPlaceController  {
      */
     @PostMapping
     public ResponseEntity create(@RequestBody LunchPlaceTo placeTo) {
-        LunchPlace place = DtoIntoEntity.toLunchPlace(placeTo, AuthorizedUser.get().getId());
-        String id = placeService.create(place, AuthorizedUser.get());
+        LunchPlace created = placeService.create(
+                DtoIntoEntity.toLunchPlace(placeTo, AuthorizedUser.get().getId()),
+                AuthorizedUser.get()
+        );
         URI uri = ServletUriComponentsBuilder.fromCurrentContextPath()
-                        .path(REST_URL + "/{id}").buildAndExpand(id).toUri();
-        return ResponseEntity.created(uri).build();
+                        .path("{base}/{id}").buildAndExpand(REST_URL, created.getId()).toUri();
+        return ResponseEntity.created(uri).body(toMap("id", created.getId()));
     }
 
     /**

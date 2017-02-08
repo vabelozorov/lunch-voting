@@ -14,8 +14,6 @@ import ua.belozorov.lunchvoting.to.MenuTo;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 
 import static java.util.Optional.ofNullable;
 
@@ -36,9 +34,8 @@ public class LunchPlaceServiceImpl implements LunchPlaceService {
 
     @Override
     @Transactional
-    public String create(LunchPlace place, User user) {
-        lunchPlaceRepository.save(place);
-        return place.getId();
+    public LunchPlace create(LunchPlace place, User user) {
+        return lunchPlaceRepository.save(place);
     }
 
     @Override

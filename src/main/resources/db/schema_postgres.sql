@@ -1,12 +1,16 @@
-DROP TABLE IF EXISTS voting_config;
 DROP TABLE IF EXISTS dishes;
-DROP TABLE IF EXISTS phones;
 DROP TABLE IF EXISTS votes;
 DROP TABLE IF EXISTS menus;
 DROP TABLE IF EXISTS poll_items;
 DROP TABLE IF EXISTS places;
 DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS polls;
+DROP TABLE IF EXISTS domains;
+
+CREATE TABLE IF NOT EXISTS domains (
+  id VARCHAR(36) NOT NULL PRIMARY KEY,
+  name VARCHAR NOT NULL,
+);
 
 CREATE TABLE IF NOT EXISTS polls (
   id VARCHAR(36) NOT NULL PRIMARY KEY,
@@ -14,7 +18,9 @@ CREATE TABLE IF NOT EXISTS polls (
   start_time TIMESTAMP NOT NULL,
   end_time TIMESTAMP NOT NULL,
   change_time TIMESTAMP NOT NULL,
-  menu_date TIMESTAMP NOT NULL
+  menu_date TIMESTAMP NOT NULL,
+  domain_id VARCHAR(36) NOT NULL,
+  FOREIGN KEY (domain_id) REFERENCES domains(domain_id) ON CASCADE DELETE
 );
 
 CREATE TABLE IF NOT EXISTS users (
@@ -26,6 +32,8 @@ CREATE TABLE IF NOT EXISTS users (
   roles INT NOT NULL,
   registered_date TIMESTAMP NOT NULL,
   activated BOOL NOT NULL,
+  domain_id VARCHAR(36),
+  FOREIGN KEY (domain_id) REFERENCES domains(domain_id)
   CONSTRAINT email_unique_idx UNIQUE (email)
 );
 
@@ -37,8 +45,10 @@ CREATE TABLE IF NOT EXISTS places (
   description VARCHAR,
   user_id VARCHAR(36),
   phones VARCHAR(500),
-  CONSTRAINT name_user_id_unique UNIQUE (name, user_id),
+  domain_id VARCHAR(36) NOT NULL,
+  FOREIGN KEY (domain_id) REFERENCES domains(domain_id) ON CASCADE DELETE,
   FOREIGN KEY (user_id) REFERENCES users(id)
+  CONSTRAINT name_user_id_unique UNIQUE (name, user_id),
 );
 
 CREATE TABLE IF NOT EXISTS poll_items (
@@ -79,10 +89,4 @@ CREATE TABLE IF NOT EXISTS dishes (
   CONSTRAINT entry_unique UNIQUE (menu_id, name, price),
   FOREIGN KEY (menu_id) REFERENCES menus(id) ON DELETE CASCADE
 );
-
-CREATE TABLE IF NOT EXISTS voting_config (
-  poll_start_time TIME NOT NULL DEFAULT '09:00',
-  poll_end_time TIME NOT NULL DEFAULT '12:00'
-)
-
 

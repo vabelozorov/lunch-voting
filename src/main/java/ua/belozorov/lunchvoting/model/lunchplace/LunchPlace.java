@@ -8,6 +8,7 @@ import lombok.Getter;
 import org.hibernate.annotations.*;
 import org.hibernate.envers.Audited;
 import org.hibernate.validator.constraints.Length;
+import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -33,12 +34,11 @@ import java.util.*;
         uniqueConstraints = @UniqueConstraint(name = "name_user_id_unique", columnNames = {"name", "user_id"})
 )
 @Getter
-//@Audited
 @DynamicUpdate
 public final class LunchPlace extends AbstractPersistableObject {
 
     @Column(name = "name", nullable = false)
-    @NotEmpty
+    @NotBlank
     @Length(max = 50)
     private final String name;
 

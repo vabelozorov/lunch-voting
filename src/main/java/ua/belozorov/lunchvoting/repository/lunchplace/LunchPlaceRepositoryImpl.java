@@ -34,8 +34,9 @@ public class LunchPlaceRepositoryImpl extends BaseRepository implements LunchPla
     }
 
     @Override
-    public void save(LunchPlace place) {
+    public LunchPlace save(LunchPlace place) {
         reliablePersist(place);
+        return place;
     }
 
     @Override
