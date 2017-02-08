@@ -1,5 +1,6 @@
 package ua.belozorov.lunchvoting.config;
 
+import net.ttddyy.dsproxy.support.ProxyDataSourceBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.*;
 import org.springframework.core.env.Environment;
@@ -26,15 +27,8 @@ public class DbConfig {
     @Autowired
     private Environment env;
 
-    @Bean(name = "dataSource")
-    public DataSource dataSource() {
-        org.apache.tomcat.jdbc.pool.DataSource dataSource = new org.apache.tomcat.jdbc.pool.DataSource();
-        dataSource.setDriverClassName(env.getProperty("database.driverClassName"));
-        dataSource.setUrl(env.getProperty("database.url"));
-        dataSource.setUsername(env.getProperty("database.username"));
-        dataSource.setPassword(env.getProperty("database.password"));
-        return dataSource;
-    }
+    @Autowired
+    private DataSource dataSource;
 
     @Bean(name = "entityManagerFactory")
     public EntityManagerFactory entityManagerFactory(DataSource dataSource) {
