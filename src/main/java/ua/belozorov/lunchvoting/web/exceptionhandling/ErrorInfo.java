@@ -15,7 +15,7 @@ public class ErrorInfo {
     public ErrorInfo(CharSequence url, ApplicationException ex) {
         this.url = url;
         this.code = ex.getCode();
-        this.message = ex.getMessage();
+        this.message = ex.getErrorMessage();
     }
 
     public ErrorInfo(CharSequence url, Code code, String message) {

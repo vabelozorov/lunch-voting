@@ -9,6 +9,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import ua.belozorov.lunchvoting.exceptions.ApplicationException;
 import ua.belozorov.lunchvoting.exceptions.DuplicateEmailException;
+import ua.belozorov.lunchvoting.exceptions.NotFoundException;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.stream.Collectors;
@@ -38,5 +39,12 @@ public final class ExceptionInfoHandler {
                 .map(fe -> fe.getField() + ' ' + fe.getDefaultMessage())
                 .collect(Collectors.joining("; "));
         return new ErrorInfo(req.getRequestURL(), Code.PARAMS_VALIDATION_FAILED, msg);
+    }
+
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(NotFoundException.class)
+    @ResponseBody
+    public ErrorInfo handleEntityNotFound(HttpServletRequest req, NotFoundException ex) {
+        return new ErrorInfo(req.getRequestURL(), ex);
     }
 }

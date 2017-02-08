@@ -11,8 +11,7 @@ import org.springframework.context.annotation.*;
         "ua.belozorov.lunchvoting.service",
         "ua.belozorov.lunchvoting.repository"
 })
-@PropertySource("classpath:db/postgres.properties")
-@Import({DbConfig.class, InitDatabaseConfig.class})
+@Import({JpaConfig.class, InitDatabaseConfig.class, DataSourceConfig.class})
 public class RootConfig {
 
 }

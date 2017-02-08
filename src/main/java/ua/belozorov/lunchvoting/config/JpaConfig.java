@@ -22,7 +22,7 @@ import java.util.Properties;
 @Configuration
 @EnableJpaRepositories(basePackages = "ua.belozorov.lunchvoting.repository", considerNestedRepositories = true)
 @EnableTransactionManagement
-public class DbConfig {
+public class JpaConfig {
 
     @Autowired
     private Environment env;

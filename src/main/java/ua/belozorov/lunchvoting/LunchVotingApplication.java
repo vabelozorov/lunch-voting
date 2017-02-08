@@ -30,7 +30,7 @@ public class LunchVotingApplication extends AbstractAnnotationConfigDispatcherSe
     @Override
     protected WebApplicationContext createRootApplicationContext() {
         WebApplicationContext rootApplicationContext = super.createRootApplicationContext();
-        ((ConfigurableEnvironment)rootApplicationContext.getEnvironment()).setActiveProfiles(SPRING_PROFILES.DEVELOPMENT);
+        ((ConfigurableEnvironment)rootApplicationContext.getEnvironment()).setActiveProfiles(SPRING_PROFILES.DB_PRODUCTION);
         return rootApplicationContext;
     }
 }

@@ -6,6 +6,8 @@ import org.springframework.core.io.Resource;
 import ua.belozorov.lunchvoting.AbstractTest;
 import ua.belozorov.lunchvoting.EqualsComparator;
 import ua.belozorov.lunchvoting.model.User;
+import ua.belozorov.lunchvoting.model.UserRole;
+import ua.belozorov.lunchvoting.util.RolesToIntegerConverter;
 import ua.belozorov.objtosql.*;
 
 import java.time.LocalDateTime;
@@ -22,20 +24,20 @@ import java.util.stream.Stream;
 public class UserTestData {
     public static final EqualsComparator<User> USER_COMPARATOR = new UserComparator();
 
-    public static User GOD = GOD = new User("GOD_ID", "Царь всея приложение", "god@email.com", "godpass", (byte)3,
-            LocalDateTime.of(2016, 11, 16, 0, 0, 1), true);
-    public static User ADMIN = new User("ADMIN_ID", "Just an admin", "admin@email.com", "adminpass", (byte) 2,
-            LocalDateTime.of(2016, 11, 16, 13, 0, 0), true);
-    public static User VOTER = new User("VOTER_ID", "Синий Гном", "voter@email.com", "voterpass", (byte) 1,
-            LocalDateTime.of(2016, 11, 17, 13, 0, 0), true);
-    public static User VOTER1 = new User("VOTER1_ID", "Voter1_Name", "voter1@email.com", "voter1pass", (byte) 1,
-            LocalDateTime.of(2016, 11, 17, 13, 0, 0), true);
-    public static User VOTER2 = new User("VOTER2_ID", "Voter2_Name", "voter2@email.com", "voter2pass", (byte) 1,
-            LocalDateTime.of(2016, 11, 17, 13, 0, 0), true);
-    public static User VOTER3 = new User("VOTER3_ID", "Voter3_Name", "voter3@email.com", "voter3pass", (byte) 1,
-            LocalDateTime.of(2016, 11, 17, 13, 0, 0), true);
-    public static User VOTER4 = new User("VOTER4_ID", "Voter4_Name", "voter4@email.com", "voter4pass", (byte) 1,
-            LocalDateTime.of(2016, 11, 17, 13, 0, 0), true);
+    public static User GOD = new User("GOD_ID", 1, "Царь всея приложение", "god@email.com", "godpass",
+            new HashSet<>(Arrays.asList(UserRole.VOTER, UserRole.ADMIN)), LocalDateTime.of(2016, 11, 16, 0, 0, 1), true);
+    public static User VOTER = new User("VOTER_ID", 1, "Синий Гном", "voter@email.com", "voterpass",
+            new HashSet<>(Arrays.asList(UserRole.VOTER)), LocalDateTime.of(2016, 11, 17, 13, 0, 0), true);
+    public static User ADMIN = new User("ADMIN_ID", 1, "Just an admin", "admin@email.com", "adminpass",
+            new HashSet<>(Arrays.asList(UserRole.ADMIN)), LocalDateTime.of(2016, 11, 16, 13, 0, 0), true);
+    public static User VOTER1 = new User("VOTER1_ID", "Voter1_Name", "voter1@email.com", "voter1pass",
+            new HashSet<>(Arrays.asList(UserRole.VOTER)), LocalDateTime.of(2016, 11, 17, 13, 0, 0), true);
+    public static User VOTER2 = new User("VOTER2_ID", "Voter2_Name", "voter2@email.com", "voter2pass",
+            new HashSet<>(Arrays.asList(UserRole.VOTER)), LocalDateTime.of(2016, 11, 17, 13, 0, 0), true);
+    public static User VOTER3 = new User("VOTER3_ID", "Voter3_Name", "voter3@email.com", "voter3pass",
+            new HashSet<>(Arrays.asList(UserRole.VOTER)), LocalDateTime.of(2016, 11, 17, 13, 0, 0), true);
+    public static User VOTER4 = new User("VOTER4_ID", "Voter4_Name", "voter4@email.com", "voter4pass",
+            new HashSet<>(Arrays.asList(UserRole.VOTER)), LocalDateTime.of(2016, 11, 17, 13, 0, 0), true);
 
     public static String GOD_ID = GOD.getId();
     public static String ADMIN_ID = ADMIN.getId();
@@ -60,7 +62,7 @@ public class UserTestData {
                         new StringSqlColumn<>("name", User::getName),
                         new StringSqlColumn<>("email", User::getEmail),
                         new StringSqlColumn<>("password", User::getPassword),
-                        new IntegerSqlColumn<>("roles", u -> (int)u.getRoles()),
+                        new IntegerSqlColumn<>("roles", u -> new RolesToIntegerConverter().convertToDatabaseColumn(u.getRoles())),
                         new DateTimeSqlColumn<>("registered_date", User::getRegisteredDate),
                         new BooleanSqlColumn<>("activated", User::isActivated)
                 )
@@ -76,7 +78,7 @@ public class UserTestData {
                     o1.getEmail().equals(o2.getEmail()) &&
                     o1.getPassword().equals(o2.getPassword()) &&
                     o1.getRegisteredDate().isEqual(o2.getRegisteredDate()) &&
-                    o1.getRoles() == o2.getRoles() &&
+                    o1.getRoles().equals(o2.getRoles()) &&
                     o1.isActivated() == o2.isActivated();
         }
     }

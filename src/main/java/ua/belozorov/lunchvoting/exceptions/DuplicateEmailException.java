@@ -18,4 +18,9 @@ public class DuplicateEmailException extends RuntimeException implements Applica
     public Code getCode() {
         return code;
     }
+
+    @Override
+    public String getErrorMessage() {
+        return super.getMessage();
+    }
 }

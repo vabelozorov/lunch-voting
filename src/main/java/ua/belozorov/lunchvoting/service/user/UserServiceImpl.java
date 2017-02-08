@@ -2,16 +2,15 @@ package ua.belozorov.lunchvoting.service.user;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.TransactionSystemException;
 import org.springframework.transaction.annotation.Transactional;
-import ua.belozorov.lunchvoting.exceptions.BadSyntaxException;
 import ua.belozorov.lunchvoting.exceptions.NotFoundException;
 import ua.belozorov.lunchvoting.model.User;
+import ua.belozorov.lunchvoting.model.UserRole;
 import ua.belozorov.lunchvoting.repository.user.UserRepository;
+import ua.belozorov.lunchvoting.util.ExceptionUtils;
 
-import javax.persistence.RollbackException;
-import javax.validation.ConstraintViolationException;
 import java.util.Collection;
+import java.util.Set;
 
 import static java.util.Optional.ofNullable;
 
@@ -49,6 +48,8 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void update(String id, String name, String email, String password) {
+        ExceptionUtils.checkAllNotNull(id, name, email, password);
+
         User persistedUser = userRepository.get(id);
         if (persistedUser == null) {
             throw new NotFoundException(id, User.class);
@@ -60,6 +61,8 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public User create(User user) {
+        ExceptionUtils.checkAllNotNull(user);
+
         return userRepository.save(user);
     }
 
@@ -73,7 +76,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void setRoles(String id, byte bitmask) {
+    public void setRoles(String id, Set<UserRole> bitmask) {
         User user = ofNullable(userRepository.get(id))
                 .orElseThrow(() -> new NotFoundException(id, User.class));
         userRepository.update(user.setRoles(bitmask));

@@ -1,17 +1,16 @@
 package ua.belozorov.lunchvoting.web;
 
-import com.fasterxml.jackson.core.type.TypeReference;
+import org.apache.commons.collections.map.HashedMap;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
+import ua.belozorov.lunchvoting.exceptions.NotFoundException;
 import ua.belozorov.lunchvoting.model.User;
 import ua.belozorov.lunchvoting.model.UserRole;
 import ua.belozorov.lunchvoting.service.user.UserService;
 import ua.belozorov.lunchvoting.to.UserTo;
-import ua.belozorov.lunchvoting.to.transformers.UserTransformer;
 import ua.belozorov.lunchvoting.util.ControllerUtils;
 import ua.belozorov.lunchvoting.web.exceptionhandling.Code;
 import ua.belozorov.lunchvoting.web.exceptionhandling.ErrorInfo;
@@ -24,7 +23,6 @@ import static org.junit.Assert.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
-import static ua.belozorov.lunchvoting.MatcherUtils.*;
 import static ua.belozorov.lunchvoting.testdata.UserTestData.*;
 
 
@@ -77,11 +75,7 @@ public class UserManagementControllerTest extends AbstractControllerTest {
         ErrorInfo errorInfo = new ErrorInfo(
                 result.getRequest().getRequestURL(),
                 Code.DUPLICATE_EMAIL,
-                messageSource.getMessage(
-                        "error.duplicate_email",
-                        new Object[]{userTo.getEmail()},
-                        LocaleContextHolder.getLocale()
-                )
+                "Email god@email.com already exists"
         );
         assertJson(
                 jsonUtils.toJson(errorInfo),
@@ -111,9 +105,7 @@ public class UserManagementControllerTest extends AbstractControllerTest {
 
     @Test
     public void testUpdate() throws Exception {
-        UserTo userTo = UserTransformer.toDto(VOTER);
-        userTo.setPassword("newPassword");
-        userTo.setEmail("newEmail@email.com");
+        UserTo userTo = new UserTo(VOTER_ID, VOTER.getName(), "newEmail@email.com", "newPassword");
 
         mockMvc.perform(put(REST_URL)
                         .content(jsonUtils.toJson(userTo))
@@ -128,49 +120,60 @@ public class UserManagementControllerTest extends AbstractControllerTest {
 
     @Test
     public void testGet() throws Exception {
-        MvcResult result = mockMvc.perform(get(REST_URL + "/" + VOTER_ID))
+        String actual = mockMvc.perform(get(REST_URL + "/" + VOTER_ID))
                 .andExpect(status().isOk())
-                .andReturn();
+                .andReturn().getResponse().getContentAsString();
 
-        UserTo actual = jsonUtils.fromMvcResultBody(result, UserTo.class);
-        UserTo expected = UserTransformer.toDto(VOTER);
-        assertThat(actual, matchByToString(expected));
+        String expected = jsonUtils.toJson(new UserTo(VOTER));
+        assertJson(expected, actual);
     }
 
     @Test
-    public void testGetAll() throws Exception {
-        MvcResult result = mockMvc.perform(get(REST_URL))
-                .andExpect(status().isOk())
+    public void e404AndMessageOnGetNonExistingId() throws Exception {
+        MvcResult result = mockMvc.perform(get("{base}/{id}", REST_URL, "I_DO_NOT_EXIST"))
+                .andExpect(status().isNotFound())
                 .andReturn();
-
-        Collection<UserTo> actual = jsonUtils.fromMvcResultBody(result, new TypeReference<Collection<UserTo>>() {});
-        List<UserTo> expected = ALL_USERS.stream()
-                .map(UserTransformer::toDto)
-                .sorted(Comparator.comparing(UserTo::getEmail))
-                .collect(Collectors.toList());
-
-        assertReflectionEquals(expected, actual);
-    }
-
-    @Test
-    public void testDelete() throws Exception {
-        mockMvc.perform(delete(REST_URL + "/" + VOTER_ID))
-                .andExpect(status().isNoContent());
-        Collection<User> actual = userService.getAll();
-        Collection<User> expected = ALL_USERS.stream()
-                                                .filter(u -> !u.getId().equals(VOTER_ID))
-                                                .collect(Collectors.toList());
-
-        assertThat(
-                actual,
-                contains(matchCollection(expected, USER_COMPARATOR))
+        ErrorInfo errorInfo = new ErrorInfo(
+                result.getRequest().getRequestURL(),
+                Code.ENTITY_NOT_FOUND,
+                "Entity(-ies) not found: I_DO_NOT_EXIST"
+        );
+        assertJson(
+                jsonUtils.toJson(errorInfo),
+                result.getResponse().getContentAsString()
         );
     }
 
     @Test
-    public void activate() throws Exception {
-        mockMvc.perform(put(REST_URL + "/" + VOTER_ID + "/activate")
-                            .content(jsonUtils.toJson("isActive", "false"))
+    public void testGetAll() throws Exception {
+        String actual = mockMvc.perform(get(REST_URL))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        List<UserTo> tos = ALL_USERS.stream()
+                .map(UserTo::new)
+                .sorted(Comparator.comparing(UserTo::getEmail))
+                .collect(Collectors.toList());
+        String expected = jsonUtils.toJson(tos);
+
+        assertJson(expected, actual);
+    }
+
+    @Test
+    public void testDelete() throws Exception {
+        assertNotNull(userService.get(VOTER_ID));
+        mockMvc.perform(delete(REST_URL + "/" + VOTER_ID))
+                .andExpect(status().isNoContent());
+        thrown.expect(NotFoundException.class);
+        userService.get(VOTER_ID);
+    }
+
+    @Test
+    public void deactivateUser() throws Exception {
+        Map<String, Object> map = new HashMap<>();
+        map.put("id", VOTER_ID);
+        map.put("activated", false);
+        mockMvc.perform(put(REST_URL  + "/activate")
+                            .content(jsonUtils.toJson(map))
                             .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
 
@@ -179,16 +182,21 @@ public class UserManagementControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    public void setRights() throws Exception {
-        mockMvc.perform(put(REST_URL + "/" + VOTER_ID + "/rights.set")
-                .content(jsonUtils.toJson("rights", "3"))
+    public void setRoles() throws Exception {
+        Set<UserRole> expectedRoles = new HashSet<>();
+        expectedRoles.add(UserRole.VOTER);
+        expectedRoles.add(UserRole.ADMIN);
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("id", VOTER_ID);
+        map.put("roles", expectedRoles);
+        mockMvc.perform(put(REST_URL + "/roles")
+                .content(jsonUtils.toJson(map))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
 
         User user = userService.get(VOTER_ID);
-        Set<UserRole> expectedRoles = new HashSet<>();
-        expectedRoles.add(UserRole.VOTER);
-        expectedRoles.add(UserRole.ADMIN);
-        assertEquals(UserRole.toUserRoles(user.getRoles()), expectedRoles);
+
+        assertEquals(user.getRoles(), expectedRoles);
     }
 }

@@ -74,9 +74,9 @@ public class WebConfig extends WebMvcConfigurerAdapter {
     @Bean
     public ReloadableResourceBundleMessageSource messageSource() {
         ReloadableResourceBundleMessageSource source = new ReloadableResourceBundleMessageSource();
-        source.setBasename("messages/messages");
+        source.setBasename("classpath:messages/messages");
         source.setFallbackToSystemLocale(false);
-        source.setUseCodeAsDefaultMessage(true);
+        source.setUseCodeAsDefaultMessage(false);
         return source;
     }
 }

@@ -1,43 +1,39 @@
 package ua.belozorov.lunchvoting.web;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ua.belozorov.lunchvoting.model.User;
-import ua.belozorov.lunchvoting.service.user.UserService;
 import ua.belozorov.lunchvoting.to.UserTo;
-import ua.belozorov.lunchvoting.to.transformers.UserTransformer;
 
 /**
- * <h2></h2>
+ * <h2><A controller that manages user requests about updating his/her own profile/h2>
  *
  * @author vabelozorov on 15.11.16.
  */
 @RestController
-@RequestMapping("/api/profile")
+@RequestMapping(UserProfileController.REST_URL)
 public class UserProfileController {
+    static final  String REST_URL = "/api/profile";
+    private final UserManagementController controller;
 
     @Autowired
-    private UserService userService;
+    public UserProfileController(UserManagementController controller) {
+        this.controller = controller;
+    }
 
     @PostMapping
-    public ResponseEntity<UserTo> register(@RequestBody UserTo userTo, String password) {
-        User newUser = UserTransformer.toEntity(userTo);
-        UserTo created = UserTransformer.toDto(userService.create(newUser));
-        return new ResponseEntity<>(created, HttpStatus.CREATED);
+    public ResponseEntity register(@RequestBody @Validated(UserTo.Create.class) UserTo userTo) {
+        return this.controller.create(userTo);
     }
 
     @PutMapping
-    public ResponseEntity update(@RequestBody UserTo userTo, String password) {
-        userService.update(userTo.getId(), userTo.getName(), userTo.getEmail(), userTo.getPassword());
-        return new ResponseEntity(HttpStatus.NO_CONTENT);
+    public ResponseEntity update(@RequestBody @Validated(UserTo.Update.class)UserTo userTo) {
+        return this.controller.update(userTo);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<UserTo> get(@PathVariable String id) {
-        User user = userService.get(id);
-        UserTo userTo = UserTransformer.toDto(user);
-        return new ResponseEntity<>(userTo, HttpStatus.OK);
+        return this.controller.get(id);
     }
 }

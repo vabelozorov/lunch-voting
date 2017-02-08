@@ -8,4 +8,5 @@ package ua.belozorov.lunchvoting.web.exceptionhandling;
 public enum  Code {
     DUPLICATE_EMAIL,
     PARAMS_VALIDATION_FAILED,
+    ENTITY_NOT_FOUND,
 }

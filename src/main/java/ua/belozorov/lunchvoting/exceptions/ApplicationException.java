@@ -9,5 +9,5 @@ import ua.belozorov.lunchvoting.web.exceptionhandling.Code;
  */
 public interface ApplicationException {
     Code getCode();
-    String getMessage();
+    String getErrorMessage();
 }

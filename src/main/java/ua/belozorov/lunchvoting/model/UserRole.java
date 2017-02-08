@@ -25,7 +25,7 @@ public enum UserRole {
         return id;
     }
 
-    public static Set<UserRole> toUserRoles(byte bitmask) {
+    public static Set<UserRole> toUserRoles(Integer bitmask) {
         Set<UserRole> roles = new HashSet<>();
         if (bitmask == 0) {
             return roles;
@@ -40,8 +40,8 @@ public enum UserRole {
         return roles;
     }
 
-    public static byte rolesToBitmask(Collection<UserRole> roles) {
-        byte bitmask = 0;
+    public static Integer rolesToBitmask(Collection<UserRole> roles) {
+        Integer bitmask = 0;
         for (UserRole role : roles) {
             bitmask += role.id();
         }

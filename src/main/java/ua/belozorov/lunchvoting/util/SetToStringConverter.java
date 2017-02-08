@@ -19,12 +19,12 @@ import java.util.stream.Stream;
  */
 public class SetToStringConverter implements AttributeConverter<Set<String>, String> {
     @Override
-    public String convertToDatabaseColumn(final Set<String> attribute) {
+    public String convertToDatabaseColumn(Set<String> attribute) {
         return String.join(",", attribute);
     }
 
     @Override
-    public Set<String> convertToEntityAttribute(final String dbData) {
-        return new HashSet<String>(Arrays.asList(dbData.split(",")));
+    public Set<String> convertToEntityAttribute(String dbData) {
+        return new HashSet<>(Arrays.asList(dbData.split(",")));
     }
 }
