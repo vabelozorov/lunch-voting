@@ -2,23 +2,20 @@ package ua.belozorov.lunchvoting.web;
 
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import ua.belozorov.lunchvoting.model.voting.polling.Vote;
 import ua.belozorov.lunchvoting.service.voting.VotingService;
 import ua.belozorov.lunchvoting.to.VoteTo;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import static org.hamcrest.Matchers.contains;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static ua.belozorov.lunchvoting.testdata.UserTestData.GOD_ID;
-import static ua.belozorov.lunchvoting.testdata.UserTestData.VOTER;
-import static ua.belozorov.lunchvoting.testdata.UserTestData.VOTER_ID;
+import static ua.belozorov.lunchvoting.model.UserTestData.GOD_ID;
+import static ua.belozorov.lunchvoting.model.UserTestData.VOTER_ID;
 
 /**
  * <h2></h2>

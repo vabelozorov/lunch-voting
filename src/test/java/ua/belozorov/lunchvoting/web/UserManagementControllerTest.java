@@ -1,6 +1,5 @@
 package ua.belozorov.lunchvoting.web;
 
-import org.apache.commons.collections.map.HashedMap;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
@@ -23,7 +22,7 @@ import static org.junit.Assert.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
-import static ua.belozorov.lunchvoting.testdata.UserTestData.*;
+import static ua.belozorov.lunchvoting.model.UserTestData.*;
 
 
 /**
@@ -74,7 +73,7 @@ public class UserManagementControllerTest extends AbstractControllerTest {
                 .andReturn();
         ErrorInfo errorInfo = new ErrorInfo(
                 result.getRequest().getRequestURL(),
-                Code.DUPLICATE_EMAIL,
+                Code.DUPLICATE_DATA,
                 "Email god@email.com already exists"
         );
         assertJson(

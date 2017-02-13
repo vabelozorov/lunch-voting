@@ -48,21 +48,20 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void update(String id, String name, String email, String password) {
-        ExceptionUtils.checkAllNotNull(id, name, email, password);
+        ExceptionUtils.checkParamsNotNull(id, name, email, password);
 
         User persistedUser = userRepository.get(id);
         if (persistedUser == null) {
             throw new NotFoundException(id, User.class);
         }
-        User updatedUser = User.builder(persistedUser).name(name).email(email).password(password).build();
+        User updatedUser = persistedUser.toBuilder().name(name).email(email).password(password).build();
         userRepository.update(updatedUser);
     }
 
     @Override
     @Transactional
     public User create(User user) {
-        ExceptionUtils.checkAllNotNull(user);
-
+        ExceptionUtils.checkParamsNotNull(user);
         return userRepository.save(user);
     }
 
@@ -76,9 +75,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void setRoles(String id, Set<UserRole> bitmask) {
+    public void setRoles(String id, Set<UserRole> roles) {
         User user = ofNullable(userRepository.get(id))
                 .orElseThrow(() -> new NotFoundException(id, User.class));
-        userRepository.update(user.setRoles(bitmask));
+        userRepository.update(user.setRoles(roles));
     }
 }

@@ -52,11 +52,11 @@ public class VoteTestData {
     private static class VoteComparator implements EqualsComparator<Vote> {
 
         @Override
-        public boolean compare(Vote v1, Vote v2) {
-            return  v1.getPoll().equals(v2.getPoll())
-                    && v1.getPollItem().equals(v2.getPollItem())
-                    && v1.getVoterId().equals(v2.getVoterId())
-                    && v1.getVoteTime().equals(v2.getVoteTime());
+        public boolean compare(Vote obj, Vote another) {
+            return  obj.getPoll().equals(another.getPoll())
+                    && obj.getPollItem().equals(another.getPollItem())
+                    && obj.getVoterId().equals(another.getVoterId())
+                    && obj.getVoteTime().equals(another.getVoteTime());
         }
     }
 }

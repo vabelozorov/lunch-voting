@@ -4,7 +4,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
-import ua.belozorov.lunchvoting.AuthorizedUser;
+import ua.belozorov.lunchvoting.model.AuthorizedUser;
 import ua.belozorov.lunchvoting.DateTimeFormatters;
 import ua.belozorov.lunchvoting.model.lunchplace.LunchPlace;
 import ua.belozorov.lunchvoting.model.lunchplace.Menu;
@@ -24,8 +24,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static ua.belozorov.lunchvoting.MatcherUtils.matchCollection;
 import static ua.belozorov.lunchvoting.MatcherUtils.matchSingle;
 import static ua.belozorov.lunchvoting.model.lunchplace.LunchPlaceTestData.*;
-import static ua.belozorov.lunchvoting.testdata.UserTestData.GOD;
-import static ua.belozorov.lunchvoting.testdata.UserTestData.GOD_ID;
+import static ua.belozorov.lunchvoting.model.UserTestData.GOD;
+import static ua.belozorov.lunchvoting.model.UserTestData.GOD_ID;
 
 /**
  * <h2></h2>

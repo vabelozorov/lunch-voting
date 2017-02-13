@@ -30,12 +30,28 @@ public final class ExceptionUtils {
         return requireNonNullNotEmpty(Arrays.asList(array));
     }
 
-    public static void checkAllNotNull(Object... objects) {
+    public static void checkParamsNotNull(Object... objects) {
         requireNonNullNotEmpty(objects);
         for (int i = 0; i < objects.length; i++) {
             if (objects[i] == null) {
                 throw new NullPointerException("Null param is not allowed, but found at position " + i);
             }
+        }
+    }
+
+    public static <T> T unwrapException(Supplier<T> supplier, Class<? extends RuntimeException> expect, RuntimeException throwOnMatch) {
+        checkParamsNotNull(supplier, expect, throwOnMatch);
+        try {
+            return supplier.get();
+        } catch (RuntimeException original) {
+            Throwable cause = original;
+            while (cause != null) {
+                if (expect.isInstance(cause)) {
+                    throw throwOnMatch;
+                }
+                cause = cause.getCause();
+            }
+            throw original;
         }
     }
 

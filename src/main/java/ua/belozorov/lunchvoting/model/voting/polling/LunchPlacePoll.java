@@ -175,7 +175,7 @@ public final class LunchPlacePoll extends AbstractPersistableObject implements P
 //        Set<String> pollItemIds = pollItems.stream().map(PollItem::getId).collect(Collectors.toSet());
 //        PollingResult.VoteCollector collector = PollingResult.getCollector(this.getId());
 //        for (Vote vote : votes) {
-//            if (vote.get().equals(this.getId()) && pollItemIds.containsOriginal(vote.getPollItem())) {
+//            if (vote.getArea().equals(this.getId()) && pollItemIds.containsOriginal(vote.getPollItem())) {
 //                collector.collect(vote);
 //            } else {
 //                throw new IllegalStateException(

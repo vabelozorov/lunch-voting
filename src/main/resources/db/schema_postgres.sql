@@ -3,13 +3,17 @@ DROP TABLE IF EXISTS votes;
 DROP TABLE IF EXISTS menus;
 DROP TABLE IF EXISTS poll_items;
 DROP TABLE IF EXISTS places;
+DROP TABLE IF EXISTS join_requests;
 DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS polls;
-DROP TABLE IF EXISTS domains;
+DROP TABLE IF EXISTS areas;
 
-CREATE TABLE IF NOT EXISTS domains (
+CREATE TABLE IF NOT EXISTS areas (
   id VARCHAR(36) NOT NULL PRIMARY KEY,
+  version INT NOT NULL DEFAULT 0,
   name VARCHAR NOT NULL,
+  created TIMESTAMP NOT NULL,
+  CONSTRAINT name_idx UNIQUE (name)
 );
 
 CREATE TABLE IF NOT EXISTS polls (
@@ -19,8 +23,8 @@ CREATE TABLE IF NOT EXISTS polls (
   end_time TIMESTAMP NOT NULL,
   change_time TIMESTAMP NOT NULL,
   menu_date TIMESTAMP NOT NULL,
-  domain_id VARCHAR(36) NOT NULL,
-  FOREIGN KEY (domain_id) REFERENCES domains(domain_id) ON CASCADE DELETE
+  area_id VARCHAR(36) NOT NULL,
+  FOREIGN KEY (area_id) REFERENCES areas(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS users (
@@ -32,9 +36,21 @@ CREATE TABLE IF NOT EXISTS users (
   roles INT NOT NULL,
   registered_date TIMESTAMP NOT NULL,
   activated BOOL NOT NULL,
-  domain_id VARCHAR(36),
-  FOREIGN KEY (domain_id) REFERENCES domains(domain_id)
+  area_id VARCHAR(36),
+  FOREIGN KEY (area_id) REFERENCES areas(id) ON DELETE SET NULL,
   CONSTRAINT email_unique_idx UNIQUE (email)
+);
+
+CREATE TABLE IF NOT EXISTS join_requests (
+  id VARCHAR(36) NOT NULL PRIMARY KEY,
+  version INT NOT NULL DEFAULT 0,
+  requester_id VARCHAR(36) NOT NULL,
+  created TIMESTAMP NOT NULL,
+  decided_on TIMESTAMP,
+  area_id VARCHAR NOT NULL,
+  status INT NOT NULL,
+  FOREIGN KEY (requester_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (area_id) REFERENCES areas(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS places (
@@ -45,10 +61,10 @@ CREATE TABLE IF NOT EXISTS places (
   description VARCHAR,
   user_id VARCHAR(36),
   phones VARCHAR(500),
-  domain_id VARCHAR(36) NOT NULL,
-  FOREIGN KEY (domain_id) REFERENCES domains(domain_id) ON CASCADE DELETE,
-  FOREIGN KEY (user_id) REFERENCES users(id)
-  CONSTRAINT name_user_id_unique UNIQUE (name, user_id),
+  area_id VARCHAR(36) NOT NULL,
+  FOREIGN KEY (area_id) REFERENCES areas(id) ON DELETE CASCADE,
+  FOREIGN KEY (user_id) REFERENCES users(id),
+  CONSTRAINT name_user_id_unique UNIQUE (name, user_id)
 );
 
 CREATE TABLE IF NOT EXISTS poll_items (

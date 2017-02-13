@@ -15,8 +15,8 @@ import java.util.stream.Stream;
 import static ua.belozorov.lunchvoting.AbstractTest.NOW_DATE;
 import static ua.belozorov.lunchvoting.AbstractTest.NOW_DATE_TIME;
 import static ua.belozorov.lunchvoting.model.lunchplace.LunchPlaceTestData.*;
-import static ua.belozorov.lunchvoting.testdata.UserTestData.VOTERS;
-import static ua.belozorov.lunchvoting.testdata.UserTestData.VOTER_ID;
+import static ua.belozorov.lunchvoting.model.UserTestData.VOTERS;
+import static ua.belozorov.lunchvoting.model.UserTestData.VOTER_ID;
 
 /**
  * <h2></h2>
@@ -34,6 +34,7 @@ public class PollTestData {
     private final LunchPlacePoll futurePoll;
     private final LunchPlacePoll activePollNoUpdate;
     private final Map<String, Integer> positionMap = new HashMap<>();
+    private final Set<LunchPlacePoll> allPolls = new LinkedHashSet<>();
 
     public  PollTestData(LunchPlaceTestData placeTestData) {
         this.pastPoll = this.createPastPoll(placeTestData);
@@ -45,6 +46,11 @@ public class PollTestData {
                 this.activePollNoUpdate, this.futurePoll);
         this.pollItemSqlResource = this.createPollItemSqlResource(this.pastPoll, this.activePoll,
                 this.activePollNoUpdate, this.futurePoll);
+
+        this.allPolls.add(this.futurePoll);
+        this.allPolls.add(this.activePoll);
+        this.allPolls.add(this.activePollNoUpdate);
+        this.allPolls.add(this.pastPoll);
     }
 
 
@@ -145,6 +151,7 @@ public class PollTestData {
                 "polls",
                 Arrays.asList(
                         new StringSqlColumn<>("id", LunchPlacePoll::getId),
+                        new StringSqlColumn<>("area_id", (lp) -> "AREA1_ID"),
                         new DateTimeSqlColumn<>("start_time", lpp -> lpp.getTimeConstraint().getStartTime()),
                         new DateTimeSqlColumn<>("end_time", lpp -> lpp.getTimeConstraint().getEndTime()),
                         new DateTimeSqlColumn<>("change_time", lpp -> lpp.getTimeConstraint().getVoteChangeThreshold()),
@@ -174,19 +181,19 @@ public class PollTestData {
     private static class PollComparator implements EqualsComparator<Poll> {
         private static final EqualsComparator<List<PollItem>> POLL_ITEMS_COMPARATOR = new PollItemCollectionComparator();
         @Override
-        public boolean compare(Poll o1, Poll o2) {
-            return o1.getId().equals(o2.getId())
-                    && o1.getPollItems().size() == o2.getPollItems().size()
-                    && POLL_ITEMS_COMPARATOR.compare(o1.getPollItems(), o2.getPollItems());
+        public boolean compare(Poll obj, Poll another) {
+            return obj.getId().equals(another.getId())
+                    && obj.getPollItems().size() == another.getPollItems().size()
+                    && POLL_ITEMS_COMPARATOR.compare(obj.getPollItems(), another.getPollItems());
         }
     }
 
     private static class PollItemComparator implements EqualsComparator<PollItem> {
         @Override
-        public boolean compare(PollItem o1, PollItem o2) {
-            return (o1.getId().equals(o2.getId())
-                    && o1.getItemId().equals(o2.getItemId())
-                    && o1.getPoll().equals(o2.getPoll()));
+        public boolean compare(PollItem obj, PollItem another) {
+            return (obj.getId().equals(another.getId())
+                    && obj.getItemId().equals(another.getItemId())
+                    && obj.getPoll().equals(another.getPoll()));
         }
     }
 
@@ -194,10 +201,10 @@ public class PollTestData {
         private static final EqualsComparator<PollItem> POLL_ITEM_COMPARATOR = new PollItemComparator();
 
         @Override
-        public boolean compare(List<PollItem> o1, List<PollItem> o2) {
-            if (o1.size() != o2.size()) return false;
-            for (int i = 0; i < o1.size(); i++) {
-                if ( ! POLL_ITEM_COMPARATOR.compare(o1.get(i), o2.get(i))) {
+        public boolean compare(List<PollItem> obj, List<PollItem> another) {
+            if (obj.size() != another.size()) return false;
+            for (int i = 0; i < obj.size(); i++) {
+                if ( ! POLL_ITEM_COMPARATOR.compare(obj.get(i), another.get(i))) {
                     return false;
                 }
             }

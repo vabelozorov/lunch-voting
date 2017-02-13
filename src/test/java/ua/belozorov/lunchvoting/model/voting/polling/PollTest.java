@@ -3,19 +3,17 @@ package ua.belozorov.lunchvoting.model.voting.polling;
 import org.junit.Test;
 import ua.belozorov.lunchvoting.AbstractTest;
 import ua.belozorov.lunchvoting.exceptions.*;
-import ua.belozorov.lunchvoting.model.lunchplace.Dish;
 import ua.belozorov.lunchvoting.model.lunchplace.LunchPlace;
 import ua.belozorov.lunchvoting.model.lunchplace.LunchPlaceTestData;
 import ua.belozorov.lunchvoting.model.lunchplace.Menu;
 import ua.belozorov.lunchvoting.model.voting.polling.votedecisions.VotePolicyDecision;
 
-import java.time.LocalDate;
 import java.util.*;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static ua.belozorov.lunchvoting.testdata.UserTestData.GOD_ID;
-import static ua.belozorov.lunchvoting.testdata.UserTestData.VOTER_ID;
+import static ua.belozorov.lunchvoting.model.UserTestData.GOD_ID;
+import static ua.belozorov.lunchvoting.model.UserTestData.VOTER_ID;
 
 /**
  * <h2></h2>

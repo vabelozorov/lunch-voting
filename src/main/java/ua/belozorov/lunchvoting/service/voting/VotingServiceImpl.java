@@ -15,8 +15,6 @@ import ua.belozorov.lunchvoting.repository.voting.PollRepository;
 import ua.belozorov.lunchvoting.util.ExceptionUtils;
 
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Objects;
 
 import static java.util.Optional.ofNullable;
 
@@ -38,7 +36,7 @@ public final class VotingServiceImpl implements VotingService {
     @Override
     @Transactional
     public Vote vote(String voterId, String pollId, String pollItemId) {
-        ExceptionUtils.checkAllNotNull(voterId, pollId, pollItemId);
+        ExceptionUtils.checkParamsNotNull(voterId, pollId, pollItemId);
         Poll poll = ofNullable(pollRepository.getWithVotes(pollId))
                             .orElseThrow(() -> new NotFoundException(pollId, LunchPlacePoll.class));
 
@@ -57,7 +55,7 @@ public final class VotingServiceImpl implements VotingService {
 
     @Override
     public VotingResult<PollItem> getPollResult(String pollId) {
-        ExceptionUtils.checkAllNotNull(pollId);
+        ExceptionUtils.checkParamsNotNull(pollId);
 
         LunchPlacePoll poll = ofNullable(pollRepository.getPollAndPollItemsAndVotes(pollId)).
                 orElseThrow(() -> new NotFoundException(pollId, LunchPlacePoll.class));
@@ -67,7 +65,7 @@ public final class VotingServiceImpl implements VotingService {
 
     @Override
     public Collection<String> getVotedByVoter(String pollId, String voterId) {
-        ExceptionUtils.checkAllNotNull(pollId, voterId);
+        ExceptionUtils.checkParamsNotNull(pollId, voterId);
 
         return pollRepository.getVotedByVoter(pollId, voterId);
     }

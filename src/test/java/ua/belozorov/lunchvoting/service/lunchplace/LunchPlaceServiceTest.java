@@ -3,7 +3,7 @@ package ua.belozorov.lunchvoting.service.lunchplace;
 import org.hibernate.exception.ConstraintViolationException;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import ua.belozorov.lunchvoting.AuthorizedUser;
+import ua.belozorov.lunchvoting.model.AuthorizedUser;
 import ua.belozorov.lunchvoting.exceptions.NotFoundException;
 import ua.belozorov.lunchvoting.model.lunchplace.LunchPlace;
 import ua.belozorov.lunchvoting.repository.lunchplace.LunchPlaceRepository;
@@ -26,7 +26,7 @@ import static ua.belozorov.lunchvoting.MatcherUtils.matchByToString;
 import static ua.belozorov.lunchvoting.MatcherUtils.matchCollection;
 import static ua.belozorov.lunchvoting.MatcherUtils.matchSingle;
 import static ua.belozorov.lunchvoting.model.lunchplace.LunchPlaceTestData.*;
-import static ua.belozorov.lunchvoting.testdata.UserTestData.*;
+import static ua.belozorov.lunchvoting.model.UserTestData.*;
 
 /**
  * <h2></h2>
@@ -45,7 +45,7 @@ public class LunchPlaceServiceTest extends AbstractServiceTest {
     public void create() throws Exception {
         List<String> phones = Arrays.asList("0661234567", "0441234567", "0123456789", "1234567890");
         LunchPlaceTo to = new LunchPlaceTo(null, "New Place", "New Address", "New Description", phones);
-        String id = service.create(DtoIntoEntity.toLunchPlace(to, GOD_ID), GOD);
+        String id = service.create(DtoIntoEntity.toLunchPlace(to, GOD_ID), GOD).getId();
 
         phones = phones.stream().sorted().collect(Collectors.toList());
 

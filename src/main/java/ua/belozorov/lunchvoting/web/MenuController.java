@@ -1,17 +1,14 @@
 package ua.belozorov.lunchvoting.web;
 
-import com.monitorjbl.json.JsonResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import ua.belozorov.lunchvoting.AuthorizedUser;
-import ua.belozorov.lunchvoting.model.lunchplace.LunchPlace;
+import ua.belozorov.lunchvoting.model.AuthorizedUser;
 import ua.belozorov.lunchvoting.service.lunchplace.LunchPlaceService;
 import ua.belozorov.lunchvoting.to.MenuTo;
 
 import java.net.URI;
-import java.time.LocalDate;
 import java.util.*;
 
 /**

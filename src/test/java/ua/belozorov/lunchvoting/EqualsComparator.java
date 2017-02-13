@@ -6,5 +6,5 @@ package ua.belozorov.lunchvoting;
  * @author vabelozorov on 04.02.17.
  */
 public interface EqualsComparator<T> {
-    boolean compare(T obj1, T obj2);
+    boolean compare(T obj, T another);
 }

@@ -15,8 +15,8 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static ua.belozorov.lunchvoting.MatcherUtils.matchSingle;
 import static ua.belozorov.lunchvoting.model.voting.polling.VoteTestData.VOTE_COMPARATOR;
-import static ua.belozorov.lunchvoting.testdata.UserTestData.GOD_ID;
-import static ua.belozorov.lunchvoting.testdata.UserTestData.VOTER_ID;
+import static ua.belozorov.lunchvoting.model.UserTestData.GOD_ID;
+import static ua.belozorov.lunchvoting.model.UserTestData.VOTER_ID;
 
 
 /**

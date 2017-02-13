@@ -13,7 +13,8 @@ import java.util.Set;
  */
 public enum UserRole {
     VOTER((byte)1),
-    ADMIN((byte)2);
+    ADMIN((byte)2),
+    CREATOR((byte)4);
 
     private final byte id;
 

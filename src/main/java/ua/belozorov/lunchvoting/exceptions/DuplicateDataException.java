@@ -8,11 +8,11 @@ import ua.belozorov.lunchvoting.web.exceptionhandling.Code;
  *
  * @author vabelozorov on 07.02.17.
  */
-public class DuplicateEmailException extends RuntimeException implements ApplicationException{
+public class DuplicateDataException extends RuntimeException implements ApplicationException{
     private final Code code;
-    public DuplicateEmailException(@NonNls String message) {
+    public DuplicateDataException(@NonNls String message) {
         super(message);
-        this.code = Code.DUPLICATE_EMAIL;
+        this.code = Code.DUPLICATE_DATA;
     }
 
     public Code getCode() {

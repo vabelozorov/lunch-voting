@@ -2,15 +2,21 @@ package ua.belozorov.lunchvoting;
 
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
-import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
+import ua.belozorov.lunchvoting.model.lunchplace.AreaTestData;
 import ua.belozorov.lunchvoting.model.lunchplace.LunchPlaceTestData;
 import ua.belozorov.lunchvoting.model.voting.polling.PollTestData;
 import ua.belozorov.lunchvoting.model.voting.polling.VoteTestData;
-import ua.belozorov.lunchvoting.testdata.UserTestData;
+import ua.belozorov.lunchvoting.model.UserTestData;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.Function;
+import java.util.function.Supplier;
+
+import static org.junit.Assert.assertTrue;
 
 
 /**
@@ -26,9 +32,25 @@ public abstract class AbstractTest {
     protected final LunchPlaceTestData testPlaces = new LunchPlaceTestData();
     protected final PollTestData testPolls = new PollTestData(testPlaces);
     protected final VoteTestData testVotes = new VoteTestData(testPolls);
+    protected final AreaTestData testAreas= new AreaTestData(testPolls, testPlaces);
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
+    public <T> void  assertExceptionCount(Class<T> exClass, int count, Supplier... suppliers) {
+        List<T> exceptions = new ArrayList<>();
+        for(Supplier supplier : suppliers) {
+            try {
+                supplier.get();
+            } catch (Exception ex) {
+                if (exClass.isInstance(ex)) {
+                    exceptions.add((T)ex);
+                } else {
+                    throw ex;
+                }
+            }
+        }
+        assertTrue(exceptions.size() == count);
+    }
 
 }

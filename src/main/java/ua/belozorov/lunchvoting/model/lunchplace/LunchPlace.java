@@ -35,7 +35,7 @@ import java.util.*;
 )
 @Getter
 @DynamicUpdate
-public final class LunchPlace extends AbstractPersistableObject {
+public final class LunchPlace extends AbstractPersistableObject implements Comparable<LunchPlace> {
 
     @Column(name = "name", nullable = false)
     @NotBlank
@@ -127,6 +127,12 @@ public final class LunchPlace extends AbstractPersistableObject {
 
     public Menu createMenu(LocalDate effectiveDate, List<Dish> dishes) {
         return new Menu(effectiveDate, dishes, this);
+    }
+
+    @Override
+    public int compareTo(LunchPlace o) {
+        int r = this.name.compareTo(o.name);
+        return r != 0 ? r : this.id.compareTo(o.id);
     }
 
     public static class LunchPlaceBuilder {

@@ -1,6 +1,5 @@
 package ua.belozorov.lunchvoting.service.user;
 
-import com.vladmihalcea.sql.SQLStatementCountValidator;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -18,7 +17,7 @@ import static org.hamcrest.Matchers.contains;
 import static org.junit.Assert.*;
 import static ua.belozorov.lunchvoting.MatcherUtils.matchCollection;
 import static ua.belozorov.lunchvoting.MatcherUtils.matchSingle;
-import static ua.belozorov.lunchvoting.testdata.UserTestData.*;
+import static ua.belozorov.lunchvoting.model.UserTestData.*;
 
 /**
  * <h2></h2>
@@ -68,7 +67,7 @@ public class UserServiceTest extends AbstractServiceTest {
     @Test
     public void update() throws Exception {
         User updated = userService.get(VOTER_ID);
-        updated = User.builder(updated).password("newPassword").email("updated@email.com").build();
+        updated = updated.toBuilder().password("newPassword").email("updated@email.com").build();
 
         reset();
         userService.update(updated.getId(), updated.getName(), updated.getEmail(), updated.getPassword());
@@ -86,7 +85,7 @@ public class UserServiceTest extends AbstractServiceTest {
         User actual = userService.create(expected);
         assertInsertCount(1);
 
-        expected = User.builder(expected)
+        expected = expected.toBuilder()
                 .registeredDate(actual.getRegisteredDate())
                 .activated(true)
                 .build();
@@ -125,7 +124,7 @@ public class UserServiceTest extends AbstractServiceTest {
 
     @Test(expected = NotFoundException.class)
     public void updateNotExisting() {
-        User updated = User.builder(VOTER).id("NOT_EXISTING_ID").password("newPassword").email("updated@email.com").build();
+        User updated = VOTER.toBuilder().id("NOT_EXISTING_ID").password("newPassword").email("updated@email.com").build();
         userService.update(updated.getId(), updated.getName(), updated.getEmail(), updated.getPassword());
     }
 
@@ -136,7 +135,7 @@ public class UserServiceTest extends AbstractServiceTest {
 
     @Test(expected = DataIntegrityViolationException.class)
     public void createDuplicate() {
-        User duplicate = User.builder(VOTER).id("XXX").email("god@email.com").build();
+        User duplicate = VOTER.toBuilder().id("XXX").email("god@email.com").build();
         userService.create(duplicate);
     }
 }

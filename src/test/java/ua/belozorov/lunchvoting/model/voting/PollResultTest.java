@@ -2,16 +2,13 @@ package ua.belozorov.lunchvoting.model.voting;
 
 import org.junit.Test;
 import ua.belozorov.lunchvoting.AbstractTest;
-import ua.belozorov.lunchvoting.model.lunchplace.LunchPlace;
 import ua.belozorov.lunchvoting.model.voting.polling.PollItem;
 import ua.belozorov.lunchvoting.model.voting.polling.Vote;
 
-import java.time.LocalDate;
 import java.util.*;
 
 import static org.junit.Assert.assertTrue;
-import static ua.belozorov.lunchvoting.model.lunchplace.LunchPlaceTestData.*;
-import static ua.belozorov.lunchvoting.testdata.UserTestData.*;
+import static ua.belozorov.lunchvoting.model.UserTestData.*;
 
 /**
  * <h2></h2>

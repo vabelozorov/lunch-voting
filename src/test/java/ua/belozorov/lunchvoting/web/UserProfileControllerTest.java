@@ -14,8 +14,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static ua.belozorov.lunchvoting.testdata.UserTestData.VOTER;
-import static ua.belozorov.lunchvoting.testdata.UserTestData.VOTER_ID;
+import static ua.belozorov.lunchvoting.model.UserTestData.VOTER;
+import static ua.belozorov.lunchvoting.model.UserTestData.VOTER_ID;
 
 /**
  * <h2></h2>

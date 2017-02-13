@@ -6,7 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import ua.belozorov.lunchvoting.AuthorizedUser;
+import ua.belozorov.lunchvoting.model.AuthorizedUser;
 import ua.belozorov.lunchvoting.model.lunchplace.LunchPlace;
 import ua.belozorov.lunchvoting.service.lunchplace.LunchPlaceService;
 import ua.belozorov.lunchvoting.to.LunchPlaceTo;

@@ -9,6 +9,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.vladmihalcea.sql.SQLStatementCountValidator.*;
+
 /**
  * <h2></h2>
  *
@@ -28,5 +30,34 @@ public class MatcherUtils {
 
     public static <T> Matcher<T> matchSingle(T expected, EqualsComparator<T> comparator) {
         return new ModelMatcher<>(comparator, expected);
+    }
+
+    public static boolean equalsWithNulls(Object o1, Object o2) {
+        if (o1==o2) return true;
+        if ((o1==null)||(o2==null)) return false;
+        return o1.equals(o2);
+    }
+
+    public static void assertSql(int selects, int inserts, int updates, int deletes) {
+        assertSelectCount(selects);
+        assertInsertCount(inserts);
+        assertUpdateCount(updates);
+        assertDeleteCount(deletes);
+    }
+
+    public static void assertSelect(int count) {
+        assertSql(count, 0, 0, 0);
+    }
+
+    public static void assertInsert(int count) {
+        assertSql(0, count, 0, 0);
+    }
+
+    public static void assertUpdate(int count) {
+        assertSql(0, 0, count, 0);
+    }
+
+    public static void assertDelete(int count) {
+        assertSql(0, 0, 0, count);
     }
 }

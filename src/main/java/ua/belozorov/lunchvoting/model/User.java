@@ -2,12 +2,14 @@ package ua.belozorov.lunchvoting.model;
 
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Singular;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.hibernate.validator.constraints.Range;
 import ua.belozorov.lunchvoting.model.base.AbstractPersistableObject;
+import ua.belozorov.lunchvoting.model.lunchplace.EatingArea;
 import ua.belozorov.lunchvoting.util.RolesToIntegerConverter;
 
 import javax.persistence.*;
@@ -25,7 +27,7 @@ import java.util.Set;
 @Entity
 @Table(name = "users")
 @DynamicUpdate
-public class User extends AbstractPersistableObject {
+public final class User extends AbstractPersistableObject {
 
     @Column(name = "name", nullable = false)
     @NotEmpty
@@ -49,6 +51,9 @@ public class User extends AbstractPersistableObject {
     @Column(name = "activated", nullable = false)
     private final boolean activated;
 
+    @Column(name = "area_id")
+    private final String areaId;
+
     /**
      * Primarily for Hibernate. Constructs a User instance with default values. Providing {@code null} as an ID
      * will getByPollItem in the object retaining its auto-generated ID.
@@ -66,13 +71,12 @@ public class User extends AbstractPersistableObject {
      * @param password
      */
     public User(String id, String name, String email, String password) {
-        this(id, null, name, email, password,  new HashSet<>(Collections.singletonList(UserRole.VOTER)), LocalDateTime.now(), true);
+        this(id, null, name, email, password,  new HashSet<>(Collections.singletonList(UserRole.VOTER)), LocalDateTime.now(), true, null);
     }
 
-    @Builder
     public User(String id, String name, String email, String password, Set<UserRole> roles,
                 LocalDateTime registeredDate, boolean activated) {
-        this(id, null, name, email, password,roles, registeredDate, activated);
+        this(id, null, name, email, password,roles, registeredDate, activated, null);
     }
     /**
      * A constructor that accepts all available parameters
@@ -84,8 +88,9 @@ public class User extends AbstractPersistableObject {
      * @param registeredDate
      * @param activated
      */
-    public User(String id, Integer version, String name, String email, String password, Set<UserRole> roles,
-                LocalDateTime registeredDate, boolean activated) {
+    @Builder(toBuilder = true)
+    User(String id, Integer version, String name, String email, String password, Set<UserRole> roles,
+                LocalDateTime registeredDate, boolean activated, String areaId) {
         super(id, version);
         this.name = name;
         this.email = email;
@@ -93,10 +98,11 @@ public class User extends AbstractPersistableObject {
         this.roles = roles;
         this.registeredDate = registeredDate;
         this.activated = activated;
+        this.areaId = areaId;
     }
 
     public User setActivated(boolean activated) {
-        return builder(this).activated(activated).build();
+        return this.toBuilder().activated(activated).build();
     }
 
     @Override
@@ -112,40 +118,23 @@ public class User extends AbstractPersistableObject {
                 '}';
     }
 
-    public static UserBuilder builder(User user) {
-        return new UserBuilder(user);
-    }
-
-    public static UserBuilder builder() {
-        return new UserBuilder();
-    }
-
     public User setRoles(Set<UserRole> roles) {
-        return User.builder(this).roles(roles).build();
+        return this.toBuilder().roles(roles).build();
     }
 
-    public static class UserBuilder {
-        private String id, name, email, password;
-        private Integer version;
-        private Set<UserRole> roles;
-        private LocalDateTime registeredDate;
-        private boolean activated;
-
-        UserBuilder() { }
-
-        UserBuilder(User user) {
-            this.id = user.id;
-            this.version = user.version;
-            this.name = user.name;
-            this.email = user.email;
-            this.password = user.password;
-            this.roles = user.roles;
-            this.registeredDate = user.registeredDate;
-            this.activated = user.activated;
-        }
-
-        public User build() {
-            return new User(this.id, this.version, this.name, this.email, this.password, this.roles, this.registeredDate, this.activated);
-        }
+    public User addRole(UserRole role) {
+        Set<UserRole> roles = new HashSet<>(this.getRoles());
+        roles.add(role);
+        return this.toBuilder().roles(roles).build();
     }
+
+
+    public User assignAreaId(String id) {
+        return this.toBuilder().areaId(id).build();
+    }
+
+    public boolean belongsToArea() {
+        return this.areaId != null;
+    }
+
 }

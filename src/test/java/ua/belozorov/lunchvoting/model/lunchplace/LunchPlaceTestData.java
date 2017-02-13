@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static ua.belozorov.lunchvoting.AbstractTest.NOW_DATE;
-import static ua.belozorov.lunchvoting.testdata.UserTestData.*;
+import static ua.belozorov.lunchvoting.model.UserTestData.*;
 
 /**
  * <h2></h2>
@@ -128,6 +128,7 @@ public class LunchPlaceTestData {
           "places",
           Arrays.asList(
               new StringSqlColumn<>("id", LunchPlace::getId),
+              new StringSqlColumn<>("area_id", (lp) -> "AREA1_ID"),
               new StringSqlColumn<>("name", LunchPlace::getName),
               new StringSqlColumn<>("address", LunchPlace::getAddress),
               new StringSqlColumn<>("description", LunchPlace::getDescription),
@@ -154,23 +155,23 @@ public class LunchPlaceTestData {
     public static class LunchPlaceComparator implements EqualsComparator<LunchPlace> {
 
         @Override
-        public boolean compare(LunchPlace o1, LunchPlace o2) {
-            return o1.getId().equals(o2.getId())
-                    && o1.getName().equals(o2.getName())
-                    && o1.getDescription().equals(o2.getDescription())
-                    && new ArrayList<>(o1.getPhones()).equals(new ArrayList<>(o2.getPhones()))
-                    && o1.getAdminId().equals(o2.getAdminId());
+        public boolean compare(LunchPlace obj, LunchPlace another) {
+            return obj.getId().equals(another.getId())
+                    && obj.getName().equals(another.getName())
+                    && obj.getDescription().equals(another.getDescription())
+                    && new ArrayList<>(obj.getPhones()).equals(new ArrayList<>(another.getPhones()))
+                    && obj.getAdminId().equals(another.getAdminId());
         }
     }
 
     public static class WebLunchPlaceComparator implements EqualsComparator<LunchPlace> {
 
         @Override
-        public boolean compare(LunchPlace o1, LunchPlace o2) {
-            return o1.getId().equals(o2.getId())
-                    && o1.getName().equals(o2.getName())
-                    && o1.getDescription().equals(o2.getDescription())
-                    && new ArrayList<>(o1.getPhones()).equals(new ArrayList<>(o2.getPhones()));
+        public boolean compare(LunchPlace obj, LunchPlace another) {
+            return obj.getId().equals(another.getId())
+                    && obj.getName().equals(another.getName())
+                    && obj.getDescription().equals(another.getDescription())
+                    && new ArrayList<>(obj.getPhones()).equals(new ArrayList<>(another.getPhones()));
         }
     }
 

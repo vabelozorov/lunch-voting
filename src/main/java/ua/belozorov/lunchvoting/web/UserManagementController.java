@@ -9,7 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import ua.belozorov.lunchvoting.exceptions.DuplicateEmailException;
+import ua.belozorov.lunchvoting.exceptions.DuplicateDataException;
 import ua.belozorov.lunchvoting.model.User;
 import ua.belozorov.lunchvoting.service.user.UserService;
 import ua.belozorov.lunchvoting.to.UserTo;
@@ -50,7 +50,7 @@ public final class UserManagementController {
      *      <li>URL to access the created object in HTTP Location Header</li>
      *      <li>ID of created object in JSON format {"id" : <ID>}</li>
      *  </ul>
-     *  @throws DuplicateEmailException if a provided email already exists in the database
+     *  @throws DuplicateDataException if a provided email already exists in the database
      */
     @PostMapping
     public ResponseEntity create(@RequestBody @Validated(UserTo.Create.class) UserTo userTo) {
@@ -58,7 +58,7 @@ public final class UserManagementController {
         try {
             created = userService.create(new User(null, userTo.getName(), userTo.getEmail(), userTo.getPassword()));
         } catch (DataIntegrityViolationException e) {
-            throw new DuplicateEmailException(messageSource.getMessage(
+            throw new DuplicateDataException(messageSource.getMessage(
                     "error.duplicate_email",
                     new Object[]{userTo.getEmail()},
                     LocaleContextHolder.getLocale()

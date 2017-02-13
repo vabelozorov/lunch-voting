@@ -2,8 +2,6 @@ package ua.belozorov.lunchvoting.exceptions;
 
 import ua.belozorov.lunchvoting.model.voting.polling.VoteIntention;
 
-import static javafx.scene.input.KeyCode.X;
-
 /**
  * <h2></h2>
  *

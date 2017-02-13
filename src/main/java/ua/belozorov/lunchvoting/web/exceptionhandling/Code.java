@@ -6,7 +6,8 @@ package ua.belozorov.lunchvoting.web.exceptionhandling;
  * @author vabelozorov on 07.02.17.
  */
 public enum  Code {
-    DUPLICATE_EMAIL,
+    DUPLICATE_DATA,
     PARAMS_VALIDATION_FAILED,
     ENTITY_NOT_FOUND,
+    MULTIPLE_AREA_MEMBERSHIP
 }

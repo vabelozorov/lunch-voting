@@ -10,10 +10,14 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.PlatformTransactionManager;
+import ua.belozorov.lunchvoting.model.AuthorizedUser;
+import ua.belozorov.lunchvoting.model.User;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.sql.DataSource;
+
+import static ua.belozorov.lunchvoting.model.UserTestData.GOD_ID;
 
 /**
  * <h2>Base class for all tests that require Spring framework components</h2>
@@ -34,6 +38,7 @@ public abstract class AbstractSpringTest extends AbstractTest {
     private DataSource dataSource;
 
     private final ResourceDatabasePopulator populator = new ResourceDatabasePopulator(
+            testAreas.getAreaSqlResource(),
             testUsers.getUserSqlResource(),
             testPlaces.getLunchPlaceSqlResource(),
             testPlaces.getMenuSqlResource(),
@@ -45,5 +50,6 @@ public abstract class AbstractSpringTest extends AbstractTest {
     @Before
     public void beforeTest() {
         DatabasePopulatorUtils.execute(populator, dataSource);
+        AuthorizedUser.authorize(em.find(User.class, GOD_ID));
     }
 }
