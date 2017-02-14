@@ -55,8 +55,7 @@ public final class User extends AbstractPersistableObject {
     private final String areaId;
 
     /**
-     * Primarily for Hibernate. Constructs a User instance with default values. Providing {@code null} as an ID
-     * will getByPollItem in the object retaining its auto-generated ID.
+     * Primarily for Hibernate. Constructs a User instance with default values.
      */
     protected User() {
         this(null, null, null, null);
@@ -71,7 +70,8 @@ public final class User extends AbstractPersistableObject {
      * @param password
      */
     public User(String id, String name, String email, String password) {
-        this(id, null, name, email, password,  new HashSet<>(Collections.singletonList(UserRole.VOTER)), LocalDateTime.now(), true, null);
+        this(id, null, name, email, password,  new HashSet<>(Collections.singletonList(UserRole.VOTER)),
+                LocalDateTime.now(), true, null);
     }
 
     public User(String id, String name, String email, String password, Set<UserRole> roles,
@@ -115,6 +115,7 @@ public final class User extends AbstractPersistableObject {
                 ", roles=" + roles +
                 ", registeredDate=" + registeredDate +
                 ", activated=" + activated +
+                ", areaId=" + areaId +
                 '}';
     }
 

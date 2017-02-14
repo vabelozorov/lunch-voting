@@ -1,44 +1,73 @@
 package ua.belozorov.lunchvoting.service.user;
 
-import org.springframework.transaction.annotation.Transactional;
 import ua.belozorov.lunchvoting.model.User;
 import ua.belozorov.lunchvoting.model.UserRole;
 
 import java.util.Collection;
 import java.util.Set;
+import java.util.function.Supplier;
 
 /**
  * <h2></h2>
  *
  * @author vabelozorov on 15.11.16.
  */
-//TODO save() and update() should not return values
 public interface UserService {
 
-    User get(String id);
-
-    Collection<User> getAll();
-
-    void delete(String id);
+    /**
+     * Saves a new User instance to a persistent storage
+     * @param user non-null user instance
+     * @return saved user object
+     * @throws org.springframework.dao.DataIntegrityViolationException if User#email already exists
+     */
+    User create(User user);
 
     /**
      * Updates a user info with ID {@code id}. All parameters must be provided and will replace existing values
+     *
+     * @param areaId EatingArea#id which the user to be updated belongs to
      * @param id a existing user ID
      * @param name non-null, not-empty username
      * @param email non-null, not-empty user email
      * @param password non-null, not-empty user password
+     * @throws ua.belozorov.lunchvoting.exceptions.NotFoundException if there is no entity with such ID
+     * in the specified area
      */
-    void update(String id, String name, String email, String password);
+    void updateMainInfo(String areaId, String id, String name, String email, String password);
 
     /**
-     * Saves a new User instance where an ID, an email, a password and a name are provided by {@code user}
-     * parameter and other values are set to default values
-     * @param user non-null user instance
-     * @return
+     * Updates a User entity by merging a given instance over its persisted version
+     * @param areaId
+     * @param user User instance which will override an existing entity
+     * @throws ua.belozorov.lunchvoting.exceptions.NotFoundException if there is no entity with such ID
+     * in the specified area
      */
-    User create(User user);
+    void update(String areaId, User user);
 
-    void activate(String id, boolean isActive);
+    /**
+     * Retrieves User entity from persistent storage.
+     * This method is intended to be used for an administrative management as it constrains the result
+     * by specifying EatingArea#id
+     * @param areaId existing non-null EatingArea#id
+     * @param userId existing non-null User#id
+     * @return User entity
+     * @throws ua.belozorov.lunchvoting.exceptions.NotFoundException if there is no entity with such ID
+     * in the specified area
+     */
+    User get(String areaId, String userId);
 
-    void setRoles(String id, Set<UserRole> roles);
+    Collection<User> getAll(String areaId);
+
+    void delete(String areaId, String id);
+
+    void activate(String areaId, String userId, boolean isActive);
+
+    void setRoles(String areaId, String userId, Set<UserRole> roles);
+
+    /**
+     * Returns result of executing {@code supplier} after flushing and clearing a persistent context
+     * @param supplier a method to execute after persistent context has been cleared.
+     * @return User entity as a result of executing the {@code supplier}
+     */
+    User getFresh(Supplier<User> supplier);
 }

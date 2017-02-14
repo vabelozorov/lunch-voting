@@ -8,9 +8,12 @@ import ua.belozorov.FieldMappingEntry;
 import ua.belozorov.SimpleObjectToMapConverter;
 import ua.belozorov.lunchvoting.exceptions.NotFoundException;
 import ua.belozorov.lunchvoting.model.AuthorizedUser;
+import ua.belozorov.lunchvoting.model.User;
 import ua.belozorov.lunchvoting.model.lunchplace.AreaTestData;
 import ua.belozorov.lunchvoting.model.lunchplace.EatingArea;
 import ua.belozorov.lunchvoting.service.lunchplace.EatingAreaService;
+import ua.belozorov.lunchvoting.service.user.UserProfileService;
+import ua.belozorov.lunchvoting.to.UserTo;
 import ua.belozorov.lunchvoting.util.ControllerUtils;
 import ua.belozorov.lunchvoting.web.exceptionhandling.Code;
 import ua.belozorov.lunchvoting.web.exceptionhandling.ErrorInfo;
@@ -36,6 +39,9 @@ public class EatingAreaControllerTest extends AbstractControllerTest {
     @Autowired
     private EatingAreaService areaService;
 
+    @Autowired
+    private UserProfileService profileService;
+
     @Test
     public void testCreate() throws Exception {
         AuthorizedUser.authorize(ALIEN_USER1);
@@ -51,6 +57,47 @@ public class EatingAreaControllerTest extends AbstractControllerTest {
         assertJson(expected, mvcResult.getResponse().getContentAsString());
 
         assertNotNull(areaService.getArea(id));
+    }
+
+    @Test
+    public void testCreateUserInArea() throws Exception {
+        String areaId = testAreas.getFirstAreaId();
+        User newUser = new User(null, "Name", "new@meil.com", "newpassword").assignAreaId(areaId);
+        MvcResult mvcResult = mockMvc.perform(post(REST_URL + "/{id}/members", areaId)
+                    .content(jsonUtils.toJson(newUser))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andReturn();
+        String location = jsonUtils.locationFromMvcResult(mvcResult);
+        String id = getCreatedId(location);
+
+        mockMvc.perform(get(location)).andExpect(status().isOk());
+
+        String expected = jsonUtils.toJson(ControllerUtils.toMap("id", id));
+        assertJson(expected, mvcResult.getResponse().getContentAsString());
+
+        assertEquals(profileService.get(id).getAreaId(), areaId);
+    }
+
+    @Test
+    public void e409AndMessageOnCreateWithDuplicateEmail() throws Exception {
+        UserTo userTo = new UserTo("New User", "god@email.com", "strongPassword");
+        MvcResult result = mockMvc
+                .perform(post(REST_URL + "/{id}/members", testAreas.getFirstAreaId())
+                        .content(jsonUtils.toJson(userTo))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isConflict())
+                .andReturn();
+        ErrorInfo errorInfo = new ErrorInfo(
+                result.getRequest().getRequestURL(),
+                Code.DUPLICATE_DATA,
+                "Email god@email.com already exists"
+        );
+        assertJson(
+                jsonUtils.toJson(errorInfo),
+                result.getResponse().getContentAsString()
+        );
     }
 
     @Test

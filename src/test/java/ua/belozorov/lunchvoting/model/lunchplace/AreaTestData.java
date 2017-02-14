@@ -41,10 +41,11 @@ public final class AreaTestData {
     private final LocalDateTime firstAreaDate;
 
     public AreaTestData(PollTestData pollTestData, LunchPlaceTestData placeTestData) {
-        this.firstArea = new EatingArea("AREA1_ID", "AREA_NAME", GOD).toBuilder()
+        this.firstArea = new EatingArea("AREA1_ID", "AREA_NAME").toBuilder()
                 .places(new HashSet<>(placeTestData.getPlaces()))
                 .polls(pollTestData.getAllPolls())
                 .users(ALL_USERS)
+                .user(GOD)
                 .build();
         this.firstAreaName = firstArea.getName();
         this.firstAreaId = firstArea.getId();

@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
 import ua.belozorov.lunchvoting.model.User;
-import ua.belozorov.lunchvoting.service.user.UserService;
+import ua.belozorov.lunchvoting.service.user.UserProfileService;
 import ua.belozorov.lunchvoting.to.UserTo;
 import ua.belozorov.lunchvoting.util.ControllerUtils;
 
@@ -26,7 +26,7 @@ public class UserProfileControllerTest extends AbstractControllerTest {
     public static final String REST_URL = UserProfileController.REST_URL;
 
     @Autowired
-    private UserService userService;
+    private UserProfileService profileService;
 
     @Test
     public void testRegister() throws Exception {
@@ -59,7 +59,7 @@ public class UserProfileControllerTest extends AbstractControllerTest {
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
 
-        User user = userService.get(VOTER_ID);
+        User user = profileService.get(VOTER_ID);
 
         assertEquals(userTo.getPassword(), user.getPassword());
         assertEquals(userTo.getEmail(), user.getEmail());

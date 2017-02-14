@@ -11,6 +11,7 @@ import ua.belozorov.lunchvoting.util.ExceptionUtils;
 
 import java.util.Collection;
 import java.util.Set;
+import java.util.function.Supplier;
 
 import static java.util.Optional.ofNullable;
 
@@ -21,41 +22,13 @@ import static java.util.Optional.ofNullable;
  */
 @Service
 @Transactional(readOnly = true)
-public class UserServiceImpl implements UserService {
+public final class UserServiceImpl implements UserService {
+
+    private final UserRepository userRepository;
 
     @Autowired
-    private UserRepository userRepository;
-
-    @Override
-    public User get(String id) {
-        return ofNullable(userRepository.get(id))
-                .orElseThrow(() -> new NotFoundException(id, User.class));
-    }
-
-    @Override
-    public Collection<User> getAll() {
-        return userRepository.getAll();
-    }
-
-    @Override
-    @Transactional
-    public void delete(String id) {
-        if ( ! userRepository.delete(id)) {
-            throw new NotFoundException(id, User.class);
-        }
-    }
-
-    @Override
-    @Transactional
-    public void update(String id, String name, String email, String password) {
-        ExceptionUtils.checkParamsNotNull(id, name, email, password);
-
-        User persistedUser = userRepository.get(id);
-        if (persistedUser == null) {
-            throw new NotFoundException(id, User.class);
-        }
-        User updatedUser = persistedUser.toBuilder().name(name).email(email).password(password).build();
-        userRepository.update(updatedUser);
+    public UserServiceImpl(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -67,17 +40,66 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void activate(String id, boolean isActive) {
-        User user = ofNullable(userRepository.get(id))
-                .orElseThrow(() -> new NotFoundException(id, User.class));
+    public void update(String areaId, User user) {
+        ExceptionUtils.checkParamsNotNull(areaId, user);
+
+        if (userRepository.get(areaId, user.getId()) == null) {
+            throw new NotFoundException(user.getId(), User.class);
+        }
+        userRepository.update(user);
+    }
+
+    @Override
+    @Transactional
+    public void updateMainInfo(String areaId, String id, String name, String email, String password) {
+        ExceptionUtils.checkParamsNotNull(areaId, id, name, email, password);
+
+        User persistedUser = this.get(areaId, id);
+        User updatedUser = persistedUser.toBuilder().name(name).email(email).password(password).build();
+        userRepository.update(updatedUser);
+    }
+
+
+    @Override
+    public User get(String areaId, String userId) {
+        ExceptionUtils.checkParamsNotNull(areaId, userId);
+
+        return ofNullable(userRepository.get(areaId, userId))
+                .orElseThrow(() -> new NotFoundException(userId, User.class));
+    }
+
+    @Override
+    public Collection<User> getAll(String areaId) {
+        ExceptionUtils.checkParamsNotNull(areaId);
+
+        return userRepository.getAll(areaId);
+    }
+
+    @Override
+    @Transactional
+    public void delete(String areaId, String id) {
+        if ( ! userRepository.delete(areaId, id)) {
+            throw new NotFoundException(id, User.class);
+        }
+    }
+
+    @Override
+    @Transactional
+    public void activate(String areaId, String userId, boolean isActive) {
+        User user = this.get(areaId, userId);
         userRepository.update(user.setActivated(isActive));
     }
 
     @Override
     @Transactional
-    public void setRoles(String id, Set<UserRole> roles) {
-        User user = ofNullable(userRepository.get(id))
-                .orElseThrow(() -> new NotFoundException(id, User.class));
+    public void setRoles(String areaId, String userId, Set<UserRole> roles) {
+        User user = this.get(areaId, userId);
         userRepository.update(user.setRoles(roles));
+    }
+
+    @Override
+    public User getFresh(Supplier<User> supplier) {
+        this.userRepository.flushAndClear();
+        return supplier.get();
     }
 }

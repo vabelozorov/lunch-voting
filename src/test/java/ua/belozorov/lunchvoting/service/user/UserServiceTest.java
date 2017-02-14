@@ -4,6 +4,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import ua.belozorov.lunchvoting.exceptions.NotFoundException;
+import ua.belozorov.lunchvoting.model.AuthorizedUser;
 import ua.belozorov.lunchvoting.model.User;
 import ua.belozorov.lunchvoting.model.UserRole;
 import ua.belozorov.lunchvoting.service.AbstractServiceTest;
@@ -29,56 +30,14 @@ public class UserServiceTest extends AbstractServiceTest {
     @Autowired
     private UserService userService;
 
-    @Test
-    public void get() throws Exception {
-        reset();
-        User actual = userService.get(VOTER_ID);
-        assertSelectCount(1);
-        assertThat(actual, matchSingle(VOTER, USER_COMPARATOR));
+    private final String areaId;
+
+    public UserServiceTest() {
+        this.areaId = testAreas.getFirstAreaId();
     }
 
     @Test
-    public void getAll() throws Exception {
-        reset();
-        Collection<User> users = userService.getAll();
-        assertSelectCount(1);
-        assertThat(
-                ALL_USERS,
-                contains(matchCollection(users, USER_COMPARATOR))
-        );
-    }
-
-    @Test
-    public void delete() throws Exception {
-        reset();
-        userService.delete(ADMIN_ID);
-        assertUpdateCount(2); // Update to null in Vote and LunchPlace entities
-        assertDeleteCount(1);
-
-        Collection<User> users = userService.getAll();
-        assertThat(
-            ALL_USERS.stream()
-                    .filter(u -> !u.getId().equals(ADMIN_ID))
-                    .collect(Collectors.toList()),
-            contains(matchCollection(users, USER_COMPARATOR))
-        );
-    }
-
-    @Test
-    public void update() throws Exception {
-        User updated = userService.get(VOTER_ID);
-        updated = updated.toBuilder().password("newPassword").email("updated@email.com").build();
-
-        reset();
-        userService.update(updated.getId(), updated.getName(), updated.getEmail(), updated.getPassword());
-        assertSelectCount(1);
-        assertUpdateCount(1);
-
-        assertThat(userService.get(VOTER_ID), matchSingle(updated, USER_COMPARATOR));
-    }
-
-    @Test
-    public void create() throws Exception {
+    public void createWithoutArea() throws Exception {
         User expected = new User("NEW_USER_ID", "New User", "new@email.com", "strongPassword");
 
         reset();
@@ -93,13 +52,61 @@ public class UserServiceTest extends AbstractServiceTest {
     }
 
     @Test
-    public void activate() throws Exception {
+    public void get() throws Exception {
         reset();
-        userService.activate(VOTER_ID, false);
+        User actual = userService.get(areaId, VOTER_ID);
+        assertSelectCount(1);
+        assertThat(actual, matchSingle(VOTER, USER_COMPARATOR));
+    }
+
+    @Test
+    public void getAll() throws Exception {
+        reset();
+        Collection<User> users = userService.getAll(AuthorizedUser.get().getAreaId());
+        assertSelectCount(1);
+        assertThat(
+                ALL_USERS,
+                contains(matchCollection(users, USER_COMPARATOR))
+        );
+    }
+
+    @Test
+    public void delete() throws Exception {
+        reset();
+        userService.delete(areaId, ADMIN_ID);
+        assertUpdateCount(1); // Update to null in LunchPlace entities
+        assertDeleteCount(1);
+
+        Collection<User> users = userService.getAll(AuthorizedUser.get().getAreaId());
+        assertThat(
+            ALL_USERS.stream()
+                    .filter(u -> !u.getId().equals(ADMIN_ID))
+                    .collect(Collectors.toList()),
+            contains(matchCollection(users, USER_COMPARATOR))
+        );
+    }
+
+    @Test
+    public void update() throws Exception {
+        User updated = userService.get(areaId, VOTER_ID);
+        updated = updated.toBuilder().password("newPassword").email("updated@email.com").build();
+
+        reset();
+        userService.updateMainInfo(areaId, updated.getId(), updated.getName(), updated.getEmail(), updated.getPassword());
         assertSelectCount(1);
         assertUpdateCount(1);
 
-        assertFalse(userService.get(VOTER_ID).isActivated());
+        assertThat(userService.get(areaId, VOTER_ID), matchSingle(updated, USER_COMPARATOR));
+    }
+
+    @Test
+    public void activate() throws Exception {
+        reset();
+        userService.activate(areaId, VOTER_ID, false);
+        assertSelectCount(1);
+        assertUpdateCount(1);
+
+        assertFalse(userService.get(areaId, VOTER_ID).isActivated());
     }
 
     @Test
@@ -109,28 +116,28 @@ public class UserServiceTest extends AbstractServiceTest {
         expectedRoles.add(UserRole.ADMIN);
 
         reset();
-        userService.setRoles(VOTER_ID, expectedRoles);
+        userService.setRoles(areaId, VOTER_ID, expectedRoles);
         assertSelectCount(1);
         assertUpdateCount(1);
 
-        assertEquals(userService.get(VOTER_ID).getRoles(), expectedRoles);
+        assertEquals(userService.get(areaId, VOTER_ID).getRoles(), expectedRoles);
     }
 
 
     @Test(expected = NotFoundException.class)
     public void getNotExisting() {
-        userService.get("NotExistingId");
+        userService.get(areaId, "NotExistingId");
     }
 
     @Test(expected = NotFoundException.class)
     public void updateNotExisting() {
         User updated = VOTER.toBuilder().id("NOT_EXISTING_ID").password("newPassword").email("updated@email.com").build();
-        userService.update(updated.getId(), updated.getName(), updated.getEmail(), updated.getPassword());
+        userService.updateMainInfo(areaId, updated.getId(), updated.getName(), updated.getEmail(), updated.getPassword());
     }
 
     @Test(expected = NotFoundException.class)
     public void deleteNotExisting() {
-        userService.delete("NotExistingId");
+        userService.delete(areaId, "NotExistingId");
     }
 
     @Test(expected = DataIntegrityViolationException.class)

@@ -92,7 +92,7 @@ CREATE TABLE IF NOT EXISTS votes (
   poll_id VARCHAR(36) NOT NULL,
   item_id VARCHAR(36),
   vote_time TIMESTAMP NOT NULL,
-  FOREIGN KEY (voter_id) REFERENCES users(id),
+  FOREIGN KEY (voter_id) REFERENCES users(id) ON DELETE SET NULL,
   FOREIGN KEY (poll_id) REFERENCES polls(id) ON DELETE CASCADE,
   FOREIGN KEY (item_id) REFERENCES poll_items(id)
 );

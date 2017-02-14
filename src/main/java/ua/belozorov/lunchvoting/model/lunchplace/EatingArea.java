@@ -18,6 +18,8 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.*;
 
+import static java.util.Optional.ofNullable;
+
 /**
  * <h2></h2>
  *
@@ -60,14 +62,14 @@ public final class EatingArea extends AbstractPersistableObject {
         this.created = null;
     }
 
-    public EatingArea(String name, User creator) {
-        this(null, name, creator);
+    public EatingArea(String name) {
+        this(null, name);
     }
 
-    public EatingArea(String id, String name, User creator) {
+    public EatingArea(String id, String name) {
         super(id, null);
         this.name = name;
-        this.users = new HashSet<>(Collections.singleton(creator));
+        this.users = new HashSet<>();
         this.places = new HashSet<>();
         this.polls = new HashSet<>();
         this.created = LocalDateTime.now().withNano(0);
@@ -88,8 +90,11 @@ public final class EatingArea extends AbstractPersistableObject {
         return this.toBuilder().name(name).build();
     }
 
-    public EatingArea join(JoinAreaRequest request) {
-        return this.toBuilder().user(request.getRequester()).build();
+    public EatingArea addMember(User member) {
+        ofNullable(member.getAreaId())
+                .filter(this.id::equals)
+                .orElseThrow(() -> new IllegalStateException("Area member without ID or ID is null"));
+        return this.toBuilder().user(member).build();
     }
 
     public Set<User> getUsers() {

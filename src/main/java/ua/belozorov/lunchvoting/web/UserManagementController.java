@@ -2,23 +2,17 @@ package ua.belozorov.lunchvoting.web;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
-import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import ua.belozorov.lunchvoting.exceptions.DuplicateDataException;
+import ua.belozorov.lunchvoting.model.AuthorizedUser;
 import ua.belozorov.lunchvoting.model.User;
 import ua.belozorov.lunchvoting.service.user.UserService;
 import ua.belozorov.lunchvoting.to.UserTo;
 
-import java.net.URI;
 import java.util.Collection;
 import java.util.stream.Collectors;
-
-import static ua.belozorov.lunchvoting.util.ControllerUtils.toMap;
 
 /**
  * <h2>A controller for administering users</h2>
@@ -28,7 +22,7 @@ import static ua.belozorov.lunchvoting.util.ControllerUtils.toMap;
 @RestController
 @RequestMapping(UserManagementController.REST_URL)
 public final class UserManagementController {
-    static final String REST_URL = "/api/usermgmt";
+    static final String REST_URL = "/api/areas/{id}/members";
 
     private final UserService userService;
     private final MessageSource messageSource;
@@ -38,35 +32,6 @@ public final class UserManagementController {
                                     MessageSource messageSource) {
         this.userService = userService;
         this.messageSource = messageSource;
-    }
-
-    /**
-     * Creates a new User object via a HTTP POST request. Three non-empty parameters must be present in the request:
-     * {@code name, password, email}. Other parameters are ignored.
-     * @param userTo represents request parameters and must contain non-empty {@code name, password, email} fields
-     * @return ResponseEntity instance with the following values upon successful completion of the request:
-     *  <ul>
-     *      <li>HTTP Status 201 Created </li>
-     *      <li>URL to access the created object in HTTP Location Header</li>
-     *      <li>ID of created object in JSON format {"id" : <ID>}</li>
-     *  </ul>
-     *  @throws DuplicateDataException if a provided email already exists in the database
-     */
-    @PostMapping
-    public ResponseEntity create(@RequestBody @Validated(UserTo.Create.class) UserTo userTo) {
-        User created;
-        try {
-            created = userService.create(new User(null, userTo.getName(), userTo.getEmail(), userTo.getPassword()));
-        } catch (DataIntegrityViolationException e) {
-            throw new DuplicateDataException(messageSource.getMessage(
-                    "error.duplicate_email",
-                    new Object[]{userTo.getEmail()},
-                    LocaleContextHolder.getLocale()
-            ));
-        }
-        URI uri = ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path(REST_URL + "/{id}").buildAndExpand(created.getId()).toUri();
-        return ResponseEntity.created(uri).body(toMap("id", created.getId()));
     }
 
     /**
@@ -80,7 +45,8 @@ public final class UserManagementController {
      */
     @PutMapping
     public ResponseEntity update(@RequestBody @Validated(UserTo.Update.class)UserTo userTo) {
-        userService.update(userTo.getId(), userTo.getName(), userTo.getEmail(), userTo.getPassword());
+        String areaId = AuthorizedUser.get().getAreaId();
+        userService.updateMainInfo(areaId, userTo.getId(), userTo.getName(), userTo.getEmail(), userTo.getPassword());
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
@@ -96,7 +62,7 @@ public final class UserManagementController {
      */
     @GetMapping("/{id}")
     public ResponseEntity<UserTo> get(@PathVariable String id) {
-        User user = userService.get(id);
+        User user = userService.get(AuthorizedUser.get().getAreaId(), id);
         return new ResponseEntity<>(new UserTo(user), HttpStatus.OK);
     }
 
@@ -111,7 +77,7 @@ public final class UserManagementController {
      */
     @GetMapping
     public ResponseEntity<Collection<UserTo>> getAll() {
-        Collection<User> users = userService.getAll();
+        Collection<User> users = userService.getAll(AuthorizedUser.get().getAreaId());
         Collection<UserTo> userTos = users.stream()
                 .map(UserTo::new)
                 .collect(Collectors.toList());
@@ -127,7 +93,7 @@ public final class UserManagementController {
      *  </ul>     */
     @DeleteMapping("/{id}")
     public ResponseEntity delete(@PathVariable String id) {
-        userService.delete(id);
+        userService.delete(AuthorizedUser.get().getAreaId(), id);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
@@ -145,7 +111,7 @@ public final class UserManagementController {
      */
     @PutMapping("/activate")
     public ResponseEntity activate(@RequestBody @Validated(UserTo.Activate.class) UserTo userTo) {
-        userService.activate(userTo.getId(), userTo.isActivated());
+        userService.activate(AuthorizedUser.get().getAreaId(), userTo.getId(), userTo.isActivated());
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
@@ -163,7 +129,7 @@ public final class UserManagementController {
      */
     @PutMapping("/roles")
     public ResponseEntity setRoles(@RequestBody @Validated(UserTo.Roles.class) UserTo userTo) {
-        userService.setRoles(userTo.getId(), userTo.getRoles());
+        userService.setRoles(AuthorizedUser.get().getAreaId(), userTo.getId(), userTo.getRoles());
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 }

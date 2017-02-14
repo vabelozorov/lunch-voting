@@ -5,14 +5,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import ua.belozorov.lunchvoting.exceptions.DuplicateDataException;
 import ua.belozorov.lunchvoting.model.AuthorizedUser;
+import ua.belozorov.lunchvoting.model.User;
 import ua.belozorov.lunchvoting.model.lunchplace.EatingArea;
 import ua.belozorov.lunchvoting.service.lunchplace.EatingAreaService;
 import ua.belozorov.lunchvoting.to.AreaTo;
+import ua.belozorov.lunchvoting.to.UserTo;
 import ua.belozorov.lunchvoting.util.ExceptionUtils;
 
 import java.net.URI;
@@ -60,6 +64,24 @@ public class EatingAreaController {
         URI uri = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path("{base}/{id}").buildAndExpand(REST_URL, area.getId()).toUri();
         return ResponseEntity.created(uri).body(toMap("id", area.getId()));
+    }
+
+    @PostMapping("/{id}/members")
+    public ResponseEntity createUserInArea(@PathVariable("id") String areaId,
+                                           @RequestBody @Validated(UserTo.Create.class) UserTo userTo) {
+        User newUser = new User(null, userTo.getName(), userTo.getEmail(), userTo.getPassword());
+        User created = ExceptionUtils.unwrapException(
+                () -> areaService.createUserInArea(areaId, newUser),
+                ConstraintViolationException.class,
+                new DuplicateDataException(messageSource.getMessage(
+                        "error.duplicate_email",
+                        new Object[]{userTo.getEmail()},
+                        LocaleContextHolder.getLocale()
+                ))
+        );
+        URI uri = ServletUriComponentsBuilder.fromCurrentContextPath()
+            .path(UserManagementController.REST_URL + "/{id}").buildAndExpand(created.getId(), created.getId()).toUri();
+        return ResponseEntity.created(uri).body(toMap("id", created.getId()));
     }
 
     @PutMapping

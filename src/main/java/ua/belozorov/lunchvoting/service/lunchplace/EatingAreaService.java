@@ -16,6 +16,16 @@ public interface EatingAreaService {
 
     EatingArea create(String name, User user);
 
+    /**
+     * Saves a new User instance and assigns it to Eating area signified by {@code areaId} parameter.
+     * User's ID, email, password and name are provided by {@code user} parameter
+     * and other values are set to default values
+     * @param user non-null user instance
+     * @param areaId non-null ID of existing EatingArea entity
+     * @return persisted User instance
+     */
+    User createUserInArea(String areaId, User user);
+
     void update(String name, User user);
 
     EatingArea getArea(String areaId);
@@ -41,4 +51,12 @@ public interface EatingAreaService {
     void cancelJoinRequest(User requester, String requestId);
 
     void rejectJoinRequest(User approver, String requestId);
+
+    /**
+     * Adds already persisted User {@code user} to an EatingArea {@code area}
+     * EatingArea#users collection must be initialized
+     * @param areaId persisted area
+     * @param member persisted User entity
+     */
+    void addMember(String areaId, User member);
 }

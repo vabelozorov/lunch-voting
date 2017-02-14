@@ -1,7 +1,10 @@
 package ua.belozorov.lunchvoting.repository;
 
+import ua.belozorov.lunchvoting.util.Pair;
+
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
 import java.util.Collection;
 import java.util.List;
 
@@ -24,4 +27,26 @@ public abstract class BaseRepository {
     public <T> T nullOrFirst(List<T> collection) {
         return collection.isEmpty() ? null : collection.get(0);
     }
+
+    public void flushAndClear() {
+        em.flush();
+        em.clear();
+    }
+
+    public <T> T regularGet(String sql, Class<T> returnType, Pair<String, Object>... pairs) {
+        TypedQuery<T> query = em.createQuery(sql, returnType);
+        for (Pair<String, Object> pair : pairs) {
+            query = query.setParameter(pair.getA(), pair.getB());
+        }
+        return nullOrFirst(query.getResultList());
+    }
+
+    public <T> List<T> regularGetList(String sql, Class<T> returnType, Pair<String, Object>... pairs) {
+        TypedQuery<T> query = em.createQuery(sql, returnType);
+        for (Pair<String, Object> pair : pairs) {
+            query = query.setParameter(pair.getA(), pair.getB());
+        }
+        return query.getResultList();
+    }
+
 }

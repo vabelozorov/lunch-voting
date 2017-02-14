@@ -16,8 +16,19 @@ public class EatingAreaTest extends AbstractTest {
     @Test
     public void testJoin() throws Exception {
         EatingArea area = testAreas.getFirstArea();
-        JoinAreaRequest request = new JoinAreaRequest(ALIEN_USER1, area);
-        EatingArea updated = area.join(request);
+        EatingArea updated = area.addMember(ALIEN_USER1.assignAreaId(area.getId()));
         assertTrue(updated.getUsers().size() == 8);
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void userCannotJoinIfAreaIdNull() throws Exception {
+        EatingArea area = testAreas.getFirstArea();
+        area.addMember(ALIEN_USER1);
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void userCannotJoinIfAreaIdNotAssigned() throws Exception {
+        EatingArea area = testAreas.getFirstArea();
+        area.addMember(ALIEN_USER1.assignAreaId("xxx"));
     }
 }

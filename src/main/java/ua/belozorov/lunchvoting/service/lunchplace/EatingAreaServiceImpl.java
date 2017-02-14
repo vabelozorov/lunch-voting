@@ -9,8 +9,10 @@ import ua.belozorov.lunchvoting.model.UserRole;
 import ua.belozorov.lunchvoting.model.lunchplace.EatingArea;
 import ua.belozorov.lunchvoting.model.lunchplace.JoinAreaRequest;
 import ua.belozorov.lunchvoting.repository.lunchplace.EatingAreaRepository;
+import ua.belozorov.lunchvoting.repository.lunchplace.EatingAreaRepositoryImpl;
 import ua.belozorov.lunchvoting.service.user.UserService;
 import ua.belozorov.lunchvoting.to.AreaTo;
+import ua.belozorov.lunchvoting.util.ExceptionUtils;
 
 import java.util.List;
 
@@ -23,7 +25,7 @@ import static java.util.Optional.ofNullable;
  */
 @Service
 @Transactional(readOnly = true)
-public class EatingAreaServiceImpl implements EatingAreaService {
+public final class EatingAreaServiceImpl implements EatingAreaService {
 
     private final EatingAreaRepository areaRepository;
     private final UserService userService;
@@ -37,8 +39,20 @@ public class EatingAreaServiceImpl implements EatingAreaService {
     @Override
     @Transactional
     public EatingArea create(String name, User user) {
-        userService.setRoles(user.getId(), user.addRole(UserRole.ADMIN).getRoles());
-        return areaRepository.save(new EatingArea(name, user));
+        EatingArea area = areaRepository.save(new EatingArea(name));
+        this.addMember(area.getId(), user);
+        userService.setRoles(area.getId(), user.getId(), user.addRole(UserRole.ADMIN).getRoles());
+        return area;
+    }
+
+    @Override
+    @Transactional
+    public User createUserInArea(String areaId, User user) {
+        ExceptionUtils.checkParamsNotNull(areaId, user);
+
+        User saved = userService.create(user);
+        this.addMember(areaId, saved);
+        return userService.getFresh(() -> userService.get(areaId, user.getId()));
     }
 
     @Override
@@ -110,8 +124,7 @@ public class EatingAreaServiceImpl implements EatingAreaService {
         JoinAreaRequest request = this.getJoinRequest(areaId, requestId);
         areaRepository.update(request.approve());
 
-        EatingArea area = request.getArea();
-        areaRepository.update(area.join(request));
+        this.addMember(areaId, request.getRequester());
     }
 
     @Override
@@ -126,5 +139,14 @@ public class EatingAreaServiceImpl implements EatingAreaService {
     public void rejectJoinRequest(User approver, String requestId) {
         JoinAreaRequest request = this.getJoinRequest(approver.getAreaId(), requestId);
         areaRepository.update(request.reject());
+    }
+
+    @Override
+    @Transactional
+    public void addMember(String areaId, User member) {
+        EatingArea area = ofNullable(areaRepository.getArea(areaId, EatingAreaRepositoryImpl.AreaFields.USERS))
+                .orElseThrow(() -> new NotFoundException(areaId, EatingArea.class));
+        member = member.assignAreaId(area.getId());
+        areaRepository.update(area.addMember(member));
     }
 }

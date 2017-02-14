@@ -1,12 +1,12 @@
 package ua.belozorov.lunchvoting.repository.user;
 
+import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 import ua.belozorov.lunchvoting.model.User;
 import ua.belozorov.lunchvoting.repository.BaseRepository;
 
@@ -35,24 +35,26 @@ public class UserRepositoryImpl extends BaseRepository implements UserRepository
     }
 
     @Override
-    public User get(String id) {
-        return crudRepository.findOne(id);
+    public User get(@Nullable String areaId, String userId) {
+        return areaId == null ? crudRepository.findOne(userId)
+                : crudRepository.findOneByAreaIdAndId(areaId, userId);
     }
 
     @Override
-    public Collection<User> getAll() {
-        return crudRepository.findAll();
+    public Collection<User> getAll(@Nullable String areaId) {
+        return areaId == null ? crudRepository.findAll()
+                : crudRepository.findAll(areaId);
     }
 
     @Override
-    public boolean delete(String id) {
-        em.createQuery("UPDATE Vote v SET v.voterId = null WHERE v.voterId = ?1")
-                .setParameter(1, id)
-                .executeUpdate();
+    public boolean delete(String areaId, String userId) {
+//        em.createQuery("UPDATE Vote v SET v.voterId = null WHERE v.voterId = ?1")
+//                .setParameter(1, id)
+//                .executeUpdate();
         em.createQuery("UPDATE LunchPlace lp SET lp.adminId = null WHERE lp.adminId = ?1")
-                .setParameter(1, id)
+                .setParameter(1, userId)
                 .executeUpdate();
-        return crudRepository.deleteById(id) != 0;
+        return crudRepository.deleteById(areaId, userId) != 0;
     }
 
     /**
@@ -66,8 +68,13 @@ public class UserRepositoryImpl extends BaseRepository implements UserRepository
         @Query("SELECT u FROM User u ORDER BY u.email ASC")
         List<User> findAll();
 
+        @Query("SELECT u FROM User u WHERE u.areaId= ?1 ORDER BY u.email ASC")
+        List<User> findAll(String areaId);
+
         @Modifying
-        @Query("DELETE FROM User u WHERE u.id = ?1")
-        int deleteById(String id);
+        @Query("DELETE FROM User u WHERE u.areaId= :areaId AND u.id = :userId")
+        int deleteById(@Param("areaId") String areaId, @Param("userId") String userId);
+
+        User findOneByAreaIdAndId(String areaId, String userId);
     }
 }

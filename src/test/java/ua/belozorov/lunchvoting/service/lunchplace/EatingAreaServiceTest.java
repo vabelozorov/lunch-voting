@@ -6,7 +6,6 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
-import ua.belozorov.lunchvoting.MatcherUtils;
 import ua.belozorov.lunchvoting.exceptions.DuplicateDataException;
 import ua.belozorov.lunchvoting.exceptions.NotFoundException;
 import ua.belozorov.lunchvoting.model.User;
@@ -14,18 +13,16 @@ import ua.belozorov.lunchvoting.model.UserRole;
 import ua.belozorov.lunchvoting.model.lunchplace.AreaTestData;
 import ua.belozorov.lunchvoting.model.lunchplace.EatingArea;
 import ua.belozorov.lunchvoting.model.lunchplace.JoinAreaRequest;
-import ua.belozorov.lunchvoting.model.lunchplace.LunchPlace;
-import ua.belozorov.lunchvoting.model.voting.polling.LunchPlacePoll;
 import ua.belozorov.lunchvoting.repository.lunchplace.EatingAreaRepository;
 import ua.belozorov.lunchvoting.repository.lunchplace.EatingAreaRepositoryImpl;
 import ua.belozorov.lunchvoting.service.AbstractServiceTest;
+import ua.belozorov.lunchvoting.service.user.UserProfileService;
 import ua.belozorov.lunchvoting.service.user.UserService;
 import ua.belozorov.lunchvoting.to.AreaTo;
 import ua.belozorov.lunchvoting.util.ExceptionUtils;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.vladmihalcea.sql.SQLStatementCountValidator.reset;
 import static org.junit.Assert.*;
@@ -50,19 +47,43 @@ public class EatingAreaServiceTest extends AbstractServiceTest {
     private UserService userService;
 
     @Autowired
+    private UserProfileService profileService;
+
+    @Autowired
     private EatingAreaRepository repository;
 
     @Test
     public void createArea() throws Exception {
         reset();
         EatingArea expected = areaService.create("ChowChow", ALIEN_USER1);
-        assertSql(1, 1,2, 0);
+        assertSql(4, 1,3, 0);
 
         EatingArea actual = areaService.getArea(expected.getId());
-        User alienUser = userService.get(ALIEN_USER1.getId());
+        User alienUser = userService.get(expected.getId(), ALIEN_USER1.getId());
 
         assertThat(actual, matchSingle(expected, AREA_COMPARATOR));
         assertTrue(alienUser.getRoles().contains(UserRole.ADMIN));
+    }
+
+    @Test
+    public void createUserInArea() throws Exception {
+        String areaId = testAreas.getFirstAreaId();
+        User newUser = new User("NEW_USER_ID", "New User", "new@email.com", "strongPassword");
+
+        reset();
+        User created = areaService.createUserInArea(areaId, newUser);
+        assertSql(3, 1, 2, 0);
+
+        assertThat(
+                userService.get(areaId, created.getId()),
+                matchSingle(created.assignAreaId(areaId), USER_COMPARATOR)
+        );
+
+        TransactionStatus transactionStatus = ptm.getTransaction(new DefaultTransactionDefinition());
+        assertTrue(repository.getArea(areaId, EatingAreaRepositoryImpl.AreaFields.USERS).getUsers()
+                .contains(created)
+        );
+        ptm.commit(transactionStatus);
     }
 
     @Test(expected = DuplicateDataException.class)
@@ -158,18 +179,19 @@ public class EatingAreaServiceTest extends AbstractServiceTest {
     //TODO check that polls and places are deleted too
     public void onAreaDeleteUserAreaIdSetsToNull() throws Exception {
         EatingArea area = areaService.create("ChowChow", ALIEN_USER1);
+        String areaId = area.getId();
 
         //asserting state before deletion
-        assertNotNull(areaService.getArea(area.getId()));
-        assertEquals(userService.get(ALIEN_USER1.getId()).getAreaId(), area.getId());
+        assertNotNull(areaService.getArea(areaId));
+        assertEquals(userService.get(areaId, ALIEN_USER1.getId()).getAreaId(), areaId);
         reset();
-        areaService.delete(area.getId());
+        areaService.delete(areaId);
 
         //asserting state after deletion
         assertDelete(1);
-        assertEquals(userService.get(ALIEN_USER1.getId()).getAreaId(), null);
+        assertEquals(profileService.get(ALIEN_USER1.getId()).getAreaId(), null);
         thrown.expect(NotFoundException.class);
-        areaService.getArea(area.getId());
+        areaService.getArea(areaId);
     }
 
     @Test
@@ -210,10 +232,15 @@ public class EatingAreaServiceTest extends AbstractServiceTest {
     @Test
     public void userCanChangeArea() throws Exception {
         EatingArea chowArea = areaService.create("ChowArea", ALIEN_USER1);
-        JoinAreaRequest request = areaService.makeJoinRequest(VOTER, chowArea.getId());
+        String areaId = chowArea.getId();
+
+        JoinAreaRequest request = areaService.makeJoinRequest(VOTER, areaId);
+
         assertEquals(VOTER.getAreaId(), testAreas.getFirstArea().getId());
-        areaService.approveJoinRequest(userService.get(ALIEN_USER1.getId()), request.getId());
-        assertEquals(chowArea.getId(), userService.get(VOTER_ID).getAreaId());
+
+        areaService.approveJoinRequest(userService.get(areaId, ALIEN_USER1.getId()), request.getId());
+
+        assertEquals(areaId, userService.get(areaId, VOTER_ID).getAreaId());
     }
 
     @Test
@@ -222,7 +249,7 @@ public class EatingAreaServiceTest extends AbstractServiceTest {
         JoinAreaRequest request1 = areaService.makeJoinRequest(VOTER1, areaId);
         JoinAreaRequest request2 = areaService.makeJoinRequest(VOTER2, areaId);
         JoinAreaRequest request3 = areaService.makeJoinRequest(VOTER3, areaId);
-        areaService.approveJoinRequest(userService.get(ALIEN_USER1.getId()), request1.getId());
+        areaService.approveJoinRequest(userService.get(areaId, ALIEN_USER1.getId()), request1.getId());
 
         reset();
         List<JoinAreaRequest> requests = areaService.getJoinRequestsByStatus(areaId, JoinAreaRequest.JoinStatus.PENDING);
@@ -272,7 +299,19 @@ public class EatingAreaServiceTest extends AbstractServiceTest {
 
         reset();
         areaService.approveJoinRequest(GOD, request.getId());
-        assertSql(2, 0, 3, 0);
+        assertSql(3, 0, 3, 0);
+
+        JoinAreaRequest approvedReq = areaService.getJoinRequest(areaId, request.getId());
+        User requester = approvedReq.getRequester();
+
+        assertEquals(JoinAreaRequest.JoinStatus.APPROVED, approvedReq.getStatus());
+        assertEquals(areaId, requester.getAreaId());
+
+        TransactionStatus transactionStatus = ptm.getTransaction(new DefaultTransactionDefinition());
+        assertTrue(repository.getArea(areaId, EatingAreaRepositoryImpl.AreaFields.USERS).getUsers()
+                .contains(requester)
+        );
+        ptm.commit(transactionStatus);
     }
 
     @Test(expected = NotFoundException.class)
@@ -324,5 +363,21 @@ public class EatingAreaServiceTest extends AbstractServiceTest {
 
         reset();
         areaService.rejectJoinRequest(GOD, request.getId());
+    }
+
+    @Test
+    public void persistedUserJoinsArea() throws Exception {
+        User member = userService.create(new User("NEW", "Name", "new@mail.com", "newpassword"));
+        String areaId = testAreas.getFirstAreaId();
+        areaService.addMember(areaId, member);
+
+        User actual = userService.get(areaId, member.getId());
+        assertThat(actual, matchSingle(member.assignAreaId(areaId), USER_COMPARATOR));
+
+        TransactionStatus transactionStatus = ptm.getTransaction(new DefaultTransactionDefinition());
+        assertTrue(repository.getArea(areaId, EatingAreaRepositoryImpl.AreaFields.USERS).getUsers()
+                .contains(actual)
+        );
+        ptm.commit(transactionStatus);
     }
 }

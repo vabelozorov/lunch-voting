@@ -1,5 +1,6 @@
 package ua.belozorov.lunchvoting.to;
 
+import lombok.Getter;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotBlank;
@@ -17,6 +18,7 @@ import java.util.Set;
  *
  * @author vabelozorov on 15.11.16.
  */
+@Getter
 public final class UserTo {
     @NotBlank(groups = {Update.class, Activate.class, Roles.class})
     private String id;
@@ -66,22 +68,6 @@ public final class UserTo {
         this.activated = user.isActivated();
     }
 
-    public String getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public Set<UserRole> getRoles() {
-        return roles;
-    }
-
     public void setId(String id) {
         this.id = id;
     }
@@ -94,10 +80,6 @@ public final class UserTo {
         this.email = email;
     }
 
-    public LocalDateTime getRegisteredDate() {
-        return registeredDate;
-    }
-
     public void setRegisteredDate(LocalDateTime registeredDate) {
         this.registeredDate = registeredDate;
     }
@@ -108,10 +90,6 @@ public final class UserTo {
 
     public void setActivated(boolean activated) {
         this.activated = activated;
-    }
-
-    public String getPassword() {
-        return password;
     }
 
     public void setPassword(String password) {
