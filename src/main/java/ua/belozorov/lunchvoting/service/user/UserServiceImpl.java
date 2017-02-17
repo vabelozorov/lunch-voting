@@ -10,6 +10,7 @@ import ua.belozorov.lunchvoting.repository.user.UserRepository;
 import ua.belozorov.lunchvoting.util.ExceptionUtils;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
 
@@ -101,5 +102,10 @@ public final class UserServiceImpl implements UserService {
     public User getFresh(Supplier<User> supplier) {
         this.userRepository.flushAndClear();
         return supplier.get();
+    }
+
+    @Override
+    public List<User> getUsersByRole(String areaId, UserRole role) {
+        return this.userRepository.getUsersByRole(areaId, role);
     }
 }

@@ -32,8 +32,8 @@ import java.util.stream.Collectors;
  */
 @Entity
 @Table(name = "polls")
-@Getter(AccessLevel.PACKAGE)
-public final class LunchPlacePoll extends AbstractPersistableObject implements Poll {
+@Getter(AccessLevel.PUBLIC)
+public final class LunchPlacePoll extends AbstractPersistableObject implements Comparable<LunchPlacePoll> {
     private static final LocalTime DEFAULT_START_TIME = LocalTime.of(9, 0);
     private static final LocalTime DEFAULT_END_TIME = LocalTime.of(12, 0);
     private static final LocalTime DEFAULT_ALLOW_CHANGE_VOTE_TIME = LocalTime.of(11, 0);
@@ -93,7 +93,7 @@ public final class LunchPlacePoll extends AbstractPersistableObject implements P
     }
 
     @Builder(toBuilder = true)
-    LunchPlacePoll(String id, Integer version, TimeConstraint timeConstraint,
+    private LunchPlacePoll(String id, Integer version, TimeConstraint timeConstraint,
                            List<PollItem> pollItems, LocalDate menuDate, Set<Vote> votes) {
         super(id, version);
         this.timeConstraint = timeConstraint;
@@ -113,7 +113,7 @@ public final class LunchPlacePoll extends AbstractPersistableObject implements P
         for (LunchPlace lunchPlace : lunchPlaces) {
             pollItems.add(new PollItem(lunchPlace, this));
         }
-        return Collections.unmodifiableList(pollItems);
+        return pollItems;
     }
 
     private void checkMenuDate(List<LunchPlace> lunchPlaces, LocalDate menuDate) {
@@ -149,7 +149,6 @@ public final class LunchPlacePoll extends AbstractPersistableObject implements P
         this.votes.add(newVote);
     }
 
-    @Override
     public VotePolicyDecision registerVote(String voterId, String pollItemId) {
         Set<Vote> votersVotes = this.votes.stream()
                                             .filter(v -> v.getVoterId().equals(voterId))
@@ -163,46 +162,22 @@ public final class LunchPlacePoll extends AbstractPersistableObject implements P
                 .orElseThrow(() -> new NoVotePolicyMatchException(intention));
     }
 
-    PollItem pollItemById(String id) {
+    private PollItem pollItemById(String id) {
         Objects.requireNonNull(id, "PollItemId must not be null");
         return pollItems.stream()
                 .filter(pollItem -> id.equals(pollItem.getId()))
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException(String.format("Poll %s does not contain item %s", this.getId(), id)));
     }
-//
-//    public PollingResult getPollResult(Set<Vote> votes) {
-//        Set<String> pollItemIds = pollItems.stream().map(PollItem::getId).collect(Collectors.toSet());
-//        PollingResult.VoteCollector collector = PollingResult.getCollector(this.getId());
-//        for (Vote vote : votes) {
-//            if (vote.getArea().equals(this.getId()) && pollItemIds.containsOriginal(vote.getPollItem())) {
-//                collector.collect(vote);
-//            } else {
-//                throw new IllegalStateException(
-//                        String.format("Unexpected vote with pollId %s and pollItemId %s. My pollItemId is %s",
-//                                vote.getId(), vote.getPollItem(), this.getId())
-//                );
-//            }
-//        }
-//        return collector.getByPollItem();
-//    }
 
-    @Override
     public List<PollItem> getPollItems() {
-        return this.pollItems;
+        return Collections.unmodifiableList(this.pollItems);
     }
 
-    @Override
-    public LocalDate getMenuDate() {
-        return this.menuDate;
-    }
-
-    @Override
     public Set<Vote> getVotes() {
         return Collections.unmodifiableSet(this.votes);
     }
 
-    @Override
     public String toString() {
         return "LunchPlacePoll{" +
                 "id=" + id +
@@ -212,54 +187,8 @@ public final class LunchPlacePoll extends AbstractPersistableObject implements P
     }
 
     @Override
-    public int compareTo(Poll o) {
+    public int compareTo(LunchPlacePoll o) {
         int r = this.getMenuDate().compareTo(o.getMenuDate());
         return r != 0 ? (-1)*r : this.getId().compareTo(o.getId());
     }
-
-    //    public LunchPlacePollBuilder toBuilder() {
-//        return new LunchPlacePollBuilder(this);
-//    }
-//
-//    public static class LunchPlacePollBuilder {
-//        private String id;
-//        private Integer version;
-//        private TimeConstraint timeConstraint;
-//        private Set<PollItem> pollItems;
-//        private Set<Vote> votes;
-//        private LocalDate menuDate;
-//
-//        private LunchPlacePollBuilder(LunchPlacePoll poll) {
-//            this.id = poll.id;
-//            this.version = poll.version;
-//            this.timeConstraint = poll.timeConstraint;
-//            this.pollItems = poll.pollItems;
-//            this.votes = poll.votes;
-//            this.menuDate = poll.menuDate;
-//        }
-//
-//        LunchPlacePollBuilder timeConstraint(TimeConstraint timeConstraint) {
-//            this.timeConstraint = timeConstraint;
-//            return this;
-//        }
-//
-//        LunchPlacePollBuilder pollItems(Set<PollItem> pollItems) {
-//            this.pollItems = pollItems;
-//            return this;
-//        }
-//
-//        public LunchPlacePollBuilder votes(Set<Vote> votes) {
-//            this.votes = votes;
-//            return this;
-//        }
-//
-//        public LunchPlacePollBuilder menuDate(LocalDate date) {
-//            this.menuDate = date;
-//            return this;
-//        }
-//
-//        public LunchPlacePoll build() {
-//            return new LunchPlacePoll(id, version, timeConstraint, pollItems, menuDate, votes);
-//        }
-//    }
 }

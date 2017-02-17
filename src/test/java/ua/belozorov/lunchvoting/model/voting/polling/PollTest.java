@@ -93,7 +93,7 @@ public class PollTest extends AbstractTest {
 
     @Test(expected = NoMenusForMenuDateException.class)
     public void failsWhenLunchPlaceDoesNotHaveMenuWithMenuDate() throws Exception {
-        LunchPlace place = new LunchPlace("ID", "Name", "Address", "Description", new ArrayList<String>(), new ArrayList<Menu>(), "AdminId");
+        LunchPlace place = new LunchPlace("ID", "Name", "Address", "Description", new HashSet<>());
         new LunchPlacePoll(Arrays.asList(place), NOW_DATE);
     }
 

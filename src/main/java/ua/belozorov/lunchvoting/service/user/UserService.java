@@ -4,6 +4,7 @@ import ua.belozorov.lunchvoting.model.User;
 import ua.belozorov.lunchvoting.model.UserRole;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
 
@@ -70,4 +71,6 @@ public interface UserService {
      * @return User entity as a result of executing the {@code supplier}
      */
     User getFresh(Supplier<User> supplier);
+
+    List<User> getUsersByRole(String areaId, UserRole role);
 }

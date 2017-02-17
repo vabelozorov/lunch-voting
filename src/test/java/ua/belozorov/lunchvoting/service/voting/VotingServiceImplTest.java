@@ -14,9 +14,10 @@ import java.util.*;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static ua.belozorov.lunchvoting.MatcherUtils.matchSingle;
+import static ua.belozorov.lunchvoting.model.UserTestData.GOD;
+import static ua.belozorov.lunchvoting.model.UserTestData.VOTER;
 import static ua.belozorov.lunchvoting.model.voting.polling.VoteTestData.VOTE_COMPARATOR;
 import static ua.belozorov.lunchvoting.model.UserTestData.GOD_ID;
-import static ua.belozorov.lunchvoting.model.UserTestData.VOTER_ID;
 
 
 /**
@@ -32,13 +33,15 @@ public class VotingServiceImplTest extends AbstractServiceTest {
     @Autowired
     private PollRepository repository;
 
+    private final String areaId = testAreas.getFirstAreaId();
 
     @Test
     public void votesFirstTime() throws Exception {
         LunchPlacePoll poll = testPolls.getActivePoll();
         PollItem item = testPolls.getActivePollPollItem1();
-        Vote returned = votingService.vote(GOD_ID, poll.getId(), item.getId());
-        Vote actual = repository.getVoteInPoll(GOD_ID, poll.getId());
+        Vote returned = votingService.vote(GOD, poll.getId(), item.getId());
+        Vote actual = repository.getVoteInPoll(areaId, GOD_ID, poll.getId());
+
         assertThat(actual, matchSingle(returned, VOTE_COMPARATOR));
     }
 
@@ -48,21 +51,21 @@ public class VotingServiceImplTest extends AbstractServiceTest {
         PollItem item1 = testPolls.getActivePollPollItem1();
         PollItem item2 = testPolls.getActivePollPollItem2();
 
-        Vote firstVote = votingService.vote(GOD_ID, poll.getId(), item1.getId());
-        Vote actual = repository.getVoteInPoll(GOD_ID, poll.getId());
+        Vote firstVote = votingService.vote(GOD, poll.getId(), item1.getId());
+        Vote actual = repository.getVoteInPoll(areaId, GOD_ID, poll.getId());
         assertTrue(firstVote.getId().equals(actual.getId()));
 
         Thread.sleep(100);
-        Vote secondVote = votingService.vote(GOD_ID, poll.getId(), item2.getId());
+        Vote secondVote = votingService.vote(GOD, poll.getId(), item2.getId());
         assertTrue(secondVote.getId().equals(
-                repository.getVoteInPoll(GOD_ID, poll.getId())
+                repository.getVoteInPoll(areaId, GOD_ID, poll.getId())
                                 .getId()
         ));
     }
 
     @Test
     public void getVotedByVoterId() {
-        Collection<String> ids = votingService.getVotedByVoter(testPolls.getActivePoll().getId(), VOTER_ID);
+        Collection<String> ids = votingService.getVotedByVoter(VOTER, testPolls.getActivePoll().getId());
         List<String> expected = Arrays.asList(testPolls.getActivePoll().getPollItems().get(0).getId());
 
         assertTrue(ids.equals(expected));
@@ -70,7 +73,7 @@ public class VotingServiceImplTest extends AbstractServiceTest {
 
     @Test
     public void getPollResult() throws Exception {
-        VotingResult<PollItem> pollResult = votingService.getPollResult(testPolls.getActivePoll().getId());
+        VotingResult<PollItem> pollResult = votingService.getPollResult(areaId, testPolls.getActivePoll().getId());
         PollItem pollItem1 = testPolls.getActivePollPollItem1();
 
         assertTrue(pollResult.getWinners().equals(Arrays.asList(pollItem1)));

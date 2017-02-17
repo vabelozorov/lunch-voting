@@ -1,6 +1,7 @@
 package ua.belozorov.lunchvoting.to.transformers;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import ua.belozorov.lunchvoting.model.lunchplace.LunchPlace;
 import ua.belozorov.lunchvoting.to.LunchPlaceTo;
 
@@ -16,8 +17,8 @@ import java.util.stream.Collectors;
  */
 public class DtoIntoEntity {
 
-    public static LunchPlace toLunchPlace(LunchPlaceTo to, String adminId) {
-        return new LunchPlace(to.getId(), to.getName(), to.getAddress(),
-                to.getDescription(), to.getPhones(), Collections.emptyList(), adminId);
+    public static LunchPlace toLunchPlace(LunchPlaceTo to, @Nullable String id) {
+        return new LunchPlace(id, to.getName(), to.getAddress(),
+                to.getDescription(), to.getPhones());
     }
 }

@@ -1,13 +1,16 @@
 package ua.belozorov.lunchvoting.to;
 
+import com.google.common.collect.ImmutableSortedSet;
 import lombok.*;
 import ua.belozorov.lunchvoting.model.lunchplace.Dish;
 import ua.belozorov.lunchvoting.model.lunchplace.LunchPlace;
 import ua.belozorov.lunchvoting.model.lunchplace.Menu;
 
+import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 /**
  * <h2></h2>
@@ -17,10 +20,19 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
 public final class MenuTo {
     private String id;
+    @NotNull
     private LocalDate effectiveDate;
-    private List<Dish> dishes;
+    @NotNull
+    private Set<Dish> dishes;
+
     private String lunchPlaceId;
+
+    public MenuTo(String id, LocalDate effectiveDate, Set<Dish> dishes, String lunchPlaceId) {
+        this.id = id;
+        this.effectiveDate = effectiveDate;
+        this.dishes = ImmutableSortedSet.copyOf(dishes);
+        this.lunchPlaceId = lunchPlaceId;
+    }
 }

@@ -12,6 +12,8 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -34,6 +36,7 @@ public class JpaConfig {
     public EntityManagerFactory entityManagerFactory(DataSource dataSource) {
         LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
         HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
+        vendorAdapter.setDatabasePlatform(env.getProperty("database.dialect"));
         vendorAdapter.setGenerateDdl(false);
         em.setDataSource(dataSource);
         em.setPackagesToScan("ua.belozorov.lunchvoting.model", "ua.belozorov.lunchvoting.util", "ua.belozorov.lunchvoting.model.voting.polling");

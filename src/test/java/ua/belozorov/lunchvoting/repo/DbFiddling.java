@@ -29,15 +29,4 @@ public class DbFiddling extends AbstractServiceTest {
     @Autowired
     private LunchPlaceRepository repository;
 
-    @Test
-    public void testWithMenus() throws Exception {
-        Collection<LunchPlace> places = get();
-        System.out.println();
-    }
-
-    @Transactional
-    private Collection<LunchPlace> get() {
-        return repository.getWithMenu(Arrays.asList(), LocalDate.now(), LocalDate.now());
-//        return repository.getMultipleWithMenu(Arrays.asList(PLACE1_ID, PLACE4_ID), LocalDate.now(), LocalDate.now());
-    }
 }

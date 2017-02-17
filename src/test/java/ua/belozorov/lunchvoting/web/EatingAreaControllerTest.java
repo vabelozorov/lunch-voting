@@ -1,5 +1,6 @@
 package ua.belozorov.lunchvoting.web;
 
+import com.google.common.collect.ImmutableSet;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -11,15 +12,19 @@ import ua.belozorov.lunchvoting.model.AuthorizedUser;
 import ua.belozorov.lunchvoting.model.User;
 import ua.belozorov.lunchvoting.model.lunchplace.AreaTestData;
 import ua.belozorov.lunchvoting.model.lunchplace.EatingArea;
-import ua.belozorov.lunchvoting.service.lunchplace.EatingAreaService;
+import ua.belozorov.lunchvoting.service.area.EatingAreaService;
+import ua.belozorov.lunchvoting.service.lunchplace.LunchPlaceService;
 import ua.belozorov.lunchvoting.service.user.UserProfileService;
+import ua.belozorov.lunchvoting.to.LunchPlaceTo;
 import ua.belozorov.lunchvoting.to.UserTo;
 import ua.belozorov.lunchvoting.util.ControllerUtils;
-import ua.belozorov.lunchvoting.web.exceptionhandling.Code;
+import ua.belozorov.lunchvoting.web.exceptionhandling.ErrorCode;
 import ua.belozorov.lunchvoting.web.exceptionhandling.ErrorInfo;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static org.junit.Assert.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -41,6 +46,9 @@ public class EatingAreaControllerTest extends AbstractControllerTest {
 
     @Autowired
     private UserProfileService profileService;
+
+    @Autowired
+    private LunchPlaceService placeService;
 
     @Test
     public void testCreate() throws Exception {
@@ -80,8 +88,28 @@ public class EatingAreaControllerTest extends AbstractControllerTest {
         assertEquals(profileService.get(id).getAreaId(), areaId);
     }
 
+
     @Test
-    public void e409AndMessageOnCreateWithDuplicateEmail() throws Exception {
+    public void createPlaceInArea() throws Exception {
+        Set<String> phones = ImmutableSet.of("0661234567", "0441234567");
+        LunchPlaceTo to = new LunchPlaceTo("New PLace", "New Street 12/12", "New Description", phones);
+
+        MvcResult result = mockMvc.perform(post(REST_URL + "/{areaId}/places", testAreas.getFirstAreaId())
+                .content(jsonUtils.toJson(to))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andReturn();
+
+        String uri = jsonUtils.locationFromMvcResult(result);
+        String id = getCreatedId(uri);
+
+        mockMvc.perform(get(uri)).andExpect(status().isOk());
+
+        assertNotNull(placeService.get(testAreas.getFirstAreaId(), id));
+    }
+
+    @Test
+    public void e409AndMessageOnCreateUserWithDuplicateEmail() throws Exception {
         UserTo userTo = new UserTo("New User", "god@email.com", "strongPassword");
         MvcResult result = mockMvc
                 .perform(post(REST_URL + "/{id}/members", testAreas.getFirstAreaId())
@@ -91,7 +119,7 @@ public class EatingAreaControllerTest extends AbstractControllerTest {
                 .andReturn();
         ErrorInfo errorInfo = new ErrorInfo(
                 result.getRequest().getRequestURL(),
-                Code.DUPLICATE_DATA,
+                ErrorCode.DUPLICATE_EMAIL,
                 "Email god@email.com already exists"
         );
         assertJson(
@@ -101,14 +129,14 @@ public class EatingAreaControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    public void e409AndMessageIfViolatesUniqueNameConstraint() throws Exception {
+    public void e409AndMessageOnCreateAreaWithDuplicateName() throws Exception {
         AuthorizedUser.authorize(ALIEN_USER1);
         MvcResult result = mockMvc.perform(post(REST_URL).param("name", testAreas.getFirstAreaName()).accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isConflict())
                 .andReturn();
         ErrorInfo errorInfo = new ErrorInfo(
                 result.getRequest().getRequestURL(),
-                Code.DUPLICATE_DATA,
+                ErrorCode.DUPLICATE_AREA_NAME,
                 "Area name " + testAreas.getFirstAreaName() + " already exists"
         );
         assertJson(

@@ -65,7 +65,7 @@ public class UserServiceTest extends AbstractServiceTest {
         Collection<User> users = userService.getAll(AuthorizedUser.get().getAreaId());
         assertSelectCount(1);
         assertThat(
-                ALL_USERS,
+                A1_USERS,
                 contains(matchCollection(users, USER_COMPARATOR))
         );
     }
@@ -74,12 +74,11 @@ public class UserServiceTest extends AbstractServiceTest {
     public void delete() throws Exception {
         reset();
         userService.delete(areaId, ADMIN_ID);
-        assertUpdateCount(1); // Update to null in LunchPlace entities
         assertDeleteCount(1);
 
         Collection<User> users = userService.getAll(AuthorizedUser.get().getAreaId());
         assertThat(
-            ALL_USERS.stream()
+            A1_USERS.stream()
                     .filter(u -> !u.getId().equals(ADMIN_ID))
                     .collect(Collectors.toList()),
             contains(matchCollection(users, USER_COMPARATOR))
@@ -123,6 +122,16 @@ public class UserServiceTest extends AbstractServiceTest {
         assertEquals(userService.get(areaId, VOTER_ID).getRoles(), expectedRoles);
     }
 
+    @Test
+    public void getUsersInAreaByRole() throws Exception {
+        reset();
+        List<User> actual = userService.getUsersByRole(areaId, UserRole.ADMIN);
+        assertSelectCount(1);
+
+        List<User> expected = Arrays.asList(ADMIN, GOD);
+
+        assertThat(actual, contains(matchCollection(expected, USER_COMPARATOR)));
+    }
 
     @Test(expected = NotFoundException.class)
     public void getNotExisting() {

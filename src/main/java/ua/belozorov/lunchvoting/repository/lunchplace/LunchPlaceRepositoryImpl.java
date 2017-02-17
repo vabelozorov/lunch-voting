@@ -1,37 +1,24 @@
 package ua.belozorov.lunchvoting.repository.lunchplace;
 
 import org.hibernate.jpa.QueryHints;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import ua.belozorov.lunchvoting.exceptions.NotFoundException;
 import ua.belozorov.lunchvoting.model.lunchplace.LunchPlace;
 import ua.belozorov.lunchvoting.repository.BaseRepository;
 
 import javax.persistence.*;
 import java.time.LocalDate;
-import java.util.Collection;
 import java.util.List;
-
-import static java.util.Optional.ofNullable;
+import java.util.Set;
 
 /**
  * <h2></h2>
  *
  * @author vabelozorov on 21.11.16.
  */
+
+//TODO make delete with area in one request
 @Repository
 public class LunchPlaceRepositoryImpl extends BaseRepository implements LunchPlaceRepository {
-
-    private final CrudLunchPlaceRepository repository;
-
-    @Autowired
-    public LunchPlaceRepositoryImpl(CrudLunchPlaceRepository repository) {
-        this.repository = repository;
-    }
 
     @Override
     public LunchPlace save(LunchPlace place) {
@@ -40,54 +27,59 @@ public class LunchPlaceRepositoryImpl extends BaseRepository implements LunchPla
     }
 
     @Override
-    public void update(LunchPlace place, String userId) {
-        LunchPlace saved = ofNullable(get(place.getId(), userId))
-                                .orElseThrow(() -> new NotFoundException(place));
-        saved = saved.toBuilder()
-                .name(place.getName())
-                .address(place.getAddress())
-                .description(place.getDescription())
-                .phones(place.getPhones())
-                .build();
-        em.merge(saved);
+    public void update(LunchPlace place) {
+        em.merge(place);
     }
 
     @Override
-    public LunchPlace get(String id, String userId) {
-        return repository.get(id, userId);
+    public LunchPlace get(String areaId, String placeId) {
+        String sql = "SELECT lp FROM EatingArea ea " +
+                "INNER JOIN ea.places lp " +
+                "WHERE ea.id= :areaId AND lp.id= :placeId";
+        return super.nullOrFirst(em.createQuery(sql, LunchPlace.class)
+                .setParameter("areaId", areaId)
+                .setParameter("placeId", placeId)
+                .getResultList());
     }
 
     @Override
-    public Collection<LunchPlace> getAll(String userId) {
-        return repository.findAll(userId);
+    public List<LunchPlace> getAll(String areaId) {
+        String sql = "SELECT lp FROM EatingArea ea " +
+                "INNER JOIN ea.places lp " +
+                "WHERE ea.id= :areaId ORDER BY lp.name ASC";
+        return em.createQuery(sql, LunchPlace.class).setParameter("areaId", areaId).getResultList();
     }
 
     @Override
-    public Collection<LunchPlace> getMultiple(Collection<String> placeIds) {
-        String sql = "SELECT lp FROM LunchPlace lp WHERE lp.id IN :placeIds ORDER BY lp.name";
+    public List<LunchPlace> getMultiple(String areaId, Set<String> placeIds) {
+        String sql = "SELECT lp FROM EatingArea ea " +
+                "INNER JOIN ea.places lp " +
+                "WHERE ea.id= :areaId AND lp.id IN :placeIds ORDER BY lp.name";
         return em.createQuery(sql, LunchPlace.class)
+            .setParameter("areaId", areaId)
             .setParameter("placeIds", placeIds)
             .getResultList();
     }
 
     @Override
-    public List<LunchPlace> getWithMenu(Collection<String> placeIds, LocalDate startDate, LocalDate endDate) {
-        String sql = "SELECT DISTINCT lp FROM LunchPlace lp " +
+    //TODO try with Criteria API
+    public List<LunchPlace> getWithMenu(String areaId, Set<String> placeIds, LocalDate startDate, LocalDate endDate) {
+        String sql = "SELECT DISTINCT lp FROM EatingArea ea " +
+                "INNER JOIN ea.places lp " +
                 "LEFT JOIN FETCH lp.menus menus " +
-                "LEFT JOIN FETCH menus.dishes";
+                "LEFT JOIN FETCH menus.dishes " +
+                "WHERE ea.id= :areaId";
 
-        boolean addedWhere = false;
         if (startDate != null || endDate != null) {
-            sql += (addedWhere ? " AND" : " WHERE") + " (menus.effectiveDate BETWEEN :startDate AND :endDate)";
-            addedWhere = true;
+            sql += " AND (menus.effectiveDate BETWEEN :startDate AND :endDate)";
         }
         if ( ! placeIds.isEmpty()) {
-            sql += (addedWhere ? " AND" : " WHERE") + " lp.id IN :placeIds";
-            addedWhere = true;
+            sql += " AND lp.id IN :placeIds";
         }
         sql += " ORDER BY lp.name";
 
         TypedQuery<LunchPlace> query = em.createQuery(sql, LunchPlace.class)
+                .setParameter("areaId", areaId)
                 .setHint(QueryHints.HINT_PASS_DISTINCT_THROUGH, false);
 
         if ( ! placeIds.isEmpty()) {
@@ -102,43 +94,25 @@ public class LunchPlaceRepositoryImpl extends BaseRepository implements LunchPla
     }
 
     @Override
-    public boolean delete(String id, String userId) {
-        em.createQuery("UPDATE PollItem pi SET pi.itemId = null WHERE pi.itemId = ?1")
-                .setParameter(1, id)
-                .executeUpdate();
-        return repository.deleteById(id, userId) != 0;
+    public boolean delete(String areaId, String placeId) {
+        return em.createNativeQuery("DELETE FROM places WHERE places.area_id= :areaId AND places.id= :placeId")
+                .setParameter("areaId", areaId)
+                .setParameter("placeId", placeId).executeUpdate() != 0;
     }
 
     @Override
-    public List<LunchPlace> getIfMenuForDate(LocalDate date) {
-        List<LunchPlace> places = em.createQuery("SELECT DISTINCT lp FROM LunchPlace lp " +
+    public List<LunchPlace> getIfMenuForDate(String areaId, LocalDate date) {
+        String sql = "SELECT DISTINCT lp FROM EatingArea ea " +
+                "INNER JOIN ea.places lp " +
                 "INNER JOIN FETCH lp.menus m " +
-                "WHERE m.effectiveDate= :date " +
-                "ORDER BY lp.name", LunchPlace.class)
+                "WHERE ea.id= :areaId AND m.effectiveDate= :date " +
+                "ORDER BY lp.name";
+        List<LunchPlace> places = em.createQuery(sql, LunchPlace.class)
+                .setParameter("areaId", areaId)
                 .setParameter("date", date)
+                .setHint(QueryHints.HINT_PASS_DISTINCT_THROUGH, false)
                 .getResultList();
         em.clear();
         return places;
-    }
-
-    /**
-     * <h2>Spring Data JPA repository</h2>
-     *
-     * @author vabelozorov on 21.11.16.
-     */
-    public interface CrudLunchPlaceRepository extends JpaRepository<LunchPlace, String> {
-
-        @Query("SELECT lp FROM LunchPlace lp WHERE lp.id= :id and lp.adminId= :userId")
-        LunchPlace get(@Param("id") String id, @Param("userId") String userId);
-
-        @Query("SELECT DISTINCT lp FROM LunchPlace lp WHERE lp.adminId= ?1 ORDER BY lp.name ASC")
-        List<LunchPlace> findAll(String userId);
-
-        @Modifying
-        @Query("DELETE FROM LunchPlace lp WHERE lp.id= :id AND lp.adminId= :userId")
-        int deleteById(@Param("id") String id, @Param("userId") String userId);
-
-        @Query("SELECT lp FROM LunchPlace lp WHERE lp.id= :id AND lp.adminId= :userId")
-        LunchPlace getOne(@Param("id") String id, @Param("userId") String userId);
     }
 }

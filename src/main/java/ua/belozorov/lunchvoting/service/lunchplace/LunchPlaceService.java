@@ -1,12 +1,14 @@
 package ua.belozorov.lunchvoting.service.lunchplace;
 
 import org.jetbrains.annotations.Nullable;
-import ua.belozorov.lunchvoting.model.User;
+import ua.belozorov.lunchvoting.model.lunchplace.Dish;
 import ua.belozorov.lunchvoting.model.lunchplace.LunchPlace;
-import ua.belozorov.lunchvoting.to.MenuTo;
+import ua.belozorov.lunchvoting.model.lunchplace.Menu;
+import ua.belozorov.lunchvoting.repository.lunchplace.MenuRepositoryImpl;
 
 import java.time.LocalDate;
-import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 
 /**
  * <h2></h2>
@@ -15,29 +17,32 @@ import java.util.Collection;
  */
 public interface LunchPlaceService {
 
-    LunchPlace create(LunchPlace placeTo, User user);
+    LunchPlace create(LunchPlace placeTo);
 
-    void update(LunchPlace placeTo, User user);
+    void bulkUpdate(String areaId, String placeId, @Nullable String name, @Nullable String address, @Nullable String description, @Nullable Set<String> phones);
 
-    LunchPlace get(String id, User user);
+    LunchPlace get(String areaId, String placeId);
 
     /**
      *
+     *
+     * @param areaId
      * @param placeIds
      * @param startDate
      * @param endDate
-     * @param user
      * @return
      */
-    Collection<LunchPlace> getMultipleWithMenu(Collection<String> placeIds, @Nullable LocalDate startDate, @Nullable LocalDate endDate, User user);
+    List<LunchPlace> getMultipleWithMenu(String areaId, Set<String> placeIds, @Nullable LocalDate startDate, @Nullable LocalDate endDate);
 
-    Collection<LunchPlace> getAll(User user);
+    List<LunchPlace> getAll(String areaId);
 
-    Collection<LunchPlace> getMultiple(Collection<String> placeIds, User user);
+    List<LunchPlace> getMultiple(String areaId, Set<String> placeIds);
 
-    void delete(String id, User user);
+    void delete(String areaId, String id);
 
-    String addMenu(String lunchPlaceId, MenuTo menuTo, User user);
+    Menu addMenu(String areaId, String lunchPlaceId, LocalDate effectiveDate, Set<Dish> dishes);
 
-    void deleteMenu(String lunchPlaceId, String menuId, User user);
+    void deleteMenu(String areaId, String lunchPlaceId, String menuId);
+
+    Menu getMenu(String areaId, String placeId, String menuId, MenuRepositoryImpl.Fields... fields);
 }

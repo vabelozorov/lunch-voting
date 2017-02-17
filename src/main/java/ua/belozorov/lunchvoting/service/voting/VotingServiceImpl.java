@@ -4,9 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ua.belozorov.lunchvoting.exceptions.NotFoundException;
+import ua.belozorov.lunchvoting.model.User;
 import ua.belozorov.lunchvoting.model.voting.*;
 import ua.belozorov.lunchvoting.model.voting.polling.LunchPlacePoll;
-import ua.belozorov.lunchvoting.model.voting.polling.Poll;
 import ua.belozorov.lunchvoting.model.voting.polling.PollItem;
 import ua.belozorov.lunchvoting.model.voting.polling.Vote;
 import ua.belozorov.lunchvoting.model.voting.polling.votedecisions.VotePolicyDecision;
@@ -14,7 +14,8 @@ import ua.belozorov.lunchvoting.repository.lunchplace.LunchPlaceRepository;
 import ua.belozorov.lunchvoting.repository.voting.PollRepository;
 import ua.belozorov.lunchvoting.util.ExceptionUtils;
 
-import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 
 import static java.util.Optional.ofNullable;
 
@@ -27,25 +28,30 @@ import static java.util.Optional.ofNullable;
 @Transactional(readOnly = true)
 public final class VotingServiceImpl implements VotingService {
 
-    @Autowired
-    private LunchPlaceRepository lunchPlaceRepository;
+    private final PollService pollService;
+    private final LunchPlaceRepository lunchPlaceRepository;
+    private final PollRepository pollRepository;
 
     @Autowired
-    private PollRepository pollRepository;
+    public VotingServiceImpl(LunchPlaceRepository lunchPlaceRepository, PollService pollService, PollRepository pollRepository) {
+        this.lunchPlaceRepository = lunchPlaceRepository;
+        this.pollService = pollService;
+        this.pollRepository = pollRepository;
+    }
 
     @Override
     @Transactional
-    public Vote vote(String voterId, String pollId, String pollItemId) {
-        ExceptionUtils.checkParamsNotNull(voterId, pollId, pollItemId);
-        Poll poll = ofNullable(pollRepository.getWithVotes(pollId))
-                            .orElseThrow(() -> new NotFoundException(pollId, LunchPlacePoll.class));
+    public Vote vote(User voter, String pollId, String pollItemId) {
+        ExceptionUtils.checkParamsNotNull(voter, pollId, pollItemId);
 
-        VotePolicyDecision decision = poll.registerVote(voterId, pollItemId);
+        LunchPlacePoll poll = pollService.getWithPollItemsAndVotes(voter.getAreaId(), pollId);
+
+        VotePolicyDecision decision = poll.registerVote(voter.getId(), pollItemId);
         Vote acceptedVote = decision.getAcceptedVote();
         if (decision.isAccept()) {
-            pollRepository.saveVote(acceptedVote);
+            pollRepository.save(acceptedVote);
         } else if (decision.isUpdate()) {
-            pollRepository.replaceVote(decision.votesToBeRemoved(), acceptedVote);
+            this.replaceVote(decision.votesToBeRemoved(), acceptedVote);
         } else {
             throw new IllegalStateException("Unknown vote decision");
         }
@@ -54,24 +60,39 @@ public final class VotingServiceImpl implements VotingService {
 
 
     @Override
-    public VotingResult<PollItem> getPollResult(String pollId) {
+    public VotingResult<PollItem> getPollResult(String areaId, String pollId) {
         ExceptionUtils.checkParamsNotNull(pollId);
 
-        LunchPlacePoll poll = ofNullable(pollRepository.getPollAndPollItemsAndVotes(pollId)).
+        LunchPlacePoll poll = ofNullable(pollRepository.getWithPollItemsAndVotes(areaId, pollId)).
                 orElseThrow(() -> new NotFoundException(pollId, LunchPlacePoll.class));
         PollVoteResult<PollItem> pollResult = new PollVoteResult<>(poll, Vote::getPollItem);
         return pollResult;
     }
 
     @Override
-    public Collection<String> getVotedByVoter(String pollId, String voterId) {
-        ExceptionUtils.checkParamsNotNull(pollId, voterId);
+    public List<String> getVotedByVoter(User voter, String pollId) {
+        ExceptionUtils.checkParamsNotNull(pollId, voter);
 
-        return pollRepository.getVotedByVoter(pollId, voterId);
+        return pollRepository.getVotedByVoter(voter.getAreaId(), pollId, voter.getId());
     }
 
     @Override
-    public Collection<Vote> getVotesForPoll(String pollId) {
-        return pollRepository.getVotesForPoll(pollId);
+    public List<Vote> getVotesForPoll(String areaId, String pollId) {
+        ExceptionUtils.checkParamsNotNull(areaId, pollId);
+
+        return pollRepository.getVotesForPoll(areaId, pollId);
     }
+
+    @Override
+    public void replaceVote(Set<Vote> forRemoval, Vote acceptedVote) {
+        ExceptionUtils.checkParamsNotNull(forRemoval, acceptedVote);
+
+        pollRepository.remove(forRemoval);
+        pollRepository.save(acceptedVote);
+    }
+
+//    @Override
+//    public void revokeVote(String areaId, String voteId) {
+//        pollRepository.
+//    }
 }

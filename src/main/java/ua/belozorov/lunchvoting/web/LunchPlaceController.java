@@ -1,22 +1,22 @@
 package ua.belozorov.lunchvoting.web;
 
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import ua.belozorov.lunchvoting.exceptions.DuplicateDataException;
 import ua.belozorov.lunchvoting.model.AuthorizedUser;
 import ua.belozorov.lunchvoting.model.lunchplace.LunchPlace;
 import ua.belozorov.lunchvoting.service.lunchplace.LunchPlaceService;
 import ua.belozorov.lunchvoting.to.LunchPlaceTo;
 import ua.belozorov.lunchvoting.to.transformers.DtoIntoEntity;
+import ua.belozorov.lunchvoting.util.ExceptionUtils;
+import ua.belozorov.lunchvoting.web.exceptionhandling.ErrorCode;
 import ua.belozorov.lunchvoting.web.queries.LunchPlaceQueryParams;
 
-import java.net.URI;
 import java.util.*;
-
-import static ua.belozorov.lunchvoting.util.ControllerUtils.toMap;
 
 /**
  * <h2></h2>
@@ -26,7 +26,7 @@ import static ua.belozorov.lunchvoting.util.ControllerUtils.toMap;
 @RestController
 @RequestMapping(LunchPlaceController.REST_URL)
 public class LunchPlaceController  {
-    static final String REST_URL = "/api/places";
+    static final String REST_URL = "/api/areas/{areaId}/places";
 
     private final LunchPlaceService placeService;
 
@@ -40,53 +40,29 @@ public class LunchPlaceController  {
     }
 
     /**
-     * Creates a new LunchPlace object via HTTP POST request.
-     * @param placeTo a LunchPlace object description in JSON format. <br/>
-     *              Mandatory fields:
-     *              <ul>
-     *                  <li><b>name</b> (up to 50 characters, not empty)</li>
-     *              </ul>
-     *              Optional fields:
-     *              <ul>
-     *                  <li><b>address</b> string, up to 100 characters</li>
-     *                  <li><b>description</b> string, up to 1000 characters</li>
-     *                  <li><b>phones</b> an array of strings, each string is 10 characters long</li>
-     *              </ul>
-     * This method requires an authorization header to be present and ADMIN userRole
-     * @return LunchPlace object with id assigned and Http 201 code on success
-     */
-    @PostMapping
-    public ResponseEntity create(@RequestBody LunchPlaceTo placeTo) {
-        LunchPlace created = placeService.create(
-                DtoIntoEntity.toLunchPlace(placeTo, AuthorizedUser.get().getId()),
-                AuthorizedUser.get()
-        );
-        URI uri = ServletUriComponentsBuilder.fromCurrentContextPath()
-                        .path("{base}/{id}").buildAndExpand(REST_URL, created.getId()).toUri();
-        return ResponseEntity.created(uri).body(toMap("id", created.getId()));
-    }
-
-    /**
-     * Updates an existing LunchPlace object. The following parameters are accepted: <br/>
-     *              Mandatory fields:
-     *              <ul>
-     *                  <li><b>id</b> 36 characters long string</li>
-     *              </ul>
-     *              Optional fields:
+     * Updates an existing LunchPlace object. The following parameters, any of them is optional, are accepted: <br/>
      *              <ul>
      *                  <li><b>name</b> (up to 50 characters, not empty)</li>
      *                  <li><b>address</b> string, up to 100 characters</li>
      *                  <li><b>description</b> string, up to 1000 characters</li>
-     *                  <li><b>phones</b> an array of strings, each string is 10 characters long</li>
+     *                  <li><b>phones</b> an array of strings, each string consists of 10 digits</li>
      *              </ul>
      * This method requires an authorization header to be present and ADMIN userRole of a user
-     * @param placeTo
+     * @param to
      * @return Http 204 code on success
      */
-    @PutMapping
-    public ResponseEntity update(@RequestBody LunchPlaceTo placeTo) {
-        LunchPlace place = DtoIntoEntity.toLunchPlace(placeTo, AuthorizedUser.get().getId());
-        placeService.update(place, AuthorizedUser.get());
+    @PutMapping("/{id}")
+    public ResponseEntity update(@PathVariable String id, @RequestBody LunchPlaceTo to) {
+        String areaId = AuthorizedUser.get().getAreaId();
+        LunchPlace place = DtoIntoEntity.toLunchPlace(to, id);
+        ExceptionUtils.executeAndUnwrapException(
+                () -> {
+                    placeService.bulkUpdate(areaId, id, to.getName(), to.getAddress(), to.getDescription(), to.getPhones());
+                    return null;
+                },
+                ConstraintViolationException.class,
+                new DuplicateDataException(ErrorCode.DUPLICATE_PLACE_NAME, new Object[]{to.getName()})
+        );
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
@@ -103,7 +79,7 @@ public class LunchPlaceController  {
      * @param id id of the place
      * @return
      */
-    @GetMapping(value = "/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<LunchPlace> get(@PathVariable String id, LunchPlaceQueryParams params) {
         params.setIds(new String[]{id});
         RefinedFields refinedFields = new LunchPlaceRefinedFields(params.getFields());
@@ -121,22 +97,22 @@ public class LunchPlaceController  {
         return ResponseEntity.ok(places);
     }
 
-    private Collection<LunchPlace> getLunchPlacesOptimally(LunchPlaceQueryParams params, RefinedFields refinedFields) {
-        Collection<LunchPlace> places;
+    private List<LunchPlace> getLunchPlacesOptimally(LunchPlaceQueryParams params, RefinedFields refinedFields) {
+        List<LunchPlace> places;
 
         // Conditions on which LP objects have to have 'menus' field loaded from DB
         if (params.hasDates() || refinedFields.containsOriginal("menus")) {
-            places = placeService.getMultipleWithMenu(params.getIds(), params.getStartDate(), params.getEndDate(), AuthorizedUser.get());
+            places = placeService.getMultipleWithMenu(AuthorizedUser.get().getAreaId(), params.getIds(), params.getStartDate(), params.getEndDate());
         // LP w/o its associations is enough
         } else  {
-            places = placeService.getMultiple(params.getIds(), AuthorizedUser.get());
+            places = placeService.getMultiple(AuthorizedUser.get().getAreaId(), params.getIds());
         }
         return places;
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity delete(@PathVariable String id) {
-        placeService.delete(id, AuthorizedUser.get());
+        placeService.delete(AuthorizedUser.get().getAreaId(), id);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 

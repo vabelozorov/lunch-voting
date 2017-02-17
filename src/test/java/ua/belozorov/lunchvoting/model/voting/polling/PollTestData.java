@@ -1,5 +1,6 @@
 package ua.belozorov.lunchvoting.model.voting.polling;
 
+import lombok.AccessLevel;
 import lombok.Getter;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
@@ -15,7 +16,7 @@ import java.util.stream.Stream;
 import static ua.belozorov.lunchvoting.AbstractTest.NOW_DATE;
 import static ua.belozorov.lunchvoting.AbstractTest.NOW_DATE_TIME;
 import static ua.belozorov.lunchvoting.model.lunchplace.LunchPlaceTestData.*;
-import static ua.belozorov.lunchvoting.model.UserTestData.VOTERS;
+import static ua.belozorov.lunchvoting.model.UserTestData.A1_VOTERS;
 import static ua.belozorov.lunchvoting.model.UserTestData.VOTER_ID;
 
 /**
@@ -25,32 +26,37 @@ import static ua.belozorov.lunchvoting.model.UserTestData.VOTER_ID;
  */
 @Getter
 public class PollTestData {
-    public static final EqualsComparator<Poll> POLL_COMPARATOR = new PollComparator();
+    public static final PollComparator POLL_COMPARATOR = new PollComparator();
 
     private final LunchPlacePoll activePoll;
-    private final Resource pollSqlResource;
-    private final Resource pollItemSqlResource;
     private final LunchPlacePoll pastPoll;
     private final LunchPlacePoll futurePoll;
     private final LunchPlacePoll activePollNoUpdate;
+    private final LunchPlacePoll a2Poll1;
+    private final Resource pollSqlResource;
+    private final Resource pollItemSqlResource;
+
+    @Getter(AccessLevel.NONE)
     private final Map<String, Integer> positionMap = new HashMap<>();
-    private final Set<LunchPlacePoll> allPolls = new LinkedHashSet<>();
+    private final List<LunchPlacePoll> a1Polls = new ArrayList<>();
 
     public  PollTestData(LunchPlaceTestData placeTestData) {
         this.pastPoll = this.createPastPoll(placeTestData);
         this.activePoll = this.createActivePoll(placeTestData);
         this.activePollNoUpdate = this.createActivePollNoUpdate(placeTestData);
         this.futurePoll = this.createFuturePoll(placeTestData);
+        this.a2Poll1 = this.createA2Poll1(placeTestData);
 
-        this.pollSqlResource = this.createPollSqlResource(this.pastPoll, this.activePoll,
-                this.activePollNoUpdate, this.futurePoll);
+        String sql = this.createA1PollSqlResource(this.pastPoll, this.activePoll,
+                this.activePollNoUpdate, this.futurePoll) + this.createA2PollSqlResource(this.a2Poll1);
+        this.pollSqlResource = new ByteArrayResource(sql.getBytes(), "Polls");
         this.pollItemSqlResource = this.createPollItemSqlResource(this.pastPoll, this.activePoll,
-                this.activePollNoUpdate, this.futurePoll);
+                this.activePollNoUpdate, this.futurePoll, this.a2Poll1);
 
-        this.allPolls.add(this.futurePoll);
-        this.allPolls.add(this.activePoll);
-        this.allPolls.add(this.activePollNoUpdate);
-        this.allPolls.add(this.pastPoll);
+        this.a1Polls.add(this.futurePoll);
+        this.a1Polls.add(this.activePoll);
+        this.a1Polls.add(this.activePollNoUpdate);
+        this.a1Polls.add(this.pastPoll);
     }
 
 
@@ -90,8 +96,8 @@ public class PollTestData {
         );
         PollItem[] items = new PollItem[]{poll.getPollItems().get(0), poll.getPollItems().get(1)};
         Set<Vote> votes = new HashSet<>();
-        for (int i = 0; i < VOTERS.size(); i++) {
-            votes.add(new Vote(VOTERS.get(i).getId(), poll, items[i & 1], NOW_DATE_TIME.minusDays(2).plusSeconds(10*i)));
+        for (int i = 0; i < A1_VOTERS.size(); i++) {
+            votes.add(new Vote(A1_VOTERS.get(i).getId(), poll, items[i & 1], NOW_DATE_TIME.minusDays(2).plusSeconds(10*i)));
         }
         return poll.toBuilder().votes(votes).build();
     }
@@ -110,8 +116,8 @@ public class PollTestData {
         );
         PollItem[] items = new PollItem[]{poll.getPollItems().get(0), poll.getPollItems().get(1)};
         Set<Vote> votes = new HashSet<>();
-        for (int i = 0; i < VOTERS.size(); i++) {
-            votes.add(new Vote(VOTERS.get(i).getId(), poll, items[i & 1], NOW_DATE_TIME.minusHours(1).plusSeconds(10*i)));
+        for (int i = 0; i < A1_VOTERS.size(); i++) {
+            votes.add(new Vote(A1_VOTERS.get(i).getId(), poll, items[i & 1], NOW_DATE_TIME.minusHours(1).plusSeconds(10*i)));
         }
         return poll.toBuilder().votes(votes).build();
     }
@@ -146,7 +152,21 @@ public class PollTestData {
         );
     }
 
-    private Resource createPollSqlResource(LunchPlacePoll... polls) {
+    private LunchPlacePoll createA2Poll1(LunchPlaceTestData placeTestData) {
+        LocalDate menuDateToday = NOW_DATE;
+        return new LunchPlacePoll(
+                NOW_DATE_TIME.minusHours(2),
+                NOW_DATE_TIME.plusHours(2),
+                NOW_DATE_TIME.plusMinutes(10),
+                Arrays.asList(
+                        getWithFilteredMenu(menuDateToday, placeTestData.getArea2place1()),
+                        getWithFilteredMenu(menuDateToday, placeTestData.getArea2place2())
+                ),
+                menuDateToday
+        );
+    }
+
+    private String createA1PollSqlResource(LunchPlacePoll... polls) {
         String pollSql = new SimpleObjectToSqlConverter<>(
                 "polls",
                 Arrays.asList(
@@ -158,7 +178,22 @@ public class PollTestData {
                         new DateSqlColumn<>("menu_date", LunchPlacePoll::getMenuDate)
                 )
         ).convert(Arrays.asList(polls));
-        return new ByteArrayResource(pollSql.getBytes(), "Polls");
+        return pollSql;
+    }
+
+    private String createA2PollSqlResource(LunchPlacePoll... polls) {
+        String pollSql = new SimpleObjectToSqlConverter<>(
+                "polls",
+                Arrays.asList(
+                        new StringSqlColumn<>("id", LunchPlacePoll::getId),
+                        new StringSqlColumn<>("area_id", (lp) -> "AREA2_ID"),
+                        new DateTimeSqlColumn<>("start_time", lpp -> lpp.getTimeConstraint().getStartTime()),
+                        new DateTimeSqlColumn<>("end_time", lpp -> lpp.getTimeConstraint().getEndTime()),
+                        new DateTimeSqlColumn<>("change_time", lpp -> lpp.getTimeConstraint().getVoteChangeThreshold()),
+                        new DateSqlColumn<>("menu_date", LunchPlacePoll::getMenuDate)
+                )
+        ).clearDbTable(false).convert(Arrays.asList(polls));
+        return pollSql;
     }
 
     private Resource createPollItemSqlResource(LunchPlacePoll... polls) {
@@ -178,13 +213,33 @@ public class PollTestData {
         return new ByteArrayResource(pollItemsSql.getBytes(), "PollItems");
     }
 
-    private static class PollComparator implements EqualsComparator<Poll> {
+    public static class PollComparator implements EqualsComparator<LunchPlacePoll> {
         private static final EqualsComparator<List<PollItem>> POLL_ITEMS_COMPARATOR = new PollItemCollectionComparator();
+        private boolean needCompareItems = true;
+        private boolean needCompareVotes = true;
+
+        public PollComparator compareItems(boolean needCompareItems) {
+            this.needCompareItems = needCompareItems;
+            return this;
+        }
+
+        public PollComparator compareVotes(boolean needCompareVotes) {
+            this.needCompareVotes = needCompareVotes;
+            return this;
+        }
+
         @Override
-        public boolean compare(Poll obj, Poll another) {
-            return obj.getId().equals(another.getId())
-                    && obj.getPollItems().size() == another.getPollItems().size()
-                    && POLL_ITEMS_COMPARATOR.compare(obj.getPollItems(), another.getPollItems());
+        public boolean compare(LunchPlacePoll obj, LunchPlacePoll another) {
+            boolean result = obj.getId().equals(another.getId())
+                    && obj.getTimeConstraint() == obj.getTimeConstraint();
+            if (result && needCompareItems) {
+                result = obj.getPollItems().size() == another.getPollItems().size()
+                        && POLL_ITEMS_COMPARATOR.compare(obj.getPollItems(), another.getPollItems());
+            }
+            if (result && needCompareVotes) {
+                result = obj.getVotes().equals(another.getVotes()); // Comparing only by Vote#id
+            }
+            return result;
         }
     }
 

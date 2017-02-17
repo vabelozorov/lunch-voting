@@ -18,10 +18,11 @@ public abstract class BaseRepository {
     @PersistenceContext
     protected EntityManager em;
 
-    public  <T> void reliablePersist(T persistable) {
+    public  <T> T reliablePersist(T persistable) {
         em.persist(persistable);
-        em.flush();;
-        em.detach(persistable);
+        return persistable;
+//        em.flush();;
+//        em.detach(persistable);
     }
 
     public <T> T nullOrFirst(List<T> collection) {
@@ -33,7 +34,8 @@ public abstract class BaseRepository {
         em.clear();
     }
 
-    public <T> T regularGet(String sql, Class<T> returnType, Pair<String, Object>... pairs) {
+    @SafeVarargs
+    public final <T> T regularGet(String sql, Class<T> returnType, Pair<String, Object>... pairs) {
         TypedQuery<T> query = em.createQuery(sql, returnType);
         for (Pair<String, Object> pair : pairs) {
             query = query.setParameter(pair.getA(), pair.getB());
@@ -41,7 +43,8 @@ public abstract class BaseRepository {
         return nullOrFirst(query.getResultList());
     }
 
-    public <T> List<T> regularGetList(String sql, Class<T> returnType, Pair<String, Object>... pairs) {
+    @SafeVarargs
+    public final <T> List<T> regularGetList(String sql, Class<T> returnType, Pair<String, Object>... pairs) {
         TypedQuery<T> query = em.createQuery(sql, returnType);
         for (Pair<String, Object> pair : pairs) {
             query = query.setParameter(pair.getA(), pair.getB());

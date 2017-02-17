@@ -1,10 +1,12 @@
 package ua.belozorov.lunchvoting.service.voting;
 
-import ua.belozorov.lunchvoting.model.voting.polling.Poll;
+import ua.belozorov.lunchvoting.model.voting.polling.LunchPlacePoll;
+import ua.belozorov.lunchvoting.model.voting.polling.Vote;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 /**
  * <h2></h2>
@@ -17,24 +19,27 @@ public interface PollService {
      * Creates a Poll instance where PollItems are a set of LunchPlace instances and each such instance has a Menu
      * for today
      * @return ID of the created Poll instance
+     * @param areaId
      */
-    Poll createPollForTodayMenus();
+    LunchPlacePoll createPollForTodayMenus(String areaId);
 
-    Poll createPollForMenuDate(LocalDate date);
+    LunchPlacePoll createPollForMenuDate(String areaId, LocalDate date);
 
-    void delete(String id);
+    LunchPlacePoll getWithPollItems(String areaId, String pollId);
 
-    List<Poll> getAll();
+    LunchPlacePoll getWithPollItemsAndVotes(String areaId, String pollId);
 
-    Poll get(String id);
+    List<LunchPlacePoll> getAll(String areaId);
 
-    List<Poll> getPollsByActivePeriod(LocalDateTime startDt, LocalDateTime endDt);
+    List<LunchPlacePoll> getPollsByActivePeriod(String areaId, LocalDateTime startDt, LocalDateTime endDt);
 
-    List<Poll> getActivePolls();
+    List<LunchPlacePoll> getPastPolls(String areaId);
 
-    List<Poll> getFuturePolls();
+    List<LunchPlacePoll> getActivePolls(String areaId);
 
-    List<Poll> getPastPolls();
+    List<LunchPlacePoll> getFuturePolls(String areaId);
 
-    Boolean isPollActive(String id);
+    Boolean isPollActive(String areaId, String pollId);
+
+    void delete(String areaId, String pollId);
 }

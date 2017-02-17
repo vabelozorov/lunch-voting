@@ -10,6 +10,7 @@ import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.SafeHtml;
+import org.jetbrains.annotations.Nullable;
 import ua.belozorov.lunchvoting.model.User;
 import ua.belozorov.lunchvoting.model.base.AbstractPersistableObject;
 import ua.belozorov.lunchvoting.model.voting.polling.LunchPlacePoll;
@@ -34,22 +35,19 @@ public final class EatingArea extends AbstractPersistableObject {
     @SafeHtml
     private final String name;
 
-    @OneToMany
+    @OneToMany(fetch = FetchType.LAZY)
     @OrderBy("email")
     @JoinColumn(name = "area_id")
-    @Fetch(FetchMode.SUBSELECT)
     private final Set<User> users;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @OrderBy("name")
     @JoinColumn(name = "area_id")
-    @Fetch(FetchMode.SUBSELECT)
     private final Set<LunchPlace> places;
 
-    @OneToMany
+    @OneToMany(fetch = FetchType.LAZY)
     @OrderBy("menuDate")
     @JoinColumn(name = "area_id")
-    @Fetch(FetchMode.SUBSELECT)
     private final Set<LunchPlacePoll> polls;
 
     private final LocalDateTime created;
@@ -66,17 +64,12 @@ public final class EatingArea extends AbstractPersistableObject {
         this(null, name);
     }
 
-    public EatingArea(String id, String name) {
-        super(id, null);
-        this.name = name;
-        this.users = new HashSet<>();
-        this.places = new HashSet<>();
-        this.polls = new HashSet<>();
-        this.created = LocalDateTime.now().withNano(0);
+    public EatingArea(@Nullable String id, String name) {
+        this(id, null, name, new HashSet<>(), new HashSet<>(), new HashSet<>(), LocalDateTime.now().withNano(0));
     }
 
     @Builder(toBuilder = true)
-    private EatingArea(String id, Integer version, String name, @Singular  Set<User> users,
+    private EatingArea(@Nullable String id, @Nullable Integer version, String name, Set<User> users,
                        Set<LunchPlace> places, Set<LunchPlacePoll> polls, LocalDateTime created) {
         super(id, version);
         this.name = name;
@@ -94,11 +87,22 @@ public final class EatingArea extends AbstractPersistableObject {
         ofNullable(member.getAreaId())
                 .filter(this.id::equals)
                 .orElseThrow(() -> new IllegalStateException("Area member without ID or ID is null"));
-        return this.toBuilder().user(member).build();
+        this.users.add(member);
+        return this.toBuilder().build();
+    }
+
+    public EatingArea addPlace(LunchPlace place) {
+        this.places.add(place);
+        return this.toBuilder().build();
+    }
+
+    public EatingArea addPoll(LunchPlacePoll poll) {
+        this.polls.add(poll);
+        return this.toBuilder().build();
     }
 
     public Set<User> getUsers() {
-        return ImmutableSortedSet.copyOf(Comparator.comparing(User::getEmail), this.users);
+        return ImmutableSortedSet.copyOf(this.users);
     }
 
     public Set<LunchPlacePoll> getPolls() {

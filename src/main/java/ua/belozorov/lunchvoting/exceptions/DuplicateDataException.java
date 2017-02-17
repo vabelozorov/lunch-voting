@@ -1,7 +1,7 @@
 package ua.belozorov.lunchvoting.exceptions;
 
 import org.jetbrains.annotations.NonNls;
-import ua.belozorov.lunchvoting.web.exceptionhandling.Code;
+import ua.belozorov.lunchvoting.web.exceptionhandling.ErrorCode;
 
 /**
  * <h2></h2>
@@ -9,18 +9,27 @@ import ua.belozorov.lunchvoting.web.exceptionhandling.Code;
  * @author vabelozorov on 07.02.17.
  */
 public class DuplicateDataException extends RuntimeException implements ApplicationException{
-    private final Code code;
-    public DuplicateDataException(@NonNls String message) {
-        super(message);
-        this.code = Code.DUPLICATE_DATA;
+    private final ErrorCode code;
+    private final Object[] args;
+
+    public DuplicateDataException(ErrorCode code, Object[] args) {
+        this.code = code;
+        this.args = args;
     }
 
-    public Code getCode() {
+    @Override
+    public String getStringErrorCode() {
+        return code.getMessageCode();
+    }
+
+    @Override
+    public ErrorCode getErrorCode() {
         return code;
     }
 
     @Override
-    public String getErrorMessage() {
-        return super.getMessage();
+    public Object[] getArgs() {
+        return args;
     }
+
 }

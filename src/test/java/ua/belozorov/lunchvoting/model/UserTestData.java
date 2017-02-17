@@ -4,7 +4,7 @@ import lombok.Getter;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import ua.belozorov.lunchvoting.EqualsComparator;
-import ua.belozorov.lunchvoting.util.RolesToIntegerConverter;
+import ua.belozorov.lunchvoting.util.hibernate.RolesToIntegerConverter;
 import ua.belozorov.objtosql.*;
 
 import java.time.LocalDateTime;
@@ -37,6 +37,12 @@ public class UserTestData {
             new HashSet<>(Arrays.asList(UserRole.VOTER)), LocalDateTime.of(2016, 11, 17, 13, 0, 0), true, "AREA1_ID");
     public static User VOTER4 = new User("VOTER4_ID", 1, "Voter4_Name", "voter4@email.com", "voter4pass",
             new HashSet<>(Arrays.asList(UserRole.VOTER)), LocalDateTime.of(2016, 11, 17, 13, 0, 0), true, "AREA1_ID");
+
+    public static User A2_ADMIN = new User("A2_ADMIN_ID", 1, "A2admin_Name", "a2admin@email.com", "a2_adminpass",
+            new HashSet<>(Arrays.asList(UserRole.ADMIN)), LocalDateTime.of(2016, 11, 17, 13, 0, 0), true, "AREA2_ID"  );
+    public static User A2_USER1 = new User("A2_USER1_ID", 1, "Alien2_Name", "a2_user1@email.com", "a2_user1pass",
+            new HashSet<>(Arrays.asList(UserRole.VOTER)), LocalDateTime.of(2016, 11, 17, 13, 0, 0), true, "AREA2_ID");
+
     public static User ALIEN_USER1 = new User("ALIEN1_ID", 1, "Alien1_Name", "alien1@email.com", "a1lienpass",
             new HashSet<>(Arrays.asList(UserRole.VOTER)), LocalDateTime.of(2016, 11, 17, 13, 0, 0), true, null  );
     public static User ALIEN_USER2 = new User("ALIEN2_ID", 1, "Alien2_Name", "alien2@email.com", "a2lienpass",
@@ -50,17 +56,21 @@ public class UserTestData {
     public static String VOTER3_ID = VOTER3.getId();
     public static String VOTER4_ID = VOTER4.getId();
 
-    public static List<User> ALL_USERS = Stream.of(ADMIN, VOTER, VOTER1, VOTER2, VOTER3, VOTER4, GOD)
+    public static List<User> A1_USERS = Stream.of(ADMIN, VOTER, VOTER1, VOTER2, VOTER3, VOTER4, GOD)
             .sorted(Comparator.comparing(User::getEmail)).collect(Collectors.toList());
 
-    public static List<User> WITH_ALIEN = Stream.of(ADMIN, ALIEN_USER1, ALIEN_USER2, VOTER, VOTER1, VOTER2, VOTER3, VOTER4, GOD)
-            .sorted(Comparator.comparing(User::getEmail)).collect(Collectors.toList());
+    public static List<User> A2_USERS = Stream.of(A2_ADMIN, A2_USER1).sorted().collect(Collectors.toList());
 
-    public static List<User> VOTERS = Arrays.asList(VOTER, VOTER1, VOTER2, VOTER3, VOTER4);
+    public static List<User> A1_VOTERS = Arrays.asList(VOTER, VOTER1, VOTER2, VOTER3, VOTER4);
 
     private final Resource userSqlResource;
 
     public UserTestData() {
+        List<User> allUsers = new ArrayList<>();
+        allUsers.addAll(A1_USERS);
+        allUsers.addAll(A2_USERS);
+        allUsers.addAll(Arrays.asList(ALIEN_USER1, ALIEN_USER2));
+
         String sql = new SimpleObjectToSqlConverter<>(
                 "users",
                 Arrays.asList(
@@ -73,7 +83,7 @@ public class UserTestData {
                         new DateTimeSqlColumn<>("registered_date", User::getRegisteredDate),
                         new BooleanSqlColumn<>("activated", User::isActivated)
                 )
-        ).convert(WITH_ALIEN);
+        ).convert(allUsers);
         this.userSqlResource = new ByteArrayResource(sql.getBytes(), "Users");
     }
 

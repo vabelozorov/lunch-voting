@@ -10,7 +10,8 @@ import ua.belozorov.SimpleObjectToMapConverter;
 import ua.belozorov.lunchvoting.model.AuthorizedUser;
 import ua.belozorov.lunchvoting.model.User;
 import ua.belozorov.lunchvoting.model.lunchplace.JoinAreaRequest;
-import ua.belozorov.lunchvoting.service.lunchplace.EatingAreaService;
+import ua.belozorov.lunchvoting.service.area.EatingAreaService;
+import ua.belozorov.lunchvoting.service.area.JoinAreaRequestService;
 import ua.belozorov.lunchvoting.service.user.UserProfileService;
 import ua.belozorov.lunchvoting.service.user.UserService;
 
@@ -35,6 +36,9 @@ public class JoinAreaRequestControllerTest extends AbstractControllerTest {
 
     @Autowired
     private EatingAreaService areaService;
+
+    @Autowired
+    private JoinAreaRequestService requestService;
 
     @Autowired
     private UserService userService;
@@ -69,21 +73,21 @@ public class JoinAreaRequestControllerTest extends AbstractControllerTest {
 
         assertJson(expected, mvcResult.getResponse().getContentAsString());
 
-        assertNotNull(areaService.getJoinRequest(testAreas.getFirstAreaId(), id));
+        assertNotNull(requestService.getJoinRequest(testAreas.getFirstAreaId(), id));
     }
 
     @Test
     public void requesterCanRequestItsOwnRequest() throws Exception {
         String areaId = areaService.create("ChowArea", ALIEN_USER1).getId();
-        JoinAreaRequest request1 = areaService.makeJoinRequest(VOTER1, areaId);
-        JoinAreaRequest request2 = areaService.makeJoinRequest(ALIEN_USER2, areaId);
+        JoinAreaRequest request1 = requestService.makeJoinRequest(VOTER1, areaId);
+        JoinAreaRequest request2 = requestService.makeJoinRequest(ALIEN_USER2, areaId);
 
         AuthorizedUser.authorize(profileService.get(ALIEN_USER2.getId()));
         String actual = mockMvc.perform(get("{base}/{id}", REST_URL, request2.getId()).accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
 
-        JoinAreaRequest request = areaService.getJoinRequest(areaId, request2.getId());
+        JoinAreaRequest request = requestService.getJoinRequest(areaId, request2.getId());
 
         Map<String, Object> objectProperties = this.converter.convert(request);
         String expected = jsonUtils.toJson(objectProperties);
@@ -94,17 +98,17 @@ public class JoinAreaRequestControllerTest extends AbstractControllerTest {
     @Test
     public void adminCanGetAllAreaRequestsByStatus() throws Exception {
         String areaId = areaService.create("ChowArea", ALIEN_USER1).getId();
-        JoinAreaRequest request1 = areaService.makeJoinRequest(VOTER1, areaId);
-        JoinAreaRequest request2 = areaService.makeJoinRequest(VOTER2, areaId);
-        JoinAreaRequest request3 = areaService.makeJoinRequest(VOTER3, areaId);
-        areaService.approveJoinRequest(userService.get(areaId, ALIEN_USER1.getId()), request1.getId());
+        JoinAreaRequest request1 = requestService.makeJoinRequest(VOTER1, areaId);
+        JoinAreaRequest request2 = requestService.makeJoinRequest(VOTER2, areaId);
+        JoinAreaRequest request3 = requestService.makeJoinRequest(VOTER3, areaId);
+        requestService.approveJoinRequest(userService.get(areaId, ALIEN_USER1.getId()), request1.getId());
 
         AuthorizedUser.authorize(profileService.get(ALIEN_USER1.getId()));
         String actual = mockMvc.perform(get(REST_URL).param("status", "PENDING").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
 
-        List<JoinAreaRequest> requests = areaService.getJoinRequestsByStatus(areaId, JoinAreaRequest.JoinStatus.PENDING);
+        List<JoinAreaRequest> requests = requestService.getJoinRequestsByStatus(areaId, JoinAreaRequest.JoinStatus.PENDING);
         List<Map<String, Object>> objectProperties = this.converter.convert(requests);
         String expected = jsonUtils.toJson(objectProperties);
 
@@ -119,16 +123,16 @@ public class JoinAreaRequestControllerTest extends AbstractControllerTest {
     @Test
     public void testGetByRequester() throws Exception {
         String areaId = areaService.create("ChowArea", ALIEN_USER1).getId();
-        JoinAreaRequest request1 = areaService.makeJoinRequest(VOTER1, areaId);
-        JoinAreaRequest request2 = areaService.makeJoinRequest(ALIEN_USER2, testAreas.getFirstArea().getId());
-        JoinAreaRequest request3 = areaService.makeJoinRequest(ALIEN_USER2, areaId);
+        JoinAreaRequest request1 = requestService.makeJoinRequest(VOTER1, areaId);
+        JoinAreaRequest request2 = requestService.makeJoinRequest(ALIEN_USER2, testAreas.getFirstArea().getId());
+        JoinAreaRequest request3 = requestService.makeJoinRequest(ALIEN_USER2, areaId);
 
         AuthorizedUser.authorize(profileService.get(ALIEN_USER1.getId()));
         String actual = mockMvc.perform(get(REST_URL).accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
 
-        List<JoinAreaRequest> requests = areaService.getJoinRequestsByRequester(ALIEN_USER1);
+        List<JoinAreaRequest> requests = requestService.getJoinRequestsByRequester(ALIEN_USER1);
 
         List<Map<String, Object>> objectProperties = this.converter.convert(requests);
         String expected = jsonUtils.toJson(objectProperties);
@@ -139,12 +143,12 @@ public class JoinAreaRequestControllerTest extends AbstractControllerTest {
     @Test
     public void testApprove() throws Exception {
         String areaId = areaService.create("ChowArea", ALIEN_USER1).getId();
-        JoinAreaRequest request = areaService.makeJoinRequest(ALIEN_USER2, areaId);
+        JoinAreaRequest request = requestService.makeJoinRequest(ALIEN_USER2, areaId);
 
         AuthorizedUser.authorize(userService.get(areaId, ALIEN_USER1.getId()));
         mockMvc.perform(put("{base}/{id}/approve", REST_URL, request.getId()).accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
-        JoinAreaRequest actual = areaService.getJoinRequest(areaId, request.getId());
+        JoinAreaRequest actual = requestService.getJoinRequest(areaId, request.getId());
 
         assertEquals(actual.getStatus(), JoinAreaRequest.JoinStatus.APPROVED);
     }
@@ -152,12 +156,12 @@ public class JoinAreaRequestControllerTest extends AbstractControllerTest {
     @Test
     public void testReject() throws Exception {
         String areaId = areaService.create("ChowArea", ALIEN_USER1).getId();
-        JoinAreaRequest request = areaService.makeJoinRequest(ALIEN_USER2, areaId);
+        JoinAreaRequest request = requestService.makeJoinRequest(ALIEN_USER2, areaId);
 
         AuthorizedUser.authorize(userService.get(areaId, ALIEN_USER1.getId()));
         mockMvc.perform(put("{base}/{id}/reject", REST_URL, request.getId()).accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
-        JoinAreaRequest actual = areaService.getJoinRequest(areaId, request.getId());
+        JoinAreaRequest actual = requestService.getJoinRequest(areaId, request.getId());
 
         assertEquals(actual.getStatus(), JoinAreaRequest.JoinStatus.REJECTED);
     }
@@ -165,13 +169,13 @@ public class JoinAreaRequestControllerTest extends AbstractControllerTest {
     @Test
     public void testCancel() throws Exception {
         String areaId = areaService.create("ChowArea", ALIEN_USER1).getId();
-        JoinAreaRequest request = areaService.makeJoinRequest(ALIEN_USER2, areaId);
+        JoinAreaRequest request = requestService.makeJoinRequest(ALIEN_USER2, areaId);
 
         User cancelingUser = profileService.get(ALIEN_USER2.getId());
         AuthorizedUser.authorize(cancelingUser);
         mockMvc.perform(put("{base}/{id}/cancel", REST_URL, request.getId()).accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
-        JoinAreaRequest actual = areaService.getJoinRequestByRequester(cancelingUser, request.getId());
+        JoinAreaRequest actual = requestService.getJoinRequestByRequester(cancelingUser, request.getId());
 
         assertEquals(actual.getStatus(), JoinAreaRequest.JoinStatus.CANCELLED);
     }

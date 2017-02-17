@@ -3,8 +3,8 @@ package ua.belozorov.lunchvoting.repository.lunchplace;
 import ua.belozorov.lunchvoting.model.lunchplace.LunchPlace;
 
 import java.time.LocalDate;
-import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 /**
  * <h2></h2>
@@ -15,17 +15,17 @@ public interface LunchPlaceRepository {
 
     LunchPlace save(LunchPlace lunchPlace);
 
-    void update(LunchPlace lunchPlace, String userId);
+    void update(LunchPlace lunchPlace);
 
-    LunchPlace get(String id, String userId);
+    LunchPlace get(String areaId, String placeId);
 
-    Collection<LunchPlace> getAll(String userId);
+    List<LunchPlace> getAll(String areaId);
 
-    Collection<LunchPlace> getMultiple(Collection<String> placeIds);
+    List<LunchPlace> getMultiple(String areaId, Set<String> placeIds);
 
-    Collection<LunchPlace> getWithMenu(Collection<String> placeIds, LocalDate startDate, LocalDate endDate);
+    List<LunchPlace> getWithMenu(String areaId, Set<String> placeIds, LocalDate startDate, LocalDate endDate);
 
-    boolean delete(String id, String userId);
+    boolean delete(String areaId, String placeId);
 
-    List<LunchPlace> getIfMenuForDate(LocalDate date);
+    List<LunchPlace> getIfMenuForDate(String areaId, LocalDate date);
 }

@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS areas (
   version INT NOT NULL DEFAULT 0,
   name VARCHAR NOT NULL,
   created TIMESTAMP NOT NULL,
-  CONSTRAINT name_idx UNIQUE (name)
+  CONSTRAINT areas_name_unique UNIQUE (name)
 );
 
 CREATE TABLE IF NOT EXISTS polls (
@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS polls (
   end_time TIMESTAMP NOT NULL,
   change_time TIMESTAMP NOT NULL,
   menu_date TIMESTAMP NOT NULL,
-  area_id VARCHAR(36) NOT NULL,
+  area_id VARCHAR(36),
   FOREIGN KEY (area_id) REFERENCES areas(id) ON DELETE CASCADE
 );
 
@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS users (
   activated BOOL NOT NULL,
   area_id VARCHAR(36),
   FOREIGN KEY (area_id) REFERENCES areas(id) ON DELETE SET NULL,
-  CONSTRAINT email_unique_idx UNIQUE (email)
+  CONSTRAINT users_email_unique UNIQUE (email)
 );
 
 CREATE TABLE IF NOT EXISTS join_requests (
@@ -59,12 +59,10 @@ CREATE TABLE IF NOT EXISTS places (
   name VARCHAR NOT NULL,
   address VARCHAR,
   description VARCHAR,
-  user_id VARCHAR(36),
   phones VARCHAR(500),
-  area_id VARCHAR(36) NOT NULL,
+  area_id VARCHAR(36),
   FOREIGN KEY (area_id) REFERENCES areas(id) ON DELETE CASCADE,
-  FOREIGN KEY (user_id) REFERENCES users(id),
-  CONSTRAINT name_user_id_unique UNIQUE (name, user_id)
+  CONSTRAINT places_name_unique UNIQUE (name)
 );
 
 CREATE TABLE IF NOT EXISTS poll_items (
@@ -74,7 +72,7 @@ CREATE TABLE IF NOT EXISTS poll_items (
   position INT NOT NULL,
   item_id VARCHAR(36),
   FOREIGN KEY (poll_id) REFERENCES polls(id) ON DELETE CASCADE,
-  FOREIGN KEY (item_id) REFERENCES places(id)
+  FOREIGN KEY (item_id) REFERENCES places(id) ON DELETE SET NULL
 );
 
 CREATE TABLE IF NOT EXISTS menus (
@@ -102,7 +100,7 @@ CREATE TABLE IF NOT EXISTS dishes (
   name VARCHAR NOT NULL,
   price FLOAT NOT NULL,
   position INT NOT NULL,
-  CONSTRAINT entry_unique UNIQUE (menu_id, name, price),
+  CONSTRAINT dishes_menu_id_position_unique UNIQUE (menu_id, position),
   FOREIGN KEY (menu_id) REFERENCES menus(id) ON DELETE CASCADE
 );
 

@@ -32,10 +32,10 @@ public enum UserRole {
             return roles;
         }
 
-        if ((bitmask & (1<<0)) == UserRole.VOTER.id()) {
+        if ((bitmask & (1<<0)) != 0) {
             roles.add(UserRole.VOTER);
         }
-        if ((bitmask & (1<<1)) == UserRole.ADMIN.id()) {
+        if ((bitmask & (1<<1)) != 0) {
             roles.add(UserRole.ADMIN);
         }
         return roles;

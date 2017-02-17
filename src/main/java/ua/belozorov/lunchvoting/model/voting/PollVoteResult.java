@@ -1,5 +1,6 @@
 package ua.belozorov.lunchvoting.model.voting;
 
+import ua.belozorov.lunchvoting.model.voting.polling.LunchPlacePoll;
 import ua.belozorov.lunchvoting.model.voting.polling.Poll;
 import ua.belozorov.lunchvoting.model.voting.polling.Vote;
 
@@ -15,7 +16,7 @@ import java.util.stream.Collectors;
  * @author vabelozorov on 29.11.16.
  */
 public class PollVoteResult<I> implements VotingResult<I> {
-    private final Poll poll;
+    private final LunchPlacePoll poll;
     private final Map<I, ResultEntry> results;
     private final Collector<Vote, ArrayList<Vote>, ResultEntry> COLLECTOR = Collector.of(
             ArrayList<Vote>::new,
@@ -27,7 +28,7 @@ public class PollVoteResult<I> implements VotingResult<I> {
             ResultEntry::new
     );
 
-    public PollVoteResult(Poll poll, Function<Vote, I> classifier) {
+    public PollVoteResult(LunchPlacePoll poll, Function<Vote, I> classifier) {
         this.poll = poll;
         this.results = Collections.unmodifiableMap(this.toResultEntries(classifier));
     }

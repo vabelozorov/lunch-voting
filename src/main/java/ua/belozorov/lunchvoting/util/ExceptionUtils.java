@@ -12,12 +12,6 @@ import static java.util.Optional.ofNullable;
  * @author vabelozorov on 12.01.17.
  */
 public final class ExceptionUtils {
-    public static <T> Collection<T> requireNonNullNotEmpty(Collection<T> collection) {
-        return requireNonNullNotEmpty(
-                collection,
-                () -> new NullPointerException("Collection must not be null or empty")
-        );
-    }
 
     public static <T> Collection<T> requireNonNullNotEmpty(Collection<T> collection,
                                                            Supplier<? extends RuntimeException> ex) {
@@ -26,12 +20,7 @@ public final class ExceptionUtils {
                 .orElseThrow(ex);
     }
 
-    public static <T> Collection<T> requireNonNullNotEmpty(T[] array) {
-        return requireNonNullNotEmpty(Arrays.asList(array));
-    }
-
     public static void checkParamsNotNull(Object... objects) {
-        requireNonNullNotEmpty(objects);
         for (int i = 0; i < objects.length; i++) {
             if (objects[i] == null) {
                 throw new NullPointerException("Null param is not allowed, but found at position " + i);
@@ -39,7 +28,7 @@ public final class ExceptionUtils {
         }
     }
 
-    public static <T> T unwrapException(Supplier<T> supplier, Class<? extends RuntimeException> expect, RuntimeException throwOnMatch) {
+    public static <T> T executeAndUnwrapException(Supplier<T> supplier, Class<? extends RuntimeException> expect, RuntimeException throwOnMatch) {
         checkParamsNotNull(supplier, expect, throwOnMatch);
         try {
             return supplier.get();

@@ -9,16 +9,10 @@ import ua.belozorov.lunchvoting.exceptions.ApplicationException;
  */
 public class ErrorInfo {
     private final CharSequence url;
-    private final Code code;
+    private final ErrorCode code;
     private final String message;
 
-    public ErrorInfo(CharSequence url, ApplicationException ex) {
-        this.url = url;
-        this.code = ex.getCode();
-        this.message = ex.getErrorMessage();
-    }
-
-    public ErrorInfo(CharSequence url, Code code, String message) {
+    public ErrorInfo(CharSequence url, ErrorCode code, String message) {
         this.url = url;
         this.code = code;
         this.message = message;

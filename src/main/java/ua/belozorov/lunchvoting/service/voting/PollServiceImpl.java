@@ -6,15 +6,12 @@ import org.springframework.transaction.annotation.Transactional;
 import ua.belozorov.lunchvoting.exceptions.NotFoundException;
 import ua.belozorov.lunchvoting.model.lunchplace.LunchPlace;
 import ua.belozorov.lunchvoting.model.voting.polling.LunchPlacePoll;
-import ua.belozorov.lunchvoting.model.voting.polling.Poll;
 import ua.belozorov.lunchvoting.repository.lunchplace.LunchPlaceRepository;
 import ua.belozorov.lunchvoting.repository.voting.PollRepository;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static java.util.Optional.ofNullable;
 
@@ -40,71 +37,72 @@ public final class PollServiceImpl implements PollService {
     /**
      * Create a poll where poll items are composed of all currently available menus for today date.
      * @return Poll
+     * @param areaId
      */
     @Override
     @Transactional
     //TODO scheduled job?
-    public Poll createPollForTodayMenus() {
-        return this.createPollForMenuDate(LocalDate.now());
+    public LunchPlacePoll createPollForTodayMenus(String areaId) {
+        return this.createPollForMenuDate(areaId, LocalDate.now());
     }
 
     @Override
     @Transactional
-    public Poll createPollForMenuDate(LocalDate menuDate) {
-        List<LunchPlace> places = lunchPlaceRepository.getIfMenuForDate(menuDate);
+    public LunchPlacePoll createPollForMenuDate(String areaId, LocalDate menuDate) {
+        List<LunchPlace> places = lunchPlaceRepository.getIfMenuForDate(areaId, menuDate);
         LunchPlacePoll poll = new LunchPlacePoll(places, menuDate);
-        pollRepository.savePoll(poll);
+        pollRepository.save(poll);
         return poll;
     }
 
     @Override
-    @Transactional
-    public void delete(String id) {
-        if ( ! pollRepository.removePoll(id)) {
-            throw new NotFoundException(id, LunchPlacePoll.class);
-        }
+    public LunchPlacePoll getWithPollItems(String areaId, String pollId) {
+        return ofNullable(pollRepository.getWithPollItems(areaId, pollId))
+                .orElseThrow(() -> new NotFoundException(pollId, LunchPlacePoll.class));
     }
 
     @Override
-    public List<Poll> getAll() {
-        return this.castToPoll(pollRepository.getAllPolls());
+    public LunchPlacePoll getWithPollItemsAndVotes(String areaId, String pollId) {
+        return ofNullable(pollRepository.getWithPollItemsAndVotes(areaId, pollId))
+                .orElseThrow(() -> new NotFoundException(pollId, LunchPlacePoll.class));
     }
 
     @Override
-    public Poll get(String id) {
-        return ofNullable(pollRepository.get(id))
-                .orElseThrow(() -> new NotFoundException(id, LunchPlacePoll.class));
+    public List<LunchPlacePoll> getAll(String areaId) {
+        return pollRepository.getAll(areaId);
     }
 
     @Override
-    public List<Poll> getPollsByActivePeriod(LocalDateTime startDt, LocalDateTime endDt) {
-        return this.castToPoll(
-                pollRepository.getPollByActivePeriod(startDt, endDt)
-        );
+    public List<LunchPlacePoll> getPollsByActivePeriod(String areaId, LocalDateTime startDt, LocalDateTime endDt) {
+        return pollRepository.getPollByActivePeriod(areaId, startDt, endDt);
     }
 
     @Override
-    public List<Poll> getActivePolls() {
+    public List<LunchPlacePoll> getPastPolls(String areaId) {
+        return pollRepository.getPastPolls(areaId);
+    }
+
+    @Override
+    public List<LunchPlacePoll> getActivePolls(String areaId) {
         LocalDateTime now = LocalDateTime.now();
-        return this.getPollsByActivePeriod(now, now);
+        return this.getPollsByActivePeriod(areaId, now, now);
     }
 
     @Override
-    public List<Poll> getFuturePolls() {
-        return this.castToPoll(pollRepository.getFuturePolls());
+    public List<LunchPlacePoll> getFuturePolls(String areaId) {
+        return pollRepository.getFuturePolls(areaId);
     }
 
     @Override
-    public List<Poll> getPastPolls() {
-        return this.castToPoll(pollRepository.getPastPolls());
+    public Boolean isPollActive(String areaId, String pollId) {
+        return pollRepository.isActive(areaId, pollId);
     }
 
     @Override
-    public Boolean isPollActive(String id) {
-        return pollRepository.isActive(id);
-    }
-
-    private List<Poll> castToPoll(Collection<LunchPlacePoll> list) {
-        return list.stream().map(poll -> (Poll)poll).collect(Collectors.toList());
+    @Transactional
+    public void delete(String areaId, String pollId) {
+        if ( ! pollRepository.removePoll(areaId, pollId)) {
+            throw new NotFoundException(pollId, LunchPlacePoll.class);
+        }
     }
 }

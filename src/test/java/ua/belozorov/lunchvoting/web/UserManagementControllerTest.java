@@ -10,8 +10,7 @@ import ua.belozorov.lunchvoting.model.User;
 import ua.belozorov.lunchvoting.model.UserRole;
 import ua.belozorov.lunchvoting.service.user.UserProfileService;
 import ua.belozorov.lunchvoting.to.UserTo;
-import ua.belozorov.lunchvoting.util.ControllerUtils;
-import ua.belozorov.lunchvoting.web.exceptionhandling.Code;
+import ua.belozorov.lunchvoting.web.exceptionhandling.ErrorCode;
 import ua.belozorov.lunchvoting.web.exceptionhandling.ErrorInfo;
 
 import java.util.*;
@@ -37,52 +36,6 @@ public class UserManagementControllerTest extends AbstractControllerTest {
     @Autowired
     private UserProfileService profileService;
 
-    @Autowired
-    private MessageSource messageSource;
-
-//    @Test
-//    public void createAreaReturnsLocationUrlHeaderAndIdInBody() throws Exception {
-//        UserTo userTo = new UserTo("New User", "new@email.com", "strongPassword");
-//        MvcResult result = mockMvc
-//                .perform(post(REST_URL, testAreas.getFirstAreaId())
-//                        .content(jsonUtils.toJson(userTo))
-//                        .contentType(MediaType.APPLICATION_JSON))
-//                .andExpect(status().isCreated())
-//                .andReturn();
-//        String location = jsonUtils.locationFromMvcResult(result);
-//        String id = super.getCreatedId(location);
-//        String expected = jsonUtils.toJson(ControllerUtils.toMap("id", id));
-//
-//        assertJson(expected, result.getResponse().getContentAsString());
-//
-//        String got = mockMvc.perform(get(REST_URL + "/{id}", testAreas.getFirstAreaId(), id).accept(MediaType.APPLICATION_JSON))
-//                .andReturn().getResponse().getContentAsString();
-//        UserTo to = jsonUtils.strToObject(got, UserTo.class);
-//
-//        assertTrue(to.getId().equals(id));
-//    }
-//
-
-    @Test
-    public void e409AndMessageOnCreateWithDuplicateEmail() throws Exception {
-        UserTo userTo = new UserTo("New User", "god@email.com", "strongPassword");
-        MvcResult result = mockMvc
-                .perform(post(REST_URL, testAreas.getFirstAreaId())
-                        .content(jsonUtils.toJson(userTo))
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isConflict())
-                .andReturn();
-        ErrorInfo errorInfo = new ErrorInfo(
-                result.getRequest().getRequestURL(),
-                Code.DUPLICATE_DATA,
-                "Email god@email.com already exists"
-        );
-        assertJson(
-                jsonUtils.toJson(errorInfo),
-                result.getResponse().getContentAsString()
-        );
-    }
-
     @Test
     public void e400AndMessageOnCreateWithValidationFails() throws Exception {
         UserTo userTo = new UserTo("", "god1@email.com", "strongPassword");
@@ -94,8 +47,8 @@ public class UserManagementControllerTest extends AbstractControllerTest {
                 .andReturn();
         ErrorInfo errorInfo = new ErrorInfo(
                 result.getRequest().getRequestURL(),
-                Code.PARAMS_VALIDATION_FAILED,
-                "name may not be empty"
+                ErrorCode.PARAMS_VALIDATION_FAILED,
+                "field 'name', rejected value '', reason: may not be empty"
         );
         assertJson(
                 jsonUtils.toJson(errorInfo),
@@ -135,8 +88,8 @@ public class UserManagementControllerTest extends AbstractControllerTest {
                 .andReturn();
         ErrorInfo errorInfo = new ErrorInfo(
                 result.getRequest().getRequestURL(),
-                Code.ENTITY_NOT_FOUND,
-                "Entity(-ies) not found: I_DO_NOT_EXIST"
+                ErrorCode.ENTITY_NOT_FOUND,
+                "entity(-ies) not found: I_DO_NOT_EXIST"
         );
         assertJson(
                 jsonUtils.toJson(errorInfo),
@@ -149,7 +102,7 @@ public class UserManagementControllerTest extends AbstractControllerTest {
         String actual = mockMvc.perform(get(REST_URL, testAreas.getFirstAreaId()))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
-        List<UserTo> tos = ALL_USERS.stream()
+        List<UserTo> tos = A1_USERS.stream()
                 .map(UserTo::new)
                 .sorted(Comparator.comparing(UserTo::getEmail))
                 .collect(Collectors.toList());

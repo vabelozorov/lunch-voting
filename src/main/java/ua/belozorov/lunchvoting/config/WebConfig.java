@@ -20,9 +20,11 @@ import org.springframework.format.FormatterRegistry;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.validation.Validator;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import ua.belozorov.lunchvoting.DateTimeFormatters;
+import ua.belozorov.lunchvoting.web.exceptionhandling.ErrorInfoFactory;
 
 import java.util.List;
 
@@ -71,12 +73,17 @@ public class WebConfig extends WebMvcConfigurerAdapter {
         registry.addFormatter(new DateTimeFormatters.LocalDateTimeFormatter());
     }
 
-    @Bean
-    public ReloadableResourceBundleMessageSource messageSource() {
+    @Bean("messageSource")
+    public MessageSource messageSource() {
         ReloadableResourceBundleMessageSource source = new ReloadableResourceBundleMessageSource();
         source.setBasename("classpath:messages/messages");
         source.setFallbackToSystemLocale(false);
         source.setUseCodeAsDefaultMessage(false);
         return source;
+    }
+
+    @Bean
+    public ErrorInfoFactory errorInfoFactory() {
+        return new ErrorInfoFactory(messageSource());
     }
 }

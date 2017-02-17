@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -14,12 +13,18 @@ import ua.belozorov.lunchvoting.exceptions.DuplicateDataException;
 import ua.belozorov.lunchvoting.model.AuthorizedUser;
 import ua.belozorov.lunchvoting.model.User;
 import ua.belozorov.lunchvoting.model.lunchplace.EatingArea;
-import ua.belozorov.lunchvoting.service.lunchplace.EatingAreaService;
+import ua.belozorov.lunchvoting.model.lunchplace.LunchPlace;
+import ua.belozorov.lunchvoting.model.voting.polling.LunchPlacePoll;
+import ua.belozorov.lunchvoting.service.area.EatingAreaService;
 import ua.belozorov.lunchvoting.to.AreaTo;
+import ua.belozorov.lunchvoting.to.LunchPlaceTo;
 import ua.belozorov.lunchvoting.to.UserTo;
+import ua.belozorov.lunchvoting.to.transformers.DtoIntoEntity;
 import ua.belozorov.lunchvoting.util.ExceptionUtils;
+import ua.belozorov.lunchvoting.web.exceptionhandling.ErrorCode;
 
 import java.net.URI;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -52,14 +57,10 @@ public class EatingAreaController {
 
     @PostMapping
     public ResponseEntity create(@RequestParam String name) {
-        EatingArea area = ExceptionUtils.unwrapException(
+        EatingArea area = ExceptionUtils.executeAndUnwrapException(
                 () -> areaService.create(name, AuthorizedUser.get()),
                 ConstraintViolationException.class,
-                new DuplicateDataException(messageSource.getMessage(
-                        "error.duplicate_area_name",
-                        new Object[]{name},
-                        LocaleContextHolder.getLocale()
-                ))
+                new DuplicateDataException(ErrorCode.DUPLICATE_AREA_NAME, new Object[]{name})
         );
         URI uri = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path("{base}/{id}").buildAndExpand(REST_URL, area.getId()).toUri();
@@ -70,30 +71,76 @@ public class EatingAreaController {
     public ResponseEntity createUserInArea(@PathVariable("id") String areaId,
                                            @RequestBody @Validated(UserTo.Create.class) UserTo userTo) {
         User newUser = new User(null, userTo.getName(), userTo.getEmail(), userTo.getPassword());
-        User created = ExceptionUtils.unwrapException(
+        User created = ExceptionUtils.executeAndUnwrapException(
                 () -> areaService.createUserInArea(areaId, newUser),
                 ConstraintViolationException.class,
-                new DuplicateDataException(messageSource.getMessage(
-                        "error.duplicate_email",
-                        new Object[]{userTo.getEmail()},
-                        LocaleContextHolder.getLocale()
-                ))
+                new DuplicateDataException(ErrorCode.DUPLICATE_EMAIL, new Object[]{userTo.getEmail()})
         );
         URI uri = ServletUriComponentsBuilder.fromCurrentContextPath()
             .path(UserManagementController.REST_URL + "/{id}").buildAndExpand(created.getId(), created.getId()).toUri();
         return ResponseEntity.created(uri).body(toMap("id", created.getId()));
     }
 
+
+    /**
+     * Creates a new LunchPlace object via HTTP POST request.
+     * @param placeTo a LunchPlace object description in JSON format. <br/>
+     *              Mandatory fields:
+     *              <ul>
+     *                  <li><b>name</b> (up to 50 characters, not empty)</li>
+     *              </ul>
+     *              Optional fields:
+     *              <ul>
+     *                  <li><b>address</b> string, up to 100 characters</li>
+     *                  <li><b>description</b> string, up to 1000 characters</li>
+     *                  <li><b>phones</b> an array of strings, each string is 10 characters long</li>
+     *              </ul>
+     * This method requires an authorization header to be present and ADMIN userRole
+     * @return LunchPlace object with id assigned and Http 201 code on success
+     */
+    @PostMapping("/{areaId}/places")
+    public ResponseEntity createPlaceInArea(@RequestBody @Validated(LunchPlaceTo.Create.class) LunchPlaceTo placeTo) {
+        String areaId = AuthorizedUser.get().getAreaId();
+        LunchPlace created = ExceptionUtils.executeAndUnwrapException(
+                () -> areaService.createPlaceInArea(areaId, DtoIntoEntity.toLunchPlace(placeTo, null)),
+                ConstraintViolationException.class,
+                new DuplicateDataException(ErrorCode.DUPLICATE_PLACE_NAME, new Object[]{placeTo.getName()})
+        );
+        URI uri = ServletUriComponentsBuilder.fromCurrentContextPath()
+                .path("{base}/{id}").buildAndExpand(LunchPlaceController.REST_URL, created.getId()).toUri();
+        return ResponseEntity.created(uri).body(toMap("id", created.getId()));
+    }
+
+
+    /**
+     * Creates a poll based on menus that currently exists with an effective date == today
+     * @return
+     */
+    @PostMapping("/{areaId}/polls")
+    public ResponseEntity createPollForTodayMenus() {
+        String areaId = AuthorizedUser.get().getAreaId();
+        LunchPlacePoll poll = areaService.createPollInArea(areaId);
+        URI uri = ServletUriComponentsBuilder.fromCurrentContextPath()
+                .path(PollController.REST_URL + "/{id}").buildAndExpand(areaId, poll.getId()).toUri();
+        return ResponseEntity.created(uri).build();
+    }
+
+
+    @PostMapping(value = "/{areaId}/polls", params = "menuDate")
+    public ResponseEntity createPollForMenuDate(@RequestParam LocalDate menuDate) {
+        String areaId = AuthorizedUser.get().getAreaId();
+        LunchPlacePoll poll = areaService.createPollInArea(areaId, menuDate);
+        URI uri = ServletUriComponentsBuilder.fromCurrentContextPath()
+                .path(PollController.REST_URL + "/{id}").buildAndExpand(areaId, poll.getId()).toUri();
+        return ResponseEntity.created(uri).build();
+    }
+
     @PutMapping
     public ResponseEntity update(@RequestParam String name) {
-        ExceptionUtils.unwrapException(
-                () -> {areaService.update(name, AuthorizedUser.get()); return null; },
+        ExceptionUtils.executeAndUnwrapException(
+                () -> {areaService.updateAreaName(name, AuthorizedUser.get()); return null; },
                 ConstraintViolationException.class,
-                new DuplicateDataException(messageSource.getMessage(
-                        "error.duplicate_area_name",
-                        new Object[]{name},
-                        LocaleContextHolder.getLocale()
-                ))
+                new DuplicateDataException(ErrorCode.DUPLICATE_AREA_NAME, new Object[]{name})
         );
         return ResponseEntity.noContent().build();
     }

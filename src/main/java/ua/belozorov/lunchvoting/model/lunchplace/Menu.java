@@ -29,7 +29,7 @@ import static java.util.Optional.ofNullable;
 @Getter
 //@Audited
 @DynamicUpdate
-public final class Menu extends AbstractPersistableObject {
+public final class Menu extends AbstractPersistableObject implements Comparable<Menu> {
 
     @Column(name = "effective_date", nullable = false)
     @NotNull
@@ -38,10 +38,9 @@ public final class Menu extends AbstractPersistableObject {
     @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name = "dishes", joinColumns = @JoinColumn(name = "menu_id"))
     @NotEmpty
-    @Getter(AccessLevel.NONE)
     private final Set<Dish> dishes;
 
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "place_id")
     @NotNull
     @JsonIgnore
@@ -58,7 +57,7 @@ public final class Menu extends AbstractPersistableObject {
     }
 
     @Builder
-    public Menu(LocalDate effectiveDate, List<Dish> dishes, LunchPlace lunchPlace) {
+    public Menu(LocalDate effectiveDate, Set<Dish> dishes, LunchPlace lunchPlace) {
         this(null, null, effectiveDate, dishes, lunchPlace);
     }
 
@@ -79,13 +78,8 @@ public final class Menu extends AbstractPersistableObject {
     }
 
     public Set<Dish> getDishes() {
-        return ImmutableSortedSet.<Dish>naturalOrder().addAll(this.dishes).build();
+        return ImmutableSortedSet.copyOf(this.dishes);
     }
-
-    //
-//    Menu setDishes(List<Dish> dishes) {
-//        return builder(this).dishes(dishes).build();
-//    }
 
     public static MenuBuilder builder() {
         return new MenuBuilder();
@@ -93,6 +87,12 @@ public final class Menu extends AbstractPersistableObject {
 
     public static MenuBuilder builder(Menu menu) {
         return new MenuBuilder(menu);
+    }
+
+    @Override
+    public int compareTo(Menu o) {
+        int i = (-1) * this.effectiveDate.compareTo(o.effectiveDate);
+        return i != 0 ? i : this.id.compareTo(o.id);
     }
 
     public static class MenuBuilder {

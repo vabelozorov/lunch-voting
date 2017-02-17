@@ -14,7 +14,7 @@ import java.util.Objects;
  * @author vabelozorov on 09.12.16.
  */
 @Embeddable
-@Getter(AccessLevel.PACKAGE)
+@Getter(AccessLevel.PUBLIC)
 public final class TimeConstraint {
     @Column(name = "start_time")
     private final LocalDateTime startTime;
@@ -32,9 +32,9 @@ public final class TimeConstraint {
     }
 
     TimeConstraint(LocalDateTime startTime, LocalDateTime endTime, LocalDateTime voteChangeThreshold) {
-        this.startTime = Objects.requireNonNull(startTime, "startTime must not be null");
-        this.endTime = Objects.requireNonNull(endTime, "endTime must not be null");
-        this.voteChangeThreshold = Objects.requireNonNull(voteChangeThreshold, "voteChangeThreshold must not be null");
+        this.startTime = Objects.requireNonNull(startTime, "startTime must not be null").withNano(0);
+        this.endTime = Objects.requireNonNull(endTime, "endTime must not be null").withNano(0);
+        this.voteChangeThreshold = Objects.requireNonNull(voteChangeThreshold, "voteChangeThreshold must not be null").withNano(0);
 
         if ( ! this.startTime.isBefore(this.endTime)) {
             throw new IllegalStateException("startTime must be before endTime");

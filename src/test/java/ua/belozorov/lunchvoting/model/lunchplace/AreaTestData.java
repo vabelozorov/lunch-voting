@@ -1,15 +1,17 @@
 package ua.belozorov.lunchvoting.model.lunchplace;
 
+import com.google.common.collect.ImmutableSet;
 import lombok.Getter;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import ua.belozorov.lunchvoting.EqualsComparator;
 import ua.belozorov.lunchvoting.MatcherUtils;
 import ua.belozorov.lunchvoting.model.User;
+import ua.belozorov.lunchvoting.model.base.Persistable;
+import ua.belozorov.lunchvoting.model.voting.polling.LunchPlacePoll;
 import ua.belozorov.lunchvoting.model.voting.polling.Poll;
 import ua.belozorov.lunchvoting.model.voting.polling.PollTestData;
 import ua.belozorov.lunchvoting.to.AreaTo;
-import ua.belozorov.lunchvoting.to.JoinRequestTo;
 import ua.belozorov.objtosql.DateTimeSqlColumn;
 import ua.belozorov.objtosql.SimpleObjectToSqlConverter;
 import ua.belozorov.objtosql.StringSqlColumn;
@@ -20,8 +22,8 @@ import java.util.HashSet;
 import java.util.stream.Collectors;
 
 import static ua.belozorov.lunchvoting.MatcherUtils.equalsWithNulls;
-import static ua.belozorov.lunchvoting.model.UserTestData.ALL_USERS;
-import static ua.belozorov.lunchvoting.model.UserTestData.GOD;
+import static ua.belozorov.lunchvoting.model.UserTestData.A1_USERS;
+import static ua.belozorov.lunchvoting.model.UserTestData.A2_USERS;
 
 /**
  * <h2></h2>
@@ -39,30 +41,42 @@ public final class AreaTestData {
     private final String firstAreaName;
     private final String firstAreaId;
     private final LocalDateTime firstAreaDate;
+    private final EatingArea secondArea;
+    private final String secondAreaName;
+    private final String secondAreaId;
+    private final LocalDateTime secondAreaDate;
 
     public AreaTestData(PollTestData pollTestData, LunchPlaceTestData placeTestData) {
         this.firstArea = new EatingArea("AREA1_ID", "AREA_NAME").toBuilder()
-                .places(new HashSet<>(placeTestData.getPlaces()))
-                .polls(pollTestData.getAllPolls())
-                .users(ALL_USERS)
-                .user(GOD)
+                .places(new HashSet<>(placeTestData.getA1Places()))
+                .polls(new HashSet<>(pollTestData.getA1Polls()))
+                .users(new HashSet<>(A1_USERS))
                 .build();
         this.firstAreaName = firstArea.getName();
         this.firstAreaId = firstArea.getId();
         this.firstAreaDate = firstArea.getCreated();
 
+        this.secondArea = new EatingArea("AREA2_ID", "AREA2_NAME").toBuilder()
+                .places(new HashSet<>(placeTestData.getA2Places()))
+//                .polls(pollTestData.getA1Polls())
+                .users(new HashSet<>(A2_USERS))
+                .build();
+        this.secondAreaName = secondArea.getName();
+        this.secondAreaId = secondArea.getId();
+        this.secondAreaDate = secondArea.getCreated();
+
         String areas = new SimpleObjectToSqlConverter<>("areas", Arrays.asList(
             new StringSqlColumn<>("id", EatingArea::getId),
             new StringSqlColumn<>("name", EatingArea::getName),
             new DateTimeSqlColumn<>("created", EatingArea::getCreated)
-        )).convert(Arrays.asList(this.firstArea));
+        )).convert(Arrays.asList(this.firstArea, this.secondArea));
         this.areaSqlResource = new ByteArrayResource(areas.getBytes(), "Areas");
     }
 
     public static AreaTo dto(EatingArea area) {
         return new AreaTo(area.getId(), area.getName(), area.getCreated(),
             area.getUsers().stream().map(User::getId).sorted().collect(Collectors.toList()),
-            area.getPolls().stream().map(Poll::getId).sorted().collect(Collectors.toList()),
+            area.getPolls().stream().map(Persistable::getId).sorted().collect(Collectors.toList()),
             area.getPlaces().stream().map(LunchPlace::getId).sorted().collect(Collectors.toList())
         );
     }
@@ -70,7 +84,7 @@ public final class AreaTestData {
     public static AreaTo dtoSummary(EatingArea area) {
         return new AreaTo(area.getId(), area.getName(), area.getCreated(),
                 area.getUsers().stream().map(User::getId).count(),
-                area.getPolls().stream().map(Poll::getId).count(),
+                area.getPolls().stream().map(Persistable::getId).count(),
                 area.getPlaces().stream().map(LunchPlace::getId).count()
         );
     }

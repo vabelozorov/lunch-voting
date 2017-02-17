@@ -28,6 +28,8 @@ public class VotingControllerTest extends AbstractControllerTest {
     @Autowired
     private VotingService votingService;
 
+    public final String areaId = testAreas.getFirstAreaId();
+
     @Test
     public void voteForPoll() throws Exception {
         String id = testPolls.getActivePoll().getId();
@@ -40,7 +42,7 @@ public class VotingControllerTest extends AbstractControllerTest {
                 .andReturn()
                     .getResponse().getContentAsString();
 
-        Vote vote = votingService.getVotesForPoll(id).stream()
+        Vote vote = votingService.getVotesForPoll(areaId, id).stream()
                 .filter(v -> v.getVoterId().equals(GOD_ID))
                 .findAny().get();
         String expected = jsonUtils.toJson(new VoteTo(vote, true));

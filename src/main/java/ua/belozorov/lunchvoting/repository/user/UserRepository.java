@@ -2,8 +2,10 @@ package ua.belozorov.lunchvoting.repository.user;
 
 import org.jetbrains.annotations.Nullable;
 import ua.belozorov.lunchvoting.model.User;
+import ua.belozorov.lunchvoting.model.UserRole;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Created by vabelozorov on 14.11.16.
@@ -22,4 +24,6 @@ public interface UserRepository {
     boolean delete(@Nullable  String areaId, String userId);
 
     void flushAndClear();
+
+    List<User> getUsersByRole(String areaId, UserRole role);
 }

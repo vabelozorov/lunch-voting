@@ -8,7 +8,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import ua.belozorov.lunchvoting.model.User;
+import ua.belozorov.lunchvoting.model.UserRole;
 import ua.belozorov.lunchvoting.repository.BaseRepository;
+import ua.belozorov.lunchvoting.util.Pair;
 
 import java.util.Collection;
 import java.util.List;
@@ -48,13 +50,14 @@ public class UserRepositoryImpl extends BaseRepository implements UserRepository
 
     @Override
     public boolean delete(String areaId, String userId) {
-//        em.createQuery("UPDATE Vote v SET v.voterId = null WHERE v.voterId = ?1")
-//                .setParameter(1, id)
-//                .executeUpdate();
-        em.createQuery("UPDATE LunchPlace lp SET lp.adminId = null WHERE lp.adminId = ?1")
-                .setParameter(1, userId)
-                .executeUpdate();
         return crudRepository.deleteById(areaId, userId) != 0;
+    }
+
+
+    @Override
+    public List<User> getUsersByRole(String areaId, UserRole role) {
+        String sql = "SELECT u FROM User u WHERE u.areaId= :areaId AND bitwise_and(u.roles, :mask) != 0";
+        return super.regularGetList(sql, User.class, new Pair<>("areaId", areaId), new Pair<>("mask", 1 << role.ordinal()));
     }
 
     /**
@@ -70,6 +73,7 @@ public class UserRepositoryImpl extends BaseRepository implements UserRepository
 
         @Query("SELECT u FROM User u WHERE u.areaId= ?1 ORDER BY u.email ASC")
         List<User> findAll(String areaId);
+
 
         @Modifying
         @Query("DELETE FROM User u WHERE u.areaId= :areaId AND u.id = :userId")

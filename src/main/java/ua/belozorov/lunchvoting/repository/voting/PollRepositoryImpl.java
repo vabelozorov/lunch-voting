@@ -7,10 +7,11 @@ import ua.belozorov.lunchvoting.model.voting.polling.Vote;
 import ua.belozorov.lunchvoting.repository.BaseRepository;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static ua.belozorov.lunchvoting.util.Pair.*;
 
 /**
  * <h2></h2>
@@ -21,67 +22,33 @@ import java.util.stream.Collectors;
 public class PollRepositoryImpl extends BaseRepository implements PollRepository {
 
     @Override
-    public void savePoll(LunchPlacePoll poll) {
-        super.reliablePersist(poll);
+    public LunchPlacePoll save(LunchPlacePoll poll) {
+        em.persist(poll);
+        return poll;
     }
 
     @Override
-    public boolean removePoll(String id) {
-        return em.createQuery("DELETE FROM LunchPlacePoll p WHERE p.id= :id")
-                .setParameter("id", id).executeUpdate() != 0;
+    public Vote save(Vote vote) {
+        em.persist(vote);
+        return vote;
     }
 
     @Override
-    public Vote getVoteInPoll(String voterId, String pollId) {
-        List<Vote> votes = em.createQuery("SELECT v FROM Vote v WHERE v.poll.id= :pollId AND v.voterId= :voterId", Vote.class)
-                .setParameter("pollId", pollId)
-                .setParameter("voterId", voterId)
-                .getResultList();
-        return super.nullOrFirst(votes);
-    }
-
-    @Override
-    public void saveVote(final Vote vote) {
-        super.reliablePersist(vote);
-    }
-
-    @Override
-    public void removeVote(final Vote vote) {
-        em.remove(vote);
-    }
-
-    @Override
-    public void removeVotes(Set<Vote> forRemoval) {
+    public void remove(Set<Vote> forRemoval) {
         List<String> ids = forRemoval.stream().map(Vote::getId).collect(Collectors.toList());
         em.createQuery("DELETE FROM Vote v WHERE v.id IN :ids")
                 .setParameter("ids", ids).executeUpdate();
     }
 
     @Override
-    public void replaceVote(final Set<Vote> forRemoval, final Vote acceptedVote) {
-        this.removeVotes(forRemoval);
-        this.saveVote(acceptedVote);
-    }
-
-    @Override
-    public Collection<String> getVotedByVoter(String pollId, String voterId) {
-        String sql = "SELECT vi.pollItem.id FROM LunchPlacePoll p " +
-                "INNER JOIN p.votes vi " +
-                "WHERE p.id= :pollId AND vi.voterId= :voterId";
-        List<String> ids = em.createQuery(sql, String.class)
-                .setParameter("pollId", pollId)
-                .setParameter("voterId", voterId)
-                .getResultList();
-        return ids;
-    }
-
-    @Override
-    public LunchPlacePoll getPollAndPollItemsAndVotes(String pollId) {
+    public LunchPlacePoll getWithPollItemsAndVotes(String areaId, String pollId) {
         String sql = "SELECT DISTINCT p FROM LunchPlacePoll p " +
                 "LEFT JOIN FETCH p.pollItems pi " +
                 "LEFT JOIN FETCH p.votes v " +
-                "WHERE p.id= :id";
+                "WHERE p.id= :id " +
+                    "AND p IN (SELECT p1 FROM EatingArea ea JOIN ea.polls p1 WHERE ea.id= :areaId)";
         List<LunchPlacePoll> polls = em.createQuery(sql, LunchPlacePoll.class)
+                .setParameter("areaId", areaId)
                 .setParameter("id", pollId)
                 .setHint(QueryHints.HINT_PASS_DISTINCT_THROUGH, false)
                 .getResultList();
@@ -89,12 +56,14 @@ public class PollRepositoryImpl extends BaseRepository implements PollRepository
     }
 
     @Override
-    public LunchPlacePoll get(String id) {
+    public LunchPlacePoll getWithPollItems(String areaId, String pollId) {
         String sql = "SELECT DISTINCT p FROM LunchPlacePoll p " +
                 "LEFT JOIN FETCH p.pollItems pi " +
-                "WHERE p.id= :id";
+                "WHERE p.id= :id " +
+                    "AND p IN (SELECT p1 FROM EatingArea ea JOIN ea.polls p1 WHERE ea.id= :areaId)";
         List<LunchPlacePoll> polls = em.createQuery(sql, LunchPlacePoll.class)
-                .setParameter("id", id)
+                .setParameter("areaId", areaId)
+                .setParameter("id", pollId)
                 .setHint(QueryHints.HINT_PASS_DISTINCT_THROUGH, false)
                 .getResultList();
         em.clear();
@@ -102,13 +71,25 @@ public class PollRepositoryImpl extends BaseRepository implements PollRepository
     }
 
     @Override
-    public LunchPlacePoll getWithVotes(String id) {
+    public LunchPlacePoll get(String areaId, String pollId) {
+        String sql = "SELECT p FROM LunchPlacePoll p " +
+                "WHERE p.id= :id AND p IN (" +
+                    "SELECT p1 FROM EatingArea ea JOIN ea.polls p1 WHERE ea.id= :areaId)";
+        List<LunchPlacePoll> polls = em.createQuery(sql, LunchPlacePoll.class)
+                .setParameter("areaId", areaId)
+                .setParameter("id", pollId)
+                .getResultList();
+        em.clear();
+        return super.nullOrFirst(polls);
+    }
+
+    @Override
+    public LunchPlacePoll getWithPollItems(String pollId) {
         String sql = "SELECT DISTINCT p FROM LunchPlacePoll p " +
                 "LEFT JOIN FETCH p.pollItems pi " +
-                "LEFT JOIN FETCH p.votes " +
-                "WHERE p.id= :id";
+                "WHERE p.id= :id ";
         List<LunchPlacePoll> polls = em.createQuery(sql, LunchPlacePoll.class)
-                .setParameter("id", id)
+                .setParameter("id", pollId)
                 .setHint(QueryHints.HINT_PASS_DISTINCT_THROUGH, false)
                 .getResultList();
         em.clear();
@@ -116,23 +97,27 @@ public class PollRepositoryImpl extends BaseRepository implements PollRepository
     }
 
     @Override
-    public List<LunchPlacePoll> getAllPolls() {
+    public List<LunchPlacePoll> getAll(String areaId) {
         String sql = "SELECT DISTINCT p FROM LunchPlacePoll p " +
-                "LEFT JOIN FETCH p.pollItems pi " +
+                "WHERE p IN (" +
+                    "SELECT p1 FROM EatingArea ea JOIN ea.polls p1 WHERE ea.id= :areaId) " +
                 "ORDER BY p.menuDate DESC, p.id";
         return em.createQuery(sql, LunchPlacePoll.class)
+                .setParameter("areaId", areaId)
                 .setHint(QueryHints.HINT_PASS_DISTINCT_THROUGH, false)
                 .getResultList();
     }
 
     @Override
-    public List<LunchPlacePoll> getPollByActivePeriod(LocalDateTime startDt, LocalDateTime endDt) {
+    public List<LunchPlacePoll> getPollByActivePeriod(String areaId, LocalDateTime startDt, LocalDateTime endDt) {
         String sql = "SELECT DISTINCT p FROM LunchPlacePoll p " +
-                "LEFT JOIN FETCH p.pollItems pi " +
-                "WHERE :startDt BETWEEN p.timeConstraint.startTime AND p.timeConstraint.endTime "+
-                    "OR :endDt BETWEEN p.timeConstraint.startTime AND p.timeConstraint.endTime " +
+                "WHERE (:startDt BETWEEN p.timeConstraint.startTime AND p.timeConstraint.endTime "+
+                    "OR :endDt BETWEEN p.timeConstraint.startTime AND p.timeConstraint.endTime) " +
+                    "AND p IN (" +
+                        "SELECT p1 FROM EatingArea ea JOIN ea.polls p1 WHERE ea.id= :areaId) " +
                 "ORDER BY p.menuDate DESC, p.id";
         List<LunchPlacePoll> polls = em.createQuery(sql, LunchPlacePoll.class)
+                .setParameter("areaId", areaId)
                 .setParameter("startDt", startDt)
                 .setParameter("endDt", endDt)
                 .setHint(QueryHints.HINT_PASS_DISTINCT_THROUGH, false)
@@ -141,13 +126,14 @@ public class PollRepositoryImpl extends BaseRepository implements PollRepository
     }
 
     @Override
-    public List<LunchPlacePoll> getFuturePolls() {
+    public List<LunchPlacePoll> getFuturePolls(String areaId) {
         LocalDateTime now = LocalDateTime.now();
         String sql = "SELECT DISTINCT p FROM LunchPlacePoll p " +
-                "LEFT JOIN FETCH p.pollItems pi " +
                 "WHERE p.timeConstraint.startTime > :now " +
+                "AND p IN (SELECT p1 FROM EatingArea ea JOIN ea.polls p1 WHERE ea.id= :areaId) " +
                 "ORDER BY p.menuDate DESC, p.id";
         List<LunchPlacePoll> polls = em.createQuery(sql, LunchPlacePoll.class)
+                .setParameter("areaId", areaId)
                 .setParameter("now", now)
                 .setHint(QueryHints.HINT_PASS_DISTINCT_THROUGH, false)
                 .getResultList();
@@ -155,13 +141,14 @@ public class PollRepositoryImpl extends BaseRepository implements PollRepository
     }
 
     @Override
-    public List<LunchPlacePoll> getPastPolls() {
+    public List<LunchPlacePoll> getPastPolls(String areaId) {
         LocalDateTime now = LocalDateTime.now();
         String sql = "SELECT DISTINCT p FROM LunchPlacePoll p " +
-                "LEFT JOIN FETCH p.pollItems pi " +
                 "WHERE p.timeConstraint.endTime < :now " +
+                    "AND  p IN (SELECT p1 FROM EatingArea ea JOIN ea.polls p1 WHERE ea.id= :areaId) " +
                 "ORDER BY p.menuDate DESC, p.id";
         List<LunchPlacePoll> polls = em.createQuery(sql, LunchPlacePoll.class)
+                .setParameter("areaId", areaId)
                 .setParameter("now", now)
                 .setHint(QueryHints.HINT_PASS_DISTINCT_THROUGH, false)
                 .getResultList();
@@ -169,22 +156,73 @@ public class PollRepositoryImpl extends BaseRepository implements PollRepository
     }
 
     @Override
-    public Collection<Vote> getVotesForPoll(String pollId) {
-        String sql = "SELECT v FROM Vote v WHERE v.poll.id= :pollId";
-        List<Vote> votes = em.createQuery(sql, Vote.class)
-                .setParameter("pollId", pollId)
-                .getResultList();
-        return votes;
-    }
-
-    @Override
-    public Boolean isActive(String id) {
+    public Boolean isActive(String areaId, String pollId) {
         String sql = "SELECT CASE WHEN count(p) > 0 THEN false ELSE true END " +
                 "FROM LunchPlacePoll p  " +
-                "WHERE p.timeConstraint.endTime < :now AND p.id= :id";
+                "WHERE p.timeConstraint.endTime < :now AND p.id= :id " +
+                    "AND p IN (SELECT p1 FROM EatingArea ea JOIN ea.polls p1 WHERE ea.id= :areaId)";
         return em.createQuery(sql, Boolean.class)
-                .setParameter("id", id)
+                .setParameter("areaId", areaId)
+                .setParameter("id", pollId)
                 .setParameter("now", LocalDateTime.now())
                 .getSingleResult();
+    }
+
+    @Override
+    public List<String> getVotedByVoter(String areaId, String pollId, String voterId) {
+        String sql = "SELECT vi.pollItem.id FROM LunchPlacePoll p " +
+                "INNER JOIN p.votes vi " +
+                "WHERE p.id= :pollId AND vi.voterId= :voterId " +
+                    "AND p IN (SELECT p1 FROM EatingArea ea JOIN ea.polls p1 WHERE ea.id= :areaId)";
+        return super.regularGetList(sql, String.class,
+                pairOf("areaId", areaId), pairOf("pollId", pollId), pairOf("voterId", voterId));
+    }
+
+    @Override
+    public Vote getVoteInPoll(String areaId, String voterId, String pollId) {
+//        String sql = "SELECT v FROM Vote v WHERE v.poll.id= :pollId AND v.voterId= :voterId";
+        String sql = "SELECT v FROM EatingArea ea " +
+                "INNER JOIN ea.polls p " +
+                "INNER JOIN p.votes v " +
+                "WHERE ea.id= :areaId AND p.id= :pollId AND v.voterId= :voterId";
+        return super.regularGet(sql, Vote.class,
+                pairOf("areaId", areaId), pairOf("pollId", pollId), pairOf("voterId", voterId));
+    }
+
+    @Override
+    public List<Vote> getVotesForPoll(String areaId, String pollId) {
+        String sql = "SELECT v FROM Vote v JOIN v.poll p " +
+                "WHERE p.id= :pollId AND p IN (" +
+                    "SELECT p1 FROM EatingArea ea JOIN ea.polls p1 WHERE ea.id= :areaId) " +
+                "ORDER BY v.voteTime, v.id";
+        return super.regularGetList(sql, Vote.class,
+                pairOf("areaId", areaId), pairOf("pollId", pollId));
+    }
+
+    @Override
+    public boolean removePoll(String areaId, String pollId) {
+        String sql = "DELETE FROM LunchPlacePoll p " +
+                "WHERE p.id= :id AND p IN (" +
+                    "SELECT po FROM EatingArea ea JOIN ea.polls po WHERE ea.id= :areaId)";
+        return em.createQuery(sql)
+                .setParameter("areaId", areaId)
+                .setParameter("id", pollId)
+                .executeUpdate() != 0;
+    }
+
+    @Override
+    public LunchPlacePoll get(String pollId) {
+        String sql = "SELECT p FROM LunchPlacePoll p " +
+                "WHERE p.id= :id";
+        List<LunchPlacePoll> polls = em.createQuery(sql, LunchPlacePoll.class)
+                .setParameter("id", pollId)
+                .getResultList();
+        em.clear();
+        return super.nullOrFirst(polls);
+    }
+
+    @Override
+    public void remove(Vote vote) {
+        em.remove(vote);
     }
 }

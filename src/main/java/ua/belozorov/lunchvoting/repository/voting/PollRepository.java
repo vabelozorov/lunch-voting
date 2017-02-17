@@ -1,13 +1,9 @@
 package ua.belozorov.lunchvoting.repository.voting;
 
 import ua.belozorov.lunchvoting.model.voting.polling.LunchPlacePoll;
-import ua.belozorov.lunchvoting.model.voting.polling.Poll;
-import ua.belozorov.lunchvoting.model.voting.polling.PollItem;
 import ua.belozorov.lunchvoting.model.voting.polling.Vote;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -18,43 +14,47 @@ import java.util.Set;
  */
 public interface PollRepository {
 
-    void savePoll(LunchPlacePoll poll);
+    LunchPlacePoll save(LunchPlacePoll poll);
 
-    boolean removePoll(String id);
+    boolean removePoll(String areaId, String pollId);
 
-    LunchPlacePoll get(String id);
+    LunchPlacePoll get(String pollId);
 
-    LunchPlacePoll getWithVotes(String id);
+    LunchPlacePoll get(String areaId, String pollId);
 
-    List<LunchPlacePoll> getAllPolls();
+    LunchPlacePoll getWithPollItems(String pollId);
 
-    List<LunchPlacePoll> getPollByActivePeriod(LocalDateTime startDate, LocalDateTime endDate);
+    LunchPlacePoll getWithPollItems(String areaId, String pollId);
+
+    List<LunchPlacePoll> getAll(String areaId);
+
+    List<LunchPlacePoll> getPollByActivePeriod(String areaId, LocalDateTime startDate, LocalDateTime endDate);
+
+    LunchPlacePoll getWithPollItemsAndVotes(String areaId, String pollId);
+
+    List<LunchPlacePoll> getFuturePolls(String areaId);
+
+    List<LunchPlacePoll> getPastPolls(String areaId);
+
+    List<Vote> getVotesForPoll(String areaId, String pollId);
+
+    Boolean isActive(String areaId, String pollId);
+
+    Vote save(Vote vote);
 
     /**
      * Searches for a voter's vote assuming that only one vote from a voter can be given in a particular poll
+     *
+     * @param areaId
      * @param voterId
      * @param pollId
      * @return
      */
-    Vote getVoteInPoll(String voterId, String pollId);
+    Vote getVoteInPoll(String areaId, String voterId, String pollId);
 
-    void saveVote(Vote vote);
+    List<String> getVotedByVoter(String areaId, String pollId, String voterId);
 
-    void removeVote(Vote vote);
+    void remove(Vote vote);
 
-    void removeVotes(Set<Vote> forRemoval);
-
-    void replaceVote(Set<Vote> forRemoval, Vote acceptedVote);
-
-    Collection<String> getVotedByVoter(String pollId, String voterId);
-
-    LunchPlacePoll getPollAndPollItemsAndVotes(String pollId);
-
-    List<LunchPlacePoll> getFuturePolls();
-
-    List<LunchPlacePoll> getPastPolls();
-
-    Collection<Vote> getVotesForPoll(String pollId);
-
-    Boolean isActive(String id);
+    void remove(Set<Vote> forRemoval);
 }

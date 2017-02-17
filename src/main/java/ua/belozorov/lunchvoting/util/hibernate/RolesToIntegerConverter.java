@@ -1,4 +1,4 @@
-package ua.belozorov.lunchvoting.util;
+package ua.belozorov.lunchvoting.util.hibernate;
 
 import ua.belozorov.lunchvoting.model.UserRole;
 

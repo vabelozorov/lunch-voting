@@ -2,9 +2,6 @@ package ua.belozorov.lunchvoting.repository.lunchplace;
 
 import ua.belozorov.lunchvoting.model.lunchplace.Menu;
 
-import java.util.Collection;
-import java.util.List;
-
 /**
  * <h2></h2>
  *
@@ -12,11 +9,9 @@ import java.util.List;
  */
 public interface MenuRepository {
 
-    boolean deleteMenu(String lunchPlaceId, String menuId);
+    Menu save(Menu menu);
 
-    Menu getMenu(String menuId);
+    Menu getMenu(String areaId, String placeId, String menuId, MenuRepositoryImpl.Fields... fields);
 
-    List<Menu> getTodayMenus();
-
-    void save(Menu menu);
+    boolean deleteMenu(String menuId);
 }

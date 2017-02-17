@@ -1,19 +1,21 @@
 package ua.belozorov.lunchvoting.service.lunchplace;
 
+import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ua.belozorov.lunchvoting.exceptions.NotFoundException;
-import ua.belozorov.lunchvoting.model.User;
+import ua.belozorov.lunchvoting.model.lunchplace.Dish;
 import ua.belozorov.lunchvoting.model.lunchplace.LunchPlace;
 import ua.belozorov.lunchvoting.model.lunchplace.Menu;
 import ua.belozorov.lunchvoting.repository.lunchplace.LunchPlaceRepository;
 import ua.belozorov.lunchvoting.repository.lunchplace.MenuRepository;
-import ua.belozorov.lunchvoting.to.MenuTo;
+import ua.belozorov.lunchvoting.repository.lunchplace.MenuRepositoryImpl;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 
 import static java.util.Optional.ofNullable;
 
@@ -34,46 +36,60 @@ public class LunchPlaceServiceImpl implements LunchPlaceService {
 
     @Override
     @Transactional
-    public LunchPlace create(LunchPlace place, User user) {
+    public LunchPlace create(LunchPlace place) {
         return lunchPlaceRepository.save(place);
     }
 
     @Override
     @Transactional
-    public void update(LunchPlace place, User user) {
-        lunchPlaceRepository.update(place, user.getId());
+    public void bulkUpdate(String areaId, String placeId, @Nullable String name, @Nullable String address, @Nullable String description, @Nullable Set<String> phones) {
+        LunchPlace toBeUpdated = this.get(areaId, placeId);
+        LunchPlace.LunchPlaceBuilder builder = toBeUpdated.toBuilder();
+        if (name != null) {
+            builder.name(name);
+        }
+        if(address != null) {
+            builder.address(address);
+        }
+        if(description != null) {
+            builder.description(description);
+        }
+        if (phones != null) {
+            builder.phones(phones);
+        }
+        lunchPlaceRepository.update(builder.build());
     }
 
     @Override
-    public LunchPlace get(String id, User user) {
-        return ofNullable(lunchPlaceRepository.get(id, user.getId()))
-                .orElseThrow(() -> new NotFoundException(id, LunchPlace.class));
+    public LunchPlace get(String areaId, String placeId) {
+        return ofNullable(lunchPlaceRepository.get(areaId, placeId))
+                .orElseThrow(() -> new NotFoundException(placeId, LunchPlace.class));
     }
 
     @Override
-    public Collection<LunchPlace> getMultipleWithMenu(Collection<String> placeIds, LocalDate startDate, LocalDate endDate, User user) {
-        return this.checkAllPresent(placeIds, lunchPlaceRepository.getWithMenu(placeIds, startDate, endDate));
+    public List<LunchPlace> getMultipleWithMenu(String areaId, Set<String> placeIds, LocalDate startDate, LocalDate endDate) {
+        return this.checkAllPresent(placeIds, lunchPlaceRepository.getWithMenu(areaId, placeIds, startDate, endDate));
     }
 
     @Override
-    public Collection<LunchPlace> getAll(User user) {
-        return lunchPlaceRepository.getAll(user.getId());
+    public List<LunchPlace> getAll(String areaId) {
+        return lunchPlaceRepository.getAll(areaId);
     }
 
     @Override
-    public Collection<LunchPlace> getMultiple(Collection<String> placeIds, User user) {
+    public List<LunchPlace> getMultiple(String areaId, Set<String> placeIds) {
         if (placeIds.isEmpty()) {
-            return lunchPlaceRepository.getAll(user.getId());
+            return lunchPlaceRepository.getAll(areaId);
         } else {
-            Collection<LunchPlace> places = lunchPlaceRepository.getMultiple(placeIds);
+            List<LunchPlace> places = lunchPlaceRepository.getMultiple(areaId, placeIds);
             // if not all LP entities got found...
             return this.checkAllPresent(placeIds, places);
         }
     }
 
-    private Collection<LunchPlace> checkAllPresent(Collection<String> placeIds, Collection<LunchPlace> result) {
+    private List<LunchPlace> checkAllPresent(Set<String> placeIds, List<LunchPlace> result) {
         if (result.size() != placeIds.size()) {
-            ArrayList<String> ids = new ArrayList<>(placeIds);
+            List<String> ids = new ArrayList<>(placeIds);
             result.forEach(place -> ids.remove(place.getId()));
             throw new NotFoundException(ids, LunchPlace.class);
         }
@@ -82,27 +98,30 @@ public class LunchPlaceServiceImpl implements LunchPlaceService {
 
     @Override
     @Transactional
-    public void delete(String id, User user) {
-        if ( ! lunchPlaceRepository.delete(id, user.getId())) {
+    public void delete(String areaId, String id) {
+        if ( ! lunchPlaceRepository.delete(areaId, id)) {
             throw new NotFoundException(id, LunchPlace.class);
         }
     }
 
     @Override
     @Transactional
-    public String addMenu(String lunchPlaceId, MenuTo menuTo, User user) {
-        LunchPlace place = ofNullable(lunchPlaceRepository.get(lunchPlaceId, user.getId()))
-                                .orElseThrow(() -> new NotFoundException(lunchPlaceId, LunchPlace.class));
-        Menu created = new Menu(menuTo.getEffectiveDate(), menuTo.getDishes(), place);
-        menuRepository.save(created);
-        return created.getId();
+    public Menu addMenu(String areaId, String lunchPlaceId, LocalDate effectiveDate, Set<Dish> dishes) {
+        LunchPlace place = this.get(areaId, lunchPlaceId);
+        Menu created = new Menu(effectiveDate, dishes, place);
+        return menuRepository.save(created);
     }
 
     @Override
     @Transactional
-    public void deleteMenu(String lunchPlaceId, String menuId, User user) {
-        LunchPlace place = ofNullable(lunchPlaceRepository.get(lunchPlaceId, user.getId()))
-                .orElseThrow(() -> new NotFoundException(lunchPlaceId, LunchPlace.class));
-        menuRepository.deleteMenu(place.getId(), menuId);
+    public void deleteMenu(String areaId, String lunchPlaceId, String menuId) {
+        this.getMenu(areaId, lunchPlaceId, menuId);
+        menuRepository.deleteMenu(menuId);
+    }
+
+    @Override
+    public Menu getMenu(String areaId, String placeId, String menuId, MenuRepositoryImpl.Fields... fields) {
+        return ofNullable(menuRepository.getMenu(areaId, placeId, menuId, fields))
+                .orElseThrow(() -> new NotFoundException(menuId, Menu.class));
     }
 }

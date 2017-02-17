@@ -1,18 +1,15 @@
 package ua.belozorov.lunchvoting.repository.lunchplace;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
+import org.hibernate.Hibernate;
 import org.springframework.stereotype.Repository;
 import ua.belozorov.lunchvoting.model.lunchplace.Menu;
 import ua.belozorov.lunchvoting.repository.BaseRepository;
 
-import java.time.LocalDate;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
+import static ua.belozorov.lunchvoting.util.Pair.pairOf;
 
 /**
  * <h2></h2>
@@ -22,45 +19,40 @@ import java.util.List;
 @Repository
 public class MenuRepositoryImpl extends BaseRepository implements MenuRepository  {
 
-    @Autowired
-    private CrudMenuRepository repository;
-
     @Override
-    public void save(Menu menu) {
-        reliablePersist(menu);
+    public Menu save(Menu menu) {
+        em.persist(menu);
+        return menu;
     }
 
     @Override
-    public Menu getMenu(String menuId) {
-        return em.find(Menu.class, menuId);
+    public Menu getMenu(String areaId, String placeId, String menuId, Fields... fields) {
+        String sql = "SELECT m FROM EatingArea ea " +
+                "INNER JOIN ea.places lp " +
+                "INNER JOIN lp.menus m " +
+                "WHERE ea.id= :areaId AND lp.id= :placeId AND m.id= :menuId";
+        Menu menu = regularGet(sql, Menu.class,
+                pairOf("areaId", areaId), pairOf("menuId", menuId), pairOf("placeId", placeId)
+        );
+        Set<Fields> fieldSet = new HashSet<>(Arrays.asList(fields));
+        if (fieldSet.contains(Fields.DISHES)) {
+            /* Unfortunately, this stupid bitch doesn't LEFT JOIN FETCH Menu#dishes,
+             throwing "QueryException: query specified join fetching, but the owner of the fetched association was not present",
+             so that is how it gets done
+            */
+            Hibernate.initialize(menu.getDishes());
+        }
+        return menu;
     }
 
     @Override
-    public List<Menu> getTodayMenus() {
-        List<Menu> menus = repository.getAllMenusOfDate(LocalDate.now());
-        return menus == null ? Collections.emptyList() : menus;
+    public boolean deleteMenu(String menuId) {
+        return em.createQuery("DELETE FROM Menu m WHERE m.id = :menuId")
+                .setParameter("menuId", menuId)
+                .executeUpdate() != 0;
     }
 
-    @Override
-    public boolean deleteMenu(String lunchPlaceId, String menuId) {
-        return repository.deleteMenu(lunchPlaceId, menuId) != 0;
-    }
-
-    /**
-     * Spring Data JPA repository for Menu entities
-     */
-    public interface CrudMenuRepository extends JpaRepository<Menu, String> {
-        @Query("SELECT m FROM Menu m JOIN FETCH m.lunchPlace WHERE m.lunchPlace.id= :lunchPlaceId AND m.id= :menuId AND m.lunchPlace.adminId= :userId")
-        Menu getMenu(@Param("lunchPlaceId") String lunchPlaceId,
-                     @Param("menuId") String menuId,
-                     @Param("userId") String userId);
-
-        @Query("SELECT m FROM Menu m JOIN FETCH m.lunchPlace WHERE m.effectiveDate = ?1")
-        List<Menu> getAllMenusOfDate(LocalDate date);
-
-        @Modifying
-        @Query("DELETE FROM Menu m WHERE m.id= :menuId AND m.lunchPlace.id= :lunchPlaceId")
-        int deleteMenu(@Param("lunchPlaceId") String lunchPlaceId,
-                       @Param("menuId") String menuId);
+    public enum Fields {
+        DISHES
     }
 }

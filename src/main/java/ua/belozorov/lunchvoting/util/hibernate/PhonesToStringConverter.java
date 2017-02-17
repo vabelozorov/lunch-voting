@@ -1,4 +1,4 @@
-package ua.belozorov.lunchvoting.util;
+package ua.belozorov.lunchvoting.util.hibernate;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSet.Builder;
@@ -17,7 +17,7 @@ import java.util.stream.Stream;
  *
  * @author vabelozorov on 12.12.16.
  */
-public class SetToStringConverter implements AttributeConverter<Set<String>, String> {
+public class PhonesToStringConverter implements AttributeConverter<Set<String>, String> {
     @Override
     public String convertToDatabaseColumn(Set<String> attribute) {
         return String.join(",", attribute);

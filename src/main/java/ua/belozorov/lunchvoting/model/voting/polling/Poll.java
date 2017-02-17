@@ -17,4 +17,5 @@ public interface Poll extends Comparable<Poll>, Persistable {
     List<PollItem> getPollItems();
     LocalDate getMenuDate();
     Set<Vote> getVotes();
+    TimeConstraint getTimeConstraint();
 }

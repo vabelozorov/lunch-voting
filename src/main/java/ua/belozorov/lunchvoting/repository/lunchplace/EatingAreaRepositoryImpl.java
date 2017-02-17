@@ -1,6 +1,7 @@
 package ua.belozorov.lunchvoting.repository.lunchplace;
 
 import org.hibernate.Hibernate;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Repository;
 import ua.belozorov.lunchvoting.model.lunchplace.EatingArea;
 import ua.belozorov.lunchvoting.model.lunchplace.JoinAreaRequest;
@@ -33,7 +34,7 @@ public class EatingAreaRepositoryImpl extends BaseRepository implements EatingAr
     }
 
     @Override
-    public EatingArea getArea(String areaId, AreaFields... fields) {
+    public EatingArea getArea(String areaId, Fields... fields) {
         List<EatingArea> areas = em.createQuery("SELECT ea FROM EatingArea ea " +
                 "WHERE ea.id= :id", EatingArea.class)
                 .setParameter("id", areaId).getResultList();
@@ -166,19 +167,19 @@ public class EatingAreaRepositoryImpl extends BaseRepository implements EatingAr
                 .getResultList());
     }
 
-    public enum AreaFields {
+    public enum Fields {
         USERS(EatingArea::getUsers),
         POLLS(EatingArea::getPolls),
         PLACES(EatingArea::getPlaces);
 
         private final Function<EatingArea, Object> valueFunction;
 
-        AreaFields(Function<EatingArea, Object> valueFunction) {
+        Fields(Function<EatingArea, Object> valueFunction) {
             this.valueFunction = valueFunction;
         }
 
-        public Object getProxyObject(EatingArea ea) {
-            return valueFunction.apply(ea);
+        public Object getProxyObject(@Nullable EatingArea ea) {
+            return ea == null ? null : valueFunction.apply(ea);
         }
     }
 }

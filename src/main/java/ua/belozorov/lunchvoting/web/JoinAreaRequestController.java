@@ -9,7 +9,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import ua.belozorov.lunchvoting.model.AuthorizedUser;
 import ua.belozorov.lunchvoting.model.User;
 import ua.belozorov.lunchvoting.model.lunchplace.JoinAreaRequest;
-import ua.belozorov.lunchvoting.service.lunchplace.EatingAreaService;
+import ua.belozorov.lunchvoting.service.area.JoinAreaRequestService;
 import ua.belozorov.lunchvoting.to.JoinRequestTo;
 
 import java.net.URI;
@@ -30,23 +30,23 @@ import static ua.belozorov.lunchvoting.util.ControllerUtils.toMap;
 public class JoinAreaRequestController {
     static final String REST_URL = "/api/requests";
 
-    private final EatingAreaService areaService;
+    private final JoinAreaRequestService requestService;
 
     private final MessageSource messageSource;
 
     private final JsonFilter jsonFilter;
 
     @Autowired
-    public JoinAreaRequestController(EatingAreaService areaService,
+    public JoinAreaRequestController(JoinAreaRequestService requestService,
                                      MessageSource messageSource, @Qualifier("simpleJsonFilter") JsonFilter jsonFilter) {
-        this.areaService = areaService;
+        this.requestService = requestService;
         this.messageSource = messageSource;
         this.jsonFilter = jsonFilter;
     }
 
     @PostMapping
     public ResponseEntity makeRequest(@RequestParam("id") String areaId) {
-        JoinAreaRequest request = areaService.makeJoinRequest(AuthorizedUser.get(), areaId);
+        JoinAreaRequest request = requestService.makeJoinRequest(AuthorizedUser.get(), areaId);
         URI uri = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path("{base}/{id}").buildAndExpand(REST_URL, request.getId()).toUri();
         return ResponseEntity.created(uri).body(toMap("id", request.getId()));
@@ -55,37 +55,37 @@ public class JoinAreaRequestController {
     @GetMapping(params = "status")
     public ResponseEntity<List<JoinRequestTo>> getAllInAreaOfStatus(@RequestParam JoinAreaRequest.JoinStatus status) {
         String areaId = ofNullable(AuthorizedUser.get()).map(User::getAreaId).orElse(null);
-        List<JoinAreaRequest> requests = areaService.getJoinRequestsByStatus(areaId, status);
+        List<JoinAreaRequest> requests = requestService.getJoinRequestsByStatus(areaId, status);
         return ResponseEntity.ok(toDto(requests));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<JoinRequestTo> getById(@PathVariable("id") String requestId) {
-        JoinAreaRequest request = areaService.getJoinRequestByRequester(AuthorizedUser.get(), requestId);
+        JoinAreaRequest request = requestService.getJoinRequestByRequester(AuthorizedUser.get(), requestId);
         return ResponseEntity.ok(new JoinRequestTo(request));
     }
 
     @GetMapping
     public ResponseEntity<List<JoinRequestTo>> getAllInAreaOfRequester() {
-        List<JoinAreaRequest> requests = areaService.getJoinRequestsByRequester(AuthorizedUser.get());
+        List<JoinAreaRequest> requests = requestService.getJoinRequestsByRequester(AuthorizedUser.get());
         return ResponseEntity.ok(toDto(requests));
     }
 
     @PutMapping("/{id}/approve")
     public ResponseEntity approve(@PathVariable("id") String requestId) {
-        areaService.approveJoinRequest(AuthorizedUser.get(), requestId);
+        requestService.approveJoinRequest(AuthorizedUser.get(), requestId);
         return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/{id}/reject")
     public ResponseEntity reject(@PathVariable("id") String requestId) {
-        areaService.rejectJoinRequest(AuthorizedUser.get(), requestId);
+        requestService.rejectJoinRequest(AuthorizedUser.get(), requestId);
         return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/{id}/cancel")
     public ResponseEntity cancel(@PathVariable("id") String requestId) {
-        areaService.cancelJoinRequest(AuthorizedUser.get(), requestId);
+        requestService.cancelJoinRequest(AuthorizedUser.get(), requestId);
         return ResponseEntity.noContent().build();
     }
 
@@ -93,6 +93,4 @@ public class JoinAreaRequestController {
         return requests.stream()
                 .map(JoinRequestTo::new).collect(Collectors.toList());
     }
-
-
 }

@@ -2,14 +2,19 @@ package ua.belozorov.lunchvoting.web;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ua.belozorov.lunchvoting.exceptions.DuplicateDataException;
 import ua.belozorov.lunchvoting.model.AuthorizedUser;
 import ua.belozorov.lunchvoting.model.User;
 import ua.belozorov.lunchvoting.service.user.UserService;
 import ua.belozorov.lunchvoting.to.UserTo;
+import ua.belozorov.lunchvoting.util.ExceptionUtils;
+import ua.belozorov.lunchvoting.web.exceptionhandling.ErrorCode;
 
 import java.util.Collection;
 import java.util.stream.Collectors;
@@ -25,13 +30,10 @@ public final class UserManagementController {
     static final String REST_URL = "/api/areas/{id}/members";
 
     private final UserService userService;
-    private final MessageSource messageSource;
 
     @Autowired
-    public UserManagementController(UserService userService,
-                                    MessageSource messageSource) {
+    public UserManagementController(UserService userService) {
         this.userService = userService;
-        this.messageSource = messageSource;
     }
 
     /**
@@ -46,7 +48,14 @@ public final class UserManagementController {
     @PutMapping
     public ResponseEntity update(@RequestBody @Validated(UserTo.Update.class)UserTo userTo) {
         String areaId = AuthorizedUser.get().getAreaId();
-        userService.updateMainInfo(areaId, userTo.getId(), userTo.getName(), userTo.getEmail(), userTo.getPassword());
+        ExceptionUtils.executeAndUnwrapException(
+                () -> {
+                    userService.updateMainInfo(areaId, userTo.getId(), userTo.getName(), userTo.getEmail(), userTo.getPassword());
+                    return null;
+                },
+                DataIntegrityViolationException.class,
+                new DuplicateDataException(ErrorCode.DUPLICATE_EMAIL, new Object[]{userTo.getEmail()})
+        );
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 

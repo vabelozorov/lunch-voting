@@ -18,7 +18,7 @@ public interface EatingAreaRepository {
 
     boolean delete(String areaId);
 
-    EatingArea getArea(String areaId, EatingAreaRepositoryImpl.AreaFields... fields);
+    EatingArea getArea(String areaId, EatingAreaRepositoryImpl.Fields... fields);
 
     AreaTo getAreaTo(String areaId);
 

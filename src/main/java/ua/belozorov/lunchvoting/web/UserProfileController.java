@@ -10,11 +10,11 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import ua.belozorov.lunchvoting.exceptions.DuplicateDataException;
-import ua.belozorov.lunchvoting.model.AuthorizedUser;
 import ua.belozorov.lunchvoting.model.User;
 import ua.belozorov.lunchvoting.service.user.UserProfileService;
 import ua.belozorov.lunchvoting.to.UserTo;
 import ua.belozorov.lunchvoting.util.ExceptionUtils;
+import ua.belozorov.lunchvoting.web.exceptionhandling.ErrorCode;
 
 import java.net.URI;
 
@@ -30,12 +30,10 @@ import static ua.belozorov.lunchvoting.util.ControllerUtils.toMap;
 public class UserProfileController {
     static final  String REST_URL = "/api/profile";
     private final UserProfileService profileService;
-    private final MessageSource messageSource;
 
     @Autowired
-    public UserProfileController(UserProfileService profileService, MessageSource messageSource) {
+    public UserProfileController(UserProfileService profileService) {
         this.profileService = profileService;
-        this.messageSource = messageSource;
     }
 
     /**
@@ -52,14 +50,10 @@ public class UserProfileController {
      */
     @PostMapping
     public ResponseEntity register(@RequestBody @Validated(UserTo.Create.class) UserTo userTo) {
-        User created = ExceptionUtils.unwrapException(
+        User created = ExceptionUtils.executeAndUnwrapException(
                 () -> profileService.register(new User(null, userTo.getName(), userTo.getEmail(), userTo.getPassword())),
                 DataIntegrityViolationException.class,
-                new DuplicateDataException(messageSource.getMessage(
-                        "error.duplicate_email",
-                        new Object[]{userTo.getEmail()},
-                        LocaleContextHolder.getLocale()
-                ))
+                new DuplicateDataException(ErrorCode.DUPLICATE_EMAIL, new Object[]{userTo.getEmail()})
         );
         URI uri = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path(REST_URL + "/{id}").buildAndExpand(created.getId()).toUri();
@@ -68,17 +62,13 @@ public class UserProfileController {
 
     @PutMapping
     public ResponseEntity update(@RequestBody @Validated(UserTo.Update.class)UserTo userTo) {
-        ExceptionUtils.unwrapException(
+        ExceptionUtils.executeAndUnwrapException(
                 () -> {
                     profileService.updateMainInfo(userTo.getId(), userTo.getName(), userTo.getEmail(), userTo.getPassword());
                     return  null;
                 },
                 DataIntegrityViolationException.class,
-                new DuplicateDataException(messageSource.getMessage(
-                        "error.duplicate_email",
-                        new Object[]{userTo.getEmail()},
-                        LocaleContextHolder.getLocale()
-                ))
+                new DuplicateDataException(ErrorCode.DUPLICATE_EMAIL, new Object[]{userTo.getEmail()})
         );
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }

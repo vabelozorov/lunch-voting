@@ -1,6 +1,6 @@
 package ua.belozorov.lunchvoting.exceptions;
 
-import ua.belozorov.lunchvoting.web.exceptionhandling.Code;
+import ua.belozorov.lunchvoting.web.exceptionhandling.ErrorCode;
 
 /**
  * <h2></h2>
@@ -8,6 +8,7 @@ import ua.belozorov.lunchvoting.web.exceptionhandling.Code;
  * @author vabelozorov on 07.02.17.
  */
 public interface ApplicationException {
-    Code getCode();
-    String getErrorMessage();
+    String getStringErrorCode();
+    ErrorCode getErrorCode();
+    Object[] getArgs();
 }

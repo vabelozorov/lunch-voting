@@ -1,6 +1,6 @@
 package ua.belozorov.lunchvoting.exceptions;
 
-import ua.belozorov.lunchvoting.web.exceptionhandling.Code;
+import ua.belozorov.lunchvoting.web.exceptionhandling.ErrorCode;
 
 /**
  * <h2></h2>
@@ -10,20 +10,24 @@ import ua.belozorov.lunchvoting.web.exceptionhandling.Code;
 
 //NOT USED!!!!!!!!
 public class MultipleAreaMembershipForbiddenException extends RuntimeException  implements ApplicationException{
-    private final Code code;
-
-    public MultipleAreaMembershipForbiddenException() {
-        super("Multiple membership is not allowed");
-        this.code = Code.MULTIPLE_AREA_MEMBERSHIP;
-    }
-
     @Override
-    public Code getCode() {
+    public String getStringErrorCode() {
         return null;
     }
 
     @Override
-    public String getErrorMessage() {
-        return this.getMessage();
+    public ErrorCode getErrorCode() {
+        return null;
     }
+
+    @Override
+    public Object[] getArgs() {
+        return new Object[0];
+    }
+//    private final ErrorCode code;
+//
+//    public MultipleAreaMembershipForbiddenException() {
+//        super("Multiple membership is not allowed");
+//        this.code = ErrorCode.MULTIPLE_AREA_MEMBERSHIP;
+//    }
 }

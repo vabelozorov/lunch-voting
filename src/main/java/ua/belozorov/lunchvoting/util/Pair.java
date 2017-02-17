@@ -6,6 +6,11 @@ package ua.belozorov.lunchvoting.util;
  * @author vabelozorov on 14.02.17.
  */
 public final class Pair<A,B> {
+
+    public static <A,B> Pair<A,B> pairOf(A a, B b) {
+        return new Pair<>(a, b);
+    }
+
     private final A a;
     private final B b;
 

@@ -2,19 +2,17 @@ package ua.belozorov.lunchvoting.model;
 
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Singular;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotEmpty;
-import org.hibernate.validator.constraints.Range;
 import ua.belozorov.lunchvoting.model.base.AbstractPersistableObject;
-import ua.belozorov.lunchvoting.model.lunchplace.EatingArea;
-import ua.belozorov.lunchvoting.util.RolesToIntegerConverter;
+import ua.belozorov.lunchvoting.util.hibernate.RolesToIntegerConverter;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -27,7 +25,7 @@ import java.util.Set;
 @Entity
 @Table(name = "users")
 @DynamicUpdate
-public final class User extends AbstractPersistableObject {
+public final class User extends AbstractPersistableObject implements Comparable<User> {
 
     @Column(name = "name", nullable = false)
     @NotEmpty
@@ -138,4 +136,8 @@ public final class User extends AbstractPersistableObject {
         return this.areaId != null;
     }
 
+    @Override
+    public int compareTo(User o) {
+        return this.email.compareTo(o.email);
+    }
 }
