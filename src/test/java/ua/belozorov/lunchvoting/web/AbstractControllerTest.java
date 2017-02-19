@@ -22,6 +22,7 @@ import ua.belozorov.lunchvoting.config.RootConfig;
 import ua.belozorov.lunchvoting.config.WebConfig;
 
 import javax.annotation.PostConstruct;
+import javax.servlet.Filter;
 import java.util.Arrays;
 
 //import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
@@ -46,9 +47,14 @@ public abstract class AbstractControllerTest extends AbstractSpringTest {
     MockMvc mockMvc;
 
     @Autowired
+    private Filter springSecurityFilterChain;
+
+    @Autowired
     public void setMockMvc(WebApplicationContext webApplicationContext) {
         this.mockMvc = MockMvcBuilders
-                .webAppContextSetup(webApplicationContext).build();
+                .webAppContextSetup(webApplicationContext)
+                .addFilters(springSecurityFilterChain)
+                .build();
     }
 
     void assertJson(String expected, String actual) throws JSONException {

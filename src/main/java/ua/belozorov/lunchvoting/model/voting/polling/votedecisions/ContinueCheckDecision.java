@@ -1,6 +1,5 @@
 package ua.belozorov.lunchvoting.model.voting.polling.votedecisions;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import ua.belozorov.lunchvoting.model.voting.polling.Vote;
 
 import java.util.Set;
@@ -28,11 +27,11 @@ public class ContinueCheckDecision implements VotePolicyDecision {
 
     @Override
     public Vote getAcceptedVote() {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public Set<Vote> votesToBeRemoved() {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
 }

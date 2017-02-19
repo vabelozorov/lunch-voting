@@ -5,6 +5,7 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 import ua.belozorov.lunchvoting.config.RootConfig;
 import ua.belozorov.lunchvoting.config.WebConfig;
+import ua.belozorov.lunchvoting.config.WebSecurityConfig;
 
 /**
  * Created by vabelozorov on 14.11.16.

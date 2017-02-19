@@ -11,7 +11,7 @@ import org.springframework.context.annotation.*;
         "ua.belozorov.lunchvoting.service",
         "ua.belozorov.lunchvoting.repository"
 })
-@Import({JpaConfig.class, InitDatabaseConfig.class, DataSourceConfig.class})
+@Import({JpaConfig.class, InitDatabaseConfig.class, DataSourceConfig.class, WebSecurityConfig.class})
 public class RootConfig {
 
 }

@@ -8,7 +8,6 @@ import lombok.Getter;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
-import org.hibernate.envers.Audited;
 import org.hibernate.validator.constraints.NotEmpty;
 import ua.belozorov.lunchvoting.model.base.AbstractPersistableObject;
 

@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableSet;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MvcResult;
 import ua.belozorov.*;
 import ua.belozorov.lunchvoting.exceptions.NotFoundException;
@@ -37,6 +38,7 @@ import static ua.belozorov.lunchvoting.DateTimeFormatters.WEB_DATE_FORMATTER;
 import static ua.belozorov.lunchvoting.MatcherUtils.matchSingle;
 import static ua.belozorov.lunchvoting.model.UserTestData.ALIEN_USER1;
 import static ua.belozorov.lunchvoting.model.lunchplace.AreaTestData.AREA_COMPARATOR;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
 
 /**
  * <h2></h2>
@@ -174,13 +176,20 @@ public class EatingAreaControllerTest extends AbstractControllerTest {
     }
 
     @Test
+
     public void testCreatePollForTodayMenus() throws Exception {
-        MvcResult mvcResult = mockMvc.perform(post(REST_URL + "/{id}/polls", areaId))
+        MvcResult mvcResult = mockMvc.perform(
+                post(REST_URL + "/{id}/polls", areaId)
+                    .with(csrf())
+                    .with(user("user"))
+                )
                 .andExpect(status().isCreated())
                 .andReturn();
         String location = jsonUtils.locationFromMvcResult(mvcResult);
 
-        String expected = mockMvc.perform(get(location).accept(MediaType.APPLICATION_JSON))
+        String expected = mockMvc.perform(get(location).accept(MediaType.APPLICATION_JSON)
+                .with(csrf())
+                .with(user("user")))
                 .andReturn().getResponse().getContentAsString();
         String id = getCreatedId(location);
 
@@ -223,7 +232,10 @@ public class EatingAreaControllerTest extends AbstractControllerTest {
     public void testGetFullDto() throws Exception {
         String actual = mockMvc.perform(get("{base}/{id}", REST_URL, testAreas.getFirstAreaId())
                     .param("summary", "false")
-                    .accept(MediaType.APPLICATION_JSON))
+                    .accept(MediaType.APPLICATION_JSON)
+                    .with(csrf())
+                    .with(user("user"))
+                )
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
         String expected = jsonUtils.toJson(AreaTestData.dto(testAreas.getFirstArea()));
