@@ -16,7 +16,6 @@ import ua.belozorov.lunchvoting.model.lunchplace.AreaTestData;
 import ua.belozorov.lunchvoting.model.lunchplace.EatingArea;
 import ua.belozorov.lunchvoting.model.lunchplace.LunchPlace;
 import ua.belozorov.lunchvoting.model.voting.polling.LunchPlacePoll;
-import ua.belozorov.lunchvoting.model.voting.polling.PollTestData;
 import ua.belozorov.lunchvoting.repository.lunchplace.EatingAreaRepository;
 import ua.belozorov.lunchvoting.repository.lunchplace.EatingAreaRepositoryImpl;
 import ua.belozorov.lunchvoting.service.AbstractServiceTest;
@@ -155,22 +154,22 @@ public class EatingAreaServiceTest extends AbstractServiceTest {
     public void createPollInAreaForTodayMenus() throws Exception {
         reset();
         LunchPlacePoll expected  = areaService.createPollInArea(areaId);
-        assertSql(3, 3, 3, 0); //TODO expected 1 update; consider changing LunchPlacePoll#pollItems to Set?
+        assertSql(3, 3, 4, 0); //TODO expected 2 update; consider changing LunchPlacePoll#pollItems to Set?
 
         LunchPlacePoll actual = pollService.getWithPollItems(areaId, expected.getId());
 
-        assertThat(actual, matchSingle(expected, new PollComparator().compareVotes(false)));
+        assertThat(actual, matchSingle(expected, POLL_COMPARATOR.noVotes()));
     }
 
     @Test
     public void createPollInAreaForMenuDate() throws Exception {
         reset();
         LunchPlacePoll expected = areaService.createPollInArea(areaId, NOW_DATE.plusDays(2));
-        assertSql(3, 3, 3, 0); //TODO expected 1 update; consider changing LunchPlacePoll#pollItems to Set?
+        assertSql(3, 3, 4, 0); //TODO expected 2 update; consider changing LunchPlacePoll#pollItems to Set?
 
         LunchPlacePoll actual = pollService.getWithPollItems(areaId, expected.getId());
 
-        assertThat(actual, matchSingle(expected, new PollComparator().compareVotes(false)));
+        assertThat(actual, matchSingle(expected, POLL_COMPARATOR.noVotes()));
     }
 
     @Test

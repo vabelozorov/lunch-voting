@@ -63,43 +63,6 @@ public class PollControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    public void testCreatePollForTodayMenus() throws Exception {
-        MvcResult mvcResult = mockMvc.perform(post(REST_URL, areaId))
-                .andExpect(status().isCreated())
-                .andReturn();
-        String location = jsonUtils.locationFromMvcResult(mvcResult);
-
-        String expected = mockMvc.perform(get(location).accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse().getContentAsString();
-        String id = getCreatedId(location);
-
-        LunchPlacePoll poll = pollService.getWithPollItems(areaId, id);
-        Map<String, Object> objProperties = this.converter.convert(new PollTo(poll));
-        String actual = jsonUtils.toJson(objProperties);
-
-        assertJson(expected, actual);
-    }
-
-    @Test
-    public void testCreatePollForMenuDate() throws Exception {
-        String date = NOW_DATE.plusDays(2).format(WEB_DATE_FORMATTER);
-        MvcResult mvcResult = mockMvc.perform(post(REST_URL, areaId).param("menuDate", date))
-                .andExpect(status().isCreated())
-                .andReturn();
-        String location = jsonUtils.locationFromMvcResult(mvcResult);
-
-        String expected = mockMvc.perform(get(location).accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse().getContentAsString();
-        String id = getCreatedId(location);
-
-        LunchPlacePoll poll = pollService.getWithPollItems(areaId, id);
-        Map<String, Object> objProperties = this.converter.convert(new PollTo(poll));
-        String actual = jsonUtils.toJson(objProperties);
-
-        assertJson(expected, actual);
-    }
-
-    @Test
     public void testGet() throws Exception {
         String actual = mockMvc.perform(get(REST_URL + "/{pollId}", areaId, activePoll.getId())
                     .accept(MediaType.APPLICATION_JSON))
@@ -127,18 +90,6 @@ public class PollControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    public void testDelete() throws Exception {
-        mockMvc.perform(get(REST_URL + "/{pollId}", areaId, testPolls.getFuturePoll().getId()).accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
-
-        mockMvc.perform(delete(REST_URL + "/{pollId}", areaId, testPolls.getFuturePoll().getId()).accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNoContent());
-
-        mockMvc.perform(get(REST_URL + "/{pollId}", areaId, testPolls.getFuturePoll().getId()).accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNotFound());
-    }
-
-    @Test
     public void testGetPollsByActivePeriod() throws Exception {
         String start = NOW_DATE_TIME.minusDays(2).format(WEB_DATE_TIME_FORMATTER);
         String end = NOW_DATE_TIME.format(WEB_DATE_TIME_FORMATTER);
@@ -153,6 +104,24 @@ public class PollControllerTest extends AbstractControllerTest {
                 .getResponse().getContentAsString();
 
         List<LunchPlacePoll> polls = Stream.of(testPolls.getPastPoll(), testPolls.getActivePollNoUpdate(), testPolls.getActivePoll())
+                .sorted()
+                .collect(Collectors.toList());
+
+        List<Map<String, Object>> objProperties = this.converter.convert(PollController.convertIntoTo(polls, false));
+        String expected = jsonUtils.toJson(objProperties);
+
+        assertJson(expected, actual);
+    }
+
+    @Test
+    public void testGetPastPolls() throws Exception {
+        String actual = mockMvc.perform(get(REST_URL + "/past", areaId)
+                .accept(MediaType.APPLICATION_JSON)
+        ).andExpect(status().isOk())
+                .andReturn()
+                .getResponse().getContentAsString();
+
+        List<LunchPlacePoll> polls = Stream.of(testPolls.getPastPoll())
                 .sorted()
                 .collect(Collectors.toList());
 
@@ -199,24 +168,6 @@ public class PollControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    public void testGetPastPolls() throws Exception {
-        String actual = mockMvc.perform(get(REST_URL + "/past", areaId)
-                .accept(MediaType.APPLICATION_JSON)
-        ).andExpect(status().isOk())
-                .andReturn()
-                .getResponse().getContentAsString();
-
-        List<LunchPlacePoll> polls = Stream.of(testPolls.getPastPoll())
-                .sorted()
-                .collect(Collectors.toList());
-
-        List<Map<String, Object>> objProperties = this.converter.convert(PollController.convertIntoTo(polls, false));
-        String expected = jsonUtils.toJson(objProperties);
-
-        assertJson(expected, actual);
-    }
-
-    @Test
     public void checksWhetherPollIsActive() throws Exception {
         String id = testPolls.getPastPoll().getId();
         String actual = mockMvc.perform(get(REST_URL + "/active/{pollId}", areaId, id)
@@ -230,5 +181,17 @@ public class PollControllerTest extends AbstractControllerTest {
         String expected = jsonUtils.toJson(map);
 
         assertJson(expected, actual);
+    }
+
+    @Test
+    public void testDelete() throws Exception {
+        mockMvc.perform(get(REST_URL + "/{pollId}", areaId, testPolls.getFuturePoll().getId()).accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(delete(REST_URL + "/{pollId}", areaId, testPolls.getFuturePoll().getId()).accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent());
+
+        mockMvc.perform(get(REST_URL + "/{pollId}", areaId, testPolls.getFuturePoll().getId()).accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
     }
 }

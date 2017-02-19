@@ -40,7 +40,7 @@ public class PollTest extends AbstractTest {
             LunchPlacePoll pastPoll = testPolls.getPastPoll();
             pastPoll
                     .registerVote(GOD_ID, pastPoll.getPollItems().get(0).getId());
-        } catch (PollNotActiveException e) {
+        } catch (VotePolicyException e) {
             exceptions.add(e);
         }
 
@@ -48,7 +48,7 @@ public class PollTest extends AbstractTest {
        try {
            LunchPlacePoll futurePoll = testPolls.getFuturePoll();
            futurePoll.registerVote(GOD_ID, futurePoll.getPollItems().get(0).getId());
-        } catch (PollNotActiveException e) {
+        } catch (VotePolicyException e) {
             exceptions.add(e);
         }
 
@@ -79,25 +79,25 @@ public class PollTest extends AbstractTest {
         assertTrue(vote.getVoterId().equals(VOTER_ID));
     }
 
-    @Test(expected = VoteChangeNotAllowedException.class)
+    @Test(expected = VotePolicyException.class)
     public void failsUpdateWhenItIsAfterTimeThreshold() throws Exception {
         LunchPlacePoll poll = testPolls.getActivePollNoUpdate();
         poll.registerVote(VOTER_ID, poll.getPollItems().get(1).getId());
     }
 
-    @Test(expected = MultipleVotePerItemException.class)
+    @Test(expected = VotePolicyException.class)
     public void failsOnSecondVoteAttempt() throws Exception {
         LunchPlacePoll poll = testPolls.getActivePoll();
         poll.registerVote(VOTER_ID, testPolls.getActivePollPollItem1().getId());
     }
 
-    @Test(expected = NoMenusForMenuDateException.class)
+    @Test(expected = PollException.class)
     public void failsWhenLunchPlaceDoesNotHaveMenuWithMenuDate() throws Exception {
         LunchPlace place = new LunchPlace("ID", "Name", "Address", "Description", new HashSet<>());
         new LunchPlacePoll(Arrays.asList(place), NOW_DATE);
     }
 
-    @Test(expected = NoPollItemsException.class)
+    @Test(expected = PollException.class)
     public void failsWhenLunchPlacesAreEmpty() throws Exception {
         new LunchPlacePoll(new ArrayList<>(), NOW_DATE);
     }

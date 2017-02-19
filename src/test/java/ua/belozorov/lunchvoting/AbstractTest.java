@@ -25,7 +25,7 @@ import static org.junit.Assert.assertTrue;
  * @author vabelozorov on 02.12.16.
  */
 public abstract class AbstractTest {
-    public static final LocalDateTime NOW_DATE_TIME = LocalDateTime.now();
+    public static final LocalDateTime NOW_DATE_TIME = LocalDateTime.now().withNano(0);
     public static final LocalDate NOW_DATE = LocalDate.now();
 
     protected final UserTestData testUsers = new UserTestData();

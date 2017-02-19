@@ -2,6 +2,9 @@ package ua.belozorov.lunchvoting.model.voting.polling;
 
 import lombok.AccessLevel;
 import lombok.Getter;
+import ua.belozorov.lunchvoting.exceptions.PollException;
+import ua.belozorov.lunchvoting.util.ExceptionUtils;
+import ua.belozorov.lunchvoting.web.exceptionhandling.ErrorCode;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
@@ -32,26 +35,28 @@ public final class TimeConstraint {
     }
 
     TimeConstraint(LocalDateTime startTime, LocalDateTime endTime, LocalDateTime voteChangeThreshold) {
-        this.startTime = Objects.requireNonNull(startTime, "startTime must not be null").withNano(0);
-        this.endTime = Objects.requireNonNull(endTime, "endTime must not be null").withNano(0);
-        this.voteChangeThreshold = Objects.requireNonNull(voteChangeThreshold, "voteChangeThreshold must not be null").withNano(0);
+        ExceptionUtils.checkParamsNotNull(startTime, endTime, voteChangeThreshold);
 
-        if ( ! this.startTime.isBefore(this.endTime)) {
-            throw new IllegalStateException("startTime must be before endTime");
+        this.startTime = startTime.withNano(0);
+        this.endTime = endTime.withNano(0);
+        this.voteChangeThreshold = voteChangeThreshold.withNano(0);
+
+        if ( this.endTime.isBefore(this.startTime)) {
+            throw new PollException(ErrorCode.TIMECONSTRAINT_END_BEFORE_START);
         }
 
-        if ( ! this.voteChangeThreshold.isBefore(this.endTime) || this.voteChangeThreshold.isBefore(this.startTime)) {
-            throw new IllegalStateException("invariant [startTime <= voteChangeThreshold < endTime] violated");
+        if ( this.voteChangeThreshold.isAfter(this.endTime) || this.voteChangeThreshold.isBefore(this.startTime)) {
+            throw new PollException(ErrorCode.VOTECHANGETHRESHOLD_INVALID);
         }
     }
 
     public boolean isInTimeToChangeVote(LocalDateTime dateTime) {
-        return ! (dateTime.isBefore(startTime) || dateTime.isAfter(voteChangeThreshold));
+        return this.isPollActive(dateTime) && !dateTime.isAfter(voteChangeThreshold);
     }
 
     @SuppressWarnings("JpaAttributeMemberSignatureInspection")
     public boolean isPollActive(LocalDateTime dateTime) {
-        return ! dateTime.isBefore(startTime) && dateTime.isBefore(endTime);
+        return ! (dateTime.isBefore(startTime) ||  dateTime.isAfter(endTime));
     }
 
     @Override

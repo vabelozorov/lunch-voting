@@ -26,6 +26,23 @@ public interface VotingService {
      */
     Vote vote(User voter, String pollId, String pollItemId);
 
+    Vote getVote(String voterId, String voteId);
+
+    Vote getFullVote(String voterId, String voteId);
+
+    List<Vote> getFullVotesForPoll(String areaId, String pollId);
+
+    /**
+     *
+     *
+     * @param voter
+     * @param pollId existing pollId
+     * @return Collection of PollItem ids for which the voter with id {@code voterId} has voted or empty collection
+     * if no vote has been made or voterId/pollId does not exist
+     */
+    List<String> getVotedForPollByVoter(User voter, String pollId);
+
+    void revokeVote(String voterId, String voteId);
 
     /**
      *
@@ -35,20 +52,4 @@ public interface VotingService {
      * @return
      */
     VotingResult<PollItem> getPollResult(String areaId, String pollId);
-
-     /**
-      *
-      *
-      * @param voter
-      * @param pollId existing pollId
-      * @return Collection of PollItem ids for which the voter with id {@code voterId} has voted or empty collection
-      * if no vote has been made or voterId/pollId does not exist
-      */
-     List<String> getVotedByVoter(User voter, String pollId);
-
-     List<Vote> getVotesForPoll(String areaId, String pollId);
-
-    void replaceVote(Set<Vote> forRemoval, Vote acceptedVote);
-
-//    void revokeVote(String areaId, String voteId);
 }

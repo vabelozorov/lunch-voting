@@ -17,7 +17,7 @@ import java.util.*;
  */
 @Getter
 public class VoteTestData {
-    public static final EqualsComparator<Vote> VOTE_COMPARATOR = new VoteComparator();
+    public static final VoteComparator VOTE_COMPARATOR = new VoteComparator();
 
     private final Set<Vote> votesForActivePoll = new HashSet<>();
     private final Set<Vote> votesForPollNoUpdate = new HashSet<>();
@@ -49,12 +49,36 @@ public class VoteTestData {
         ).convert(forConversion);
     }
 
-    private static class VoteComparator implements EqualsComparator<Vote> {
+    public static class VoteComparator implements EqualsComparator<Vote> {
+        private final boolean withAssoc;
+
+        public VoteComparator() {
+            this.withAssoc = true;
+        }
+
+        private VoteComparator(boolean withAssoc) {
+            this.withAssoc = withAssoc;
+        }
+
+        public VoteComparator noAssoc() {
+            return new VoteComparator(false);
+        }
 
         @Override
         public boolean compare(Vote obj, Vote another) {
-            return  obj.getPoll().equals(another.getPoll())
+            return this.withAssoc ? this.fullCompare(obj, another) : this.simpleCompare(obj, another);
+        }
+
+        private boolean fullCompare(Vote obj, Vote another) {
+            return  obj.getId().equals(another.getId())
+                    && obj.getPoll().equals(another.getPoll())
                     && obj.getPollItem().equals(another.getPollItem())
+                    && obj.getVoterId().equals(another.getVoterId())
+                    && obj.getVoteTime().equals(another.getVoteTime());
+        }
+
+        private boolean simpleCompare(Vote obj, Vote another) {
+            return  obj.getId().equals(another.getId())
                     && obj.getVoterId().equals(another.getVoterId())
                     && obj.getVoteTime().equals(another.getVoteTime());
         }

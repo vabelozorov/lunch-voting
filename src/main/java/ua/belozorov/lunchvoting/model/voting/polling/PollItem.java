@@ -18,7 +18,7 @@ import java.util.Objects;
 @Getter(AccessLevel.PACKAGE)
 @Entity
 @Table(name = "poll_items")
-public final class PollItem extends AbstractPersistableObject {
+public class PollItem extends AbstractPersistableObject {
 
     @Column(name = "position")
     @Getter(AccessLevel.NONE)

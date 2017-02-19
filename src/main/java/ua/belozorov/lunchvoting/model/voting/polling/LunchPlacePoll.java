@@ -13,6 +13,7 @@ import ua.belozorov.lunchvoting.model.voting.polling.votepolicies.CommonPolicy;
 import ua.belozorov.lunchvoting.model.voting.polling.votepolicies.VoteForAnotherUpdatePolicy;
 import ua.belozorov.lunchvoting.model.voting.polling.votepolicies.VotePolicy;
 import ua.belozorov.lunchvoting.util.ExceptionUtils;
+import ua.belozorov.lunchvoting.web.exceptionhandling.ErrorCode;
 
 import javax.persistence.*;
 import javax.persistence.CascadeType;
@@ -33,7 +34,7 @@ import java.util.stream.Collectors;
 @Entity
 @Table(name = "polls")
 @Getter(AccessLevel.PUBLIC)
-public final class LunchPlacePoll extends AbstractPersistableObject implements Comparable<LunchPlacePoll> {
+public class LunchPlacePoll extends AbstractPersistableObject implements Comparable<LunchPlacePoll> {
     private static final LocalTime DEFAULT_START_TIME = LocalTime.of(9, 0);
     private static final LocalTime DEFAULT_END_TIME = LocalTime.of(12, 0);
     private static final LocalTime DEFAULT_ALLOW_CHANGE_VOTE_TIME = LocalTime.of(11, 0);
@@ -82,7 +83,7 @@ public final class LunchPlacePoll extends AbstractPersistableObject implements C
      * @param lunchPlaces non-null, non-empty list of items to vote for
      */
     public LunchPlacePoll(LocalDateTime startTime, LocalDateTime endTime, LocalDateTime voteChangeTimeThreshold, List<LunchPlace> lunchPlaces, LocalDate menuDate) {
-        ExceptionUtils.requireNonNullNotEmpty(lunchPlaces, NoPollItemsException::new);
+        ExceptionUtils.requireNonNullNotEmpty(lunchPlaces, () -> new PollException(ErrorCode.NO_POLL_ITEMS));
         this.checkMenuDate(lunchPlaces, menuDate);
 
         this.timeConstraint = new TimeConstraint(startTime, endTime,voteChangeTimeThreshold);
@@ -121,7 +122,7 @@ public final class LunchPlacePoll extends AbstractPersistableObject implements C
             if (lp.getMenus().stream()
                 .filter(menu -> menu.getEffectiveDate().equals(menuDate))
                 .count() == 0 ) {
-                throw new NoMenusForMenuDateException();
+                throw new PollException(ErrorCode.NO_MENUS_FOR_MENU_DATE);
             }
         }
     }
@@ -159,7 +160,9 @@ public final class LunchPlacePoll extends AbstractPersistableObject implements C
                 .map(policy -> policy.checkCompliance(intention))
                 .filter(vd -> ! vd.isContinue())
                 .findFirst()
-                .orElseThrow(() -> new NoVotePolicyMatchException(intention));
+                .orElseThrow(() -> new IllegalStateException(
+                        String.format("No VotePolicy match. Voter %s, Poll %s, Item %s",
+                                voterId, this.id, pollItemId)));
     }
 
     private PollItem pollItemById(String id) {

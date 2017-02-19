@@ -2,7 +2,6 @@ package ua.belozorov.lunchvoting.model.lunchplace;
 
 import lombok.Builder;
 import lombok.Getter;
-import ua.belozorov.lunchvoting.exceptions.MultipleAreaMembershipForbiddenException;
 import ua.belozorov.lunchvoting.model.User;
 import ua.belozorov.lunchvoting.model.base.AbstractPersistableObject;
 

@@ -28,16 +28,14 @@ public class PollRepositoryImpl extends BaseRepository implements PollRepository
     }
 
     @Override
-    public Vote save(Vote vote) {
-        em.persist(vote);
-        return vote;
-    }
-
-    @Override
-    public void remove(Set<Vote> forRemoval) {
-        List<String> ids = forRemoval.stream().map(Vote::getId).collect(Collectors.toList());
-        em.createQuery("DELETE FROM Vote v WHERE v.id IN :ids")
-                .setParameter("ids", ids).executeUpdate();
+    public LunchPlacePoll get(String pollId) {
+        String sql = "SELECT p FROM LunchPlacePoll p " +
+                "WHERE p.id= :id";
+        List<LunchPlacePoll> polls = em.createQuery(sql, LunchPlacePoll.class)
+                .setParameter("id", pollId)
+                .getResultList();
+        em.clear();
+        return super.nullOrFirst(polls);
     }
 
     @Override
@@ -73,11 +71,11 @@ public class PollRepositoryImpl extends BaseRepository implements PollRepository
     @Override
     public LunchPlacePoll get(String areaId, String pollId) {
         String sql = "SELECT p FROM LunchPlacePoll p " +
-                "WHERE p.id= :id AND p IN (" +
+                "WHERE p.id= :pollId AND p IN (" +
                     "SELECT p1 FROM EatingArea ea JOIN ea.polls p1 WHERE ea.id= :areaId)";
         List<LunchPlacePoll> polls = em.createQuery(sql, LunchPlacePoll.class)
                 .setParameter("areaId", areaId)
-                .setParameter("id", pollId)
+                .setParameter("pollId", pollId)
                 .getResultList();
         em.clear();
         return super.nullOrFirst(polls);
@@ -179,19 +177,55 @@ public class PollRepositoryImpl extends BaseRepository implements PollRepository
     }
 
     @Override
-    public Vote getVoteInPoll(String areaId, String voterId, String pollId) {
-//        String sql = "SELECT v FROM Vote v WHERE v.poll.id= :pollId AND v.voterId= :voterId";
-        String sql = "SELECT v FROM EatingArea ea " +
-                "INNER JOIN ea.polls p " +
-                "INNER JOIN p.votes v " +
-                "WHERE ea.id= :areaId AND p.id= :pollId AND v.voterId= :voterId";
+    public boolean removePoll(String areaId, String pollId) {
+        String sql = "DELETE FROM LunchPlacePoll p " +
+                "WHERE p.id= :id AND p IN (" +
+                "SELECT po FROM EatingArea ea JOIN ea.polls po WHERE ea.id= :areaId)";
+        return em.createQuery(sql)
+                .setParameter("areaId", areaId)
+                .setParameter("id", pollId)
+                .executeUpdate() != 0;
+    }
+
+    @Override
+    public Vote save(Vote vote) {
+        em.persist(vote);
+        return vote;
+    }
+
+    @Override
+    public Vote getVote(String voterId, String voteId) {
+        String sql = "SELECT v FROM Vote v WHERE v.id= :voteId AND v.voterId= :voterId";
+        return regularGet(sql, Vote.class,
+                pairOf("voterId", voterId), pairOf("voteId", voteId));
+    }
+
+    @Override
+    public Vote getFullVote(String voterId, String voteId) {
+        String sql = "SELECT v FROM Vote v " +
+                "INNER JOIN FETCH v.poll p " +
+                "INNER JOIN FETCH v.pollItem " +
+                "WHERE v.id= :voteId AND v.voterId= :voterId";
+        return regularGet(sql, Vote.class,
+                pairOf("voterId", voterId), pairOf("voteId", voteId));
+    }
+
+    @Override
+    public Vote getFullVoteInPoll(String areaId, String voterId, String pollId) {
+        String sql = "SELECT v FROM Vote v " +
+                "INNER JOIN FETCH v.poll p " +
+                "INNER JOIN FETCH v.pollItem pi " +
+                "WHERE p.id= :pollId AND v.voterId= :voterId " +
+                    "AND p IN (SELECT p1 FROM EatingArea ea JOIN ea.polls p1 WHERE ea.id= :areaId)";
         return super.regularGet(sql, Vote.class,
                 pairOf("areaId", areaId), pairOf("pollId", pollId), pairOf("voterId", voterId));
     }
 
     @Override
     public List<Vote> getVotesForPoll(String areaId, String pollId) {
-        String sql = "SELECT v FROM Vote v JOIN v.poll p " +
+        String sql = "SELECT v FROM Vote v " +
+                "INNER JOIN FETCH v.poll p " +
+                "INNER JOIN FETCH v.pollItem pi " +
                 "WHERE p.id= :pollId AND p IN (" +
                     "SELECT p1 FROM EatingArea ea JOIN ea.polls p1 WHERE ea.id= :areaId) " +
                 "ORDER BY v.voteTime, v.id";
@@ -200,29 +234,14 @@ public class PollRepositoryImpl extends BaseRepository implements PollRepository
     }
 
     @Override
-    public boolean removePoll(String areaId, String pollId) {
-        String sql = "DELETE FROM LunchPlacePoll p " +
-                "WHERE p.id= :id AND p IN (" +
-                    "SELECT po FROM EatingArea ea JOIN ea.polls po WHERE ea.id= :areaId)";
-        return em.createQuery(sql)
-                .setParameter("areaId", areaId)
-                .setParameter("id", pollId)
-                .executeUpdate() != 0;
-    }
-
-    @Override
-    public LunchPlacePoll get(String pollId) {
-        String sql = "SELECT p FROM LunchPlacePoll p " +
-                "WHERE p.id= :id";
-        List<LunchPlacePoll> polls = em.createQuery(sql, LunchPlacePoll.class)
-                .setParameter("id", pollId)
-                .getResultList();
-        em.clear();
-        return super.nullOrFirst(polls);
-    }
-
-    @Override
     public void remove(Vote vote) {
         em.remove(vote);
+    }
+
+    @Override
+    public void remove(Set<Vote> forRemoval) {
+        List<String> ids = forRemoval.stream().map(Vote::getId).collect(Collectors.toList());
+        em.createQuery("DELETE FROM Vote v WHERE v.id IN :ids")
+                .setParameter("ids", ids).executeUpdate();
     }
 }

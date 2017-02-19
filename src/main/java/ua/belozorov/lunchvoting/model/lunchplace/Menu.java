@@ -27,7 +27,6 @@ import static java.util.Optional.ofNullable;
 @Entity
 @Table(name = "menus")
 @Getter
-//@Audited
 @DynamicUpdate
 public final class Menu extends AbstractPersistableObject implements Comparable<Menu> {
 

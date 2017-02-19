@@ -1,12 +1,10 @@
 package ua.belozorov.lunchvoting.service.voting;
 
-import com.vladmihalcea.sql.SQLStatementCountValidator;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import ua.belozorov.lunchvoting.exceptions.NoPollItemsException;
 import ua.belozorov.lunchvoting.exceptions.NotFoundException;
+import ua.belozorov.lunchvoting.exceptions.PollException;
 import ua.belozorov.lunchvoting.model.voting.polling.LunchPlacePoll;
-import ua.belozorov.lunchvoting.model.voting.polling.PollTestData;
 import ua.belozorov.lunchvoting.repository.voting.PollRepository;
 import ua.belozorov.lunchvoting.service.AbstractServiceTest;
 
@@ -20,7 +18,6 @@ import static org.hamcrest.Matchers.contains;
 import static org.junit.Assert.*;
 import static ua.belozorov.lunchvoting.MatcherUtils.*;
 import static ua.belozorov.lunchvoting.model.voting.polling.PollTestData.*;
-import static ua.belozorov.lunchvoting.model.voting.polling.PollTestData.POLL_COMPARATOR;
 
 /**
  * <h2></h2>
@@ -45,7 +42,7 @@ public class PollServiceTest extends AbstractServiceTest {
 
         LunchPlacePoll actual = pollRepository.getWithPollItems(expected.getId());
 
-        assertThat(actual, matchSingle(expected, new PollComparator().compareVotes(false)));
+        assertThat(actual, matchSingle(expected, POLL_COMPARATOR.noVotes()));
     }
 
     @Test
@@ -56,10 +53,10 @@ public class PollServiceTest extends AbstractServiceTest {
 
         LunchPlacePoll actual = pollRepository.getWithPollItems(expected.getId());
 
-        assertThat(actual, matchSingle(expected, new PollComparator().compareVotes(false)));
+        assertThat(actual, matchSingle(expected, POLL_COMPARATOR.noVotes()));
     }
 
-    @Test(expected = NoPollItemsException.class)
+    @Test(expected = PollException.class)
     public void failOnCreatePollWhenNoMenusForTheDate() throws Exception {
         pollService.createPollForMenuDate(areaId, NOW_DATE.plusDays(1));
     }
@@ -70,7 +67,7 @@ public class PollServiceTest extends AbstractServiceTest {
         LunchPlacePoll actual = pollService.getWithPollItems(areaId, testPolls.getActivePoll().getId());
         assertSelect(1);
 
-        assertThat(actual, matchSingle(testPolls.getActivePoll(), new PollComparator().compareVotes(false)));
+        assertThat(actual, matchSingle(testPolls.getActivePoll(), POLL_COMPARATOR.noVotes()));
     }
 
     @Test
@@ -79,7 +76,7 @@ public class PollServiceTest extends AbstractServiceTest {
         LunchPlacePoll actual = pollService.getWithPollItemsAndVotes(areaId, testPolls.getActivePoll().getId());
         assertSelect(1);
 
-        assertThat(actual, matchSingle(testPolls.getActivePoll(), new PollComparator()));
+        assertThat(actual, matchSingle(testPolls.getActivePoll(), POLL_COMPARATOR));
     }
 
     @Test(expected = NotFoundException.class)
@@ -105,7 +102,7 @@ public class PollServiceTest extends AbstractServiceTest {
 
         assertThat(
                 actual,
-                contains(matchCollection(expected, new PollComparator().compareVotes(false).compareItems(false)))
+                contains(matchCollection(expected, POLL_COMPARATOR_NO_ASSOC))
         );
     }
 
@@ -121,7 +118,7 @@ public class PollServiceTest extends AbstractServiceTest {
 
         assertThat(
                 actual,
-                contains(matchCollection(expected, new PollComparator().compareItems(false).compareVotes(false)))
+                contains(matchCollection(expected, POLL_COMPARATOR_NO_ASSOC))
         );
     }
 
@@ -134,7 +131,7 @@ public class PollServiceTest extends AbstractServiceTest {
         List<LunchPlacePoll> expected = Arrays.asList(testPolls.getPastPoll());
         assertThat(
                 actual,
-                contains(matchCollection(expected, new PollComparator().compareItems(false).compareVotes(false)))
+                contains(matchCollection(expected, POLL_COMPARATOR_NO_ASSOC))
         );
     }
 
@@ -150,7 +147,7 @@ public class PollServiceTest extends AbstractServiceTest {
 
         assertThat(
                 actual,
-                contains(matchCollection(expected, new PollComparator().compareItems(false).compareVotes(false)))
+                contains(matchCollection(expected, POLL_COMPARATOR_NO_ASSOC))
         );
     }
 
@@ -164,7 +161,7 @@ public class PollServiceTest extends AbstractServiceTest {
 
         assertThat(
                 actual,
-                contains(matchCollection(expected, new PollComparator().compareItems(false).compareVotes(false)))
+                contains(matchCollection(expected, POLL_COMPARATOR_NO_ASSOC))
         );
     }
 

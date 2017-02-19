@@ -58,41 +58,56 @@ public final class VotingServiceImpl implements VotingService {
         return acceptedVote;
     }
 
-
     @Override
-    public VotingResult<PollItem> getPollResult(String areaId, String pollId) {
-        ExceptionUtils.checkParamsNotNull(pollId);
+    public Vote getVote(String voterId, String voteId) {
+        ExceptionUtils.checkParamsNotNull(voterId, voteId);
 
-        LunchPlacePoll poll = ofNullable(pollRepository.getWithPollItemsAndVotes(areaId, pollId)).
-                orElseThrow(() -> new NotFoundException(pollId, LunchPlacePoll.class));
-        PollVoteResult<PollItem> pollResult = new PollVoteResult<>(poll, Vote::getPollItem);
-        return pollResult;
+        return ofNullable(pollRepository.getFullVote(voterId, voteId))
+                .orElseThrow(() -> new NotFoundException(voteId, Vote.class));
     }
 
     @Override
-    public List<String> getVotedByVoter(User voter, String pollId) {
-        ExceptionUtils.checkParamsNotNull(pollId, voter);
+    public Vote getFullVote(String voterId, String voteId) {
+        ExceptionUtils.checkParamsNotNull(voterId, voteId);
 
-        return pollRepository.getVotedByVoter(voter.getAreaId(), pollId, voter.getId());
+        return ofNullable(pollRepository.getFullVote(voterId, voteId))
+                .orElseThrow(() -> new NotFoundException(voteId, Vote.class));
     }
 
     @Override
-    public List<Vote> getVotesForPoll(String areaId, String pollId) {
+    public List<Vote> getFullVotesForPoll(String areaId, String pollId) {
         ExceptionUtils.checkParamsNotNull(areaId, pollId);
 
         return pollRepository.getVotesForPoll(areaId, pollId);
     }
 
     @Override
-    public void replaceVote(Set<Vote> forRemoval, Vote acceptedVote) {
+    public List<String> getVotedForPollByVoter(User voter, String pollId) {
+        ExceptionUtils.checkParamsNotNull(pollId, voter);
+
+        return pollRepository.getVotedByVoter(voter.getAreaId(), pollId, voter.getId());
+    }
+
+    @Override
+    @Transactional
+    public void revokeVote(String voterId, String voteId) {
+        Vote vote = this.getVote(voterId, voteId);
+        pollRepository.remove(vote);
+    }
+
+    @Override
+    public VotingResult<PollItem> getPollResult(String areaId, String pollId) {
+        ExceptionUtils.checkParamsNotNull(pollId);
+
+        LunchPlacePoll poll = pollService.getWithPollItemsAndVotes(areaId, pollId);
+        PollVoteResult<PollItem> pollResult = new PollVoteResult<>(poll, Vote::getPollItem);
+        return pollResult;
+    }
+
+    private void replaceVote(Set<Vote> forRemoval, Vote acceptedVote) {
         ExceptionUtils.checkParamsNotNull(forRemoval, acceptedVote);
 
         pollRepository.remove(forRemoval);
         pollRepository.save(acceptedVote);
     }
-
-//    @Override
-//    public void revokeVote(String areaId, String voteId) {
-//        pollRepository.
-//    }
 }

@@ -20,7 +20,7 @@ import static java.util.Optional.ofNullable;
 @Entity
 @Table(name = "votes")
 @Immutable
-public final class Vote extends AbstractPersistableObject {
+public final class Vote extends AbstractPersistableObject implements Comparable<Vote> {
 
     @NotNull
     @Column(name = "voter_id")
@@ -82,9 +82,15 @@ public final class Vote extends AbstractPersistableObject {
     public String toString() {
         return "Vote{" +
                 "voterId='" + voterId + '\'' +
-                "pollid='" + ofNullable(poll.getId()).orElse(null)+ '\'' +
-                "pollItemId='" + ofNullable(pollItem.getId()).orElse(null) + '\'' +
+//                "pollid='" + ofNullable(poll.getId()).orElse(null)+ '\'' +
+//                "pollItemId='" + ofNullable(pollItem.getId()).orElse(null) + '\'' +
                 "voteTime='" +voteTime + '\'' +
                 '}';
+    }
+
+    @Override
+    public int compareTo(Vote o) {
+        int i = this.voteTime.compareTo(o.voteTime);
+        return i != 0 ? i : this.id.compareTo(o.id);
     }
 }

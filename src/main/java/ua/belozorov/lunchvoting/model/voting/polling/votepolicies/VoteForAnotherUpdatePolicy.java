@@ -1,15 +1,15 @@
 package ua.belozorov.lunchvoting.model.voting.polling.votepolicies;
 
-import ua.belozorov.lunchvoting.exceptions.VoteChangeNotAllowedException;
+import ua.belozorov.lunchvoting.exceptions.VotePolicyException;
 import ua.belozorov.lunchvoting.model.voting.polling.TimeConstraint;
 import ua.belozorov.lunchvoting.model.voting.polling.Vote;
 import ua.belozorov.lunchvoting.model.voting.polling.VoteIntention;
 import ua.belozorov.lunchvoting.model.voting.polling.votedecisions.ContinueCheckDecision;
 import ua.belozorov.lunchvoting.model.voting.polling.votedecisions.UpdateDecision;
 import ua.belozorov.lunchvoting.model.voting.polling.votedecisions.VotePolicyDecision;
+import ua.belozorov.lunchvoting.web.exceptionhandling.ErrorCode;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -47,7 +47,7 @@ public final class VoteForAnotherUpdatePolicy implements VotePolicy {
     private void withinTimeThreshold(VoteIntention intention) {
         LocalDateTime voteTime = intention.getTime();
         if ( ! this.timeConstraint.isInTimeToChangeVote(voteTime)) {
-            throw new VoteChangeNotAllowedException(intention);
+            throw new VotePolicyException(ErrorCode.VOTE_CHANGE_NOT_ALLOWED);
         }
     }
 

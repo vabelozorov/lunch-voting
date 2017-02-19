@@ -12,8 +12,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static ua.belozorov.lunchvoting.MatcherUtils.equalsWithNulls;
-
 /**
  * <h2></h2>
  *
@@ -96,7 +94,7 @@ public class UserTestData {
                     obj.getPassword().equals(another.getPassword()) &&
                     obj.getRegisteredDate().isEqual(another.getRegisteredDate()) &&
                     obj.getRoles().equals(another.getRoles()) &&
-                    equalsWithNulls(obj.getAreaId(), another.getAreaId()) &&
+                    Objects.equals(obj.getAreaId(), another.getAreaId()) &&
                     obj.isActivated() == another.isActivated();
         }
 

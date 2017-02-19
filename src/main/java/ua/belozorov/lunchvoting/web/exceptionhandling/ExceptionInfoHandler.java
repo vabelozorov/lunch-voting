@@ -37,14 +37,14 @@ public final class ExceptionInfoHandler {
     @ResponseStatus(HttpStatus.CONFLICT)  // 409
     @ExceptionHandler(DuplicateDataException.class)
     @ResponseBody
-    public ErrorInfo handleConflict(HttpServletRequest req, DuplicateDataException ex) {
+    public ErrorInfo handleFor409(HttpServletRequest req, DuplicateDataException ex) {
         return errorInfoFactory.create(req, ex);
     }
 
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)  // 400
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseBody
-    public ErrorInfo handleRequestParamsValidationFailure(HttpServletRequest req, MethodArgumentNotValidException ex) {
+    public ErrorInfo handleValidationFailure(HttpServletRequest req, MethodArgumentNotValidException ex) {
         BindingResult result = ex.getBindingResult();
         String msg = result.getFieldErrors().stream()
                 .map(fe -> String.format(ERROR_MESSAGE_TEMPLATE,
@@ -59,15 +59,21 @@ public final class ExceptionInfoHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)  //404
     @ExceptionHandler(NotFoundException.class)
     @ResponseBody
-    public ErrorInfo handleEntityNotFound(HttpServletRequest req, NotFoundException ex) {
+    public ErrorInfo handleFor404(HttpServletRequest req, NotFoundException ex) {
         return errorInfoFactory.create(req, ex);
     }
 
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)  //422
-    @ExceptionHandler(NoAreaAdminException.class)
+    @ExceptionHandler({NoAreaAdminException.class, PollException.class, VotePolicyException.class})
     @ResponseBody
-    public ErrorInfo handleEntityNotFound(HttpServletRequest req, NoAreaAdminException ex) {
+    public ErrorInfo handleFor422(HttpServletRequest req, ApplicationException ex) {
         return errorInfoFactory.create(req, ex);
+    }
+
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)  //500
+    @ExceptionHandler(Exception.class)
+    public void handleAnother(HttpServletRequest req, Exception ex) {
+        LOG.error(ex.getMessage());
     }
 
     private String composeMessage(FieldError fe) {

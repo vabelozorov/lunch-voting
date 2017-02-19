@@ -59,18 +59,19 @@ public final class PollController {
         return ResponseEntity.ok(tos);
     }
 
-    @DeleteMapping("{id}")
-    public ResponseEntity delete(@PathVariable String id) {
-        String areaId = AuthorizedUser.get().getAreaId();
-        pollService.delete(areaId, id);
-        return new ResponseEntity(HttpStatus.NO_CONTENT);
-    }
-
     @GetMapping(params = {"start", "end"})
     public ResponseEntity<List<PollTo>> getPollsByActivePeriod(@RequestParam LocalDateTime start,
                                                                @RequestParam LocalDateTime end) {
         String areaId = AuthorizedUser.get().getAreaId();
         List<PollTo> tos = convertIntoTo(pollService.getPollsByActivePeriod(areaId, start, end), false);
+        this.filterTo(tos);
+        return ResponseEntity.ok(tos);
+    }
+
+    @GetMapping("/past")
+    public ResponseEntity<List<PollTo>> getPastPolls() {
+        String areaId = AuthorizedUser.get().getAreaId();
+        List<PollTo> tos = convertIntoTo(pollService.getPastPolls(areaId), false);
         this.filterTo(tos);
         return ResponseEntity.ok(tos);
     }
@@ -87,14 +88,6 @@ public final class PollController {
     public ResponseEntity<List<PollTo>> getFuturePolls() {
         String areaId = AuthorizedUser.get().getAreaId();
         List<PollTo> tos = convertIntoTo(pollService.getFuturePolls(areaId), false);
-        this.filterTo(tos);
-        return ResponseEntity.ok(tos);
-    }
-
-    @GetMapping("/past")
-    public ResponseEntity<List<PollTo>> getPastPolls() {
-        String areaId = AuthorizedUser.get().getAreaId();
-        List<PollTo> tos = convertIntoTo(pollService.getPastPolls(areaId), false);
         this.filterTo(tos);
         return ResponseEntity.ok(tos);
     }
@@ -120,5 +113,12 @@ public final class PollController {
                 Stream.of("version", "position", "poll").collect(Collectors.toSet())
         );
         jsonFilter.excludingFilter(obj, map);
+    }
+
+    @DeleteMapping("{id}")
+    public ResponseEntity delete(@PathVariable String id) {
+        String areaId = AuthorizedUser.get().getAreaId();
+        pollService.delete(areaId, id);
+        return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 }

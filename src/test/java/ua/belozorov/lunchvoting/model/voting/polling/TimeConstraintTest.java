@@ -2,6 +2,8 @@ package ua.belozorov.lunchvoting.model.voting.polling;
 
 import org.junit.Assert;
 import org.junit.Test;
+import ua.belozorov.lunchvoting.AbstractTest;
+import ua.belozorov.lunchvoting.exceptions.PollException;
 import ua.belozorov.lunchvoting.model.voting.polling.TimeConstraint;
 
 import java.time.LocalDateTime;
@@ -15,52 +17,46 @@ import static org.junit.Assert.*;
  *
  * @author vabelozorov on 09.12.16.
  */
-public class TimeConstraintTest {
+public class TimeConstraintTest extends AbstractTest{
 
     @Test
     public void testInitWithValidTimeParams() throws Exception {
-        LocalDateTime start = LocalDateTime.now();
+        LocalDateTime start = NOW_DATE_TIME;
         LocalDateTime end = start.plusHours(2);
+        // all values the same
+        new TimeConstraint(start, start, start);
+        // threshold equals start
         new TimeConstraint(start, end, start);
-        new TimeConstraint(start, end, start.plusNanos(1));
-        new TimeConstraint(start, end, end.minusNanos(1));
+        //threshold between start and end
+        new TimeConstraint(start, end, start.plusSeconds(1));
+        // threshold equals end
+        new TimeConstraint(start, end, end);
     }
 
     @Test
     public void testInitWithInvalidTimeParams() throws Exception {
-        LocalDateTime start = LocalDateTime.now();
-        LocalDateTime end = start.plusHours(2);
-        List<IllegalStateException> exceptions = new ArrayList<>();
-        try {
-            new TimeConstraint(start, end, start.minusNanos(1));
-        } catch (IllegalStateException e) {
-            exceptions.add(e);
-        }
-        try {
-            new TimeConstraint(start, end, end);
-        } catch (IllegalStateException e) {
-            exceptions.add(e);
-        }
-        try {
-            new TimeConstraint(start, start, start);
-        } catch (IllegalStateException e) {
-            exceptions.add(e);
-        }
-        Assert.assertTrue(exceptions.size() == 3);
+        super.assertExceptionCount(PollException.class, 3,
+                // end before start
+                () -> new TimeConstraint(NOW_DATE_TIME, NOW_DATE_TIME.minusSeconds(1), NOW_DATE_TIME.plusHours(1)),
+                // threshold before start
+                () -> new TimeConstraint(NOW_DATE_TIME, NOW_DATE_TIME.plusHours(1), NOW_DATE_TIME.minusSeconds(1)),
+                // threshold after end
+                () -> new TimeConstraint(NOW_DATE_TIME, NOW_DATE_TIME.plusHours(1), NOW_DATE_TIME.plusHours(1).plusSeconds(1))
+        );
     }
 
     @Test
-    public void testisInTimeToChangeVote() throws Exception {
-        LocalDateTime start = LocalDateTime.now();
+    public void isInTimeToChangeVote() throws Exception {
+        LocalDateTime start = NOW_DATE_TIME;
         LocalDateTime end = start.plusHours(2);
         LocalDateTime changeVoteTimeThreshold = start.plusHours(1);
         TimeConstraint constraint = new TimeConstraint(start, end, changeVoteTimeThreshold);
 
         assertTrue(constraint.isInTimeToChangeVote(start));
-        assertTrue(constraint.isInTimeToChangeVote(start.plusNanos(1)));
+        assertTrue(constraint.isInTimeToChangeVote(start.plusSeconds(1)));
         assertTrue(constraint.isInTimeToChangeVote(changeVoteTimeThreshold));
 
-        assertFalse(constraint.isInTimeToChangeVote(start.minusNanos(1)));
+        assertFalse(constraint.isInTimeToChangeVote(start.minusSeconds(1)));
         assertFalse(constraint.isInTimeToChangeVote(end));
     }
 
@@ -71,9 +67,9 @@ public class TimeConstraintTest {
         TimeConstraint constraint = new TimeConstraint(start, end, start.plusHours(1));
 
         assertTrue(constraint.isPollActive(start));
-        assertTrue(constraint.isPollActive(end.minusNanos(1)));
+        assertTrue(constraint.isPollActive(end.minusSeconds(1)));
 
-        assertFalse(constraint.isPollActive(start.minusNanos(1)));
+        assertFalse(constraint.isPollActive(start.minusSeconds(1)));
         assertFalse(constraint.isPollActive(end));
     }
 }

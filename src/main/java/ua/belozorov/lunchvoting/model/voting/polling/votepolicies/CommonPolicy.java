@@ -1,15 +1,16 @@
 package ua.belozorov.lunchvoting.model.voting.polling.votepolicies;
 
-import ua.belozorov.lunchvoting.exceptions.MultipleVotePerItemException;
-import ua.belozorov.lunchvoting.exceptions.PollNotActiveException;
+import com.google.common.collect.ImmutableSet;
+import ua.belozorov.lunchvoting.exceptions.PollException;
+import ua.belozorov.lunchvoting.exceptions.VotePolicyException;
 import ua.belozorov.lunchvoting.model.voting.polling.TimeConstraint;
+import ua.belozorov.lunchvoting.model.voting.polling.Vote;
 import ua.belozorov.lunchvoting.model.voting.polling.VoteIntention;
 import ua.belozorov.lunchvoting.model.voting.polling.votedecisions.ContinueCheckDecision;
 import ua.belozorov.lunchvoting.model.voting.polling.votedecisions.VotePolicyDecision;
+import ua.belozorov.lunchvoting.web.exceptionhandling.ErrorCode;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Consumer;
 
@@ -30,7 +31,7 @@ public final class CommonPolicy implements VotePolicy {
     private final TimeConstraint timeConstraint;
     private final Set<Consumer<VoteIntention>> validators;
 
-    public CommonPolicy(final TimeConstraint timeConstraint) {
+    public CommonPolicy(TimeConstraint timeConstraint) {
         this.timeConstraint = timeConstraint;
         this.validators = this.registerValidators();
     }
@@ -42,19 +43,19 @@ public final class CommonPolicy implements VotePolicy {
     }
 
     private Set<Consumer<VoteIntention>> registerValidators() {
-        return new HashSet<>(Arrays.asList(this::oneVotePerItem, this::isRunning));
+        return ImmutableSet.of(this::oneVotePerItem, this::isRunning);
     }
 
     private void oneVotePerItem(VoteIntention intention) {
         if (intention.isVoteAgainForCurrentItem()) {
-            throw new MultipleVotePerItemException(intention);
+            throw new VotePolicyException(ErrorCode.MULTIPLE_VOTE_PER_SAME_ITEM);
         }
     }
 
     private void isRunning(VoteIntention intention) {
         LocalDateTime voteTime = intention.getTime();
         if ( ! this.timeConstraint.isPollActive(voteTime)) {
-            throw new PollNotActiveException(intention);
+            throw new VotePolicyException(ErrorCode.POLL_NOT_ACTIVE);
         }
     }
 }

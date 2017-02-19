@@ -26,7 +26,7 @@ import java.util.*;
 @Table(name = "places")
 @Getter
 @DynamicUpdate
-public final class LunchPlace extends AbstractPersistableObject implements Comparable<LunchPlace> {
+public class LunchPlace extends AbstractPersistableObject implements Comparable<LunchPlace> {
 
     @Column(name = "name", nullable = false)
     @NotBlank
@@ -81,7 +81,7 @@ public final class LunchPlace extends AbstractPersistableObject implements Compa
         this.address = address;
         this.description = description;
         this.phones = new HashSet<>(phones);
-        this.menus = new LinkedHashSet<>(menus);
+        this.menus = menus;
     }
 
     public Set<String> getPhones() {

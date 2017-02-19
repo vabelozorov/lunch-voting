@@ -23,9 +23,9 @@ import java.util.stream.Collectors;
  * @author vabelozorov on 15.11.16.
  */
 @RestController
-@RequestMapping(VotingController.VOTE_URL)
+@RequestMapping(VotingController.REST_URL)
 public final class VotingController {
-    static final String VOTE_URL = "/api/votes";
+    static final String REST_URL = "/api/areas/{areaid}/votes";
 
     private final VotingService votingService;
     private final JsonFilter jsonFilter;
@@ -36,21 +36,20 @@ public final class VotingController {
         this.jsonFilter = jsonFilter;
     }
 
-    @PostMapping("/polls/{id}")
-    public ResponseEntity<VoteTo> vote(@PathVariable("id") String pollId,
-                                       @RequestParam String voterId,
-                                       @RequestParam String pollItemId) {
+    @PostMapping("/polls/{pollId}/{pollItemId}")
+    public ResponseEntity<VoteTo> vote(@PathVariable String pollId,
+                                       @PathVariable String pollItemId) {
         User voter = AuthorizedUser.get();
         Vote vote = votingService.vote(voter, pollId, pollItemId);
         URI uri = ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path(VOTE_URL + "/" + vote.getId()).build().toUri();
+                .path(REST_URL + "/" + vote.getId()).build().toUri();
         return ResponseEntity.created(uri).body(new VoteTo(vote, true));
     }
 
-    @GetMapping("/polls/{id}")
-    public ResponseEntity getVotesForPoll(@PathVariable("id") String pollId) {
+    @GetMapping("/polls/{pollId}")
+    public ResponseEntity getVotesForPoll(@PathVariable String pollId) {
         String areaId = AuthorizedUser.get().getAreaId();
-        List<Vote> votesForPoll = votingService.getVotesForPoll(areaId, pollId);
+        List<Vote> votesForPoll = votingService.getFullVotesForPoll(areaId, pollId);
         List<VoteTo> tos = convertIntoTo(votesForPoll, false);
         Map<String, Object> map = new LinkedHashMap<>();
         map.put("pollId", pollId);
@@ -59,23 +58,30 @@ public final class VotingController {
         return ResponseEntity.ok(map);
     }
 
-    @GetMapping("/polls/{id}/result/perItem")
-    public ResponseEntity<CountPerItemTo> getPollResult(@PathVariable("id") String pollId) {
+    @GetMapping(value = "/polls/{pollId}", params = "item")
+    public ResponseEntity<CountPerItemTo> getPollResult(@PathVariable String pollId) {
         String areaId = AuthorizedUser.get().getAreaId();
         VotingResult<PollItem> pollResult = votingService.getPollResult(areaId, pollId);
         CountPerItemTo to = new CountPerItemTo(pollResult, pollId);
         return ResponseEntity.ok(to);
     }
 
-    @GetMapping(value = "/polls/{id}", params = "voterId")
-    public ResponseEntity getVotedByVoter(@PathVariable("id") String pollId, @RequestParam String voterId) {
+    @GetMapping(value = "/polls/{pollId}", params = "voter")
+    public ResponseEntity getVotedByVoter(@PathVariable String pollId) {
         User voter = AuthorizedUser.get();
-        List<String> votedByVoter = votingService.getVotedByVoter(voter, pollId);
+        List<String> votedByVoter = votingService.getVotedForPollByVoter(voter, pollId);
         Map<String, Object> map = new LinkedHashMap<>();
         map.put("pollId", pollId);
-        map.put("voterId", voterId);
+        map.put("voterId", voter.getId());
         map.put("votedItems", votedByVoter);
         return ResponseEntity.ok(map);
+    }
+
+    @DeleteMapping("/{voteId}")
+    public ResponseEntity revokeVote(@PathVariable String voteId) {
+        User voter = AuthorizedUser.get();
+        votingService.revokeVote(voter.getId(),voteId);
+        return ResponseEntity.noContent().build();
     }
 
     static List<VoteTo> convertIntoTo(Collection<Vote> votes, boolean includePollId) {

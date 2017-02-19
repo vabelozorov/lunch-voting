@@ -1,10 +1,7 @@
 package ua.belozorov.lunchvoting.to;
 
 import lombok.Getter;
-import ua.belozorov.lunchvoting.model.base.AbstractPersistableObject;
-import ua.belozorov.lunchvoting.model.base.Persistable;
 import ua.belozorov.lunchvoting.model.voting.polling.LunchPlacePoll;
-import ua.belozorov.lunchvoting.model.voting.polling.Poll;
 import ua.belozorov.lunchvoting.model.voting.polling.PollItem;
 import ua.belozorov.lunchvoting.model.voting.polling.TimeConstraint;
 

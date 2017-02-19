@@ -42,6 +42,8 @@ public interface PollRepository {
 
     Vote save(Vote vote);
 
+    Vote getFullVote(String voterId, String voteId);
+
     /**
      * Searches for a voter's vote assuming that only one vote from a voter can be given in a particular poll
      *
@@ -50,11 +52,13 @@ public interface PollRepository {
      * @param pollId
      * @return
      */
-    Vote getVoteInPoll(String areaId, String voterId, String pollId);
+    Vote getFullVoteInPoll(String areaId, String voterId, String pollId);
 
     List<String> getVotedByVoter(String areaId, String pollId, String voterId);
 
     void remove(Vote vote);
+
+    Vote getVote(String voterId, String voteId);
 
     void remove(Set<Vote> forRemoval);
 }

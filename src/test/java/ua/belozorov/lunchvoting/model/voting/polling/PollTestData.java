@@ -27,6 +27,7 @@ import static ua.belozorov.lunchvoting.model.UserTestData.VOTER_ID;
 @Getter
 public class PollTestData {
     public static final PollComparator POLL_COMPARATOR = new PollComparator();
+    public static final PollComparator POLL_COMPARATOR_NO_ASSOC = new PollComparator(false, false);
 
     private final LunchPlacePoll activePoll;
     private final LunchPlacePoll pastPoll;
@@ -59,10 +60,10 @@ public class PollTestData {
         this.a1Polls.add(this.pastPoll);
     }
 
-
     public PollItem getActivePollPollItem1() {
         return this.activePoll.getPollItems().get(0);
     }
+
 
     public PollItem getActivePollPollItem2() {
         return this.activePoll.getPollItems().get(1);
@@ -215,17 +216,25 @@ public class PollTestData {
 
     public static class PollComparator implements EqualsComparator<LunchPlacePoll> {
         private static final EqualsComparator<List<PollItem>> POLL_ITEMS_COMPARATOR = new PollItemCollectionComparator();
-        private boolean needCompareItems = true;
-        private boolean needCompareVotes = true;
+        private final boolean needCompareItems;
+        private final boolean needCompareVotes;
 
-        public PollComparator compareItems(boolean needCompareItems) {
-            this.needCompareItems = needCompareItems;
-            return this;
+        public PollComparator() {
+            this.needCompareItems = true;
+            this.needCompareVotes = true;
         }
 
-        public PollComparator compareVotes(boolean needCompareVotes) {
+        public PollComparator(boolean needCompareItems, boolean needCompareVotes) {
+            this.needCompareItems = needCompareItems;
             this.needCompareVotes = needCompareVotes;
-            return this;
+        }
+
+        public PollComparator noItems() {
+            return new PollComparator(false, this.needCompareVotes);
+        }
+
+        public PollComparator noVotes() {
+            return new PollComparator(this.needCompareItems, false);
         }
 
         @Override

@@ -8,7 +8,14 @@ import ua.belozorov.lunchvoting.web.exceptionhandling.ErrorCode;
  * @author vabelozorov on 07.02.17.
  */
 public interface ApplicationException {
-    String getStringErrorCode();
+
+    default String getStringErrorCode() {
+        return this.getErrorCode().getMessageCode();
+    }
+
     ErrorCode getErrorCode();
-    Object[] getArgs();
+
+    default Object[] getArgs() {
+        return new Object[0];
+    }
 }

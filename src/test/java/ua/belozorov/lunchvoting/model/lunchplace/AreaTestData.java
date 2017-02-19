@@ -1,6 +1,5 @@
 package ua.belozorov.lunchvoting.model.lunchplace;
 
-import com.google.common.collect.ImmutableSet;
 import lombok.Getter;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
@@ -8,8 +7,6 @@ import ua.belozorov.lunchvoting.EqualsComparator;
 import ua.belozorov.lunchvoting.MatcherUtils;
 import ua.belozorov.lunchvoting.model.User;
 import ua.belozorov.lunchvoting.model.base.Persistable;
-import ua.belozorov.lunchvoting.model.voting.polling.LunchPlacePoll;
-import ua.belozorov.lunchvoting.model.voting.polling.Poll;
 import ua.belozorov.lunchvoting.model.voting.polling.PollTestData;
 import ua.belozorov.lunchvoting.to.AreaTo;
 import ua.belozorov.objtosql.DateTimeSqlColumn;
@@ -19,9 +16,9 @@ import ua.belozorov.objtosql.StringSqlColumn;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
-import static ua.belozorov.lunchvoting.MatcherUtils.equalsWithNulls;
 import static ua.belozorov.lunchvoting.model.UserTestData.A1_USERS;
 import static ua.belozorov.lunchvoting.model.UserTestData.A2_USERS;
 
@@ -106,7 +103,7 @@ public final class AreaTestData {
                     && obj.getId().equals(another.getId())
                     && obj.getRequester().equals(another.getRequester())
                     && obj.getStatus().equals(another.getStatus())
-                    && equalsWithNulls(obj.getDecidedOn(), another.getDecidedOn())
+                    && Objects.equals(obj.getDecidedOn(), another.getDecidedOn())
                     && obj.getArea().equals(another.getArea());
         }
     }
@@ -118,12 +115,12 @@ public final class AreaTestData {
             return obj.getId().equals(another.getId())
                     && obj.getName().equals(another.getName())
                     && obj.getCreated().equals(another.getCreated())
-                    && MatcherUtils.equalsWithNulls(obj.getPlaceCount(), another.getPlaceCount())
-                    && MatcherUtils.equalsWithNulls(obj.getPlaceIds(), another.getPlaceIds())
-                    && MatcherUtils.equalsWithNulls(obj.getPollCount(), another.getPollCount())
-                    && MatcherUtils.equalsWithNulls(obj.getPolls(), another.getPolls())
-                    && MatcherUtils.equalsWithNulls(obj.getUserCount(), another.getUserCount())
-                    && MatcherUtils.equalsWithNulls(obj.getUsers(), another.getUsers());
+                    && Objects.equals(obj.getPlaceCount(), another.getPlaceCount())
+                    && Objects.equals(obj.getPlaceIds(), another.getPlaceIds())
+                    && Objects.equals(obj.getPollCount(), another.getPollCount())
+                    && Objects.equals(obj.getPolls(), another.getPolls())
+                    && Objects.equals(obj.getUserCount(), another.getUserCount())
+                    && Objects.equals(obj.getUsers(), another.getUsers());
         }
     }
 }

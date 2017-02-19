@@ -51,7 +51,7 @@ public class LunchPlaceServiceTest extends AbstractServiceTest {
 
         reset();
         service.bulkUpdate(areaId,  place2.getId(), null, "Updated Address", null, Collections.singleton("0481234567"));
-        assertSql(2, 0, 1, 0); //TODO expected 1 selects. Unnecessary select of lazy Menu#lunchplace
+        assertSql(1, 0, 1, 0);
 
         LunchPlace expected = place2.toBuilder().address("Updated Address")
                                 .phones(Collections.singleton("0481234567")).build();
@@ -174,7 +174,7 @@ public class LunchPlaceServiceTest extends AbstractServiceTest {
     public void getMenuWithoutDishes() throws Exception {
         reset();
         Menu menu = service.getMenu(testAreas.getFirstAreaId(), testPlaces.getPlace4Id(), testPlaces.getMenu1Id());
-        assertSelect(2); //TODO expected 1 select
+        assertSelect(1);
 
         assertThat(menu, matchSingle(testPlaces.getMenu1(), MENU_COMPARATOR));
     }
@@ -183,7 +183,7 @@ public class LunchPlaceServiceTest extends AbstractServiceTest {
     public void getMenuWithDishes() throws Exception {
         reset();
         Menu menu = service.getMenu(testAreas.getFirstAreaId(), testPlaces.getPlace4Id(), testPlaces.getMenu1Id(), MenuRepositoryImpl.Fields.DISHES);
-        assertSelect(3); //TODO expected 2 selects
+        assertSelect(2);
 
         assertThat(menu, matchSingle(testPlaces.getMenu1(), MENU_WITH_DISHES_COMPARATOR));
     }
@@ -195,7 +195,7 @@ public class LunchPlaceServiceTest extends AbstractServiceTest {
         assertNotNull(menu);
         reset();
         service.deleteMenu(areaId, testPlaces.getPlace4Id(), testPlaces.getMenu1Id());
-        assertSql(2, 0, 0, 1); //TODO expected 1 select
+        assertSql(1, 0, 0, 1);
 
         thrown.expect(NotFoundException.class);
         service.getMenu(areaId, testPlaces.getPlace4Id(), testPlaces.getMenu1Id());

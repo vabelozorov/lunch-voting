@@ -1,16 +1,24 @@
 package ua.belozorov.lunchvoting.exceptions;
 
 import ua.belozorov.lunchvoting.model.voting.polling.VoteIntention;
+import ua.belozorov.lunchvoting.web.exceptionhandling.ErrorCode;
 
 /**
  * <h2></h2>
  *
- * @author vabelozorov on 19.01.17.
+ * @author vabelozorov on 18.02.17.
  */
-public class NoVotePolicyMatchException extends RuntimeException {
+public class NoVotePolicyMatchException extends RuntimeException implements ApplicationException {
+    private final ErrorCode code;
     private final VoteIntention intention;
 
     public NoVotePolicyMatchException(VoteIntention intention) {
+        this.code = ErrorCode.NO_VOTE_POLICY_MATCH;
         this.intention = intention;
+    }
+
+    @Override
+    public ErrorCode getErrorCode() {
+        return code;
     }
 }

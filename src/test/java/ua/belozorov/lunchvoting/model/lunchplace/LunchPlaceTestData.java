@@ -17,7 +17,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static ua.belozorov.lunchvoting.AbstractTest.NOW_DATE;
-import static ua.belozorov.lunchvoting.MatcherUtils.equalsWithNulls;
 
 /**
  * <h2></h2>
@@ -200,8 +199,8 @@ public class LunchPlaceTestData {
         @Override
         public boolean compare(LunchPlace obj, LunchPlace another) {
             return obj.getId().equals(another.getId())
-                    && equalsWithNulls(obj.getName(),another.getName())
-                    && equalsWithNulls(obj.getDescription(), another.getDescription())
+                    && Objects.equals(obj.getName(),another.getName())
+                    && Objects.equals(obj.getDescription(), another.getDescription())
                     && new ArrayList<>(obj.getPhones()).equals(new ArrayList<>(another.getPhones()));
         }
     }

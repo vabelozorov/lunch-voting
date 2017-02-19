@@ -266,5 +266,4 @@ public class LunchPlaceControllerTest extends AbstractControllerTest {
                 contains(matchCollection(expected, LUNCH_PLACE_COMPARATOR))
         );
     }
-    //TODO test response codes and content during errors
 }

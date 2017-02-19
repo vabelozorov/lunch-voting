@@ -51,5 +51,4 @@ public abstract class BaseRepository {
         }
         return query.getResultList();
     }
-
 }
