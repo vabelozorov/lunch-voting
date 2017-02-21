@@ -18,11 +18,11 @@ public interface EatingAreaRepository {
 
     boolean delete(String areaId);
 
-    EatingArea getArea(String areaId, EatingAreaRepositoryImpl.Fields... fields);
+    @Nullable EatingArea getArea(String areaId, EatingAreaRepositoryImpl.Fields... fields);
 
-    AreaTo getAreaTo(String areaId);
+    @Nullable AreaTo getAreaTo(String areaId);
 
-    AreaTo getAreaToSummary(String areaId);
+    @Nullable AreaTo getAreaToSummary(String areaId);
 
     @Nullable JoinAreaRequest getJoinRequest(String areaId, String requestId);
 

@@ -1,5 +1,7 @@
 package ua.belozorov.lunchvoting.model;
 
+import org.springframework.security.core.GrantedAuthority;
+
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -11,7 +13,7 @@ import java.util.Set;
  *
  * @author vabelozorov on 15.11.16.
  */
-public enum UserRole {
+public enum UserRole implements GrantedAuthority {
     VOTER((byte)1),
     ADMIN((byte)2),
     CREATOR((byte)4);
@@ -24,6 +26,11 @@ public enum UserRole {
 
     public byte id() {
         return id;
+    }
+
+    @Override
+    public String getAuthority() {
+        return "ROLE_" + this.name();
     }
 
     public static Set<UserRole> toUserRoles(Integer bitmask) {

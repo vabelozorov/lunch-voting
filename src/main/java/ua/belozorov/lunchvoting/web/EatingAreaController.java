@@ -4,13 +4,12 @@ import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.MessageSource;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import ua.belozorov.lunchvoting.exceptions.DuplicateDataException;
-import ua.belozorov.lunchvoting.model.AuthorizedUser;
+import ua.belozorov.lunchvoting.web.security.AuthorizedUser;
 import ua.belozorov.lunchvoting.model.User;
 import ua.belozorov.lunchvoting.model.lunchplace.EatingArea;
 import ua.belozorov.lunchvoting.model.lunchplace.LunchPlace;
@@ -55,7 +54,7 @@ public class EatingAreaController {
         this.jsonFilter = jsonFilter;
     }
 
-    @PostMapping
+    @PostMapping//any
     public ResponseEntity create(@RequestParam String name) {
         EatingArea area = ExceptionUtils.executeAndUnwrapException(
                 () -> areaService.create(name, AuthorizedUser.get()),

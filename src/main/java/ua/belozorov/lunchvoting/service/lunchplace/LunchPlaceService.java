@@ -4,6 +4,7 @@ import org.jetbrains.annotations.Nullable;
 import ua.belozorov.lunchvoting.model.lunchplace.Dish;
 import ua.belozorov.lunchvoting.model.lunchplace.LunchPlace;
 import ua.belozorov.lunchvoting.model.lunchplace.Menu;
+import ua.belozorov.lunchvoting.repository.lunchplace.LunchPlaceRepository;
 import ua.belozorov.lunchvoting.repository.lunchplace.MenuRepositoryImpl;
 
 import java.time.LocalDate;
@@ -45,4 +46,6 @@ public interface LunchPlaceService {
     void deleteMenu(String areaId, String lunchPlaceId, String menuId);
 
     Menu getMenu(String areaId, String placeId, String menuId, MenuRepositoryImpl.Fields... fields);
+
+    LunchPlaceRepository getRepository();
 }

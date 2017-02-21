@@ -140,4 +140,9 @@ public final class EatingAreaServiceImpl implements EatingAreaService {
         member = member.assignAreaId(area.getId());
         areaRepository.update(area.addMember(member));
     }
+
+    @Override
+    public EatingAreaRepository getRepository() {
+        return this.areaRepository;
+    }
 }

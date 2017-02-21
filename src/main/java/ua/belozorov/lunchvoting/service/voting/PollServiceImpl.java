@@ -105,4 +105,9 @@ public final class PollServiceImpl implements PollService {
             throw new NotFoundException(pollId, LunchPlacePoll.class);
         }
     }
+
+    @Override
+    public PollRepository getRepository() {
+        return this.pollRepository;
+    }
 }

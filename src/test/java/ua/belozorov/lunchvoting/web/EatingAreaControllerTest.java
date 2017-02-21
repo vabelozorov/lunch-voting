@@ -8,7 +8,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MvcResult;
 import ua.belozorov.*;
 import ua.belozorov.lunchvoting.exceptions.NotFoundException;
-import ua.belozorov.lunchvoting.model.AuthorizedUser;
+import ua.belozorov.lunchvoting.web.security.AuthorizedUser;
 import ua.belozorov.lunchvoting.model.User;
 import ua.belozorov.lunchvoting.model.lunchplace.AreaTestData;
 import ua.belozorov.lunchvoting.model.lunchplace.EatingArea;
@@ -26,7 +26,6 @@ import ua.belozorov.lunchvoting.util.ControllerUtils;
 import ua.belozorov.lunchvoting.web.exceptionhandling.ErrorCode;
 import ua.belozorov.lunchvoting.web.exceptionhandling.ErrorInfo;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -84,24 +83,36 @@ public class EatingAreaControllerTest extends AbstractControllerTest {
     @Test
     public void testCreate() throws Exception {
         AuthorizedUser.authorize(ALIEN_USER1);
-        MvcResult mvcResult = mockMvc.perform(post(REST_URL).param("name", "Name").accept(MediaType.APPLICATION_JSON))
+        MvcResult mvcResult = mockMvc
+                .perform(
+                        post(REST_URL).param("name", "Name")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .with(csrf())
+                        .with(voter())
+                )
                 .andExpect(status().isCreated())
                 .andReturn();
         String location = jsonUtils.locationFromMvcResult(mvcResult);
         String id = getCreatedId(location);
 
-        mockMvc.perform(get(location)).andExpect(status().isOk());
+        mockMvc.perform(get(location).with(voter())).andExpect(status().isOk());
 
         String expected = jsonUtils.toJson(ControllerUtils.toMap("id", id));
         assertJson(expected, mvcResult.getResponse().getContentAsString());
 
-        assertNotNull(areaService.getArea(id));
+        assertNotNull(areaService.getRepository().getArea(id));
     }
 
     @Test
     public void e409AndMessageOnCreateAreaWithDuplicateName() throws Exception {
         AuthorizedUser.authorize(ALIEN_USER1);
-        MvcResult result = mockMvc.perform(post(REST_URL).param("name", testAreas.getFirstAreaName()).accept(MediaType.APPLICATION_JSON))
+        MvcResult result = mockMvc
+                .perform(
+                        post(REST_URL).param("name", testAreas.getFirstAreaName())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .with(csrf())
+                        .with(voter())
+                )
                 .andExpect(status().isConflict())
                 .andReturn();
         ErrorInfo errorInfo = new ErrorInfo(
@@ -119,21 +130,26 @@ public class EatingAreaControllerTest extends AbstractControllerTest {
     public void testCreateUserInArea() throws Exception {
         String areaId = testAreas.getFirstAreaId();
         User newUser = new User(null, "Name", "new@meil.com", "newpassword").assignAreaId(areaId);
-        MvcResult mvcResult = mockMvc.perform(post(REST_URL + "/{id}/members", areaId)
-                    .content(jsonUtils.toJson(newUser))
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .accept(MediaType.APPLICATION_JSON))
+        MvcResult mvcResult = mockMvc
+                .perform(
+                        post(REST_URL + "/{id}/members", areaId)
+                        .content(jsonUtils.toJson(newUser))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .with(csrf())
+                        .with(god())
+                )
                 .andExpect(status().isCreated())
                 .andReturn();
         String location = jsonUtils.locationFromMvcResult(mvcResult);
         String id = getCreatedId(location);
 
-        mockMvc.perform(get(location)).andExpect(status().isOk());
+        mockMvc.perform(get(location).with(voter())).andExpect(status().isOk());
 
         String expected = jsonUtils.toJson(ControllerUtils.toMap("id", id));
         assertJson(expected, mvcResult.getResponse().getContentAsString());
 
-        assertEquals(profileService.get(id).getAreaId(), areaId);
+        assertEquals(profileService.getRepository().get(null, id).getAreaId(), areaId);
     }
 
     @Test
@@ -142,7 +158,11 @@ public class EatingAreaControllerTest extends AbstractControllerTest {
         MvcResult result = mockMvc
                 .perform(post(REST_URL + "/{id}/members", testAreas.getFirstAreaId())
                         .content(jsonUtils.toJson(userTo))
-                        .contentType(MediaType.APPLICATION_JSON))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .with(csrf())
+                        .with(god())
+                )
                 .andExpect(status().isConflict())
                 .andReturn();
         ErrorInfo errorInfo = new ErrorInfo(
@@ -161,39 +181,45 @@ public class EatingAreaControllerTest extends AbstractControllerTest {
         Set<String> phones = ImmutableSet.of("0661234567", "0441234567");
         LunchPlaceTo to = new LunchPlaceTo("New PLace", "New Street 12/12", "New Description", phones);
 
-        MvcResult result = mockMvc.perform(post(REST_URL + "/{areaId}/places", testAreas.getFirstAreaId())
-                .content(jsonUtils.toJson(to))
-                .contentType(MediaType.APPLICATION_JSON))
+        MvcResult result = mockMvc
+                .perform(
+                        post(REST_URL + "/{areaId}/places", testAreas.getFirstAreaId())
+                        .content(jsonUtils.toJson(to))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .with(csrf())
+                        .with(god())
+                )
                 .andExpect(status().isCreated())
                 .andReturn();
 
         String uri = jsonUtils.locationFromMvcResult(result);
         String id = getCreatedId(uri);
 
-        mockMvc.perform(get(uri)).andExpect(status().isOk());
+        mockMvc.perform(get(uri).with(voter())).andExpect(status().isOk());
 
-        assertNotNull(placeService.get(testAreas.getFirstAreaId(), id));
+        assertNotNull(placeService.getRepository().get(testAreas.getFirstAreaId(), id));
     }
 
     @Test
 
     public void testCreatePollForTodayMenus() throws Exception {
-        MvcResult mvcResult = mockMvc.perform(
-                post(REST_URL + "/{id}/polls", areaId)
+        MvcResult mvcResult = mockMvc
+                .perform(
+                    post(REST_URL + "/{id}/polls", areaId)
+                    .accept(MediaType.APPLICATION_JSON)
                     .with(csrf())
-                    .with(user("user"))
+                    .with(god())
                 )
                 .andExpect(status().isCreated())
                 .andReturn();
         String location = jsonUtils.locationFromMvcResult(mvcResult);
 
-        String expected = mockMvc.perform(get(location).accept(MediaType.APPLICATION_JSON)
-                .with(csrf())
-                .with(user("user")))
+        String expected = mockMvc.perform(get(location).with(voter()).accept(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse().getContentAsString();
         String id = getCreatedId(location);
 
-        LunchPlacePoll poll = pollService.getWithPollItems(areaId, id);
+        LunchPlacePoll poll = asVoter(() -> pollService.getWithPollItems(areaId, id));
         Map<String, Object> objProperties = this.converter.convert(new PollTo(poll));
         String actual = jsonUtils.toJson(objProperties);
 
@@ -203,16 +229,23 @@ public class EatingAreaControllerTest extends AbstractControllerTest {
     @Test
     public void testCreatePollForMenuDate() throws Exception {
         String date = NOW_DATE.plusDays(2).format(WEB_DATE_FORMATTER);
-        MvcResult mvcResult = mockMvc.perform(post(REST_URL + "/{id}/polls", areaId).param("menuDate", date))
+        MvcResult mvcResult = mockMvc
+                .perform(
+                        post(REST_URL + "/{id}/polls", areaId)
+                        .param("menuDate", date)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .with(csrf())
+                        .with(god())
+                )
                 .andExpect(status().isCreated())
                 .andReturn();
         String location = jsonUtils.locationFromMvcResult(mvcResult);
 
-        String expected = mockMvc.perform(get(location).accept(MediaType.APPLICATION_JSON))
+        String expected = mockMvc.perform(get(location).with(voter()).accept(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse().getContentAsString();
         String id = getCreatedId(location);
 
-        LunchPlacePoll poll = pollService.getWithPollItems(areaId, id);
+        LunchPlacePoll poll = asVoter(() -> pollService.getWithPollItems(areaId, id));
         Map<String, Object> objProperties = this.converter.convert(new PollTo(poll));
         String actual = jsonUtils.toJson(objProperties);
 
@@ -220,21 +253,28 @@ public class EatingAreaControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    public void testUpdate() throws Exception {
-        mockMvc.perform(put(REST_URL).param("name", "NEW_AWESOME_NAME"))
+    public void testUpdateName() throws Exception {
+        mockMvc
+                .perform(
+                        put(REST_URL)
+                        .param("name", "NEW_AWESOME_NAME")
+                        .with(csrf())
+                        .with(god())
+                )
                 .andExpect(status().isNoContent());
-        EatingArea updated = areaService.getArea(testAreas.getFirstAreaId());
+        EatingArea updated = areaService.getRepository().getArea(testAreas.getFirstAreaId());
 
-        assertThat(updated, matchSingle(testAreas.getFirstArea().changeName("NEW_AWESOME_NAME"), AREA_COMPARATOR));
+        assertEquals(updated.getName(), "NEW_AWESOME_NAME");
     }
 
     @Test
     public void testGetFullDto() throws Exception {
-        String actual = mockMvc.perform(get("{base}/{id}", REST_URL, testAreas.getFirstAreaId())
-                    .param("summary", "false")
-                    .accept(MediaType.APPLICATION_JSON)
-                    .with(csrf())
-                    .with(user("user"))
+        String actual = mockMvc
+                .perform(
+                        get("{base}/{id}", REST_URL, testAreas.getFirstAreaId())
+                        .param("summary", "false")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .with(voter())
                 )
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
@@ -245,8 +285,12 @@ public class EatingAreaControllerTest extends AbstractControllerTest {
 
     @Test
     public void testGetSummaryDto() throws Exception {
-        String actual = mockMvc.perform(get("{base}/{id}", REST_URL, testAreas.getFirstAreaId())
-                .accept(MediaType.APPLICATION_JSON))
+        String actual = mockMvc
+                .perform(
+                        get("{base}/{id}", REST_URL, testAreas.getFirstAreaId())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .with(voter())
+                )
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
         String expected = jsonUtils.toJson(AreaTestData.dtoSummary(testAreas.getFirstArea()));
@@ -256,10 +300,16 @@ public class EatingAreaControllerTest extends AbstractControllerTest {
 
     @Test
     public void testFilterByName() throws Exception {
-        EatingArea chow1 = areaService.create("ChowArea", ALIEN_USER1);
-        EatingArea chow2 = areaService.create("ChowAreaNew", ALIEN_USER1);
-        String actual = mockMvc.perform(get("{base}/filter", REST_URL).param("name", "Chow")
-                .accept(MediaType.APPLICATION_JSON))
+        EatingArea chow1 = asVoter(() -> areaService.create("ChowArea", ALIEN_USER1));
+        EatingArea chow2 = asVoter(() -> areaService.create("ChowAreaNew", ALIEN_USER1));
+
+        String actual = mockMvc
+                .perform(
+                        get("{base}/filter", REST_URL)
+                        .param("name", "Chow")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .with(voter())
+                )
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
         List<Map<String, Object>> convert = new SimpleObjectToMapConverter<>(
@@ -275,10 +325,11 @@ public class EatingAreaControllerTest extends AbstractControllerTest {
     @Test
     public void testDelete() throws Exception {
         mockMvc.perform(delete("{base}/{id}", REST_URL, testAreas.getFirstAreaId())
-                .accept(MediaType.APPLICATION_JSON))
+                .accept(MediaType.APPLICATION_JSON)
+                .with(csrf())
+                .with(god())
+        )
                 .andExpect(status().isNoContent());
-        thrown.expect(NotFoundException.class);
-        areaService.getArea(testAreas.getFirstAreaId());
+        assertNull(areaService.getRepository().getArea(testAreas.getFirstAreaId()));
     }
-
 }

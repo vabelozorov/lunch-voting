@@ -6,7 +6,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import ua.belozorov.lunchvoting.model.AuthorizedUser;
+import ua.belozorov.lunchvoting.web.security.AuthorizedUser;
 import ua.belozorov.lunchvoting.model.User;
 import ua.belozorov.lunchvoting.model.lunchplace.JoinAreaRequest;
 import ua.belozorov.lunchvoting.service.area.JoinAreaRequestService;
@@ -46,7 +46,7 @@ public class JoinAreaRequestController {
 
     @PostMapping
     public ResponseEntity makeRequest(@RequestParam("id") String areaId) {
-        JoinAreaRequest request = requestService.makeJoinRequest(AuthorizedUser.get(), areaId);
+        JoinAreaRequest request = requestService.make(AuthorizedUser.get(), areaId);
         URI uri = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path("{base}/{id}").buildAndExpand(REST_URL, request.getId()).toUri();
         return ResponseEntity.created(uri).body(toMap("id", request.getId()));
@@ -55,37 +55,37 @@ public class JoinAreaRequestController {
     @GetMapping(params = "status")
     public ResponseEntity<List<JoinRequestTo>> getAllInAreaOfStatus(@RequestParam JoinAreaRequest.JoinStatus status) {
         String areaId = ofNullable(AuthorizedUser.get()).map(User::getAreaId).orElse(null);
-        List<JoinAreaRequest> requests = requestService.getJoinRequestsByStatus(areaId, status);
+        List<JoinAreaRequest> requests = requestService.getByStatus(areaId, status);
         return ResponseEntity.ok(toDto(requests));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<JoinRequestTo> getById(@PathVariable("id") String requestId) {
-        JoinAreaRequest request = requestService.getJoinRequestByRequester(AuthorizedUser.get(), requestId);
+        JoinAreaRequest request = requestService.getByRequester(AuthorizedUser.get(), requestId);
         return ResponseEntity.ok(new JoinRequestTo(request));
     }
 
     @GetMapping
     public ResponseEntity<List<JoinRequestTo>> getAllInAreaOfRequester() {
-        List<JoinAreaRequest> requests = requestService.getJoinRequestsByRequester(AuthorizedUser.get());
+        List<JoinAreaRequest> requests = requestService.getByRequester(AuthorizedUser.get());
         return ResponseEntity.ok(toDto(requests));
     }
 
     @PutMapping("/{id}/approve")
     public ResponseEntity approve(@PathVariable("id") String requestId) {
-        requestService.approveJoinRequest(AuthorizedUser.get(), requestId);
+        requestService.approve(AuthorizedUser.get(), requestId);
         return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/{id}/reject")
     public ResponseEntity reject(@PathVariable("id") String requestId) {
-        requestService.rejectJoinRequest(AuthorizedUser.get(), requestId);
+        requestService.reject(AuthorizedUser.get(), requestId);
         return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/{id}/cancel")
     public ResponseEntity cancel(@PathVariable("id") String requestId) {
-        requestService.cancelJoinRequest(AuthorizedUser.get(), requestId);
+        requestService.cancel(AuthorizedUser.get(), requestId);
         return ResponseEntity.noContent().build();
     }
 

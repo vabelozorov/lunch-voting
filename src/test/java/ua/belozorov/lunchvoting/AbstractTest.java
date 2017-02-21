@@ -2,6 +2,8 @@ package ua.belozorov.lunchvoting;
 
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 import ua.belozorov.lunchvoting.model.lunchplace.AreaTestData;
 import ua.belozorov.lunchvoting.model.lunchplace.LunchPlaceTestData;
 import ua.belozorov.lunchvoting.model.voting.polling.PollTestData;
@@ -36,6 +38,10 @@ public abstract class AbstractTest {
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
+
+    @Rule
+    public MockitoRule mockitoRule = MockitoJUnit.rule();
+
 
     public <T> void  assertExceptionCount(Class<T> exClass, int count, Supplier... suppliers) {
         List<T> exceptions = new ArrayList<>();

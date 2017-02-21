@@ -30,31 +30,26 @@ public final class JoinAreaRequestServiceImpl implements JoinAreaRequestService 
         this.areaRepository = areaRepository;
     }
 
-    @Override
-    public JoinAreaRequest getJoinRequest(String areaId, String requestId) {
-        return ofNullable(areaRepository.getJoinRequest(areaId, requestId))
-                .orElseThrow(() -> new NotFoundException(requestId, JoinAreaRequest.class));
-    }
 
     @Override
-    public List<JoinAreaRequest> getJoinRequestsByStatus(String areaId, JoinAreaRequest.JoinStatus status) {
+    public List<JoinAreaRequest> getByStatus(String areaId, JoinAreaRequest.JoinStatus status) {
         return areaRepository.getJoinRequestsByStatus(areaId, status);
     }
 
     @Override
-    public List<JoinAreaRequest> getJoinRequestsByRequester(User user) {
+    public List<JoinAreaRequest> getByRequester(User user) {
         return areaRepository.getJoinRequestsByRequester(user.getId());
     }
 
     @Override
-    public JoinAreaRequest getJoinRequestByRequester(User user, String requestId) {
+    public JoinAreaRequest getByRequester(User user, String requestId) {
         return ofNullable(areaRepository.getJoinRequestByRequester(user.getId(), requestId))
                 .orElseThrow(() -> new NotFoundException(requestId, JoinAreaRequest.class));
     }
 
     @Override
     @Transactional
-    public JoinAreaRequest makeJoinRequest(User requester, String areaId) {
+    public JoinAreaRequest make(User requester, String areaId) {
         EatingArea area = areaRepository.getArea(areaId);
         JoinAreaRequest request = new JoinAreaRequest(requester, area);
         return areaRepository.save(request);
@@ -62,9 +57,9 @@ public final class JoinAreaRequestServiceImpl implements JoinAreaRequestService 
 
     @Override
     @Transactional
-    public void approveJoinRequest(User approver, String requestId) {
+    public void approve(User approver, String requestId) {
         String areaId = approver.getAreaId();
-        JoinAreaRequest request = this.getJoinRequest(areaId, requestId);
+        JoinAreaRequest request = this.get(areaId, requestId);
         areaRepository.update(request.approve());
 
         areaService.addMember(areaId, request.getRequester());
@@ -72,16 +67,20 @@ public final class JoinAreaRequestServiceImpl implements JoinAreaRequestService 
 
     @Override
     @Transactional
-    public void cancelJoinRequest(User requester, String requestId) {
-        JoinAreaRequest request = this.getJoinRequestByRequester(requester, requestId);
+    public void cancel(User requester, String requestId) {
+        JoinAreaRequest request = this.getByRequester(requester, requestId);
         areaRepository.update(request.cancel());
     }
 
     @Override
     @Transactional
-    public void rejectJoinRequest(User approver, String requestId) {
-        JoinAreaRequest request = this.getJoinRequest(approver.getAreaId(), requestId);
+    public void reject(User approver, String requestId) {
+        JoinAreaRequest request = this.get(approver.getAreaId(), requestId);
         areaRepository.update(request.reject());
     }
 
+    private JoinAreaRequest get(String areaId, String requestId) {
+        return ofNullable(areaRepository.getJoinRequest(areaId, requestId))
+                .orElseThrow(() -> new NotFoundException(requestId, JoinAreaRequest.class));
+    }
 }

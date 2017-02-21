@@ -59,4 +59,9 @@ public final class UserProfileServiceImpl implements UserProfileService {
         return ofNullable(userRepository.get(null, id))
                 .orElseThrow(() -> new NotFoundException(id, User.class));
     }
+
+    @Override
+    public UserRepository getRepository() {
+        return this.userRepository;
+    }
 }

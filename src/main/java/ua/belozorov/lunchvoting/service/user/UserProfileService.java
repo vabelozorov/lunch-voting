@@ -1,6 +1,7 @@
 package ua.belozorov.lunchvoting.service.user;
 
 import ua.belozorov.lunchvoting.model.User;
+import ua.belozorov.lunchvoting.repository.user.UserRepository;
 
 /**
  * <h2></h2>
@@ -38,4 +39,6 @@ public interface UserProfileService {
      * @throws ua.belozorov.lunchvoting.exceptions.NotFoundException if there is no entity with such ID
      */
     User get(String id);
+
+    UserRepository getRepository();
 }

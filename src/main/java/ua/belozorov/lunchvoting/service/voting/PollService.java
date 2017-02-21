@@ -2,6 +2,7 @@ package ua.belozorov.lunchvoting.service.voting;
 
 import ua.belozorov.lunchvoting.model.voting.polling.LunchPlacePoll;
 import ua.belozorov.lunchvoting.model.voting.polling.Vote;
+import ua.belozorov.lunchvoting.repository.voting.PollRepository;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -42,4 +43,6 @@ public interface PollService {
     Boolean isPollActive(String areaId, String pollId);
 
     void delete(String areaId, String pollId);
+
+    PollRepository getRepository();
 }

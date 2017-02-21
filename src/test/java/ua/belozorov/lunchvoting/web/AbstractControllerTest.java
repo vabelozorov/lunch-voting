@@ -12,6 +12,7 @@ import org.springframework.test.context.jdbc.SqlConfig;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import ua.belozorov.lunchvoting.AbstractSpringTest;
@@ -24,6 +25,12 @@ import ua.belozorov.lunchvoting.config.WebConfig;
 import javax.annotation.PostConstruct;
 import javax.servlet.Filter;
 import java.util.Arrays;
+
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+import static ua.belozorov.lunchvoting.model.UserTestData.ALIEN_USER1;
+import static ua.belozorov.lunchvoting.model.UserTestData.GOD;
+import static ua.belozorov.lunchvoting.model.UserTestData.VOTER;
 
 //import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 
@@ -47,13 +54,10 @@ public abstract class AbstractControllerTest extends AbstractSpringTest {
     MockMvc mockMvc;
 
     @Autowired
-    private Filter springSecurityFilterChain;
-
-    @Autowired
     public void setMockMvc(WebApplicationContext webApplicationContext) {
         this.mockMvc = MockMvcBuilders
                 .webAppContextSetup(webApplicationContext)
-                .addFilters(springSecurityFilterChain)
+                .apply(springSecurity())
                 .build();
     }
 
@@ -63,5 +67,17 @@ public abstract class AbstractControllerTest extends AbstractSpringTest {
 
     String getCreatedId(String uri) {
         return Arrays.stream(uri.split("/")).reduce((a, b) -> b).orElse(null);
+    }
+
+    static RequestPostProcessor god() {
+        return httpBasic(GOD.getEmail(), GOD.getPassword());
+    }
+
+    static RequestPostProcessor voter() {
+        return httpBasic(VOTER.getEmail(), VOTER.getPassword());
+    }
+
+    static RequestPostProcessor alien() {
+        return httpBasic(ALIEN_USER1.getEmail(), ALIEN_USER1.getPassword());
     }
 }

@@ -2,6 +2,8 @@ package ua.belozorov.lunchvoting.service.area;
 
 import ua.belozorov.lunchvoting.model.User;
 import ua.belozorov.lunchvoting.model.lunchplace.JoinAreaRequest;
+import ua.belozorov.lunchvoting.web.security.IsAdmin;
+import ua.belozorov.lunchvoting.web.security.IsAdminOrVoter;
 
 import java.util.List;
 
@@ -12,19 +14,24 @@ import java.util.List;
  */
 public interface JoinAreaRequestService {
 
-    JoinAreaRequest makeJoinRequest(User user, String areaId);
+    @IsAdminOrVoter
+    JoinAreaRequest make(User user, String areaId);
 
-    JoinAreaRequest getJoinRequest(String areaId, String requestId);
+    @IsAdminOrVoter
+    List<JoinAreaRequest> getByRequester(User user);
 
-    JoinAreaRequest getJoinRequestByRequester(User user, String requestId);
+    @IsAdminOrVoter
+    JoinAreaRequest getByRequester(User user, String requestId);
 
-    List<JoinAreaRequest> getJoinRequestsByStatus(String areaId, JoinAreaRequest.JoinStatus status);
+    @IsAdmin
+    List<JoinAreaRequest> getByStatus(String areaId, JoinAreaRequest.JoinStatus status);
 
-    List<JoinAreaRequest> getJoinRequestsByRequester(User user);
+    @IsAdmin
+    void approve(User approver, String requestId);
 
-    void approveJoinRequest(User approver, String requestId);
+    @IsAdminOrVoter
+    void cancel(User requester, String requestId);
 
-    void cancelJoinRequest(User requester, String requestId);
-
-    void rejectJoinRequest(User approver, String requestId);
+    @IsAdmin
+    void reject(User approver, String requestId);
 }

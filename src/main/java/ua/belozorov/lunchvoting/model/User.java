@@ -6,15 +6,15 @@ import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotEmpty;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import ua.belozorov.lunchvoting.model.base.AbstractPersistableObject;
 import ua.belozorov.lunchvoting.util.hibernate.RolesToIntegerConverter;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * <h2></h2>
@@ -25,7 +25,7 @@ import java.util.Set;
 @Entity
 @Table(name = "users")
 @DynamicUpdate
-public final class User extends AbstractPersistableObject implements Comparable<User> {
+public final class User extends AbstractPersistableObject implements Comparable<User>, UserDetails {
 
     @Column(name = "name", nullable = false)
     @NotEmpty
@@ -109,7 +109,6 @@ public final class User extends AbstractPersistableObject implements Comparable<
                 "id=" + id + '\'' +
                 ", name='" + name + '\'' +
                 ", email='" + email + '\'' +
-                ", password='" + password + '\'' +
                 ", roles=" + roles +
                 ", registeredDate=" + registeredDate +
                 ", activated=" + activated +
@@ -127,7 +126,6 @@ public final class User extends AbstractPersistableObject implements Comparable<
         return this.toBuilder().roles(roles).build();
     }
 
-
     public User assignAreaId(String id) {
         return this.toBuilder().areaId(id).build();
     }
@@ -139,5 +137,38 @@ public final class User extends AbstractPersistableObject implements Comparable<
     @Override
     public int compareTo(User o) {
         return this.email.compareTo(o.email);
+    }
+
+    /*
+            UserDetails methods for Spring Security
+     */
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return this.getRoles().stream().map(m -> (GrantedAuthority)m).collect(Collectors.toList());
+    }
+
+    @Override
+    public String getUsername() {
+        return this.getName();
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return this.isActivated();
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
     }
 }

@@ -124,4 +124,9 @@ public class LunchPlaceServiceImpl implements LunchPlaceService {
         return ofNullable(menuRepository.getMenu(areaId, placeId, menuId, fields))
                 .orElseThrow(() -> new NotFoundException(menuId, Menu.class));
     }
+
+    @Override
+    public LunchPlaceRepository getRepository() {
+        return this.lunchPlaceRepository;
+    }
 }

@@ -14,6 +14,7 @@ import ua.belozorov.lunchvoting.util.Pair;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * <h2></h2>
@@ -60,6 +61,11 @@ public class UserRepositoryImpl extends BaseRepository implements UserRepository
         return super.regularGetList(sql, User.class, new Pair<>("areaId", areaId), new Pair<>("mask", 1 << role.ordinal()));
     }
 
+    @Override
+    public Optional<User> geByEmail(String email) {
+        return crudRepository.getByEmail(email);
+    }
+
     /**
      * <h2></h2>
      *
@@ -80,5 +86,7 @@ public class UserRepositoryImpl extends BaseRepository implements UserRepository
         int deleteById(@Param("areaId") String areaId, @Param("userId") String userId);
 
         User findOneByAreaIdAndId(String areaId, String userId);
+
+        Optional<User> getByEmail(String email);
     }
 }

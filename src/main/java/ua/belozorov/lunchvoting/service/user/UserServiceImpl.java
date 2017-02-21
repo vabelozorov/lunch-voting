@@ -1,6 +1,9 @@
 package ua.belozorov.lunchvoting.service.user;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ua.belozorov.lunchvoting.exceptions.NotFoundException;
@@ -23,7 +26,7 @@ import static java.util.Optional.ofNullable;
  */
 @Service
 @Transactional(readOnly = true)
-public final class UserServiceImpl implements UserService {
+public final class UserServiceImpl implements UserService, UserDetailsService {
 
     private final UserRepository userRepository;
 
@@ -107,5 +110,15 @@ public final class UserServiceImpl implements UserService {
     @Override
     public List<User> getUsersByRole(String areaId, UserRole role) {
         return this.userRepository.getUsersByRole(areaId, role);
+    }
+
+    /*
+           For Spring Security
+     */
+    @Override
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        UserDetails user = userRepository.geByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException(String.format("UserRecord %s not found", email)) );
+        return user;
     }
 }

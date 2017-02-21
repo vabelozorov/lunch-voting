@@ -38,7 +38,11 @@ public class UserTestData {
 
     public static User A2_ADMIN = new User("A2_ADMIN_ID", 1, "A2admin_Name", "a2admin@email.com", "a2_adminpass",
             new HashSet<>(Arrays.asList(UserRole.ADMIN)), LocalDateTime.of(2016, 11, 17, 13, 0, 0), true, "AREA2_ID"  );
-    public static User A2_USER1 = new User("A2_USER1_ID", 1, "Alien2_Name", "a2_user1@email.com", "a2_user1pass",
+    public static User A2_USER1 = new User("A2_USER1_ID", 1, "A2_Name1", "a2_user1@email.com", "a2_user1pass",
+            new HashSet<>(Arrays.asList(UserRole.VOTER)), LocalDateTime.of(2016, 11, 17, 13, 0, 0), true, "AREA2_ID");
+    public static User A2_USER2 = new User("A2_USER2_ID", 1, "A2_Name2", "a2_user2@email.com", "a2_user2pass",
+            new HashSet<>(Arrays.asList(UserRole.VOTER)), LocalDateTime.of(2016, 11, 17, 13, 0, 0), true, "AREA2_ID");
+    public static User A2_USER3 = new User("A2_USER3_ID", 1, "A2_Name3", "a2_user3@email.com", "a2_user3pass",
             new HashSet<>(Arrays.asList(UserRole.VOTER)), LocalDateTime.of(2016, 11, 17, 13, 0, 0), true, "AREA2_ID");
 
     public static User ALIEN_USER1 = new User("ALIEN1_ID", 1, "Alien1_Name", "alien1@email.com", "a1lienpass",
@@ -55,9 +59,13 @@ public class UserTestData {
     public static String VOTER4_ID = VOTER4.getId();
 
     public static List<User> A1_USERS = Stream.of(ADMIN, VOTER, VOTER1, VOTER2, VOTER3, VOTER4, GOD)
-            .sorted(Comparator.comparing(User::getEmail)).collect(Collectors.toList());
+            .sorted().collect(Collectors.toList());
 
-    public static List<User> A2_USERS = Stream.of(A2_ADMIN, A2_USER1).sorted().collect(Collectors.toList());
+    public static List<User> A2_USERS = Stream.of(A2_ADMIN, A2_USER1, A2_USER2, A2_USER3)
+            .sorted().collect(Collectors.toList());
+
+    public static List<User> ALIEN_USERS = Stream.of(ALIEN_USER1, ALIEN_USER2)
+            .sorted().collect(Collectors.toList());
 
     public static List<User> A1_VOTERS = Arrays.asList(VOTER, VOTER1, VOTER2, VOTER3, VOTER4);
 
@@ -67,7 +75,7 @@ public class UserTestData {
         List<User> allUsers = new ArrayList<>();
         allUsers.addAll(A1_USERS);
         allUsers.addAll(A2_USERS);
-        allUsers.addAll(Arrays.asList(ALIEN_USER1, ALIEN_USER2));
+        allUsers.addAll(ALIEN_USERS);
 
         String sql = new SimpleObjectToSqlConverter<>(
                 "users",

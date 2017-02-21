@@ -6,6 +6,7 @@ import ua.belozorov.lunchvoting.model.UserRole;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Created by vabelozorov on 14.11.16.
@@ -26,4 +27,6 @@ public interface UserRepository {
     void flushAndClear();
 
     List<User> getUsersByRole(String areaId, UserRole role);
+
+    Optional<User> geByEmail(String email);
 }

@@ -58,8 +58,7 @@ public final class JoinAreaRequest extends AbstractPersistableObject {
     }
 
     public JoinAreaRequest approve() {
-        this.status = JoinStatus.APPROVED;
-        return this;
+        return this.changeStatus(JoinStatus.APPROVED);
     }
 
     public JoinAreaRequest reject() {
