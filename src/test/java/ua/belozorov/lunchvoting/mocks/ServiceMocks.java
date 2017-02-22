@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import ua.belozorov.lunchvoting.service.user.UserProfileService;
 import ua.belozorov.lunchvoting.service.user.UserService;
+import ua.belozorov.lunchvoting.service.voting.PollService;
 
 import static org.mockito.Mockito.mock;
 
@@ -14,7 +15,7 @@ import static org.mockito.Mockito.mock;
  * @author vabelozorov on 22.02.17.
  */
 @Configuration
-public class LocalTestConfig {
+public class ServiceMocks {
 
     @Bean
     @Primary
@@ -26,5 +27,11 @@ public class LocalTestConfig {
     @Primary
     public UserService userService() {
         return mock(UserService.class);
+    }
+
+    @Bean
+    @Primary
+    public PollService pollService() {
+        return mock(PollService.class);
     }
 }

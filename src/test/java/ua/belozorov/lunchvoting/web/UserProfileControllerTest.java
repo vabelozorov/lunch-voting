@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MvcResult;
-import ua.belozorov.lunchvoting.mocks.LocalTestConfig;
+import ua.belozorov.lunchvoting.mocks.ServiceMocks;
 import ua.belozorov.lunchvoting.model.User;
 import ua.belozorov.lunchvoting.service.user.UserProfileService;
 import ua.belozorov.lunchvoting.to.UserTo;
@@ -30,7 +30,7 @@ import static ua.belozorov.lunchvoting.model.UserTestData.VOTER_ID;
  *
  * @author vabelozorov on 08.02.17.
  */
-@ContextConfiguration(classes = {LocalTestConfig.class})
+@ContextConfiguration(classes = {ServiceMocks.class})
 public class UserProfileControllerTest extends AbstractControllerTest {
     public static final String REST_URL = UserProfileController.REST_URL;
 

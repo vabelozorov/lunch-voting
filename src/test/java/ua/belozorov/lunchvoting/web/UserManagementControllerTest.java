@@ -1,15 +1,12 @@
 package ua.belozorov.lunchvoting.web;
 
-import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MvcResult;
-import ua.belozorov.lunchvoting.exceptions.DuplicateDataException;
 import ua.belozorov.lunchvoting.exceptions.NotFoundException;
-import ua.belozorov.lunchvoting.mocks.LocalTestConfig;
+import ua.belozorov.lunchvoting.mocks.ServiceMocks;
 import ua.belozorov.lunchvoting.model.User;
 import ua.belozorov.lunchvoting.model.UserRole;
 import ua.belozorov.lunchvoting.service.user.UserService;
@@ -20,7 +17,6 @@ import ua.belozorov.lunchvoting.web.exceptionhandling.ErrorInfo;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -36,7 +32,7 @@ import static ua.belozorov.lunchvoting.model.UserTestData.*;
  *
  * @author vabelozorov on 17.11.16.
  */
-@ContextConfiguration(classes = {LocalTestConfig.class})
+@ContextConfiguration(classes = {ServiceMocks.class})
 public class UserManagementControllerTest extends AbstractControllerTest {
     private static final String REST_URL = UserManagementController.REST_URL;
 
