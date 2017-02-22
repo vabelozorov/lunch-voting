@@ -71,7 +71,7 @@ public abstract class AbstractControllerTest extends AbstractSpringTest {
     }
 
     static RequestPostProcessor god() {
-        return httpBasic(GOD.getEmail(), GOD.getPassword());
+        return user(GOD);
     }
 
     static RequestPostProcessor voter() {
@@ -79,6 +79,6 @@ public abstract class AbstractControllerTest extends AbstractSpringTest {
     }
 
     static RequestPostProcessor alien() {
-        return httpBasic(ALIEN_USER1.getEmail(), ALIEN_USER1.getPassword());
+        return user(ALIEN_USER1);
     }
 }

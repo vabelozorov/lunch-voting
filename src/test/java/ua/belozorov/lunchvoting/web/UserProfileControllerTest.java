@@ -1,23 +1,16 @@
 package ua.belozorov.lunchvoting.web;
 
 import org.junit.Test;
-import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MvcResult;
+import ua.belozorov.lunchvoting.mocks.LocalTestConfig;
 import ua.belozorov.lunchvoting.model.User;
-import ua.belozorov.lunchvoting.model.UserTestData;
 import ua.belozorov.lunchvoting.service.user.UserProfileService;
-import ua.belozorov.lunchvoting.service.user.UserService;
 import ua.belozorov.lunchvoting.to.UserTo;
 import ua.belozorov.lunchvoting.util.ControllerUtils;
 
-import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -37,12 +30,16 @@ import static ua.belozorov.lunchvoting.model.UserTestData.VOTER_ID;
  *
  * @author vabelozorov on 08.02.17.
  */
-@ContextConfiguration(classes = {UserProfileControllerTest.LocalTestConfig.class})
+@ContextConfiguration(classes = {LocalTestConfig.class})
 public class UserProfileControllerTest extends AbstractControllerTest {
     public static final String REST_URL = UserProfileController.REST_URL;
 
     @Autowired
     private UserProfileService profileService;
+
+    @Override
+    public void beforeTest() {
+    }
 
     @Test
     public void testRegister() throws Exception {
@@ -68,7 +65,7 @@ public class UserProfileControllerTest extends AbstractControllerTest {
         assertJson(expected, result.getResponse().getContentAsString());
 
         when(profileService.get(id)).thenReturn(newUser);
-        mockMvc.perform(get(location).with(user(VOTER)).accept(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get(location).with(voter()).accept(MediaType.APPLICATION_JSON))
                                 .andExpect(status().isOk());
     }
 
@@ -85,11 +82,6 @@ public class UserProfileControllerTest extends AbstractControllerTest {
         )
         .andExpect(status().isNoContent());
         verify(profileService).updateMainInfo(VOTER_ID, VOTER.getName(), "newEmail@email.com", "newPassword");
-//
-//        User user = profileService.get(VOTER_ID);
-//
-//        assertEquals(userTo.getPassword(), user.getPassword());
-//        assertEquals(userTo.getEmail(), user.getEmail());
     }
 
     @Test
@@ -111,15 +103,5 @@ public class UserProfileControllerTest extends AbstractControllerTest {
 
     public static User userWithoutId(User user) {
         return argThat(new UserComparator(user, false, false));
-    }
-
-    @Configuration
-    public static class LocalTestConfig {
-
-        @Bean
-        @Primary
-        public UserProfileService userProfileService() {
-            return mock(UserProfileService.class);
-        }
     }
 }

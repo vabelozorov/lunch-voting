@@ -1,14 +1,18 @@
 package ua.belozorov.lunchvoting.web;
 
+import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.MessageSource;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MvcResult;
+import ua.belozorov.lunchvoting.exceptions.DuplicateDataException;
 import ua.belozorov.lunchvoting.exceptions.NotFoundException;
+import ua.belozorov.lunchvoting.mocks.LocalTestConfig;
 import ua.belozorov.lunchvoting.model.User;
 import ua.belozorov.lunchvoting.model.UserRole;
-import ua.belozorov.lunchvoting.service.user.UserProfileService;
+import ua.belozorov.lunchvoting.service.user.UserService;
 import ua.belozorov.lunchvoting.to.UserTo;
 import ua.belozorov.lunchvoting.web.exceptionhandling.ErrorCode;
 import ua.belozorov.lunchvoting.web.exceptionhandling.ErrorInfo;
@@ -16,12 +20,14 @@ import ua.belozorov.lunchvoting.web.exceptionhandling.ErrorInfo;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.hamcrest.Matchers.contains;
 import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
 import static ua.belozorov.lunchvoting.model.UserTestData.*;
 
 
@@ -30,12 +36,19 @@ import static ua.belozorov.lunchvoting.model.UserTestData.*;
  *
  * @author vabelozorov on 17.11.16.
  */
-
+@ContextConfiguration(classes = {LocalTestConfig.class})
 public class UserManagementControllerTest extends AbstractControllerTest {
     private static final String REST_URL = UserManagementController.REST_URL;
 
     @Autowired
-    private UserProfileService profileService;
+    private UserService userService;
+
+    private final String areaId = testAreas.getFirstAreaId();
+
+    @Override
+    public void beforeTest() {
+
+    }
 
     @Test
     public void testUpdate() throws Exception {
@@ -48,15 +61,13 @@ public class UserManagementControllerTest extends AbstractControllerTest {
                 .with(god())
                 .with(csrf()))
         .andExpect(status().isNoContent());
-
-        User user = profileService.getRepository().get(null, VOTER_ID);
-
-        assertEquals(userTo.getPassword(), user.getPassword());
-        assertEquals(userTo.getEmail(), user.getEmail());
+        verify(userService)
+                .updateMainInfo(areaId, userTo.getId(), userTo.getName(), userTo.getEmail(), userTo.getPassword());
     }
 
     @Test
     public void testGet() throws Exception {
+        when(userService.get(areaId, VOTER_ID)).thenReturn(VOTER);
         String actual = mockMvc
                 .perform(
                         get(REST_URL + "/{voter}", testAreas.getFirstAreaId(),  VOTER_ID)
@@ -64,6 +75,7 @@ public class UserManagementControllerTest extends AbstractControllerTest {
                 )
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
+        verify(userService).get(areaId, VOTER_ID);
 
         String expected = jsonUtils.toJson(new UserTo(VOTER));
         assertJson(expected, actual);
@@ -71,6 +83,7 @@ public class UserManagementControllerTest extends AbstractControllerTest {
 
     @Test
     public void e404AndMessageOnGetNonExistingId() throws Exception {
+        when(userService.get(any(), any())).thenThrow(new NotFoundException("I_DO_NOT_EXIST", User.class));
         MvcResult result = mockMvc
                 .perform(
                         get(REST_URL + "/{id}", testAreas.getFirstAreaId(), "I_DO_NOT_EXIST")
@@ -91,6 +104,8 @@ public class UserManagementControllerTest extends AbstractControllerTest {
 
     @Test
     public void testGetAll() throws Exception {
+        when(userService.getAll(areaId)).thenReturn(A1_USERS);
+
         String actual = mockMvc
                 .perform(
                         get(REST_URL, testAreas.getFirstAreaId())
@@ -116,7 +131,7 @@ public class UserManagementControllerTest extends AbstractControllerTest {
                         .with(csrf())
                 )
                 .andExpect(status().isNoContent());
-        assertNull(profileService.getRepository().get(null, VOTER_ID));
+        verify(userService).delete(areaId, VOTER_ID);
     }
 
     @Test
@@ -133,8 +148,7 @@ public class UserManagementControllerTest extends AbstractControllerTest {
         )
         .andExpect(status().isNoContent());
 
-        User user = profileService.getRepository().get(null, VOTER_ID);
-        assertFalse(user.isActivated());
+        verify(userService).activate(areaId, VOTER_ID, false);
     }
 
     @Test
@@ -155,8 +169,6 @@ public class UserManagementControllerTest extends AbstractControllerTest {
         )
         .andExpect(status().isNoContent());
 
-        User user = profileService.getRepository().get(null, VOTER_ID);
-
-        assertEquals(user.getRoles(), expectedRoles);
+        verify(userService).setRoles(areaId, VOTER_ID, expectedRoles);
     }
 }

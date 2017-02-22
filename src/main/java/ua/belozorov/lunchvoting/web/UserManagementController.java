@@ -55,7 +55,7 @@ public class UserManagementController {
                     return null;
                 },
                 DataIntegrityViolationException.class,
-                new DuplicateDataException(ErrorCode.DUPLICATE_EMAIL, new Object[]{userTo.getEmail()})
+                    new DuplicateDataException(ErrorCode.DUPLICATE_EMAIL, new Object[]{userTo.getEmail()})
         );
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }

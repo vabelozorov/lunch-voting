@@ -36,7 +36,6 @@ import static ua.belozorov.lunchvoting.model.UserTestData.GOD_ID;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ActiveProfiles(SPRING_PROFILES.DB_PROXY)
-@Sql(scripts = "classpath:db/populate_postgres.sql", config = @SqlConfig(encoding = "UTF-8"))
 public abstract class AbstractSpringTest extends AbstractTest {
     @Autowired
     protected PlatformTransactionManager ptm;
