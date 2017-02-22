@@ -1,5 +1,6 @@
 package ua.belozorov.lunchvoting.web.queries;
 
+import com.google.common.collect.ImmutableSet;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -32,14 +33,6 @@ public final class LunchPlaceQueryParams {
     protected LunchPlaceQueryParams() {
     }
 
-    public boolean allEmpty() {
-        return ids.length == 0 && startDate == null && endDate == null && fields.length == 0;
-    }
-
-    public boolean onlyIds() {
-        return ids.length != 0 && startDate == null && endDate == null && fields.length == 0;
-    }
-
     @NotNull public  Set<String> getIds() {
         return toSet(ids);
     }
@@ -60,11 +53,7 @@ public final class LunchPlaceQueryParams {
         return startDate != null || endDate != null;
     }
 
-    @NotNull public Set<String> getFieldsOrDefault(Set<String> defaultFields) {
-        return fields.length == 0 ? defaultFields : getFields();
-    }
-
     private Set<String> toSet(String[] strings) {
-        return new HashSet<>(Arrays.asList(strings));
+        return ImmutableSet.copyOf(strings);
     }
 }

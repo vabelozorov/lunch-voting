@@ -17,7 +17,7 @@ import ua.belozorov.lunchvoting.util.SecurityEnforcerBeanFactoryPostProcessor;
 public class RootConfig {
 
     @Bean
-    public BeanFactoryPostProcessor securityEnforcer() {
+    public static BeanFactoryPostProcessor securityEnforcer() {
         return new SecurityEnforcerBeanFactoryPostProcessor();
     }
 }

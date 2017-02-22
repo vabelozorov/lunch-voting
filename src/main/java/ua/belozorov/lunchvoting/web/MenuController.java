@@ -49,7 +49,7 @@ public class MenuController {
     @IsAdmin
     public ResponseEntity create(@PathVariable String placeId, @RequestBody @Validated MenuTo menuTo) {
         String areaId = AuthorizedUser.get().getAreaId();
-        Menu created= placeService.addMenu(areaId, placeId, menuTo.getEffectiveDate(), menuTo.getDishes());
+        Menu created = placeService.addMenu(areaId, placeId, menuTo.getEffectiveDate(), menuTo.getDishes());
         URI uri = ServletUriComponentsBuilder.fromCurrentContextPath().path(REST_URL + "/{id}")
                 .buildAndExpand(areaId, placeId, created.getId()).toUri();
         return ResponseEntity.created(uri).build();

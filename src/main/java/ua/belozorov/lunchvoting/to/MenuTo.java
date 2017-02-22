@@ -21,6 +21,7 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public final class MenuTo {
+
     private String id;
     @NotNull
     private LocalDate effectiveDate;
@@ -28,6 +29,10 @@ public final class MenuTo {
     private Set<Dish> dishes;
 
     private String lunchPlaceId;
+
+    public MenuTo(LocalDate effectiveDate, Set<Dish> dishes) {
+        this(null, effectiveDate, dishes, null);
+    }
 
     public MenuTo(String id, LocalDate effectiveDate, Set<Dish> dishes, String lunchPlaceId) {
         this.id = id;

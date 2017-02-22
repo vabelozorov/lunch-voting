@@ -1,11 +1,18 @@
 package ua.belozorov.lunchvoting.web;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
+import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MvcResult;
 import ua.belozorov.lunchvoting.DateTimeFormatters;
+import ua.belozorov.lunchvoting.exceptions.DuplicateDataException;
+import ua.belozorov.lunchvoting.exceptions.NotFoundException;
+import ua.belozorov.lunchvoting.mocks.ServiceMocks;
 import ua.belozorov.lunchvoting.model.lunchplace.LunchPlace;
 import ua.belozorov.lunchvoting.model.lunchplace.Menu;
 import ua.belozorov.lunchvoting.service.lunchplace.LunchPlaceService;
@@ -20,6 +27,11 @@ import java.util.stream.Stream;
 
 import static org.hamcrest.Matchers.contains;
 import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -32,6 +44,7 @@ import static ua.belozorov.lunchvoting.model.lunchplace.LunchPlaceTestData.*;
  *
  * @author vabelozorov on 25.11.16.
  */
+@ContextConfiguration(classes = ServiceMocks.class)
 public class LunchPlaceControllerTest extends AbstractControllerTest {
     private static final String REST_URL = LunchPlaceController.REST_URL;
 
@@ -44,11 +57,18 @@ public class LunchPlaceControllerTest extends AbstractControllerTest {
     private final LunchPlace PLACE4 = super.testPlaces.getPlace4();
     private final String PLACE4_ID = PLACE4.getId();
 
+    @Override
+    @Before
+    public void beforeTest() {
+        Mockito.reset(placeService);
+    }
 
     @Test
     public void testUpdate() throws Exception {
-        Set<String> phones = ImmutableSet.of("0661234567", "0441234567");
+        Set<String> phones = Sets.newHashSet("0661234567", "0441234567");
         LunchPlaceTo to = new LunchPlaceTo("Updated PLace", null, "Updated Description", phones);
+
+//        when(placeService)
 
         mockMvc.perform(
                 put(REST_URL + "/{id}",  areaId, PLACE4_ID)
@@ -59,19 +79,16 @@ public class LunchPlaceControllerTest extends AbstractControllerTest {
         )
         .andExpect(status().isNoContent());
 
-        LunchPlace expected = PLACE4.toBuilder().name("Updated PLace").description("Updated Description")
-                .phones(phones).build();
-        assertThat(
-                placeService.getRepository().get(PLACE4_ID),
-                matchSingle(expected, LUNCH_PLACE_COMPARATOR)
-        );
+        verify(placeService).bulkUpdate(areaId, PLACE4_ID, to.getName(), to.getAddress(), to.getDescription(), to.getPhones());
     }
 
     @Test
     public void updateWhereNameIsDuplicated() throws Exception {
-        Set<String> phones = ImmutableSet.of("0661234567", "0441234567");
         String duplicatedName = PLACE3.getName();
-        LunchPlaceTo to = new LunchPlaceTo(duplicatedName, null, "Updated Description", phones);
+        LunchPlaceTo to = new LunchPlaceTo(duplicatedName, null, "Updated Description", Collections.emptySet());
+
+        doThrow(new DuplicateDataException(ErrorCode.DUPLICATE_PLACE_NAME, new Object[]{duplicatedName}))
+                .when(placeService).bulkUpdate(any(), any(), any(), any(), any(), any());
 
         MvcResult result = mockMvc
                 .perform(
@@ -95,6 +112,9 @@ public class LunchPlaceControllerTest extends AbstractControllerTest {
 
     @Test
     public void testGet() throws Exception {
+        when(placeService.getMultiple(any(), any()))
+                .thenReturn(Collections.singletonList(testPlaces.getPlace4()));
+
         String actualJson = mockMvc
                 .perform(
                         get(REST_URL + "/{id}", areaId, PLACE4_ID)
@@ -102,33 +122,39 @@ public class LunchPlaceControllerTest extends AbstractControllerTest {
                 )
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
+
+        verify(placeService).getMultiple(areaId, Collections.singleton(PLACE4_ID));
 
         Map<String, String> properties = new HashMap<>();
         properties.put("id", PLACE4_ID);
         properties.put("name", PLACE4.getName());
 
         String expectedJson = jsonUtils.toJson(properties);
+
         assertJson(expectedJson, actualJson);
     }
 
     @Test
-    public void testGetWithFields() throws Exception {
+    public void getWithFields() throws Exception {
+        when(placeService.getMultipleWithMenu(any(), any(), any(), any()))
+                    .thenReturn(Collections.singletonList(testPlaces.getPlace4()));
+
         String actualJson = mockMvc
                 .perform(
                         get(REST_URL + "/{id}", areaId, PLACE4_ID)
                         .param("fields", "name,description,menus")
-                                .with(voter())
+                        .with(voter())
                 )
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
+
+        verify(placeService).getMultipleWithMenu(areaId, Collections.singleton(PLACE4_ID), null, null);
 
         Object obj = new Object() {
             String id = PLACE4.getId();
             String name = PLACE4.getName();
             String description = PLACE4.getDescription();
-            Set<Menu> menus = new HashSet<>(Arrays.asList(
-                    testPlaces.getMenu1(), testPlaces.getMenu2(),
-                    testPlaces.getMenu3(), testPlaces.getMenu4()));
+            Set<Menu> menus = new HashSet<>(testPlaces.getPlace4().getMenus());
         };
         String expectedJson = jsonUtils.toJson(obj);
 
@@ -136,20 +162,26 @@ public class LunchPlaceControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    public void testGetByMenuDates() throws Exception {
+    public void getByMenuDates() throws Exception {
+        Set<Menu> expectedMenus = Sets.newHashSet(testPlaces.getMenu3(), testPlaces.getMenu4());
+        when(placeService.getMultipleWithMenu(any(), any(), any(), any()))
+                .thenReturn(Collections.singletonList(testPlaces.getPlace4().setMenus(expectedMenus)));
+
         String actualJson = mockMvc
                 .perform(
                         get(REST_URL + "/{id}", areaId, PLACE4_ID)
-                        .param("startDate", LocalDate.now().format(DateTimeFormatters.WEB_DATE_FORMATTER))
+                        .param("startDate", NOW_DATE.format(DateTimeFormatters.WEB_DATE_FORMATTER))
                         .param("fields", "menus")
                         .with(voter())
                 )
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
 
+        verify(placeService).getMultipleWithMenu(areaId, Collections.singleton(PLACE4_ID), NOW_DATE, null);
+
         Object obj = new Object() {
             String id = PLACE4.getId();
-            Set<Menu> menus = new HashSet<>(Arrays.asList(testPlaces.getMenu3(), testPlaces.getMenu4()));
+            Set<Menu> menus = expectedMenus;
         };
 
         String expectedJson = jsonUtils.toJson(obj);
@@ -159,6 +191,11 @@ public class LunchPlaceControllerTest extends AbstractControllerTest {
 
     @Test
     public void testGetMultiple() throws Exception {
+        List<LunchPlace> places = Arrays.asList(PLACE4, PLACE3);
+
+        when(placeService.getMultiple(any(), any()))
+                .thenReturn(places);
+
         String actualJson = mockMvc
                 .perform(
                         get(REST_URL, areaId)
@@ -168,7 +205,7 @@ public class LunchPlaceControllerTest extends AbstractControllerTest {
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
 
-        List<LunchPlace> places = Stream.of(PLACE3, PLACE4).sorted().collect(Collectors.toList());
+        verify(placeService).getMultiple(areaId, Sets.newHashSet(PLACE3_ID, PLACE4_ID));
 
         List<Map<String,String>> placesValues = new ArrayList<>();
         for (LunchPlace lp : places) {
@@ -185,27 +222,36 @@ public class LunchPlaceControllerTest extends AbstractControllerTest {
 
     @Test
     public void testGetMultipleByMenuDates() throws Exception {
+        LunchPlace place3 = PLACE3.setMenus(Sets.newHashSet(testPlaces.getMenu6()));
+        LunchPlace place4 = PLACE4.setMenus(Sets.newHashSet(testPlaces.getMenu1(), testPlaces.getMenu2()));
+
+        when(placeService.getMultipleWithMenu(any(), any(), any(), any()))
+                .thenReturn(Arrays.asList(place4, place3));
+
         String actualJson = mockMvc
                 .perform(
                         get(REST_URL, areaId)
                         .param("ids", PLACE3_ID + "," + PLACE4_ID)
                         .param("fields", "menus, name")
-                        .param("startDate", LocalDate.now().minusDays(2).format(DateTimeFormatters.WEB_DATE_FORMATTER))
-                        .param("endDate", LocalDate.now().minusDays(1).format(DateTimeFormatters.WEB_DATE_FORMATTER))
+                        .param("startDate", NOW_DATE.minusDays(2).format(DateTimeFormatters.WEB_DATE_FORMATTER))
+                        .param("endDate", NOW_DATE.minusDays(1).format(DateTimeFormatters.WEB_DATE_FORMATTER))
                         .with(voter())
                 )
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
 
+        verify(placeService).getMultipleWithMenu(areaId, Sets.newHashSet(PLACE3_ID, PLACE4_ID),
+                NOW_DATE.minusDays(2), NOW_DATE.minusDays(1));
+
         Object obj1 = new Object() {
             String id = PLACE3.getId();
             String name = PLACE3.getName();
-            Set<Menu> menus = new HashSet<>(Arrays.asList(testPlaces.getMenu6()));
+            Set<Menu> menus = place3.getMenus();
         };
         Object obj2 = new Object() {
             String id = PLACE4.getId();
             String name = PLACE4.getName();
-            Set<Menu> menus = new HashSet<>(Arrays.asList(testPlaces.getMenu1(), testPlaces.getMenu2()));
+            Set<Menu> menus = place4.getMenus();
         };
 
         String expectedJson = jsonUtils.toJson(Arrays.asList(obj1, obj2));
@@ -215,6 +261,11 @@ public class LunchPlaceControllerTest extends AbstractControllerTest {
 
     @Test
     public void getAll() throws Exception {
+        List<LunchPlace> places = testPlaces.getA1Places();
+
+        when(placeService.getMultiple(areaId, Collections.emptySet()))
+                .thenReturn(places);
+
         String actualJson = mockMvc
                 .perform(
                         get(REST_URL, areaId)
@@ -223,7 +274,7 @@ public class LunchPlaceControllerTest extends AbstractControllerTest {
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
 
-        List<LunchPlace> places = testPlaces.getA1Places().stream().sorted().collect(Collectors.toList());
+        verify(placeService).getMultiple(areaId, Collections.emptySet());
 
         List<Map<String,String>> placesValues = new ArrayList<>();
         for (LunchPlace lp : places) {
@@ -240,6 +291,11 @@ public class LunchPlaceControllerTest extends AbstractControllerTest {
 
     @Test
     public void testGetAllWithFields() throws Exception {
+        List<LunchPlace> places = testPlaces.getA1Places();
+
+        when(placeService.getMultiple(any(), any()))
+                .thenReturn(places);
+
         String actualJson = mockMvc
                 .perform(
                         get(REST_URL, areaId)
@@ -249,7 +305,8 @@ public class LunchPlaceControllerTest extends AbstractControllerTest {
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
 
-        List<LunchPlace> places = testPlaces.getA1Places().stream().sorted().collect(Collectors.toList());
+        verify(placeService).getMultiple(areaId, Collections.emptySet());
+
         List<Map<String,String>> placesValues = new ArrayList<>();
         for (LunchPlace lp : places) {
             Map<String, String> properties = new HashMap<>();
@@ -265,6 +322,8 @@ public class LunchPlaceControllerTest extends AbstractControllerTest {
 
     @Test
     public void testGetMultipleOneNotExists() throws Exception {
+        when(placeService.getMultipleWithMenu(any(), any(), any(), any()))
+                .thenThrow(new NotFoundException(Sets.newHashSet("I_DO_NOT_EXIST"), LunchPlace.class));
         MvcResult result = mockMvc
                 .perform(
                         get(REST_URL, areaId)
@@ -297,6 +356,6 @@ public class LunchPlaceControllerTest extends AbstractControllerTest {
         )
                 .andExpect(status().isNoContent());
 
-        assertNull(placeService.getRepository().get(PLACE4_ID));
+        verify(placeService).delete(areaId, PLACE4_ID);
     }
 }

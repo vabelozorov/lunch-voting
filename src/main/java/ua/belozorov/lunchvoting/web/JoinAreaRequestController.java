@@ -55,19 +55,19 @@ public class JoinAreaRequestController {
         return ResponseEntity.created(uri).body(toMap("id", request.getId()));
     }
 
+    @GetMapping("/{id}")
+    @IsAdminOrVoter
+    public ResponseEntity<JoinRequestTo> getById(@PathVariable("id") String requestId) {
+        JoinAreaRequest request = requestService.getByRequester(AuthorizedUser.get(), requestId);
+        return ResponseEntity.ok(new JoinRequestTo(request));
+    }
+
     @GetMapping(params = "status")
     @IsAdmin
     public ResponseEntity<List<JoinRequestTo>> getAllInAreaOfStatus(@RequestParam JoinAreaRequest.JoinStatus status) {
         String areaId = ofNullable(AuthorizedUser.get()).map(User::getAreaId).orElse(null);
         List<JoinAreaRequest> requests = requestService.getByStatus(areaId, status);
         return ResponseEntity.ok(toDto(requests));
-    }
-
-    @GetMapping("/{id}")
-    @IsAdminOrVoter
-    public ResponseEntity<JoinRequestTo> getById(@PathVariable("id") String requestId) {
-        JoinAreaRequest request = requestService.getByRequester(AuthorizedUser.get(), requestId);
-        return ResponseEntity.ok(new JoinRequestTo(request));
     }
 
     @GetMapping

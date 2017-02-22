@@ -47,7 +47,7 @@ public class PollControllerTest extends AbstractControllerTest {
 
     @Override
     public void beforeTest() {
-        
+
     }
 
     public PollControllerTest() {
