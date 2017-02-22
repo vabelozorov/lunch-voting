@@ -1,6 +1,8 @@
 package ua.belozorov.lunchvoting.config;
 
+import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.context.annotation.*;
+import ua.belozorov.lunchvoting.util.SecurityEnforcerBeanFactoryPostProcessor;
 
 
 /**
@@ -14,4 +16,8 @@ import org.springframework.context.annotation.*;
 @Import({JpaConfig.class, InitDatabaseConfig.class, DataSourceConfig.class, WebSecurityConfig.class})
 public class RootConfig {
 
+    @Bean
+    public BeanFactoryPostProcessor securityEnforcer() {
+        return new SecurityEnforcerBeanFactoryPostProcessor();
+    }
 }

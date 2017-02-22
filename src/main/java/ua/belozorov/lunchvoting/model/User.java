@@ -28,15 +28,12 @@ import java.util.stream.Collectors;
 public final class User extends AbstractPersistableObject implements Comparable<User>, UserDetails {
 
     @Column(name = "name", nullable = false)
-    @NotEmpty
     private final String name;
 
     @Column(name = "email", nullable = false)
-    @Email
     private final String email;
 
     @Column(name = "password", nullable = false)
-    @Length(min = 6)
     private final String password;
 
     @Column(name = "roles", nullable = false)
@@ -56,19 +53,18 @@ public final class User extends AbstractPersistableObject implements Comparable<
      * Primarily for Hibernate. Constructs a User instance with default values.
      */
     protected User() {
-        this(null, null, null, null);
+        this( null, null, null);
     }
 
     /**
      * For a convenient creation from a DTO.
      *
-     * @param id
      * @param name
      * @param email
      * @param password
      */
-    public User(String id, String name, String email, String password) {
-        this(id, null, name, email, password,  new HashSet<>(Collections.singletonList(UserRole.VOTER)),
+    public User(String name, String email, String password) {
+        this(null, null, name, email, password,  new HashSet<>(Collections.singletonList(UserRole.VOTER)),
                 LocalDateTime.now(), true, null);
     }
 
@@ -149,7 +145,7 @@ public final class User extends AbstractPersistableObject implements Comparable<
 
     @Override
     public String getUsername() {
-        return this.getName();
+        return this.email;
     }
 
     @Override

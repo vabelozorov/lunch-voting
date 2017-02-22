@@ -33,6 +33,7 @@ public final class UserProfileServiceImpl implements UserProfileService {
     }
 
     @Override
+    @Transactional
     public void updateMainInfo(String id, String name, String email, String password) {
         ExceptionUtils.checkParamsNotNull(id, name, email, password);
 

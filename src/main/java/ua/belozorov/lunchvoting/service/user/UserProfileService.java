@@ -21,6 +21,7 @@ public interface UserProfileService {
      * @param password non-null, not-empty user password
      * @throws ua.belozorov.lunchvoting.exceptions.NotFoundException if there is no entity with such ID
      */
+
     void updateMainInfo(String id, String name, String email, String password);
 
     /**
@@ -28,6 +29,7 @@ public interface UserProfileService {
      * @param user User instance which will override an existing entity
      * @throws ua.belozorov.lunchvoting.exceptions.NotFoundException if there is no entity with such ID
      */
+
     void update(User user);
 
     /**
@@ -38,6 +40,7 @@ public interface UserProfileService {
      * @return User entity
      * @throws ua.belozorov.lunchvoting.exceptions.NotFoundException if there is no entity with such ID
      */
+
     User get(String id);
 
     UserRepository getRepository();

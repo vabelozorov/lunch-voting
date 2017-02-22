@@ -17,4 +17,13 @@ public class ErrorInfo {
         this.code = code;
         this.message = message;
     }
+
+    @Override
+    public String toString() {
+        return "ErrorInfo{" +
+                "url=" + url + "\n" +
+                ", code=" + code + "\n" +
+                ", message='" + message + '\'' + "\n" +
+                '}';
+    }
 }

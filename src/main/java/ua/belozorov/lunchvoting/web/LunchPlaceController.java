@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ua.belozorov.lunchvoting.exceptions.DuplicateDataException;
 import ua.belozorov.lunchvoting.web.security.AuthorizedUser;
@@ -15,7 +16,10 @@ import ua.belozorov.lunchvoting.to.transformers.DtoIntoEntity;
 import ua.belozorov.lunchvoting.util.ExceptionUtils;
 import ua.belozorov.lunchvoting.web.exceptionhandling.ErrorCode;
 import ua.belozorov.lunchvoting.web.queries.LunchPlaceQueryParams;
+import ua.belozorov.lunchvoting.web.security.IsAdmin;
+import ua.belozorov.lunchvoting.web.security.IsAdminOrVoter;
 
+import javax.validation.Valid;
 import java.util.*;
 
 /**
@@ -52,7 +56,8 @@ public class LunchPlaceController  {
      * @return Http 204 code on success
      */
     @PutMapping("/{id}")
-    public ResponseEntity update(@PathVariable String id, @RequestBody LunchPlaceTo to) {
+    @IsAdmin
+    public ResponseEntity update(@PathVariable String id, @RequestBody @Validated LunchPlaceTo to) {
         String areaId = AuthorizedUser.get().getAreaId();
         LunchPlace place = DtoIntoEntity.toLunchPlace(to, id);
         ExceptionUtils.executeAndUnwrapException(
@@ -80,6 +85,7 @@ public class LunchPlaceController  {
      * @return
      */
     @GetMapping("/{id}")
+    @IsAdminOrVoter
     public ResponseEntity<LunchPlace> get(@PathVariable String id, LunchPlaceQueryParams params) {
         params.setIds(new String[]{id});
         RefinedFields refinedFields = new LunchPlaceRefinedFields(params.getFields());
@@ -90,6 +96,7 @@ public class LunchPlaceController  {
     }
 
     @GetMapping
+    @IsAdminOrVoter
     public ResponseEntity<Collection<LunchPlace>> getLunchPlaces(LunchPlaceQueryParams params) {
         RefinedFields refinedFields = new LunchPlaceRefinedFields(params.getFields());
         Collection<LunchPlace> places = this.getLunchPlacesOptimally(params, refinedFields);
@@ -111,6 +118,7 @@ public class LunchPlaceController  {
     }
 
     @DeleteMapping("/{id}")
+    @IsAdmin
     public ResponseEntity delete(@PathVariable String id) {
         placeService.delete(AuthorizedUser.get().getAreaId(), id);
         return new ResponseEntity(HttpStatus.NO_CONTENT);

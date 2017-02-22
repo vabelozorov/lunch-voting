@@ -118,7 +118,7 @@ public class EatingAreaServiceTest extends AbstractServiceTest {
     @Test
     @WithMockAdmin
     public void createUserInArea() throws Exception {
-        User newUser = new User("NEW_USER_ID", "New User", "new@email.com", "strongPassword");
+        User newUser = new User("New User", "new@email.com", "strongPassword");
 
         reset();
         User created = areaService.createUserInArea(areaId, newUser);
@@ -192,7 +192,7 @@ public class EatingAreaServiceTest extends AbstractServiceTest {
         assertSelect(1);
 
         assertThat(actual, matchSingle(expected, AREA_COMPARATOR));
-        assertExceptionCount(LazyInitializationException.class, 3,
+        assertExceptionCount(LazyInitializationException.class,
                 () -> actual.getUsers().size(),
                 () -> actual.getPolls().size(),
                 () -> actual.getPlaces().size()
@@ -202,7 +202,7 @@ public class EatingAreaServiceTest extends AbstractServiceTest {
     @Test
     @WithMockVoter
     public void getAreaWithUsers() throws Exception {
-        EatingArea expected = areaService.create("ChowChow", ALIEN_USER1);
+        EatingArea expected = testAreas.getFirstArea();
 
         reset();
         TransactionStatus transactionStatus = ptm.getTransaction(new DefaultTransactionDefinition());
@@ -212,8 +212,8 @@ public class EatingAreaServiceTest extends AbstractServiceTest {
         assertSelect(2);
 
         assertThat(expected, matchSingle(actual, AREA_COMPARATOR));
-        assertTrue(actual.getUsers().size() == 1);
-        assertExceptionCount(LazyInitializationException.class, 2,
+        assertTrue(actual.getUsers().size() == 7);
+        assertExceptionCount(LazyInitializationException.class,
                 () -> actual.getPolls().size(),
                 () -> actual.getPlaces().size()
         );
@@ -222,7 +222,7 @@ public class EatingAreaServiceTest extends AbstractServiceTest {
     @Test
     @WithMockVoter
     public void getAreaWithUsersAndPolls() throws Exception {
-        EatingArea expected = areaService.create("ChowChow", ALIEN_USER1);
+        EatingArea expected = testAreas.getFirstArea();
 
         reset();
         TransactionStatus transactionStatus = ptm.getTransaction(new DefaultTransactionDefinition());
@@ -231,9 +231,9 @@ public class EatingAreaServiceTest extends AbstractServiceTest {
         assertSelect(3);
 
         assertThat(expected, matchSingle(actual, AREA_COMPARATOR));
-        assertTrue(actual.getUsers().size() == 1);
-        assertTrue(actual.getPolls().size() == 0);
-        assertExceptionCount(LazyInitializationException.class, 1,
+        assertTrue(actual.getUsers().size() == 7);
+        assertTrue(actual.getPolls().size() == 4);
+        assertExceptionCount(LazyInitializationException.class,
                 () -> actual.getPlaces().size()
         );
     }

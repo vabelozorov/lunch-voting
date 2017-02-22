@@ -4,11 +4,9 @@ import com.google.common.collect.ImmutableSortedSet;
 import lombok.Builder;
 import lombok.Getter;
 import org.hibernate.annotations.*;
-import org.hibernate.validator.constraints.Length;
-import org.hibernate.validator.constraints.NotBlank;
 import org.jetbrains.annotations.Nullable;
-import ua.belozorov.lunchvoting.LengthEach;
 import ua.belozorov.lunchvoting.model.base.AbstractPersistableObject;
+import ua.belozorov.lunchvoting.util.ExceptionUtils;
 import ua.belozorov.lunchvoting.util.hibernate.PhonesToStringConverter;
 
 import javax.persistence.*;
@@ -29,20 +27,15 @@ import java.util.*;
 public class LunchPlace extends AbstractPersistableObject implements Comparable<LunchPlace> {
 
     @Column(name = "name", nullable = false)
-    @NotBlank
-    @Length(max = 50)
     private final String name;
 
     @Column(name = "address")
-    @Length(max = 100)
     private final String address;
 
     @Column(name = "description")
-    @Length(max = 1000)
     private final String description;
 
     @Column(name = "phones")
-    @LengthEach//TODO
     @OrderBy
     @Convert(converter = PhonesToStringConverter.class)
     @SuppressWarnings("JpaAttributeTypeInspection")
@@ -62,8 +55,8 @@ public class LunchPlace extends AbstractPersistableObject implements Comparable<
 
     public LunchPlace(String name) {
         this.name = name;
-        this.address = null;
-        this.description = null;
+        this.address = "";
+        this.description = "";
         this.phones = new HashSet<>();
         this.menus = new HashSet<>();
     }
@@ -77,10 +70,12 @@ public class LunchPlace extends AbstractPersistableObject implements Comparable<
     LunchPlace(@Nullable String id, @Nullable Integer version, String name, String address, String description,
                       Set<String> phones, Set<Menu> menus) {
         super(id, version);
+        ExceptionUtils.checkParamsNotNull(name, phones, menus);
+
         this.name = name;
-        this.address = address;
-        this.description = description;
-        this.phones = new HashSet<>(phones);
+        this.address = address == null ? "" : address;
+        this.description = description == null ? "" : description;
+        this.phones = phones;
         this.menus = menus;
     }
 

@@ -15,6 +15,8 @@ import ua.belozorov.lunchvoting.service.user.UserProfileService;
 import ua.belozorov.lunchvoting.to.UserTo;
 import ua.belozorov.lunchvoting.util.ExceptionUtils;
 import ua.belozorov.lunchvoting.web.exceptionhandling.ErrorCode;
+import ua.belozorov.lunchvoting.web.security.InSecure;
+import ua.belozorov.lunchvoting.web.security.IsAdminOrVoter;
 
 import java.net.URI;
 
@@ -49,9 +51,10 @@ public class UserProfileController {
      *  @throws DuplicateDataException if a provided email already exists in the database
      */
     @PostMapping
+    @InSecure
     public ResponseEntity register(@RequestBody @Validated(UserTo.Create.class) UserTo userTo) {
         User created = ExceptionUtils.executeAndUnwrapException(
-                () -> profileService.register(new User(null, userTo.getName(), userTo.getEmail(), userTo.getPassword())),
+                () -> profileService.register(new User(userTo.getName(), userTo.getEmail(), userTo.getPassword())),
                 DataIntegrityViolationException.class,
                 new DuplicateDataException(ErrorCode.DUPLICATE_EMAIL, new Object[]{userTo.getEmail()})
         );
@@ -61,6 +64,7 @@ public class UserProfileController {
     }
 
     @PutMapping
+    @IsAdminOrVoter
     public ResponseEntity update(@RequestBody @Validated(UserTo.Update.class)UserTo userTo) {
         ExceptionUtils.executeAndUnwrapException(
                 () -> {
@@ -74,6 +78,7 @@ public class UserProfileController {
     }
 
     @GetMapping("/{id}")
+    @IsAdminOrVoter
     public ResponseEntity<UserTo> get(@PathVariable String id) {
         User user = profileService.get(id);
         return new ResponseEntity<>(new UserTo(user), HttpStatus.OK);

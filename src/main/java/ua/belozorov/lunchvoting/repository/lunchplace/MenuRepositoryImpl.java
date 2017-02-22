@@ -26,7 +26,7 @@ public class MenuRepositoryImpl extends BaseRepository implements MenuRepository
     }
 
     @Override
-    public Menu getMenu(String areaId, String placeId, String menuId, Fields... fields) {
+    public Menu get(String areaId, String placeId, String menuId, Fields... fields) {
         String sql = "SELECT m FROM EatingArea ea " +
                 "INNER JOIN ea.places lp " +
                 "INNER JOIN lp.menus m " +
@@ -46,7 +46,7 @@ public class MenuRepositoryImpl extends BaseRepository implements MenuRepository
     }
 
     @Override
-    public boolean deleteMenu(String menuId) {
+    public boolean delete(String menuId) {
         return em.createQuery("DELETE FROM Menu m WHERE m.id = :menuId")
                 .setParameter("menuId", menuId)
                 .executeUpdate() != 0;

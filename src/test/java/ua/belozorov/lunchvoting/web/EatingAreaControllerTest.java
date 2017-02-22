@@ -129,7 +129,7 @@ public class EatingAreaControllerTest extends AbstractControllerTest {
     @Test
     public void testCreateUserInArea() throws Exception {
         String areaId = testAreas.getFirstAreaId();
-        User newUser = new User(null, "Name", "new@meil.com", "newpassword").assignAreaId(areaId);
+        User newUser = new User("Name", "new@meil.com", "newpassword").assignAreaId(areaId);
         MvcResult mvcResult = mockMvc
                 .perform(
                         post(REST_URL + "/{id}/members", areaId)
@@ -144,12 +144,36 @@ public class EatingAreaControllerTest extends AbstractControllerTest {
         String location = jsonUtils.locationFromMvcResult(mvcResult);
         String id = getCreatedId(location);
 
-        mockMvc.perform(get(location).with(voter())).andExpect(status().isOk());
+        mockMvc.perform(get(location).with(god())).andExpect(status().isOk());
 
         String expected = jsonUtils.toJson(ControllerUtils.toMap("id", id));
         assertJson(expected, mvcResult.getResponse().getContentAsString());
 
         assertEquals(profileService.getRepository().get(null, id).getAreaId(), areaId);
+    }
+
+    @Test
+    public void e400AndMessageOnCreateUserWithValidationFails() throws Exception {
+        UserTo userTo = new UserTo("", "god1@email.com", "strongPassword");
+        MvcResult result = mockMvc
+                .perform(
+                        post(REST_URL + "/{id}/members", testAreas.getFirstAreaId())
+                                .content(jsonUtils.toJson(userTo))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .with(god())
+                                .with(csrf())
+                )
+                .andExpect(status().isBadRequest())
+                .andReturn();
+        ErrorInfo errorInfo = new ErrorInfo(
+                result.getRequest().getRequestURL(),
+                ErrorCode.PARAMS_VALIDATION_FAILED,
+                "field 'name', rejected value '', reason: may not be empty"
+        );
+        assertJson(
+                jsonUtils.toJson(errorInfo),
+                result.getResponse().getContentAsString()
+        );
     }
 
     @Test

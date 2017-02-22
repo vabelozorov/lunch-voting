@@ -21,6 +21,7 @@ import java.util.Set;
 @Getter
 public final class UserTo {
     @NotBlank(groups = {Update.class, Activate.class, Roles.class})
+    @SafeHtml
     private String id;
 
     @NotBlank(groups = {Create.class, Update.class})

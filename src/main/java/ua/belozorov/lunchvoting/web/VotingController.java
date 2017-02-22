@@ -12,6 +12,7 @@ import ua.belozorov.lunchvoting.model.voting.polling.Vote;
 import ua.belozorov.lunchvoting.service.voting.VotingService;
 import ua.belozorov.lunchvoting.to.CountPerItemTo;
 import ua.belozorov.lunchvoting.to.VoteTo;
+import ua.belozorov.lunchvoting.web.security.IsAdminOrVoter;
 
 import java.net.URI;
 import java.util.*;
@@ -24,7 +25,8 @@ import java.util.stream.Collectors;
  */
 @RestController
 @RequestMapping(VotingController.REST_URL)
-public final class VotingController {
+@IsAdminOrVoter
+public class VotingController {
     static final String REST_URL = "/api/areas/{areaid}/votes";
 
     private final VotingService votingService;

@@ -13,6 +13,8 @@ import ua.belozorov.lunchvoting.service.user.UserService;
 import ua.belozorov.lunchvoting.to.UserTo;
 import ua.belozorov.lunchvoting.util.ExceptionUtils;
 import ua.belozorov.lunchvoting.web.exceptionhandling.ErrorCode;
+import ua.belozorov.lunchvoting.web.security.IsAdmin;
+import ua.belozorov.lunchvoting.web.security.IsAdminOrVoter;
 
 import java.util.Collection;
 import java.util.stream.Collectors;
@@ -24,7 +26,8 @@ import java.util.stream.Collectors;
  */
 @RestController
 @RequestMapping(UserManagementController.REST_URL)
-public final class UserManagementController {
+@IsAdmin
+public class UserManagementController {
     static final String REST_URL = "/api/areas/{id}/members";
 
     private final UserService userService;

@@ -14,10 +14,10 @@ import java.util.stream.Collectors;
  *
  * @author vabelozorov on 22.02.17.
  */
-public class UnsecuredControllerMethodException extends RuntimeException {
+public class InSecuredControllerMethodException extends RuntimeException {
     private final List<Pair<Class<?>, Method>> unSecuredMethods;
 
-    public UnsecuredControllerMethodException(List<Pair<Class<?>, Method>> unSecuredMethods) {
+    public InSecuredControllerMethodException(List<Pair<Class<?>, Method>> unSecuredMethods) {
         this.unSecuredMethods = unSecuredMethods;
     }
 

@@ -16,6 +16,8 @@ import ua.belozorov.lunchvoting.model.lunchplace.Menu;
 import ua.belozorov.lunchvoting.repository.lunchplace.MenuRepositoryImpl;
 import ua.belozorov.lunchvoting.service.lunchplace.LunchPlaceService;
 import ua.belozorov.lunchvoting.to.MenuTo;
+import ua.belozorov.lunchvoting.web.security.IsAdmin;
+import ua.belozorov.lunchvoting.web.security.IsAdminOrVoter;
 
 import java.net.URI;
 
@@ -44,6 +46,7 @@ public class MenuController {
     }
 
     @PostMapping
+    @IsAdmin
     public ResponseEntity create(@PathVariable String placeId, @RequestBody @Validated MenuTo menuTo) {
         String areaId = AuthorizedUser.get().getAreaId();
         Menu created= placeService.addMenu(areaId, placeId, menuTo.getEffectiveDate(), menuTo.getDishes());
@@ -53,6 +56,7 @@ public class MenuController {
     }
 
     @GetMapping("/{id}")
+    @IsAdminOrVoter
     public ResponseEntity<MenuTo> get(@PathVariable String placeId, @PathVariable("id") String menuId) {
         String areaId = AuthorizedUser.get().getAreaId();
         Menu menu = placeService.getMenu(areaId, placeId, menuId, MenuRepositoryImpl.Fields.DISHES);
@@ -61,6 +65,7 @@ public class MenuController {
     }
 
     @DeleteMapping("/{menuId}")
+    @IsAdmin
     public ResponseEntity delete(@PathVariable String placeId, @PathVariable String menuId) {
         placeService.deleteMenu(AuthorizedUser.get().getAreaId(), placeId, menuId);
         return ResponseEntity.noContent().build();

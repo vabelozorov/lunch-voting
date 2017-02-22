@@ -350,6 +350,8 @@
                 <version>2.19.1</version>
                 <configuration>
                     <argLine>-Dfile.encoding=UTF-8</argLine>
+                    <!--<parallel>classes</parallel>-->
+                    <!--<threadCount>5</threadCount>-->
                 </configuration>
             </plugin>
             <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-war-plugin -->

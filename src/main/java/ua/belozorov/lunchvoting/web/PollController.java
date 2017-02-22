@@ -12,6 +12,8 @@ import ua.belozorov.lunchvoting.model.voting.polling.PollItem;
 import ua.belozorov.lunchvoting.service.voting.PollService;
 import ua.belozorov.lunchvoting.service.voting.VotingService;
 import ua.belozorov.lunchvoting.to.PollTo;
+import ua.belozorov.lunchvoting.web.security.IsAdmin;
+import ua.belozorov.lunchvoting.web.security.IsAdminOrVoter;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -26,7 +28,7 @@ import java.util.stream.Stream;
  */
 @RestController
 @RequestMapping(PollController.REST_URL)
-public final class PollController {
+public class PollController {
     static final String REST_URL = "/api/areas/{areaid}/polls";
 
     private final PollService pollService;
@@ -42,6 +44,7 @@ public final class PollController {
     }
 
     @GetMapping(value = "/{id}")
+    @IsAdminOrVoter
     public ResponseEntity<PollTo> get(@PathVariable String id) {
         String areaId = AuthorizedUser.get().getAreaId();
         PollTo to = new PollTo(pollService.getWithPollItems(areaId, id));
@@ -50,6 +53,7 @@ public final class PollController {
     }
 
     @GetMapping
+    @IsAdminOrVoter
     public ResponseEntity<List<PollTo>> getAll() {
         String areaId = AuthorizedUser.get().getAreaId();
         List<PollTo> tos = convertIntoTo(pollService.getAll(areaId), false);
@@ -58,6 +62,7 @@ public final class PollController {
     }
 
     @GetMapping(params = {"start", "end"})
+    @IsAdminOrVoter
     public ResponseEntity<List<PollTo>> getPollsByActivePeriod(@RequestParam LocalDateTime start,
                                                                @RequestParam LocalDateTime end) {
         String areaId = AuthorizedUser.get().getAreaId();
@@ -67,6 +72,7 @@ public final class PollController {
     }
 
     @GetMapping("/past")
+    @IsAdminOrVoter
     public ResponseEntity<List<PollTo>> getPastPolls() {
         String areaId = AuthorizedUser.get().getAreaId();
         List<PollTo> tos = convertIntoTo(pollService.getPastPolls(areaId), false);
@@ -75,6 +81,7 @@ public final class PollController {
     }
 
     @GetMapping("/active")
+    @IsAdminOrVoter
     public ResponseEntity<List<PollTo>> getActivePolls() {
         String areaId = AuthorizedUser.get().getAreaId();
         List<PollTo> tos = convertIntoTo(pollService.getActivePolls(areaId), false);
@@ -83,6 +90,7 @@ public final class PollController {
     }
 
     @GetMapping("/future")
+    @IsAdminOrVoter
     public ResponseEntity<List<PollTo>> getFuturePolls() {
         String areaId = AuthorizedUser.get().getAreaId();
         List<PollTo> tos = convertIntoTo(pollService.getFuturePolls(areaId), false);
@@ -91,11 +99,20 @@ public final class PollController {
     }
 
     @GetMapping("/active/{id}")
+    @IsAdminOrVoter
     public ResponseEntity isPollActive(@PathVariable String id) {
         String areaId = AuthorizedUser.get().getAreaId();
         Map<String,Boolean> map = new HashMap<>();
         map.put(id, pollService.isPollActive(areaId, id));
         return ResponseEntity.ok(map);
+    }
+
+    @DeleteMapping("{id}")
+    @IsAdmin
+    public ResponseEntity delete(@PathVariable String id) {
+        String areaId = AuthorizedUser.get().getAreaId();
+        pollService.delete(areaId, id);
+        return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
     static List<PollTo> convertIntoTo(Collection<LunchPlacePoll> polls, boolean includePollItems) {
@@ -111,12 +128,5 @@ public final class PollController {
                 Stream.of("version", "position", "poll").collect(Collectors.toSet())
         );
         jsonFilter.excludingFilter(obj, map);
-    }
-
-    @DeleteMapping("{id}")
-    public ResponseEntity delete(@PathVariable String id) {
-        String areaId = AuthorizedUser.get().getAreaId();
-        pollService.delete(areaId, id);
-        return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 }

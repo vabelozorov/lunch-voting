@@ -222,7 +222,7 @@ public class PollRepositoryImpl extends BaseRepository implements PollRepository
     }
 
     @Override
-    public List<Vote> getVotesForPoll(String areaId, String pollId) {
+    public List<Vote> getFullVotesForPoll(String areaId, String pollId) {
         String sql = "SELECT v FROM Vote v " +
                 "INNER JOIN FETCH v.poll p " +
                 "INNER JOIN FETCH v.pollItem pi " +

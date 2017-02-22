@@ -116,12 +116,12 @@ public class LunchPlaceServiceImpl implements LunchPlaceService {
     @Transactional
     public void deleteMenu(String areaId, String lunchPlaceId, String menuId) {
         this.getMenu(areaId, lunchPlaceId, menuId);
-        menuRepository.deleteMenu(menuId);
+        menuRepository.delete(menuId);
     }
 
     @Override
     public Menu getMenu(String areaId, String placeId, String menuId, MenuRepositoryImpl.Fields... fields) {
-        return ofNullable(menuRepository.getMenu(areaId, placeId, menuId, fields))
+        return ofNullable(menuRepository.get(areaId, placeId, menuId, fields))
                 .orElseThrow(() -> new NotFoundException(menuId, Menu.class));
     }
 

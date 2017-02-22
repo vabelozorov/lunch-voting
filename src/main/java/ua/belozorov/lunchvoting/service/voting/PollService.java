@@ -3,6 +3,8 @@ package ua.belozorov.lunchvoting.service.voting;
 import ua.belozorov.lunchvoting.model.voting.polling.LunchPlacePoll;
 import ua.belozorov.lunchvoting.model.voting.polling.Vote;
 import ua.belozorov.lunchvoting.repository.voting.PollRepository;
+import ua.belozorov.lunchvoting.web.security.IsAdmin;
+import ua.belozorov.lunchvoting.web.security.IsAdminOrVoter;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

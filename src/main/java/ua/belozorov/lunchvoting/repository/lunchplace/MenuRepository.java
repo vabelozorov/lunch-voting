@@ -11,7 +11,7 @@ public interface MenuRepository {
 
     Menu save(Menu menu);
 
-    Menu getMenu(String areaId, String placeId, String menuId, MenuRepositoryImpl.Fields... fields);
+    Menu get(String areaId, String placeId, String menuId, MenuRepositoryImpl.Fields... fields);
 
-    boolean deleteMenu(String menuId);
+    boolean delete(String menuId);
 }

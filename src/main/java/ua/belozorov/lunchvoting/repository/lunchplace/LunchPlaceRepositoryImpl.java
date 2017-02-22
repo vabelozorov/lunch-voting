@@ -4,11 +4,14 @@ import org.hibernate.jpa.QueryHints;
 import org.springframework.stereotype.Repository;
 import ua.belozorov.lunchvoting.model.lunchplace.LunchPlace;
 import ua.belozorov.lunchvoting.repository.BaseRepository;
+import ua.belozorov.lunchvoting.util.Pair;
 
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
+
+import static ua.belozorov.lunchvoting.util.Pair.*;
 
 /**
  * <h2></h2>
@@ -32,14 +35,19 @@ public class LunchPlaceRepositoryImpl extends BaseRepository implements LunchPla
     }
 
     @Override
+    public LunchPlace get(String placeId) {
+        String sql = "SELECT lp FROM LunchPlace lp " +
+                "WHERE lp.id= :placeId";
+        return super.regularGet(sql, LunchPlace.class, pairOf("placeId", placeId));
+    }
+
+    @Override
     public LunchPlace get(String areaId, String placeId) {
         String sql = "SELECT lp FROM EatingArea ea " +
                 "INNER JOIN ea.places lp " +
                 "WHERE ea.id= :areaId AND lp.id= :placeId";
-        return super.nullOrFirst(em.createQuery(sql, LunchPlace.class)
-                .setParameter("areaId", areaId)
-                .setParameter("placeId", placeId)
-                .getResultList());
+        return super.regularGet(sql, LunchPlace.class,
+                pairOf("areaId", areaId), pairOf("placeId", placeId));
     }
 
     @Override

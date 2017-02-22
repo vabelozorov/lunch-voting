@@ -14,24 +14,17 @@ import java.util.List;
  */
 public interface JoinAreaRequestService {
 
-    @IsAdminOrVoter
     JoinAreaRequest make(User user, String areaId);
 
-    @IsAdminOrVoter
     List<JoinAreaRequest> getByRequester(User user);
 
-    @IsAdminOrVoter
     JoinAreaRequest getByRequester(User user, String requestId);
 
-    @IsAdmin
     List<JoinAreaRequest> getByStatus(String areaId, JoinAreaRequest.JoinStatus status);
 
-    @IsAdmin
     void approve(User approver, String requestId);
 
-    @IsAdminOrVoter
     void cancel(User requester, String requestId);
 
-    @IsAdmin
     void reject(User approver, String requestId);
 }

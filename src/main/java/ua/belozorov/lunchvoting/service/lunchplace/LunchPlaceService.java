@@ -6,6 +6,8 @@ import ua.belozorov.lunchvoting.model.lunchplace.LunchPlace;
 import ua.belozorov.lunchvoting.model.lunchplace.Menu;
 import ua.belozorov.lunchvoting.repository.lunchplace.LunchPlaceRepository;
 import ua.belozorov.lunchvoting.repository.lunchplace.MenuRepositoryImpl;
+import ua.belozorov.lunchvoting.web.security.IsAdmin;
+import ua.belozorov.lunchvoting.web.security.IsAdminOrVoter;
 
 import java.time.LocalDate;
 import java.util.List;

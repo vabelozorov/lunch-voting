@@ -35,7 +35,7 @@ public class TimeConstraintTest extends AbstractTest{
 
     @Test
     public void testInitWithInvalidTimeParams() throws Exception {
-        super.assertExceptionCount(PollException.class, 3,
+        super.assertExceptionCount(PollException.class,
                 // end before start
                 () -> new TimeConstraint(NOW_DATE_TIME, NOW_DATE_TIME.minusSeconds(1), NOW_DATE_TIME.plusHours(1)),
                 // threshold before start

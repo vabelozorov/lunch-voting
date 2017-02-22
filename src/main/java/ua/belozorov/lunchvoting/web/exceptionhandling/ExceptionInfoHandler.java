@@ -38,7 +38,7 @@ public final class ExceptionInfoHandler {
     @ResponseStatus(HttpStatus.CONFLICT)  // 409
     @ExceptionHandler(DuplicateDataException.class)
     @ResponseBody
-    public ErrorInfo handleFor409(HttpServletRequest req, DuplicateDataException ex) {
+    public ErrorInfo handleFor409(HttpServletRequest req, ApplicationException ex) {
         return errorInfoFactory.create(req, ex);
     }
 
@@ -54,27 +54,39 @@ public final class ExceptionInfoHandler {
                         this.composeMessage(fe))
                 )
                 .collect(Collectors.joining("\n"));
-        return new ErrorInfo(req.getRequestURL(), ErrorCode.PARAMS_VALIDATION_FAILED, msg);
+        ErrorInfo errorInfo = new ErrorInfo(req.getRequestURL(), ErrorCode.PARAMS_VALIDATION_FAILED, msg);
+        return this.logAndCreate(errorInfo);
     }
 
     @ResponseStatus(HttpStatus.NOT_FOUND)  //404
     @ExceptionHandler(NotFoundException.class)
     @ResponseBody
-    public ErrorInfo handleFor404(HttpServletRequest req, NotFoundException ex) {
-        return errorInfoFactory.create(req, ex);
+    public ErrorInfo handleFor404(HttpServletRequest req, ApplicationException ex) {
+        return this.logAndCreate(req, ex);
     }
 
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)  //422
     @ExceptionHandler({NoAreaAdminException.class, PollException.class, VotePolicyException.class})
     @ResponseBody
     public ErrorInfo handleFor422(HttpServletRequest req, ApplicationException ex) {
-        return errorInfoFactory.create(req, ex);
+        return this.logAndCreate(req, ex);
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)  //500
     @ExceptionHandler(Exception.class)
     public void handleAnother(HttpServletRequest req, Exception ex) {
-        LOG.error(ex.getMessage());
+        LOG.error(ex.toString());
+    }
+
+    private ErrorInfo logAndCreate(HttpServletRequest req, ApplicationException ex) {
+        ErrorInfo errorInfo = errorInfoFactory.create(req, ex);
+        LOG.debug(errorInfo.toString());
+        return errorInfo;
+    }
+
+    private ErrorInfo logAndCreate(ErrorInfo errorInfo) {
+        LOG.debug(errorInfo.toString());
+        return errorInfo;
     }
 
     private String composeMessage(FieldError fe) {

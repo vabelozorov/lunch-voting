@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 
 import static org.hamcrest.Matchers.contains;
 import static org.junit.Assert.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
@@ -37,35 +38,18 @@ public class UserManagementControllerTest extends AbstractControllerTest {
     private UserProfileService profileService;
 
     @Test
-    public void e400AndMessageOnCreateWithValidationFails() throws Exception {
-        UserTo userTo = new UserTo("", "god1@email.com", "strongPassword");
-        MvcResult result = mockMvc
-                .perform(post(REST_URL, testAreas.getFirstAreaId())
-                        .content(jsonUtils.toJson(userTo))
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest())
-                .andReturn();
-        ErrorInfo errorInfo = new ErrorInfo(
-                result.getRequest().getRequestURL(),
-                ErrorCode.PARAMS_VALIDATION_FAILED,
-                "field 'name', rejected value '', reason: may not be empty"
-        );
-        assertJson(
-                jsonUtils.toJson(errorInfo),
-                result.getResponse().getContentAsString()
-        );
-    }
-
-    @Test
     public void testUpdate() throws Exception {
         UserTo userTo = new UserTo(VOTER_ID, VOTER.getName(), "newEmail@email.com", "newPassword");
 
-        mockMvc.perform(put(REST_URL, testAreas.getFirstAreaId())
-                        .content(jsonUtils.toJson(userTo))
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNoContent());
+        mockMvc.perform(
+                put(REST_URL, testAreas.getFirstAreaId())
+                .content(jsonUtils.toJson(userTo))
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(god())
+                .with(csrf()))
+        .andExpect(status().isNoContent());
 
-        User user = profileService.get(VOTER_ID);
+        User user = profileService.getRepository().get(null, VOTER_ID);
 
         assertEquals(userTo.getPassword(), user.getPassword());
         assertEquals(userTo.getEmail(), user.getEmail());
@@ -73,7 +57,11 @@ public class UserManagementControllerTest extends AbstractControllerTest {
 
     @Test
     public void testGet() throws Exception {
-        String actual = mockMvc.perform(get(REST_URL + "/{voter}", testAreas.getFirstAreaId(),  VOTER_ID))
+        String actual = mockMvc
+                .perform(
+                        get(REST_URL + "/{voter}", testAreas.getFirstAreaId(),  VOTER_ID)
+                        .with(god())
+                )
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
 
@@ -83,7 +71,11 @@ public class UserManagementControllerTest extends AbstractControllerTest {
 
     @Test
     public void e404AndMessageOnGetNonExistingId() throws Exception {
-        MvcResult result = mockMvc.perform(get(REST_URL + "/{id}", testAreas.getFirstAreaId(), "I_DO_NOT_EXIST"))
+        MvcResult result = mockMvc
+                .perform(
+                        get(REST_URL + "/{id}", testAreas.getFirstAreaId(), "I_DO_NOT_EXIST")
+                        .with(god())
+                )
                 .andExpect(status().isNotFound())
                 .andReturn();
         ErrorInfo errorInfo = new ErrorInfo(
@@ -99,7 +91,11 @@ public class UserManagementControllerTest extends AbstractControllerTest {
 
     @Test
     public void testGetAll() throws Exception {
-        String actual = mockMvc.perform(get(REST_URL, testAreas.getFirstAreaId()))
+        String actual = mockMvc
+                .perform(
+                        get(REST_URL, testAreas.getFirstAreaId())
+                        .with(god())
+                )
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
         List<UserTo> tos = A1_USERS.stream()
@@ -113,11 +109,14 @@ public class UserManagementControllerTest extends AbstractControllerTest {
 
     @Test
     public void testDelete() throws Exception {
-        assertNotNull(profileService.get(VOTER_ID));
-        mockMvc.perform(delete(REST_URL + "/{voter}", testAreas.getFirstAreaId(), VOTER_ID))
+        mockMvc
+                .perform(
+                        delete(REST_URL + "/{voter}", testAreas.getFirstAreaId(), VOTER_ID)
+                        .with(god())
+                        .with(csrf())
+                )
                 .andExpect(status().isNoContent());
-        thrown.expect(NotFoundException.class);
-        profileService.get(VOTER_ID);
+        assertNull(profileService.getRepository().get(null, VOTER_ID));
     }
 
     @Test
@@ -125,12 +124,16 @@ public class UserManagementControllerTest extends AbstractControllerTest {
         Map<String, Object> map = new HashMap<>();
         map.put("id", VOTER_ID);
         map.put("activated", false);
-        mockMvc.perform(put(REST_URL  + "/activate", testAreas.getFirstAreaId())
-                            .content(jsonUtils.toJson(map))
-                            .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNoContent());
+        mockMvc.perform(
+                put(REST_URL  + "/activate", testAreas.getFirstAreaId())
+                .content(jsonUtils.toJson(map))
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(god())
+                .with(csrf())
+        )
+        .andExpect(status().isNoContent());
 
-        User user = profileService.get(VOTER_ID);
+        User user = profileService.getRepository().get(null, VOTER_ID);
         assertFalse(user.isActivated());
     }
 
@@ -143,12 +146,16 @@ public class UserManagementControllerTest extends AbstractControllerTest {
         Map<String, Object> map = new HashMap<>();
         map.put("id", VOTER_ID);
         map.put("roles", expectedRoles);
-        mockMvc.perform(put(REST_URL + "/roles", testAreas.getFirstAreaId())
+        mockMvc.perform(
+                put(REST_URL + "/roles", testAreas.getFirstAreaId())
                 .content(jsonUtils.toJson(map))
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNoContent());
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(god())
+                .with(csrf())
+        )
+        .andExpect(status().isNoContent());
 
-        User user = profileService.get(VOTER_ID);
+        User user = profileService.getRepository().get(null, VOTER_ID);
 
         assertEquals(user.getRoles(), expectedRoles);
     }

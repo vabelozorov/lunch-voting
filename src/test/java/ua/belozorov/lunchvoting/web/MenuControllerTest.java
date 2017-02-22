@@ -4,11 +4,6 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.validation.Validator;
-import ua.belozorov.CollectionMappingEntry;
-import ua.belozorov.FieldMappingEntry;
-import ua.belozorov.SimpleObjectToMapConverter;
-import ua.belozorov.lunchvoting.model.lunchplace.Dish;
 import ua.belozorov.lunchvoting.repository.lunchplace.MenuRepository;
 import ua.belozorov.lunchvoting.service.lunchplace.LunchPlaceService;
 import ua.belozorov.lunchvoting.to.MenuTo;
@@ -19,6 +14,7 @@ import java.time.LocalDate;
 import java.util.*;
 
 import static org.junit.Assert.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -36,7 +32,8 @@ public class MenuControllerTest extends AbstractControllerTest {
     private LunchPlaceService service;
 
     @Autowired
-    private MenuRepository repository;
+    private MenuRepository menuRepository;
+    private final String areaId = testAreas.getFirstAreaId();
 
     @Test
     public void testCreate() throws Exception {
@@ -56,18 +53,23 @@ public class MenuControllerTest extends AbstractControllerTest {
             );
         };
 
-        MvcResult result = mockMvc.perform(post(REST_URL, testAreas.getFirstAreaId(),testPlaces.getPlace4Id())
-                    .content( jsonUtils.toJson(sent))
-                    .contentType(MediaType.APPLICATION_JSON))
+        MvcResult result = mockMvc
+                .perform(
+                        post(REST_URL,areaId, testPlaces.getPlace4Id())
+                        .content( jsonUtils.toJson(sent))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(csrf())
+                        .with(god())
+                )
                 .andExpect(status().isCreated())
                 .andReturn();
         String  uri = jsonUtils.locationFromMvcResult(result);
         String id = getCreatedId(uri);
 
-        mockMvc.perform(get(uri).accept(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get(uri).with(voter()).accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        assertNotNull(service.getMenu(testAreas.getFirstAreaId(), testPlaces.getPlace4Id(), id));
+        assertNotNull(menuRepository.get(areaId, testPlaces.getPlace4Id(), id));
     }
 
     @Test
@@ -84,9 +86,14 @@ public class MenuControllerTest extends AbstractControllerTest {
             );
         };
 
-        MvcResult result = mockMvc.perform(post(REST_URL, testAreas.getFirstAreaId(),testPlaces.getPlace4Id())
-                .content( jsonUtils.toJson(sent))
-                .contentType(MediaType.APPLICATION_JSON))
+        MvcResult result = mockMvc
+                .perform(
+                        post(REST_URL, testAreas.getFirstAreaId(),testPlaces.getPlace4Id())
+                        .content( jsonUtils.toJson(sent))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(csrf())
+                        .with(god())
+                )
                 .andExpect(status().isBadRequest())
                 .andReturn();
 
@@ -107,9 +114,13 @@ public class MenuControllerTest extends AbstractControllerTest {
 
     @Test
     public void getMenuWithDishes() throws Exception {
-        String actual = mockMvc.perform(get(REST_URL + "/{id}",
-                testAreas.getFirstAreaId(), testPlaces.getPlace4Id(), testPlaces.getMenu1Id())
-                .accept(MediaType.APPLICATION_JSON))
+        String actual = mockMvc
+                .perform(
+                        get(REST_URL + "/{id}",
+                        areaId, testPlaces.getPlace4Id(), testPlaces.getMenu1Id())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .with(voter())
+                )
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
 
@@ -125,13 +136,16 @@ public class MenuControllerTest extends AbstractControllerTest {
     public void testDelete() throws Exception {
         String place4Id = testPlaces.getPlace4Id();
 
-        assertNotNull(repository.getMenu(testAreas.getFirstAreaId(), place4Id, testPlaces.getMenu1Id()));
+        assertNotNull(menuRepository.get(testAreas.getFirstAreaId(), place4Id, testPlaces.getMenu1Id()));
 
         mockMvc.perform(
-                    delete(REST_URL + "/{menuId}",
-                            testAreas.getFirstAreaId(),testPlaces.getPlace4Id(), testPlaces.getMenu1Id()))
-                    .andExpect(status().isNoContent());
+                delete(REST_URL + "/{menuId}",
+                testAreas.getFirstAreaId(),testPlaces.getPlace4Id(), testPlaces.getMenu1Id())
+                .with(csrf())
+                .with(god())
+        )
+        .andExpect(status().isNoContent());
 
-        assertNull(repository.getMenu(testAreas.getFirstAreaId(), place4Id, testPlaces.getMenu1Id()));
+        assertNull(menuRepository.get(testAreas.getFirstAreaId(), place4Id, testPlaces.getMenu1Id()));
     }
 }

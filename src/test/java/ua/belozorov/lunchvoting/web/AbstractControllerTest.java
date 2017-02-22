@@ -27,6 +27,7 @@ import javax.servlet.Filter;
 import java.util.Arrays;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static ua.belozorov.lunchvoting.model.UserTestData.ALIEN_USER1;
 import static ua.belozorov.lunchvoting.model.UserTestData.GOD;
@@ -74,7 +75,7 @@ public abstract class AbstractControllerTest extends AbstractSpringTest {
     }
 
     static RequestPostProcessor voter() {
-        return httpBasic(VOTER.getEmail(), VOTER.getPassword());
+        return user(VOTER);
     }
 
     static RequestPostProcessor alien() {

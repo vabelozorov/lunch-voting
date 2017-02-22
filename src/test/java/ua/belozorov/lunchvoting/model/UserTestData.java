@@ -1,6 +1,7 @@
 package ua.belozorov.lunchvoting.model;
 
 import lombok.Getter;
+import org.mockito.ArgumentMatcher;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import ua.belozorov.lunchvoting.EqualsComparator;
@@ -19,7 +20,7 @@ import java.util.stream.Stream;
  */
 @Getter
 public class UserTestData {
-    public static final EqualsComparator<User> USER_COMPARATOR = new UserComparator();
+    public static final UserComparator USER_COMPARATOR = new UserComparator();
 
     public static User GOD = new User("GOD_ID", 1, "Царь всея приложение", "god@email.com", "godpass",
             new HashSet<>(Arrays.asList(UserRole.VOTER, UserRole.ADMIN)), LocalDateTime.of(2016, 11, 16, 0, 0, 1), true, "AREA1_ID");
@@ -93,19 +94,53 @@ public class UserTestData {
         this.userSqlResource = new ByteArrayResource(sql.getBytes(), "Users");
     }
 
-    private static class UserComparator implements EqualsComparator<User>{
-        @Override
-        public boolean compare(User obj, User another) {
-            return  obj.getId().equals(another.getId()) &&
-                    obj.getName().equals(another.getName()) &&
-                    obj.getEmail().equals(another.getEmail()) &&
-                    obj.getPassword().equals(another.getPassword()) &&
-                    obj.getRegisteredDate().isEqual(another.getRegisteredDate()) &&
-                    obj.getRoles().equals(another.getRoles()) &&
-                    Objects.equals(obj.getAreaId(), another.getAreaId()) &&
-                    obj.isActivated() == another.isActivated();
+    public static class UserComparator implements EqualsComparator<User>, ArgumentMatcher<User>{
+        private final boolean matchId;
+        private final boolean matchDate;
+        private final User expected;
+
+        public UserComparator(User user, boolean matchId, boolean matchDate) {
+            this.matchId = matchId;
+            this.expected = user;
+            this.matchDate = matchDate;
         }
 
+        public UserComparator() {
+            this.matchId = true;
+            expected = null;
+            matchDate = true;
+        }
+
+        public UserComparator(User user) {
+            this.matchId = true;
+            expected = user;
+            matchDate = true;
+        }
+
+        public UserComparator noMatchId() {
+            return new UserComparator(this.expected, false, this.matchDate);
+        }
+
+        public UserComparator noDate() {
+            return new UserComparator(this.expected, this.matchId, false);
+        }
+
+        @Override
+        public boolean compare(User obj, User another) {
+            return  matchId ? obj.getId().equals(another.getId()) : true
+                    && obj.getName().equals(another.getName())
+                    && obj.getEmail().equals(another.getEmail())
+                    && obj.getPassword().equals(another.getPassword())
+                    && matchDate ? obj.getRegisteredDate().isEqual(another.getRegisteredDate()) : true
+                    && obj.getRoles().equals(another.getRoles())
+                    && Objects.equals(obj.getAreaId(), another.getAreaId())
+                    && obj.isActivated() == another.isActivated();
+        }
+
+        @Override
+        public boolean matches(User argument) {
+            return this.expected == argument || (this.expected != null && argument != null && compare(this.expected, argument));
+        }
     }
 
 }

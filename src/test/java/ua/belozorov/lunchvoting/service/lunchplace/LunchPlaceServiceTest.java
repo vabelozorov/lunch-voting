@@ -2,29 +2,27 @@ package ua.belozorov.lunchvoting.service.lunchplace;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
-import org.hibernate.exception.ConstraintViolationException;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import ua.belozorov.lunchvoting.WithMockAdmin;
+import ua.belozorov.lunchvoting.WithMockVoter;
 import ua.belozorov.lunchvoting.exceptions.DuplicateDataException;
 import ua.belozorov.lunchvoting.exceptions.NotFoundException;
 import ua.belozorov.lunchvoting.model.lunchplace.LunchPlace;
 import ua.belozorov.lunchvoting.model.lunchplace.Menu;
 import ua.belozorov.lunchvoting.repository.lunchplace.LunchPlaceRepository;
+import ua.belozorov.lunchvoting.repository.lunchplace.MenuRepository;
 import ua.belozorov.lunchvoting.repository.lunchplace.MenuRepositoryImpl;
 import ua.belozorov.lunchvoting.service.AbstractServiceTest;
-import ua.belozorov.lunchvoting.to.LunchPlaceTo;
-import ua.belozorov.lunchvoting.to.transformers.DtoIntoEntity;
 import ua.belozorov.lunchvoting.util.ExceptionUtils;
 import ua.belozorov.lunchvoting.web.exceptionhandling.ErrorCode;
 
-import javax.persistence.PersistenceException;
 import java.time.LocalDate;
 import java.util.*;
 
 import static com.vladmihalcea.sql.SQLStatementCountValidator.reset;
 import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.isA;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.*;
 import static ua.belozorov.lunchvoting.MatcherUtils.*;
@@ -41,11 +39,25 @@ public class LunchPlaceServiceTest extends AbstractServiceTest {
     private LunchPlaceService service;
 
     @Autowired
-    private LunchPlaceRepository repository;
+    private LunchPlaceRepository placeRepository;
+
+    @Autowired
+    private MenuRepository menuRepository;
 
     private final String areaId = testAreas.getFirstAreaId();
 
     @Test
+    @WithMockAdmin
+    public void createLunchPlace() throws Exception {
+        Set<String> phones = ImmutableSet.of("0935977663", "0445793264", "0672569486");
+        LunchPlace expected = service.create(new LunchPlace(null, "NEW NAME", "", "", phones));
+        LunchPlace actual = placeRepository.get(expected.getId());
+
+        assertThat(actual, matchSingle(expected, LUNCH_PLACE_COMPARATOR));
+    }
+
+    @Test
+    @WithMockAdmin
     public void update() throws Exception {
         LunchPlace place2 = testPlaces.getPlace2();
 
@@ -57,26 +69,29 @@ public class LunchPlaceServiceTest extends AbstractServiceTest {
                                 .phones(Collections.singleton("0481234567")).build();
 
         assertThat(
-                repository.get(areaId, place2.getId()),
+                placeRepository.get(areaId, place2.getId()),
                 matchSingle(expected, LUNCH_PLACE_COMPARATOR)
         );
     }
 
     @Test
+    @WithMockVoter
     public void get() throws Exception {
         reset();
         LunchPlace actual = service.get(areaId, testPlaces.getPlace4Id());
         assertSelect(1);
 
-        assertThat(actual, matchByToString(testPlaces.getPlace4()));
+        assertThat(actual, matchSingle(testPlaces.getPlace4(), LUNCH_PLACE_COMPARATOR));
     }
 
     @Test(expected = NotFoundException.class)
-    public void GetPlaceFailsIfAreaNotCorresponds() throws Exception {
+    @WithMockVoter
+    public void getPlaceFailsIfAreaNotCorresponds() throws Exception {
         LunchPlace actual = service.get(testAreas.getSecondAreaId(), testPlaces.getPlace4Id());
     }
 
     @Test
+    @WithMockVoter
     public void getAll() throws Exception {
         reset();
         Collection<LunchPlace> actual = service.getAll(areaId);
@@ -89,6 +104,7 @@ public class LunchPlaceServiceTest extends AbstractServiceTest {
     }
 
     @Test
+    @WithMockVoter
     public void testGetMultipleNoIds() throws Exception {
         reset();
         Collection<LunchPlace> actual = service.getMultiple(areaId, Collections.emptySet());
@@ -101,6 +117,7 @@ public class LunchPlaceServiceTest extends AbstractServiceTest {
     }
 
     @Test
+    @WithMockVoter
     public void testGetMultipleWhenIdsProvided() throws Exception {
         reset();
         Collection<LunchPlace> actual = service.getMultiple(areaId,
@@ -114,11 +131,13 @@ public class LunchPlaceServiceTest extends AbstractServiceTest {
     }
 
     @Test(expected = NotFoundException.class)
+    @WithMockVoter
     public void GetMultipleWhenHasNotExistingIdsFails() throws Exception {
         service.getMultiple(areaId, ImmutableSet.of(testPlaces.getPlace3Id(), "NOT_EXISTS_ID"));
     }
 
     @Test
+    @WithMockVoter
     public void testGetMultiplePlacesWithMenu() throws Exception {
         LocalDate now = LocalDate.now();
 
@@ -130,6 +149,7 @@ public class LunchPlaceServiceTest extends AbstractServiceTest {
     }
 
     @Test
+    @WithMockAdmin
     public void deletePlace() throws Exception {
         int initialSize = service.getAll(areaId).size();
 
@@ -142,35 +162,35 @@ public class LunchPlaceServiceTest extends AbstractServiceTest {
     }
 
     @Test(expected = NotFoundException.class)
+    @WithMockVoter
     public void getNotExistingFails() {
         service.get(areaId, "NOT_EXISTING_ID");
     }
 
     @Test(expected = NotFoundException.class)
+    @WithMockAdmin
     public void updateNotExistingFails() {
-        LunchPlaceTo expected = new LunchPlaceTo(testPlaces.getPlace2().getName(), "Updated Address", testPlaces.getPlace2().getDescription(),
-                Collections.singleton("0481234567"));
         service.bulkUpdate(areaId, "I_DO_NOT_EXIST", "new name", null, null, null);
     }
 
     @Test(expected = NotFoundException.class)
+    @WithMockAdmin
     public void deleteNotExistingFails() {
         service.delete(areaId, "NOT_EXISTING_ID");
     }
 
     @Test(expected = DuplicateDataException.class)
+    @WithMockAdmin
     public void createPlaceWithDuplicateNameFails() {
-        LunchPlaceTo expectedTo = new LunchPlaceTo( testPlaces.getPlace1().getName(),
-                "New Address", "New Description", Collections.emptySet());
-
         ExceptionUtils.executeAndUnwrapException(
-                () -> service.create(DtoIntoEntity.toLunchPlace(expectedTo, null)),
+                () -> service.create(new LunchPlace(testPlaces.getPlace1().getName())),
                 DataIntegrityViolationException.class,
                 new DuplicateDataException(ErrorCode.DUPLICATE_PLACE_NAME, new Object[]{})
         );
     }
 
     @Test
+    @WithMockVoter
     public void getMenuWithoutDishes() throws Exception {
         reset();
         Menu menu = service.getMenu(testAreas.getFirstAreaId(), testPlaces.getPlace4Id(), testPlaces.getMenu1Id());
@@ -180,6 +200,7 @@ public class LunchPlaceServiceTest extends AbstractServiceTest {
     }
 
     @Test
+    @WithMockVoter
     public void getMenuWithDishes() throws Exception {
         reset();
         Menu menu = service.getMenu(testAreas.getFirstAreaId(), testPlaces.getPlace4Id(), testPlaces.getMenu1Id(), MenuRepositoryImpl.Fields.DISHES);
@@ -189,8 +210,9 @@ public class LunchPlaceServiceTest extends AbstractServiceTest {
     }
 
     @Test
+    @WithMockAdmin
     public void deleteMenu() throws Exception {
-        Menu menu = service.getMenu(areaId, testPlaces.getPlace4Id(), testPlaces.getMenu1Id());
+        Menu menu = menuRepository.get(areaId, testPlaces.getPlace4Id(), testPlaces.getMenu1Id());
 
         assertNotNull(menu);
         reset();
@@ -202,11 +224,13 @@ public class LunchPlaceServiceTest extends AbstractServiceTest {
     }
 
     @Test(expected = NotFoundException.class)
+    @WithMockAdmin
     public void failsDeleteMenuIfAreaNotCorresponds() throws Exception {
         service.deleteMenu(testAreas.getSecondAreaId(), testPlaces.getPlace4Id(), testPlaces.getMenu1Id());
     }
 
     @Test(expected = NotFoundException.class)
+    @WithMockVoter
     public void failsGetMenuIfAreaNotCorresponds() throws Exception {
         Menu menu = service.getMenu(testAreas.getSecondAreaId(), testPlaces.getPlace4Id(), testPlaces.getMenu1Id());
     }

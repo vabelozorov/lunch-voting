@@ -78,7 +78,7 @@ public final class VotingServiceImpl implements VotingService {
     public List<Vote> getFullVotesForPoll(String areaId, String pollId) {
         ExceptionUtils.checkParamsNotNull(areaId, pollId);
 
-        return pollRepository.getVotesForPoll(areaId, pollId);
+        return pollRepository.getFullVotesForPoll(areaId, pollId);
     }
 
     @Override

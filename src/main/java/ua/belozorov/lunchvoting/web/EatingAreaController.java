@@ -21,6 +21,8 @@ import ua.belozorov.lunchvoting.to.UserTo;
 import ua.belozorov.lunchvoting.to.transformers.DtoIntoEntity;
 import ua.belozorov.lunchvoting.util.ExceptionUtils;
 import ua.belozorov.lunchvoting.web.exceptionhandling.ErrorCode;
+import ua.belozorov.lunchvoting.web.security.IsAdmin;
+import ua.belozorov.lunchvoting.web.security.IsAdminOrVoter;
 
 import java.net.URI;
 import java.time.LocalDate;
@@ -54,7 +56,8 @@ public class EatingAreaController {
         this.jsonFilter = jsonFilter;
     }
 
-    @PostMapping//any
+    @PostMapping
+    @IsAdminOrVoter
     public ResponseEntity create(@RequestParam String name) {
         EatingArea area = ExceptionUtils.executeAndUnwrapException(
                 () -> areaService.create(name, AuthorizedUser.get()),
@@ -67,9 +70,10 @@ public class EatingAreaController {
     }
 
     @PostMapping("/{id}/members")
+    @IsAdmin
     public ResponseEntity createUserInArea(@PathVariable("id") String areaId,
                                            @RequestBody @Validated(UserTo.Create.class) UserTo userTo) {
-        User newUser = new User(null, userTo.getName(), userTo.getEmail(), userTo.getPassword());
+        User newUser = new User(userTo.getName(), userTo.getEmail(), userTo.getPassword());
         User created = ExceptionUtils.executeAndUnwrapException(
                 () -> areaService.createUserInArea(areaId, newUser),
                 ConstraintViolationException.class,
@@ -98,6 +102,7 @@ public class EatingAreaController {
      * @return LunchPlace object with id assigned and Http 201 code on success
      */
     @PostMapping("/{areaId}/places")
+    @IsAdmin
     public ResponseEntity createPlaceInArea(@RequestBody @Validated(LunchPlaceTo.Create.class) LunchPlaceTo placeTo) {
         String areaId = AuthorizedUser.get().getAreaId();
         LunchPlace created = ExceptionUtils.executeAndUnwrapException(
@@ -116,6 +121,7 @@ public class EatingAreaController {
      * @return
      */
     @PostMapping("/{areaId}/polls")
+    @IsAdmin
     public ResponseEntity createPollForTodayMenus() {
         String areaId = AuthorizedUser.get().getAreaId();
         LunchPlacePoll poll = areaService.createPollInArea(areaId);
@@ -126,6 +132,7 @@ public class EatingAreaController {
 
 
     @PostMapping(value = "/{areaId}/polls", params = "menuDate")
+    @IsAdmin
     public ResponseEntity createPollForMenuDate(@RequestParam LocalDate menuDate) {
         String areaId = AuthorizedUser.get().getAreaId();
         LunchPlacePoll poll = areaService.createPollInArea(areaId, menuDate);
@@ -135,6 +142,7 @@ public class EatingAreaController {
     }
 
     @PutMapping
+    @IsAdmin
     public ResponseEntity update(@RequestParam String name) {
         ExceptionUtils.executeAndUnwrapException(
                 () -> {areaService.updateAreaName(name, AuthorizedUser.get()); return null; },
@@ -145,12 +153,14 @@ public class EatingAreaController {
     }
 
     @GetMapping("/{id}")
+    @IsAdminOrVoter
     public ResponseEntity<AreaTo> get(@PathVariable String id, @RequestParam(defaultValue = "true") boolean summary) {
         AreaTo to = areaService.getAsTo(id, summary);
         return ResponseEntity.ok(to);
     }
 
     @GetMapping(value = "/filter", params = "name")
+    @IsAdminOrVoter
     public ResponseEntity<List<EatingArea>> filterByName(@RequestParam String name) {
         List<EatingArea> areas = areaService.filterByNameStarts(name);
         this.filterArea(areas);
@@ -158,6 +168,7 @@ public class EatingAreaController {
     }
 
     @DeleteMapping("/{id}")
+    @IsAdmin
     public ResponseEntity delete(@PathVariable String id) {
         areaService.delete(id);
         return ResponseEntity.noContent().build();

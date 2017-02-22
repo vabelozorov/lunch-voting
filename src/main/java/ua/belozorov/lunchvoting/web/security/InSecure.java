@@ -8,12 +8,12 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * <h2></h2>
- *
+ * Indicates that an applied target element does not require protection
+ * by {@link Secured} annotation
+ * @see ua.belozorov.lunchvoting.util.SecurityEnforcerBeanFactoryPostProcessor
  * @author vabelozorov on 20.02.17.
  */
 @Target({ ElementType.METHOD, ElementType.TYPE })
 @Retention(RetentionPolicy.RUNTIME)
-@Secured("IS_AUTHENTICATED_ANONYMOUSLY")
-public @interface IsAnonymous {
+public @interface InSecure {
 }

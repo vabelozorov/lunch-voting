@@ -11,6 +11,8 @@ import ua.belozorov.lunchvoting.model.User;
 import ua.belozorov.lunchvoting.model.lunchplace.JoinAreaRequest;
 import ua.belozorov.lunchvoting.service.area.JoinAreaRequestService;
 import ua.belozorov.lunchvoting.to.JoinRequestTo;
+import ua.belozorov.lunchvoting.web.security.IsAdmin;
+import ua.belozorov.lunchvoting.web.security.IsAdminOrVoter;
 
 import java.net.URI;
 import java.util.Collection;
@@ -45,6 +47,7 @@ public class JoinAreaRequestController {
     }
 
     @PostMapping
+    @IsAdminOrVoter
     public ResponseEntity makeRequest(@RequestParam("id") String areaId) {
         JoinAreaRequest request = requestService.make(AuthorizedUser.get(), areaId);
         URI uri = ServletUriComponentsBuilder.fromCurrentContextPath()
@@ -53,6 +56,7 @@ public class JoinAreaRequestController {
     }
 
     @GetMapping(params = "status")
+    @IsAdmin
     public ResponseEntity<List<JoinRequestTo>> getAllInAreaOfStatus(@RequestParam JoinAreaRequest.JoinStatus status) {
         String areaId = ofNullable(AuthorizedUser.get()).map(User::getAreaId).orElse(null);
         List<JoinAreaRequest> requests = requestService.getByStatus(areaId, status);
@@ -60,30 +64,35 @@ public class JoinAreaRequestController {
     }
 
     @GetMapping("/{id}")
+    @IsAdminOrVoter
     public ResponseEntity<JoinRequestTo> getById(@PathVariable("id") String requestId) {
         JoinAreaRequest request = requestService.getByRequester(AuthorizedUser.get(), requestId);
         return ResponseEntity.ok(new JoinRequestTo(request));
     }
 
     @GetMapping
+    @IsAdminOrVoter
     public ResponseEntity<List<JoinRequestTo>> getAllInAreaOfRequester() {
         List<JoinAreaRequest> requests = requestService.getByRequester(AuthorizedUser.get());
         return ResponseEntity.ok(toDto(requests));
     }
 
     @PutMapping("/{id}/approve")
+    @IsAdmin
     public ResponseEntity approve(@PathVariable("id") String requestId) {
         requestService.approve(AuthorizedUser.get(), requestId);
         return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/{id}/reject")
+    @IsAdmin
     public ResponseEntity reject(@PathVariable("id") String requestId) {
         requestService.reject(AuthorizedUser.get(), requestId);
         return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/{id}/cancel")
+    @IsAdminOrVoter
     public ResponseEntity cancel(@PathVariable("id") String requestId) {
         requestService.cancel(AuthorizedUser.get(), requestId);
         return ResponseEntity.noContent().build();

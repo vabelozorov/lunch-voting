@@ -17,6 +17,8 @@ public interface LunchPlaceRepository {
 
     void update(LunchPlace lunchPlace);
 
+    LunchPlace get(String placeId);
+
     LunchPlace get(String areaId, String placeId);
 
     List<LunchPlace> getAll(String areaId);

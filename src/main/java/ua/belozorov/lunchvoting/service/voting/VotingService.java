@@ -4,6 +4,8 @@ import ua.belozorov.lunchvoting.model.User;
 import ua.belozorov.lunchvoting.model.voting.*;
 import ua.belozorov.lunchvoting.model.voting.polling.PollItem;
 import ua.belozorov.lunchvoting.model.voting.polling.Vote;
+import ua.belozorov.lunchvoting.repository.voting.PollRepository;
+import ua.belozorov.lunchvoting.web.security.IsAdminOrVoter;
 
 import java.util.List;
 import java.util.Set;

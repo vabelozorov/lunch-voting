@@ -4,6 +4,8 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import ua.belozorov.lunchvoting.exceptions.NotFoundException;
+import ua.belozorov.lunchvoting.repository.voting.PollRepository;
+import ua.belozorov.lunchvoting.service.voting.PollService;
 import ua.belozorov.lunchvoting.web.security.AuthorizedUser;
 import ua.belozorov.lunchvoting.model.voting.polling.Vote;
 import ua.belozorov.lunchvoting.service.voting.VotingService;
@@ -14,6 +16,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import static org.hamcrest.Matchers.contains;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static ua.belozorov.lunchvoting.model.UserTestData.GOD_ID;
@@ -29,6 +32,9 @@ public class VotingControllerTest extends AbstractControllerTest {
     public static final String REST_URL = VotingController.REST_URL;
 
     @Autowired
+    private PollRepository pollRepository;
+
+    @Autowired
     private VotingService votingService;
 
     public final String areaId = testAreas.getFirstAreaId();
@@ -36,14 +42,18 @@ public class VotingControllerTest extends AbstractControllerTest {
     @Test
     public void voteForPoll() throws Exception {
         String id = testPolls.getActivePoll().getId();
-        String actual = mockMvc.perform(
-                post(REST_URL + "/polls/{pollid}/{pollItemId}", areaId, id, testPolls.getActivePollPollItem1().getId())
-                        .accept(MediaType.APPLICATION_JSON))
+        String actual = mockMvc
+                .perform(
+                    post(REST_URL + "/polls/{pollid}/{pollItemId}", areaId, id, testPolls.getActivePollPollItem1().getId())
+                    .accept(MediaType.APPLICATION_JSON)
+                    .with(csrf())
+                    .with(god()) // actually VOTER right is enough, but GOD is the only who hasn't voted
+                )
                 .andExpect(status().isCreated())
                 .andReturn()
                     .getResponse().getContentAsString();
 
-        Vote vote = votingService.getFullVotesForPoll(areaId, id).stream()
+        Vote vote = pollRepository.getFullVotesForPoll(areaId, id).stream()
                 .filter(v -> v.getVoterId().equals(GOD_ID))
                 .findAny().get();
         String expected = jsonUtils.toJson(new VoteTo(vote, true));
@@ -54,9 +64,12 @@ public class VotingControllerTest extends AbstractControllerTest {
     @Test
     public void getVotesForPoll() throws Exception {
         String id = testPolls.getPastPoll().getId();
-        String actual = mockMvc.perform(
-                get(REST_URL + "/polls/{pollid}", areaId, id)
-                        .accept(MediaType.APPLICATION_JSON))
+        String actual = mockMvc
+                .perform(
+                    get(REST_URL + "/polls/{pollid}", areaId, id)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .with(voter())
+                )
                 .andExpect(status().isOk())
                 .andReturn()
                     .getResponse().getContentAsString();
@@ -72,13 +85,17 @@ public class VotingControllerTest extends AbstractControllerTest {
     @Test
     public void getPollResult() throws Exception {
         String id = testPolls.getPastPoll().getId();
-        String actual = mockMvc.perform(
-                get(REST_URL + "/polls/{pollId}", areaId, id)
+        String actual = mockMvc
+                .perform(
+                        get(REST_URL + "/polls/{pollId}", areaId, id)
                         .param("item", "")
-                        .accept(MediaType.APPLICATION_JSON))
+                        .accept(MediaType.APPLICATION_JSON)
+                        .with(voter())
+                )
                 .andExpect(status().isOk())
                 .andReturn()
                     .getResponse().getContentAsString();
+
         Map<String, Object> resultMap1 = new LinkedHashMap<>();
         resultMap1.put("id", testPolls.getPastPollPollItem1().getId());
         resultMap1.put("itemId", testPolls.getPastPollPollItem1().getItemId());
@@ -101,10 +118,13 @@ public class VotingControllerTest extends AbstractControllerTest {
         AuthorizedUser.authorize(VOTER);
 
         String id = testPolls.getPastPoll().getId();
-        String actual = mockMvc.perform(
-                get(REST_URL + "/polls/{pollId}", areaId, id)
+        String actual = mockMvc
+                .perform(
+                        get(REST_URL + "/polls/{pollId}", areaId, id)
                         .param("voter", "")
-                        .accept(MediaType.APPLICATION_JSON))
+                        .accept(MediaType.APPLICATION_JSON)
+                        .with(voter())
+                )
                 .andExpect(status().isOk())
                 .andReturn()
                 .getResponse().getContentAsString();
@@ -122,9 +142,13 @@ public class VotingControllerTest extends AbstractControllerTest {
         AuthorizedUser.authorize(VOTER);
 
         Vote voteToRevoke = testPolls.getPastPoll().getVotes().stream().filter(v -> v.getVoterId().equals(VOTER_ID)).findFirst().get();
-        String actual = mockMvc.perform(
-                delete(REST_URL + "/{voteId}", areaId, voteToRevoke.getId())
-                        .accept(MediaType.APPLICATION_JSON))
+        String actual = mockMvc
+                .perform(
+                        delete(REST_URL + "/{voteId}", areaId, voteToRevoke.getId())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .with(csrf())
+                        .with(voter())
+                )
                 .andExpect(status().isNoContent())
                 .andReturn()
                 .getResponse().getContentAsString();

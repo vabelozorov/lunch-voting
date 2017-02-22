@@ -41,7 +41,6 @@ public final class PollServiceImpl implements PollService {
      */
     @Override
     @Transactional
-    //TODO scheduled job?
     public LunchPlacePoll createPollForTodayMenus(String areaId) {
         return this.createPollForMenuDate(areaId, LocalDate.now());
     }

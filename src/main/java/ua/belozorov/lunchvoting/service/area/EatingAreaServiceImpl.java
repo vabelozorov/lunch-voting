@@ -33,7 +33,6 @@ import static java.util.Optional.ofNullable;
 @Transactional(readOnly = true)
 public final class EatingAreaServiceImpl implements EatingAreaService {
 
-    //TODO make ServiceRegistry
     private final EatingAreaRepository areaRepository;
     private final UserService userService;
     private final LunchPlaceService placeService;

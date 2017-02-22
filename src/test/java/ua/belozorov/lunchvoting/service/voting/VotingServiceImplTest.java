@@ -4,6 +4,7 @@ import com.vladmihalcea.sql.SQLStatementCountValidator;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import ua.belozorov.lunchvoting.WithMockVoter;
 import ua.belozorov.lunchvoting.exceptions.NotFoundException;
 import ua.belozorov.lunchvoting.model.voting.VotingResult;
 import ua.belozorov.lunchvoting.model.voting.polling.LunchPlacePoll;
@@ -28,6 +29,7 @@ import static ua.belozorov.lunchvoting.model.voting.polling.VoteTestData.VOTE_CO
  *
  * @author vabelozorov on 04.01.17.
  */
+@WithMockVoter
 public class VotingServiceImplTest extends AbstractServiceTest {
 
     @Autowired

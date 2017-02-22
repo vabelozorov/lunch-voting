@@ -29,7 +29,6 @@ public interface EatingAreaService {
      * @param user
      * @return
      */
-    @IsAdminOrVoter
     EatingArea create(String name, User user);
 
     /**
@@ -41,34 +40,24 @@ public interface EatingAreaService {
      * @return persisted User instance
      */
 
-    @IsAdmin
     User createUserInArea(String areaId, User user);
 
-    @IsAdmin
     LunchPlace createPlaceInArea(String areaId, LunchPlace place);
 
-    @IsAdmin
     LunchPlacePoll createPollInArea(String areaId);
 
-    @IsAdmin
     LunchPlacePoll createPollInArea(String areaId, LocalDate menuDate);
 
-    @IsAdmin
     void updateAreaName(String name, User user);
 
-    @IsAdminOrVoter
     EatingArea getArea(String areaId);
 
-    @IsAdminOrVoter
     EatingArea getArea(String areaId, EatingAreaRepositoryImpl.Fields... fields);
 
-    @IsAdminOrVoter
     AreaTo getAsTo(String areaId, boolean summary);
 
-    @IsAdminOrVoter
     List<EatingArea> filterByNameStarts(String search);
 
-    @IsAdmin
     void delete(String areaId);
 
     /**
@@ -77,7 +66,6 @@ public interface EatingAreaService {
      * @param areaId persisted area
      * @param member persisted User entity
      */
-    @IsAdmin
     void addMember(String areaId, User member);
 
     EatingAreaRepository getRepository();

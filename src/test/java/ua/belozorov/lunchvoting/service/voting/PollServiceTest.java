@@ -2,6 +2,8 @@ package ua.belozorov.lunchvoting.service.voting;
 
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import ua.belozorov.lunchvoting.WithMockAdmin;
+import ua.belozorov.lunchvoting.WithMockVoter;
 import ua.belozorov.lunchvoting.exceptions.NotFoundException;
 import ua.belozorov.lunchvoting.exceptions.PollException;
 import ua.belozorov.lunchvoting.model.voting.polling.LunchPlacePoll;
@@ -35,6 +37,7 @@ public class PollServiceTest extends AbstractServiceTest {
     private final String areaId = testAreas.getFirstAreaId();
     
     @Test
+    @WithMockAdmin
     public void createsPollForTodayMenus() throws Exception {
         reset();
         LunchPlacePoll expected  = pollService.createPollForTodayMenus(areaId);
@@ -46,6 +49,7 @@ public class PollServiceTest extends AbstractServiceTest {
     }
 
     @Test
+    @WithMockAdmin
     public void createPollForMenuDate() throws Exception {
         reset();
         LunchPlacePoll expected = pollService.createPollForMenuDate(areaId, NOW_DATE.plusDays(2));
@@ -57,11 +61,13 @@ public class PollServiceTest extends AbstractServiceTest {
     }
 
     @Test(expected = PollException.class)
+    @WithMockAdmin
     public void failOnCreatePollWhenNoMenusForTheDate() throws Exception {
         pollService.createPollForMenuDate(areaId, NOW_DATE.plusDays(1));
     }
 
     @Test
+    @WithMockVoter
     public void getPollWithPollItems() throws Exception {
         reset();
         LunchPlacePoll actual = pollService.getWithPollItems(areaId, testPolls.getActivePoll().getId());
@@ -71,6 +77,7 @@ public class PollServiceTest extends AbstractServiceTest {
     }
 
     @Test
+    @WithMockVoter
     public void getPollWithPollItemsAndVotes() throws Exception {
         reset();
         LunchPlacePoll actual = pollService.getWithPollItemsAndVotes(areaId, testPolls.getActivePoll().getId());
@@ -80,16 +87,19 @@ public class PollServiceTest extends AbstractServiceTest {
     }
 
     @Test(expected = NotFoundException.class)
+    @WithMockVoter
     public void failsGetWhenNonExistingId() throws Exception {
         pollService.getWithPollItems(areaId, "I_DO_NOT_EXIST");
     }
 
     @Test(expected = NotFoundException.class)
+    @WithMockVoter
     public void failsGetWhenAreaNotCorresponds() throws Exception {
         pollService.getWithPollItems(testAreas.getSecondAreaId(), testPolls.getActivePoll().getId());
     }
 
     @Test
+    @WithMockVoter
     public void getAllAreaPolls() throws Exception {
         reset();
         List<LunchPlacePoll> actual = pollService.getAll(areaId);
@@ -107,6 +117,7 @@ public class PollServiceTest extends AbstractServiceTest {
     }
 
     @Test
+    @WithMockVoter
     public void getPollsByActivePeriod() throws Exception {
         reset();
         List<LunchPlacePoll> actual = pollService.getPollsByActivePeriod(areaId, NOW_DATE_TIME.minusDays(2), NOW_DATE_TIME);
@@ -123,6 +134,7 @@ public class PollServiceTest extends AbstractServiceTest {
     }
 
     @Test
+    @WithMockVoter
     public void getPastPolls() throws Exception {
         reset();
         List<LunchPlacePoll> actual = pollService.getPastPolls(areaId);
@@ -136,6 +148,7 @@ public class PollServiceTest extends AbstractServiceTest {
     }
 
     @Test
+    @WithMockVoter
     public void getActivePolls() throws Exception {
         reset();
         List<LunchPlacePoll> actual = pollService.getActivePolls(areaId);
@@ -152,6 +165,7 @@ public class PollServiceTest extends AbstractServiceTest {
     }
 
     @Test
+    @WithMockVoter
     public void getFuturePolls() throws Exception {
         reset();
         List<LunchPlacePoll> actual = pollService.getFuturePolls(areaId);
@@ -166,6 +180,7 @@ public class PollServiceTest extends AbstractServiceTest {
     }
 
     @Test
+    @WithMockVoter
     public void checksWhetherPollIsActive() throws Exception {
         reset();
         Boolean isActive = pollService.isPollActive(areaId, testPolls.getPastPoll().getId());
@@ -178,19 +193,20 @@ public class PollServiceTest extends AbstractServiceTest {
     }
 
     @Test
+    @WithMockAdmin
     public void deletesPollFromItsArea() throws Exception {
         String pollId = testPolls.getFuturePoll().getId();
-        pollService.getWithPollItems(areaId, pollId);
 
         reset();
         pollService.delete(areaId, pollId);
         assertDelete(1);
 
         thrown.expect(NotFoundException.class);
-        pollService.getWithPollItems(areaId, pollId);
+        asVoter(() -> pollService.getWithPollItems(areaId, pollId));
     }
 
     @Test(expected = NotFoundException.class)
+    @WithMockAdmin
     public void failsDeletePollFromAnotherArea() throws Exception {
         String pollId = testPolls.getFuturePoll().getId();
         pollService.delete(testAreas.getSecondAreaId(), pollId);

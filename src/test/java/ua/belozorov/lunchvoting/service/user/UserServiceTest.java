@@ -3,6 +3,8 @@ package ua.belozorov.lunchvoting.service.user;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import ua.belozorov.lunchvoting.WithMockAdmin;
+import ua.belozorov.lunchvoting.WithMockVoter;
 import ua.belozorov.lunchvoting.exceptions.NotFoundException;
 import ua.belozorov.lunchvoting.web.security.AuthorizedUser;
 import ua.belozorov.lunchvoting.model.User;
@@ -25,6 +27,7 @@ import static ua.belozorov.lunchvoting.model.UserTestData.*;
  *
  * @author vabelozorov on 17.11.16.
  */
+@WithMockAdmin
 public class UserServiceTest extends AbstractServiceTest {
 
     @Autowired
@@ -37,8 +40,9 @@ public class UserServiceTest extends AbstractServiceTest {
     }
 
     @Test
+    @WithMockAdmin
     public void createWithoutArea() throws Exception {
-        User expected = new User("NEW_USER_ID", "New User", "new@email.com", "strongPassword");
+        User expected = new User("New User", "new@email.com", "strongPassword");
 
         reset();
         User actual = userService.create(expected);
@@ -52,6 +56,7 @@ public class UserServiceTest extends AbstractServiceTest {
     }
 
     @Test
+    @WithMockAdmin
     public void get() throws Exception {
         reset();
         User actual = userService.get(areaId, VOTER_ID);
@@ -60,9 +65,10 @@ public class UserServiceTest extends AbstractServiceTest {
     }
 
     @Test
+    @WithMockAdmin
     public void getAll() throws Exception {
         reset();
-        Collection<User> users = userService.getAll(AuthorizedUser.get().getAreaId());
+        Collection<User> users = userService.getAll(areaId);
         assertSelectCount(1);
         assertThat(
                 A1_USERS,
@@ -71,12 +77,13 @@ public class UserServiceTest extends AbstractServiceTest {
     }
 
     @Test
+    @WithMockAdmin
     public void delete() throws Exception {
         reset();
         userService.delete(areaId, ADMIN_ID);
         assertDeleteCount(1);
 
-        Collection<User> users = userService.getAll(AuthorizedUser.get().getAreaId());
+        Collection<User> users = userService.getAll(areaId);
         assertThat(
             A1_USERS.stream()
                     .filter(u -> !u.getId().equals(ADMIN_ID))
@@ -86,6 +93,7 @@ public class UserServiceTest extends AbstractServiceTest {
     }
 
     @Test
+    @WithMockAdmin
     public void update() throws Exception {
         User updated = userService.get(areaId, VOTER_ID);
         updated = updated.toBuilder().password("newPassword").email("updated@email.com").build();
@@ -99,6 +107,7 @@ public class UserServiceTest extends AbstractServiceTest {
     }
 
     @Test
+    @WithMockAdmin
     public void activate() throws Exception {
         reset();
         userService.activate(areaId, VOTER_ID, false);
@@ -109,6 +118,7 @@ public class UserServiceTest extends AbstractServiceTest {
     }
 
     @Test
+    @WithMockAdmin
     public void setRoles() throws Exception {
         Set<UserRole> expectedRoles = new HashSet<>();
         expectedRoles.add(UserRole.VOTER);
@@ -123,6 +133,7 @@ public class UserServiceTest extends AbstractServiceTest {
     }
 
     @Test
+    @WithMockAdmin
     public void getUsersInAreaByRole() throws Exception {
         reset();
         List<User> actual = userService.getUsersByRole(areaId, UserRole.ADMIN);
@@ -134,22 +145,26 @@ public class UserServiceTest extends AbstractServiceTest {
     }
 
     @Test(expected = NotFoundException.class)
+    @WithMockAdmin
     public void getNotExisting() {
         userService.get(areaId, "NotExistingId");
     }
 
     @Test(expected = NotFoundException.class)
+    @WithMockAdmin
     public void updateNotExisting() {
         User updated = VOTER.toBuilder().id("NOT_EXISTING_ID").password("newPassword").email("updated@email.com").build();
         userService.updateMainInfo(areaId, updated.getId(), updated.getName(), updated.getEmail(), updated.getPassword());
     }
 
     @Test(expected = NotFoundException.class)
+    @WithMockAdmin
     public void deleteNotExisting() {
         userService.delete(areaId, "NotExistingId");
     }
 
     @Test(expected = DataIntegrityViolationException.class)
+    @WithMockAdmin
     public void createDuplicate() {
         User duplicate = VOTER.toBuilder().id("XXX").email("god@email.com").build();
         userService.create(duplicate);

@@ -49,7 +49,6 @@ public class DataSourceConfig {
     public DataSource proxyDataSource() {
         return ProxyDataSourceBuilder
                 .create(p6spyDataSource())
-//                .logQueryToSysOut()
                 .countQuery()
                 .build();
     }

@@ -1,7 +1,9 @@
 package ua.belozorov.lunchvoting.service.user;
 
+import org.springframework.security.access.annotation.Secured;
 import ua.belozorov.lunchvoting.model.User;
 import ua.belozorov.lunchvoting.model.UserRole;
+import ua.belozorov.lunchvoting.web.security.IsAdmin;
 
 import java.util.Collection;
 import java.util.List;

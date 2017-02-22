@@ -36,7 +36,7 @@ public interface PollRepository {
 
     List<LunchPlacePoll> getPastPolls(String areaId);
 
-    List<Vote> getVotesForPoll(String areaId, String pollId);
+    List<Vote> getFullVotesForPoll(String areaId, String pollId);
 
     Boolean isActive(String areaId, String pollId);
 

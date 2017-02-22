@@ -26,4 +26,12 @@ public final class Pair<A,B> {
     public B getB() {
         return b;
     }
+
+    @Override
+    public String toString() {
+        return "Pair{" +
+                "a=" + a +
+                ", b=" + b +
+                '}';
+    }
 }

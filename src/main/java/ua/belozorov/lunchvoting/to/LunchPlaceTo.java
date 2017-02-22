@@ -1,15 +1,13 @@
 package ua.belozorov.lunchvoting.to;
 
-import com.google.common.collect.ImmutableSortedSet;
 import lombok.*;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.SafeHtml;
-import ua.belozorov.lunchvoting.model.lunchplace.LunchPlace;
-import ua.belozorov.lunchvoting.model.lunchplace.Menu;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import javax.validation.Valid;
+import javax.validation.constraints.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * <h2></h2>
@@ -32,7 +30,10 @@ public final class LunchPlaceTo {
     @SafeHtml
     @Size(max=1000)
     private final String description;
-    private final Set<String> phones;
+
+    @Valid
+    @Size(max = 5)
+    private final Set<Phone> phones;
 
     protected LunchPlaceTo() {
         name = null;
@@ -41,13 +42,38 @@ public final class LunchPlaceTo {
         phones = null;
     }
 
-    @Builder(toBuilder = true)
     public LunchPlaceTo(String name, String address, String description, Set<String> phones) {
         this.name = name;
         this.address = address;
         this.description = description;
-        this.phones = ImmutableSortedSet.copyOf(phones);
+        this.phones = phones.stream().map(Phone::new).collect(Collectors.toSet());
+    }
+
+    public Set<String> getPhones() {
+        return this.phones.stream().map(Phone::getPhone).collect(Collectors.toSet());
     }
 
     public interface Create {}
+
+    /**
+     * <h2></h2>
+     *
+     * @author vabelozorov on 22.02.17.
+     */
+    private static class Phone {
+
+        @Pattern(regexp = "^[0-9]{10}$")
+        private String phone;
+
+        public Phone() {
+        }
+
+        public Phone(String phone) {
+            this.phone = phone;
+        }
+
+        public String getPhone() {
+            return phone;
+        }
+    }
 }

@@ -43,7 +43,7 @@ public abstract class AbstractTest {
     public MockitoRule mockitoRule = MockitoJUnit.rule();
 
 
-    public <T> void  assertExceptionCount(Class<T> exClass, int count, Supplier... suppliers) {
+    public <T> void  assertExceptionCount(Class<T> exClass, Supplier... suppliers) {
         List<T> exceptions = new ArrayList<>();
         for(Supplier supplier : suppliers) {
             try {
@@ -56,7 +56,7 @@ public abstract class AbstractTest {
                 }
             }
         }
-        assertTrue(exceptions.size() == count);
+        assertTrue(exceptions.size() == suppliers.length);
     }
 
 }
