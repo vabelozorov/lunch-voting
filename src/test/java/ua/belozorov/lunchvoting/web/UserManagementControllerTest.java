@@ -1,12 +1,14 @@
 package ua.belozorov.lunchvoting.web;
 
+import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MvcResult;
 import ua.belozorov.lunchvoting.exceptions.NotFoundException;
-import ua.belozorov.lunchvoting.mocks.ServiceMocks;
+import ua.belozorov.lunchvoting.mocks.ServicesTestConfig;
 import ua.belozorov.lunchvoting.model.User;
 import ua.belozorov.lunchvoting.model.UserRole;
 import ua.belozorov.lunchvoting.service.user.UserService;
@@ -32,7 +34,6 @@ import static ua.belozorov.lunchvoting.model.UserTestData.*;
  *
  * @author vabelozorov on 17.11.16.
  */
-@ContextConfiguration(classes = {ServiceMocks.class})
 public class UserManagementControllerTest extends AbstractControllerTest {
     private static final String REST_URL = UserManagementController.REST_URL;
 
@@ -41,9 +42,9 @@ public class UserManagementControllerTest extends AbstractControllerTest {
 
     private final String areaId = testAreas.getFirstAreaId();
 
-    @Override
-    public void beforeTest() {
-
+    @Before
+    public void setUp() throws Exception {
+        Mockito.reset(userService);
     }
 
     @Test

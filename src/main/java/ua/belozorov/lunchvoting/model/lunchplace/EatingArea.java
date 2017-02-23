@@ -86,7 +86,7 @@ public final class EatingArea extends AbstractPersistableObject {
     public EatingArea addMember(User member) {
         ofNullable(member.getAreaId())
                 .filter(this.id::equals)
-                .orElseThrow(() -> new IllegalStateException("Area member without ID or ID is null"));
+                .orElseThrow(() -> new IllegalStateException("Area member ID is null or belongs to other area"));
         this.users.add(member);
         return this.toBuilder().build();
     }

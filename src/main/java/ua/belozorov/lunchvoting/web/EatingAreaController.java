@@ -74,6 +74,7 @@ public class EatingAreaController {
     public ResponseEntity createUserInArea(@PathVariable("id") String areaId,
                                            @RequestBody @Validated(UserTo.Create.class) UserTo userTo) {
         User newUser = new User(userTo.getName(), userTo.getEmail(), userTo.getPassword());
+        System.out.println("-------I was invoked-------");
         User created = ExceptionUtils.executeAndUnwrapException(
                 () -> areaService.createUserInArea(areaId, newUser),
                 ConstraintViolationException.class,
@@ -87,7 +88,7 @@ public class EatingAreaController {
 
     /**
      * Creates a new LunchPlace object via HTTP POST request.
-     * @param placeTo a LunchPlace object description in JSON format. <br/>
+     * @param dto a LunchPlace object description in JSON format. <br/>
      *              Mandatory fields:
      *              <ul>
      *                  <li><b>name</b> (up to 50 characters, not empty)</li>
@@ -103,12 +104,14 @@ public class EatingAreaController {
      */
     @PostMapping("/{areaId}/places")
     @IsAdmin
-    public ResponseEntity createPlaceInArea(@RequestBody @Validated(LunchPlaceTo.Create.class) LunchPlaceTo placeTo) {
+    public ResponseEntity createPlaceInArea(@RequestBody @Validated(LunchPlaceTo.Create.class) LunchPlaceTo dto) {
         String areaId = AuthorizedUser.get().getAreaId();
+
         LunchPlace created = ExceptionUtils.executeAndUnwrapException(
-                () -> areaService.createPlaceInArea(areaId, DtoIntoEntity.toLunchPlace(placeTo, null)),
+                () -> areaService.createPlaceInArea(areaId, null, dto.getName(), dto.getAddress(),
+                        dto.getDescription(), dto.getPhones()),
                 ConstraintViolationException.class,
-                new DuplicateDataException(ErrorCode.DUPLICATE_PLACE_NAME, new Object[]{placeTo.getName()})
+                new DuplicateDataException(ErrorCode.DUPLICATE_PLACE_NAME, new Object[]{dto.getName()})
         );
         URI uri = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path("{base}/{id}").buildAndExpand(LunchPlaceController.REST_URL, created.getId()).toUri();

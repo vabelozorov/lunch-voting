@@ -20,7 +20,7 @@ import java.util.Set;
  */
 public interface LunchPlaceService {
 
-    LunchPlace create(LunchPlace placeTo);
+    LunchPlace create(LunchPlace place);
 
     void bulkUpdate(String areaId, String placeId, @Nullable String name, @Nullable String address, @Nullable String description, @Nullable Set<String> phones);
 

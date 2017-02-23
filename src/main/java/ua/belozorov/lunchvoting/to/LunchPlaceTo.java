@@ -3,6 +3,7 @@ package ua.belozorov.lunchvoting.to;
 import lombok.*;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.SafeHtml;
+import ua.belozorov.lunchvoting.util.ExceptionUtils;
 
 import javax.validation.Valid;
 import javax.validation.constraints.*;

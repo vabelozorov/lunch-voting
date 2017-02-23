@@ -26,7 +26,7 @@ import static java.util.Optional.ofNullable;
  */
 @Service
 @Transactional(readOnly = true)
-public final class UserServiceImpl implements UserService, UserDetailsService {
+public class UserServiceImpl implements UserService, UserDetailsService {
 
     private final UserRepository userRepository;
 

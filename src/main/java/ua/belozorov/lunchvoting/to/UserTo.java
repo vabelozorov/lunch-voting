@@ -1,6 +1,8 @@
 package ua.belozorov.lunchvoting.to;
 
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotBlank;
@@ -19,6 +21,7 @@ import java.util.Set;
  * @author vabelozorov on 15.11.16.
  */
 @Getter
+@Setter
 public final class UserTo {
     @NotBlank(groups = {Update.class, Activate.class, Roles.class})
     @SafeHtml
@@ -42,6 +45,7 @@ public final class UserTo {
     private LocalDateTime registeredDate;
 
     @NotNull(groups = Activate.class)
+    @Getter(AccessLevel.NONE)
     private Boolean activated;
 
     protected UserTo() {
@@ -69,34 +73,6 @@ public final class UserTo {
         this.activated = user.isActivated();
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public void setRegisteredDate(LocalDateTime registeredDate) {
-        this.registeredDate = registeredDate;
-    }
-
-    public boolean isActivated() {
-        return activated;
-    }
-
-    public void setActivated(boolean activated) {
-        this.activated = activated;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
     @Override
     public String toString() {
         return "UserTo{" +
@@ -107,6 +83,10 @@ public final class UserTo {
                 ", registeredDate=" + registeredDate +
                 ", activated=" + activated +
                 '}';
+    }
+
+    public boolean isActivated() {
+        return activated;
     }
 
     /* Marker interfaces for JSR-303 group validation

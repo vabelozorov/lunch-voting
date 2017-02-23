@@ -30,7 +30,6 @@ public final class JoinAreaRequestServiceImpl implements JoinAreaRequestService 
         this.areaRepository = areaRepository;
     }
 
-
     @Override
     public List<JoinAreaRequest> getByStatus(String areaId, JoinAreaRequest.JoinStatus status) {
         return areaRepository.getJoinRequestsByStatus(areaId, status);

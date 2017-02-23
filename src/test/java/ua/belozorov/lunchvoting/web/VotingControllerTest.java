@@ -1,17 +1,13 @@
 package ua.belozorov.lunchvoting.web;
 
+import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Answers;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
-import ua.belozorov.lunchvoting.exceptions.NotFoundException;
-import ua.belozorov.lunchvoting.mocks.ServiceMocks;
+import ua.belozorov.lunchvoting.mocks.ServicesTestConfig;
 import ua.belozorov.lunchvoting.model.voting.PollVoteResult;
-import ua.belozorov.lunchvoting.model.voting.polling.PollItem;
-import ua.belozorov.lunchvoting.repository.voting.PollRepository;
-import ua.belozorov.lunchvoting.service.voting.PollService;
-import ua.belozorov.lunchvoting.web.security.AuthorizedUser;
 import ua.belozorov.lunchvoting.model.voting.polling.Vote;
 import ua.belozorov.lunchvoting.service.voting.VotingService;
 import ua.belozorov.lunchvoting.to.VoteTo;
@@ -31,20 +27,17 @@ import static ua.belozorov.lunchvoting.model.UserTestData.*;
  *
  * @author vabelozorov on 05.02.17.
  */
-@ContextConfiguration(classes = ServiceMocks.class)
 public class VotingControllerTest extends AbstractControllerTest {
     public static final String REST_URL = VotingController.REST_URL;
-
-    @Autowired
-    private PollRepository pollRepository;
 
     @Autowired
     private VotingService votingService;
 
     public final String areaId = testAreas.getFirstAreaId();
 
-    @Override
-    public void beforeTest() {
+    @Before
+    public void setUp() throws Exception {
+        Mockito.reset(votingService);
     }
 
     @Test

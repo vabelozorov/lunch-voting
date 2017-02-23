@@ -28,11 +28,15 @@ import static java.util.Optional.ofNullable;
 @Transactional(readOnly = true)
 public class LunchPlaceServiceImpl implements LunchPlaceService {
 
-    @Autowired
-    private LunchPlaceRepository lunchPlaceRepository;
+    private final LunchPlaceRepository lunchPlaceRepository;
+
+    private final MenuRepository menuRepository;
 
     @Autowired
-    private MenuRepository menuRepository;
+    public LunchPlaceServiceImpl(LunchPlaceRepository lunchPlaceRepository, MenuRepository menuRepository) {
+        this.lunchPlaceRepository = lunchPlaceRepository;
+        this.menuRepository = menuRepository;
+    }
 
     @Override
     @Transactional
@@ -68,7 +72,8 @@ public class LunchPlaceServiceImpl implements LunchPlaceService {
 
     @Override
     public List<LunchPlace> getMultipleWithMenu(String areaId, Set<String> placeIds, LocalDate startDate, LocalDate endDate) {
-        return this.checkAllPresent(placeIds, lunchPlaceRepository.getWithMenu(areaId, placeIds, startDate, endDate));
+        List<LunchPlace> places = lunchPlaceRepository.getWithMenu(areaId, placeIds, startDate, endDate);
+        return this.checkAllPresent(placeIds, places);
     }
 
     @Override

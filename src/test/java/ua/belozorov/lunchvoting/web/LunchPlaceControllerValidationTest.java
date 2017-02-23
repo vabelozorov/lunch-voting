@@ -1,7 +1,9 @@
 package ua.belozorov.lunchvoting.web;
 
 import com.google.common.collect.ImmutableSet;
+import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
 import ua.belozorov.lunchvoting.model.lunchplace.LunchPlace;

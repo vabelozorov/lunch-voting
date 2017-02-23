@@ -13,6 +13,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static org.mockito.ArgumentMatchers.argThat;
+
 /**
  * <h2></h2>
  *
@@ -143,4 +145,7 @@ public class UserTestData {
         }
     }
 
+    public static User userNoIdNoDate(User user) {
+        return argThat(new UserComparator(user, false, false));
+    }
 }

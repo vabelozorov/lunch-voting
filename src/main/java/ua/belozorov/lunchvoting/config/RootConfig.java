@@ -10,11 +10,14 @@ import ua.belozorov.lunchvoting.util.SecurityEnforcerBeanFactoryPostProcessor;
  */
 @Configuration
 @ComponentScan(basePackages = {
-        "ua.belozorov.lunchvoting.service",
         "ua.belozorov.lunchvoting.repository"
 })
-@Import({JpaConfig.class, InitDatabaseConfig.class, DataSourceConfig.class, WebSecurityConfig.class})
+@Import({JpaConfig.class, InitDatabaseConfig.class, DataSourceConfig.class})
 public class RootConfig {
+
+    public RootConfig() {
+        System.out.println("I am root");
+    }
 
     @Bean
     public static BeanFactoryPostProcessor securityEnforcer() {

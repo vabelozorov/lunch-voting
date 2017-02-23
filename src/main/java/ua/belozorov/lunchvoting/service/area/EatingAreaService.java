@@ -1,5 +1,6 @@
 package ua.belozorov.lunchvoting.service.area;
 
+import org.jetbrains.annotations.Nullable;
 import ua.belozorov.lunchvoting.model.User;
 import ua.belozorov.lunchvoting.model.lunchplace.EatingArea;
 import ua.belozorov.lunchvoting.model.lunchplace.LunchPlace;
@@ -12,6 +13,7 @@ import ua.belozorov.lunchvoting.web.security.IsAdminOrVoter;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
 /**
  * <h2></h2>
@@ -42,7 +44,8 @@ public interface EatingAreaService {
 
     User createUserInArea(String areaId, User user);
 
-    LunchPlace createPlaceInArea(String areaId, LunchPlace place);
+    LunchPlace createPlaceInArea(String areaId, @Nullable String id, String name, @Nullable String address, @Nullable String description,
+                                 Set<String> phones);
 
     LunchPlacePoll createPollInArea(String areaId);
 

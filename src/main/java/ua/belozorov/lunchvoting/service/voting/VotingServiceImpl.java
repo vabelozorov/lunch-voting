@@ -29,12 +29,10 @@ import static java.util.Optional.ofNullable;
 public final class VotingServiceImpl implements VotingService {
 
     private final PollService pollService;
-    private final LunchPlaceRepository lunchPlaceRepository;
     private final PollRepository pollRepository;
 
     @Autowired
-    public VotingServiceImpl(LunchPlaceRepository lunchPlaceRepository, PollService pollService, PollRepository pollRepository) {
-        this.lunchPlaceRepository = lunchPlaceRepository;
+    public VotingServiceImpl(PollService pollService, PollRepository pollRepository) {
         this.pollService = pollService;
         this.pollRepository = pollRepository;
     }
@@ -62,7 +60,7 @@ public final class VotingServiceImpl implements VotingService {
     public Vote getVote(String voterId, String voteId) {
         ExceptionUtils.checkParamsNotNull(voterId, voteId);
 
-        return ofNullable(pollRepository.getFullVote(voterId, voteId))
+        return ofNullable(pollRepository.getVote(voterId, voteId))
                 .orElseThrow(() -> new NotFoundException(voteId, Vote.class));
     }
 

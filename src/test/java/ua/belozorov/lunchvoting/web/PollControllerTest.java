@@ -1,11 +1,13 @@
 package ua.belozorov.lunchvoting.web;
 
+import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import ua.belozorov.*;
-import ua.belozorov.lunchvoting.mocks.ServiceMocks;
+import ua.belozorov.lunchvoting.mocks.ServicesTestConfig;
 import ua.belozorov.lunchvoting.model.voting.polling.LunchPlacePoll;
 import ua.belozorov.lunchvoting.model.voting.polling.PollItem;
 import ua.belozorov.lunchvoting.model.voting.polling.TimeConstraint;
@@ -32,7 +34,6 @@ import static ua.belozorov.lunchvoting.DateTimeFormatters.WEB_DATE_TIME_FORMATTE
  *
  * @author vabelozorov on 04.02.17.
  */
-@ContextConfiguration(classes = ServiceMocks.class)
 public class PollControllerTest extends AbstractControllerTest {
     private static final String REST_URL = PollController.REST_URL;
 
@@ -44,11 +45,6 @@ public class PollControllerTest extends AbstractControllerTest {
     private final LunchPlacePoll activePoll = testPolls.getActivePoll();
 
     private final ObjectToMapConverter<PollTo> converter;
-
-    @Override
-    public void beforeTest() {
-
-    }
 
     public PollControllerTest() {
         ObjectToMapConverter<TimeConstraint> timeConstraintConverter = new SimpleObjectToMapConverter<>(
@@ -66,6 +62,11 @@ public class PollControllerTest extends AbstractControllerTest {
                 new ObjectMappingEntry<>("timeConstraint", PollTo::getTimeConstraint, timeConstraintConverter),
                 new CollectionMappingEntry<>("pollItems", PollTo::getPollItems, pollItemConverter)
         );
+    }
+
+    @Before
+    public void setUp() throws Exception {
+        Mockito.reset(pollService);
     }
 
     @Test

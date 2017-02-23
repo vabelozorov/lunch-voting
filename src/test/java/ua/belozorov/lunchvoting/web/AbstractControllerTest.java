@@ -1,32 +1,25 @@
 package ua.belozorov.lunchvoting.web;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONException;
-import org.junit.runner.RunWith;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.context.jdbc.SqlConfig;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import ua.belozorov.lunchvoting.AbstractSpringTest;
-import ua.belozorov.lunchvoting.AbstractTest;
 import ua.belozorov.lunchvoting.JsonUtils;
 import ua.belozorov.lunchvoting.TestConfig;
 import ua.belozorov.lunchvoting.config.RootConfig;
 import ua.belozorov.lunchvoting.config.WebConfig;
+import ua.belozorov.lunchvoting.config.WebSecurityConfig;
+import ua.belozorov.lunchvoting.mocks.ServicesTestConfig;
 
-import javax.annotation.PostConstruct;
-import javax.servlet.Filter;
 import java.util.Arrays;
 
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static ua.belozorov.lunchvoting.model.UserTestData.ALIEN_USER1;
@@ -38,7 +31,9 @@ import static ua.belozorov.lunchvoting.model.UserTestData.VOTER;
 /**
  * Created by vabelozorov on 15.11.16.
  */
-@ContextConfiguration(classes = {RootConfig.class, WebConfig.class, TestConfig.class})
+@ContextConfiguration(classes =
+        {WebConfig.class, ServicesTestConfig.class, WebSecurityConfig.class, TestConfig.class}
+)
 @WebAppConfiguration
 public abstract class AbstractControllerTest extends AbstractSpringTest {
 

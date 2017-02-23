@@ -1,6 +1,8 @@
 package ua.belozorov.lunchvoting.web;
 
+import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
@@ -8,25 +10,18 @@ import org.springframework.test.web.servlet.MvcResult;
 import ua.belozorov.FieldMappingEntry;
 import ua.belozorov.ObjectToMapConverter;
 import ua.belozorov.SimpleObjectToMapConverter;
-import ua.belozorov.lunchvoting.mocks.ServiceMocks;
+import ua.belozorov.lunchvoting.mocks.ServicesTestConfig;
 import ua.belozorov.lunchvoting.model.lunchplace.EatingArea;
-import ua.belozorov.lunchvoting.web.security.AuthorizedUser;
-import ua.belozorov.lunchvoting.model.User;
 import ua.belozorov.lunchvoting.model.lunchplace.JoinAreaRequest;
-import ua.belozorov.lunchvoting.service.area.EatingAreaService;
 import ua.belozorov.lunchvoting.service.area.JoinAreaRequestService;
-import ua.belozorov.lunchvoting.service.user.UserProfileService;
-import ua.belozorov.lunchvoting.service.user.UserService;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -39,7 +34,6 @@ import static ua.belozorov.lunchvoting.util.ControllerUtils.toMap;
  * @author vabelozorov on 12.02.17.
  */
 
-@ContextConfiguration(classes = ServiceMocks.class)
 public class JoinAreaRequestControllerTest extends AbstractControllerTest {
     static final String REST_URL = JoinAreaRequestController.REST_URL;
 
@@ -47,11 +41,8 @@ public class JoinAreaRequestControllerTest extends AbstractControllerTest {
     private JoinAreaRequestService requestService;
 
     private final ObjectToMapConverter<JoinAreaRequest> converter;
-    private final String areaId = testAreas.getFirstAreaId();
 
-    @Override
-    public void beforeTest() {
-    }
+    private final String areaId = testAreas.getFirstAreaId();
 
     public JoinAreaRequestControllerTest() {
         this.converter = new SimpleObjectToMapConverter<>(
@@ -62,6 +53,11 @@ public class JoinAreaRequestControllerTest extends AbstractControllerTest {
                 new FieldMappingEntry<>("created", JoinAreaRequest::getCreated),
                 new FieldMappingEntry<>("decidedOn", JoinAreaRequest::getDecidedOn)
         );
+    }
+
+    @Before
+    public void resetMocks() throws Exception {
+        Mockito.reset(requestService);
     }
 
     @Test

@@ -142,10 +142,10 @@ public class EatingAreaServiceTest extends AbstractServiceTest {
     @WithMockAdmin
     public void createPlaceInArea() throws Exception {
         Set<String> phones = ImmutableSet.of("0661234567", "0441234567", "0123456789", "1234567890");
-        LunchPlace place = new LunchPlace("NEW_ID", "NEW_PLACE_NAME", "new address", "new description", phones);
 
         reset();
-        LunchPlace created = areaService.createPlaceInArea(testAreas.getFirstAreaId(), place);
+        LunchPlace created = areaService.createPlaceInArea(testAreas.getFirstAreaId(),
+                "NEW_ID", "NEW_PLACE_NAME", "new address", "new description", phones);
         assertSql(2, 1, 2, 0);
 
         phones = phones.stream().sorted().collect(Collectors.toSet());

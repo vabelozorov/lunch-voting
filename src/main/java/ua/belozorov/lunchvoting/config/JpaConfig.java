@@ -26,6 +26,10 @@ import java.util.Properties;
 @EnableTransactionManagement
 public class JpaConfig {
 
+    public JpaConfig() {
+        System.out.println();
+    }
+
     @Autowired
     private Environment env;
 

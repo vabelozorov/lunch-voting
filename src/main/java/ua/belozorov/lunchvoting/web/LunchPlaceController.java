@@ -84,12 +84,12 @@ public class LunchPlaceController  {
      * @param id id of the place
      * @return
      */
-    @GetMapping("/{id}")
+    @GetMapping(value = "/{id}")
     @IsAdminOrVoter
     public ResponseEntity<LunchPlace> get(@PathVariable String id, LunchPlaceQueryParams params) {
         params.setIds(new String[]{id});
         RefinedFields refinedFields = new LunchPlaceRefinedFields(params.getFields());
-        Collection<LunchPlace> places = this.getLunchPlacesOptimally(params, refinedFields);
+        List<LunchPlace> places = this.getLunchPlacesOptimally(params, refinedFields);
         LunchPlace place = places.iterator().next();
         jsonFilter.includingFilter(place, refinedFields);
         return ResponseEntity.ok(place);
@@ -97,7 +97,7 @@ public class LunchPlaceController  {
 
     @GetMapping
     @IsAdminOrVoter
-    public ResponseEntity<Collection<LunchPlace>> getLunchPlaces(LunchPlaceQueryParams params) {
+    public ResponseEntity<Collection<LunchPlace>> getMany(LunchPlaceQueryParams params) {
         RefinedFields refinedFields = new LunchPlaceRefinedFields(params.getFields());
         Collection<LunchPlace> places = this.getLunchPlacesOptimally(params, refinedFields);
         jsonFilter.includingFilter(places, refinedFields);
@@ -136,6 +136,10 @@ public class LunchPlaceController  {
 
         private final Set<String> originalFields = new HashSet<>();
         private final Map<String, String> fieldReplacements = new HashMap<>();
+
+        private LunchPlaceRefinedFields() {
+            this.fieldReplacements.put("menus", "menus.*");
+        }
 
         private LunchPlaceRefinedFields(Set<String> fields) {
             this.originalFields.addAll(fields);

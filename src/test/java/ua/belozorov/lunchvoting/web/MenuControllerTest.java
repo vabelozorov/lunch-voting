@@ -1,24 +1,23 @@
 package ua.belozorov.lunchvoting.web;
 
 import com.google.common.collect.ImmutableSet;
+import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MvcResult;
-import ua.belozorov.lunchvoting.mocks.ServiceMocks;
+import ua.belozorov.lunchvoting.mocks.ServicesTestConfig;
 import ua.belozorov.lunchvoting.model.lunchplace.Dish;
-import ua.belozorov.lunchvoting.repository.lunchplace.MenuRepository;
 import ua.belozorov.lunchvoting.repository.lunchplace.MenuRepositoryImpl;
 import ua.belozorov.lunchvoting.service.lunchplace.LunchPlaceService;
 import ua.belozorov.lunchvoting.to.MenuTo;
 import ua.belozorov.lunchvoting.web.exceptionhandling.ErrorCode;
 import ua.belozorov.lunchvoting.web.exceptionhandling.ErrorInfo;
 
-import java.time.LocalDate;
 import java.util.*;
 
-import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -33,20 +32,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  *
  * @author vabelozorov on 26.11.16.
  */
-@ContextConfiguration(classes = ServiceMocks.class)
 public class MenuControllerTest extends AbstractControllerTest {
     public static final String REST_URL = MenuController.REST_URL;
 
     @Autowired
     private LunchPlaceService placeService;
 
-    @Autowired
-    private MenuRepository menuRepository;
     private final String areaId = testAreas.getFirstAreaId();
 
-    @Override
-    public void beforeTest() {
-
+    @Before
+    public void setUp() throws Exception {
+        Mockito.reset(placeService);
     }
 
     @Test
@@ -56,6 +52,8 @@ public class MenuControllerTest extends AbstractControllerTest {
                 new Dish("Second Dish", 10.12f, 1)
         );
         MenuTo sent = new MenuTo(NOW_DATE, dishes);
+
+
 
         when(placeService.addMenu(areaId, "placeId", NOW_DATE, dishes))
                 .thenReturn(testPlaces.getMenu1());
@@ -138,7 +136,6 @@ public class MenuControllerTest extends AbstractControllerTest {
         verify(placeService).getMenu(areaId, "FourthPlaceID", "menuId", MenuRepositoryImpl.Fields.DISHES);
 
         MenuTo to = new MenuTo(testPlaces.getMenu1Id(), testPlaces.getMenu1().getEffectiveDate(), testPlaces.getMenu1().getDishes(), testPlaces.getPlace4Id());
-
         assertJson(
                 jsonUtils.toJson(to),
                 actual

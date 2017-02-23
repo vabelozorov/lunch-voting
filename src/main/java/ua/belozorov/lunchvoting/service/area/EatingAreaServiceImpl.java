@@ -1,5 +1,6 @@
 package ua.belozorov.lunchvoting.service.area;
 
+import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +22,7 @@ import ua.belozorov.lunchvoting.util.ExceptionUtils;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import static java.util.Optional.ofNullable;
 
@@ -35,14 +37,12 @@ public final class EatingAreaServiceImpl implements EatingAreaService {
 
     private final EatingAreaRepository areaRepository;
     private final UserService userService;
-    private final LunchPlaceService placeService;
     private final PollService pollService;
 
     @Autowired
-    public EatingAreaServiceImpl(EatingAreaRepository areaRepository, UserService userService, LunchPlaceService placeService, PollService pollService) {
+    public EatingAreaServiceImpl(EatingAreaRepository areaRepository, UserService userService, PollService pollService) {
         this.areaRepository = areaRepository;
         this.userService = userService;
-        this.placeService = placeService;
         this.pollService = pollService;
     }
 
@@ -73,8 +73,10 @@ public final class EatingAreaServiceImpl implements EatingAreaService {
 
     @Override
     @Transactional
-    public LunchPlace createPlaceInArea(String areaId, LunchPlace place) {
+    public LunchPlace createPlaceInArea(String areaId, String id, String name, String address, String description,
+                                        Set<String> phones) {
         EatingArea area = this.getArea(areaId, EatingAreaRepositoryImpl.Fields.PLACES);
+        LunchPlace place = new LunchPlace(id, name, address, description, phones);
         areaRepository.update(area.addPlace(place));
         return place;
     }

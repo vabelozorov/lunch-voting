@@ -11,10 +11,12 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.PlatformTransactionManager;
+import ua.belozorov.lunchvoting.config.RootConfig;
 import ua.belozorov.lunchvoting.web.security.AuthorizedUser;
 import ua.belozorov.lunchvoting.model.User;
 
@@ -36,7 +38,9 @@ import static ua.belozorov.lunchvoting.model.UserTestData.GOD_ID;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ActiveProfiles(SPRING_PROFILES.DB_PROXY)
+@ContextConfiguration(classes = {RootConfig.class})
 public abstract class AbstractSpringTest extends AbstractTest {
+
     @Autowired
     protected PlatformTransactionManager ptm;
 
@@ -44,22 +48,7 @@ public abstract class AbstractSpringTest extends AbstractTest {
     protected EntityManager em;
 
     @Autowired
-    private DataSource dataSource;
-
-    private final ResourceDatabasePopulator populator = new ResourceDatabasePopulator(
-            testAreas.getAreaSqlResource(),
-            testUsers.getUserSqlResource(),
-            testPlaces.getLunchPlaceSqlResource(),
-            testPlaces.getMenuSqlResource(),
-            testPolls.getPollSqlResource(),
-            testPolls.getPollItemSqlResource(),
-            testVotes.getVoteSqlResource()
-    );
-
-    @Before
-    public void beforeTest() {
-        DatabasePopulatorUtils.execute(populator, dataSource);
-    }
+    protected DataSource dataSource;
 
     public <T> T asAdmin(Supplier<T> supplier) {
         return asRole(supplier, "ROLE_ADMIN");

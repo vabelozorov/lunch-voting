@@ -1,6 +1,5 @@
 package ua.belozorov.lunchvoting.web;
 
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import org.junit.Before;
 import org.junit.Test;
@@ -12,7 +11,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import ua.belozorov.lunchvoting.DateTimeFormatters;
 import ua.belozorov.lunchvoting.exceptions.DuplicateDataException;
 import ua.belozorov.lunchvoting.exceptions.NotFoundException;
-import ua.belozorov.lunchvoting.mocks.ServiceMocks;
+import ua.belozorov.lunchvoting.mocks.ServicesTestConfig;
 import ua.belozorov.lunchvoting.model.lunchplace.LunchPlace;
 import ua.belozorov.lunchvoting.model.lunchplace.Menu;
 import ua.belozorov.lunchvoting.service.lunchplace.LunchPlaceService;
@@ -22,11 +21,8 @@ import ua.belozorov.lunchvoting.web.exceptionhandling.ErrorInfo;
 
 import java.time.LocalDate;
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static org.hamcrest.Matchers.contains;
-import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
@@ -35,16 +31,12 @@ import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static ua.belozorov.lunchvoting.MatcherUtils.matchCollection;
-import static ua.belozorov.lunchvoting.MatcherUtils.matchSingle;
-import static ua.belozorov.lunchvoting.model.lunchplace.LunchPlaceTestData.*;
 
 /**
  * <h2></h2>
  *
  * @author vabelozorov on 25.11.16.
  */
-@ContextConfiguration(classes = ServiceMocks.class)
 public class LunchPlaceControllerTest extends AbstractControllerTest {
     private static final String REST_URL = LunchPlaceController.REST_URL;
 
@@ -57,18 +49,10 @@ public class LunchPlaceControllerTest extends AbstractControllerTest {
     private final LunchPlace PLACE4 = super.testPlaces.getPlace4();
     private final String PLACE4_ID = PLACE4.getId();
 
-    @Override
-    @Before
-    public void beforeTest() {
-        Mockito.reset(placeService);
-    }
-
     @Test
     public void testUpdate() throws Exception {
         Set<String> phones = Sets.newHashSet("0661234567", "0441234567");
         LunchPlaceTo to = new LunchPlaceTo("Updated PLace", null, "Updated Description", phones);
-
-//        when(placeService)
 
         mockMvc.perform(
                 put(REST_URL + "/{id}",  areaId, PLACE4_ID)
@@ -80,6 +64,11 @@ public class LunchPlaceControllerTest extends AbstractControllerTest {
         .andExpect(status().isNoContent());
 
         verify(placeService).bulkUpdate(areaId, PLACE4_ID, to.getName(), to.getAddress(), to.getDescription(), to.getPhones());
+    }
+
+    @Before
+    public void setUp() throws Exception {
+        Mockito.reset(placeService);
     }
 
     @Test
@@ -118,7 +107,7 @@ public class LunchPlaceControllerTest extends AbstractControllerTest {
         String actualJson = mockMvc
                 .perform(
                         get(REST_URL + "/{id}", areaId, PLACE4_ID)
-                                .with(voter())
+                        .with(voter())
                 )
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();

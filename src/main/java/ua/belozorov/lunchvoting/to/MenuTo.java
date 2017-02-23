@@ -18,17 +18,16 @@ import java.util.Set;
  * @author vabelozorov on 26.11.16.
  */
 @Getter
-@Setter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PROTECTED, force = true)
 public final class MenuTo {
 
-    private String id;
+    private final String id;
     @NotNull
-    private LocalDate effectiveDate;
+    private final LocalDate effectiveDate;
     @NotNull
-    private Set<Dish> dishes;
+    private final Set<Dish> dishes;
 
-    private String lunchPlaceId;
+    private final String lunchPlaceId;
 
     public MenuTo(LocalDate effectiveDate, Set<Dish> dishes) {
         this(null, effectiveDate, dishes, null);

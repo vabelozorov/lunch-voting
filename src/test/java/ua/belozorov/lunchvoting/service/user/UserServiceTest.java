@@ -40,7 +40,6 @@ public class UserServiceTest extends AbstractServiceTest {
     }
 
     @Test
-    @WithMockAdmin
     public void createWithoutArea() throws Exception {
         User expected = new User("New User", "new@email.com", "strongPassword");
 
@@ -56,7 +55,6 @@ public class UserServiceTest extends AbstractServiceTest {
     }
 
     @Test
-    @WithMockAdmin
     public void get() throws Exception {
         reset();
         User actual = userService.get(areaId, VOTER_ID);
@@ -65,7 +63,6 @@ public class UserServiceTest extends AbstractServiceTest {
     }
 
     @Test
-    @WithMockAdmin
     public void getAll() throws Exception {
         reset();
         Collection<User> users = userService.getAll(areaId);
@@ -77,7 +74,6 @@ public class UserServiceTest extends AbstractServiceTest {
     }
 
     @Test
-    @WithMockAdmin
     public void delete() throws Exception {
         reset();
         userService.delete(areaId, ADMIN_ID);
@@ -93,7 +89,6 @@ public class UserServiceTest extends AbstractServiceTest {
     }
 
     @Test
-    @WithMockAdmin
     public void update() throws Exception {
         User updated = userService.get(areaId, VOTER_ID);
         updated = updated.toBuilder().password("newPassword").email("updated@email.com").build();

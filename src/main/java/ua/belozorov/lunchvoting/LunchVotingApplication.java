@@ -4,6 +4,7 @@ import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 import ua.belozorov.lunchvoting.config.RootConfig;
+import ua.belozorov.lunchvoting.config.ServiceBeansConfig;
 import ua.belozorov.lunchvoting.config.WebConfig;
 import ua.belozorov.lunchvoting.config.WebSecurityConfig;
 
@@ -15,7 +16,7 @@ public class LunchVotingApplication extends AbstractAnnotationConfigDispatcherSe
 
     @Override
     protected Class<?>[] getRootConfigClasses() {
-        return new Class<?>[]{RootConfig.class};
+        return new Class<?>[]{RootConfig.class, ServiceBeansConfig.class, WebSecurityConfig.class};
     }
 
     @Override

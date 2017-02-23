@@ -74,9 +74,11 @@ public final class ExceptionInfoHandler {
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)  //500
     @ExceptionHandler(Exception.class)
-    public void handleAnother(HttpServletRequest req, Exception ex) {
-        LOG.error(ex.toString());
+    public void handleAnother(HttpServletRequest req, Exception ex) throws Exception {
+//        LOG.error(ex.toString());
+        throw ex;
     }
+
 
     private ErrorInfo logAndCreate(HttpServletRequest req, ApplicationException ex) {
         ErrorInfo errorInfo = errorInfoFactory.create(req, ex);
