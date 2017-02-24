@@ -3,7 +3,7 @@ package ua.belozorov.lunchvoting;
 import org.springframework.security.web.context.AbstractSecurityWebApplicationInitializer;
 
 /**
- * <h2></h2>
+ * Security Initializer class
  *
  * @author vabelozorov on 19.02.17.
  */

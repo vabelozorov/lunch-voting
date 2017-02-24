@@ -1,12 +1,15 @@
 package ua.belozorov.lunchvoting.web;
 
+import com.google.common.collect.Sets;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ua.belozorov.lunchvoting.exceptions.DuplicateDataException;
+import ua.belozorov.lunchvoting.model.UserRole;
 import ua.belozorov.lunchvoting.web.security.AuthorizedUser;
 import ua.belozorov.lunchvoting.model.User;
 import ua.belozorov.lunchvoting.service.user.UserService;
@@ -14,44 +17,91 @@ import ua.belozorov.lunchvoting.to.UserTo;
 import ua.belozorov.lunchvoting.util.ExceptionUtils;
 import ua.belozorov.lunchvoting.web.exceptionhandling.ErrorCode;
 import ua.belozorov.lunchvoting.web.security.IsAdmin;
-import ua.belozorov.lunchvoting.web.security.IsAdminOrVoter;
 
 import java.util.Collection;
 import java.util.stream.Collectors;
 
 /**
- * <h2>A controller for administering users</h2>
+ * A controller for administering users
  *
- * @author vabelozorov on 15.11.16.
+ * Generated on 15.11.16.
  */
 @RestController
 @RequestMapping(UserManagementController.REST_URL)
 @IsAdmin
 public class UserManagementController {
-    static final String REST_URL = "/api/areas/{id}/members";
+    static final String REST_URL = "/api/areas/{areaId}/members";
 
     private final UserService userService;
 
+    /**
+     * <p>Class constructor.</p>
+     *
+     * @param userService   an instance which class implements {@link UserService} interface
+     */
     @Autowired
     public UserManagementController(UserService userService) {
         this.userService = userService;
     }
 
     /**
-     * Updates an existing User instance via a HTTP PUT request. Four non-empty parameters must be present in the request:
-     * {@code id, name, password, email}. Other parameters are ignored.
-     * @param userTo  represents request parameters and must contain non-empty {@code id, name, password, email} fields
-     * @return ResponseEntity instance with the following values upon successful completion of the request:
+     * <p>Updates an existing {@link User}.</p>
+     *
+     * <table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px; padding:3px;">
+     *     <tr>
+     *         <td>HTTP Request</td>
+     *         <td><font style="color:green">{@code HTTP PUT /api/areas/{areaId}/members/{userId} 204}</font><br>
+     *             <b>{areaId}</b> existing {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea} ID<br>
+     *             <b>{userId}</b> existing {@link User} ID
+     *         </td>
+     *     </tr>
+     *     <tr>
+     *         <td>Content-Type</td>
+     *         <td>{@code application/json}</td>
+     *     </tr>
+     *     <tr>
+     *         <td>Required Parameters</td>
+     *         <td><code>name<br>email<br>password<br></code></td>
+     *     </tr>
+     *     <tr>
+     *         <td>Requires role</td>
+     *         <td><strong>ADMIN</strong></td>
+     *     </tr>
+     * </table>
+     *
+     * <p>The {@link User}  must belong to the same {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea}
+     * as the {@link User} whose credentials were submitted.<br>
+     * Content of the request must a JSON object and {@code Content-Type} must be set to {@code application/json}
+     * </p>
+     * Three non-empty parameters must be present in the JSON object:
+     * <ul>
+     *  <li><strong>name</strong>  new name of the User, must be between 2 and 100 characters long</li>
+     *  <li><strong> password</strong>  new password of the User, must be between 6 and 30 characters long</li>
+     *  <li><strong>email</strong>  new email of the User. The application enforces a unique contraint on this value and
+     *  {@code DuplicateDataException} is thrown if value happens to be not unique</li>
+     * </ul>
+     * Other parameters are ignored.
+     * If a certain {@link User}  property is not changed, its old value should be included in the request.
+     * @param userId  existing {@link User} ID
+     * @param userTo  represents request parameters and must contain non-empty {@code name, password, email} fields
+     * @return ResponseEntity instance with the following values upon success:
      *  <ul>
-     *      <li>HTTP Status 204 No_Content </li>
+     *      <li>HTTP Status 204 No_Content</li>
+     *  </ul>
+     *  If the request fails:
+     *  <ul>
+     *      <li>HTTP Status 400 Bad_Syntax is returned if parameter validation fails</li>
+     *      <li>HTTP Status 409 Conflict is returned if the submitted email value is not unique</li>
+     *      <li>HTTP Status 404 Not_Found is returned if a {@link User}  with the given ID does not exist<
+     *      in the {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea}/li>
      *  </ul>
      */
-    @PutMapping
-    public ResponseEntity update(@RequestBody @Validated(UserTo.Update.class)UserTo userTo) {
+    @PutMapping(value = "/{userId}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity update(@PathVariable String userId, @RequestBody @Validated(UserTo.Update.class)UserTo userTo) {
         String areaId = AuthorizedUser.get().getAreaId();
         ExceptionUtils.executeAndUnwrapException(
                 () -> {
-                    userService.updateMainInfo(areaId, userTo.getId(), userTo.getName(), userTo.getEmail(), userTo.getPassword());
+                    userService.updateMainInfo(areaId, userId, userTo.getName(), userTo.getEmail(), userTo.getPassword());
                     return null;
                 },
                 DataIntegrityViolationException.class,
@@ -61,33 +111,69 @@ public class UserManagementController {
     }
 
     /**
-     * Retrieves a User instance with ID {@code id}
-     * @param id existing user ID
-     * @return ResponseEntity instance with the following values upon successful completion of the request:
+     * <p>Retrieves a {@link User} with a given ID.</p>
+     *
+     * <table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px;">
+     *     <tr>
+     *         <td>HTTP Request</td>
+     *         <td><font style="color:green">{@code HTTP GET /api/areas/{areaId}/members/{userId} 200}</font><br>
+     *             <b>{areaId}</b> existing {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea} ID<br>
+     *             <b>{userId}</b> existing {@link User} ID
+ *             </td>
+     *     </tr>
+     *     <tr>
+     *         <td>Requires role</td>
+     *         <td><strong>ADMIN</strong></td>
+     *     </tr>
+     * </table>
+     *
+     * <p>The {@link User}  must belong to the same EatingArea as the {@link User}  whose credentials were submitted.</p>
+     *
+     * @param userId existing user ID
+     * @return ResponseEntity instance with the following values upon success:
      *  <ul>
      *      <li>HTTP Status 200 Ok </li>
-     *      <li>User instance in JSON format with fields
-     *      {@code id, name, email, roles, registeredDate, activated} </li>
+     *      <li>JSON object with fields {@code userId, name, email, roles, registeredDate, activated} </li>
      *  </ul>
-     */
-    @GetMapping("/{id}")
-    public ResponseEntity<UserTo> get(@PathVariable String id) {
-        User user = userService.get(AuthorizedUser.get().getAreaId(), id);
+     *  If the request fails:
+     *  <ul>
+     *      <li>HTTP Status 404 Not_Found is returned if a {@link User}  with the given ID does not exist<
+     *      in the {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea}/li>
+     *  </ul>
+     *  */
+    @GetMapping("/{userId}")
+    public ResponseEntity<UserTo> get(@PathVariable String userId) {
+        User user = userService.get(AuthorizedUser.get().getAreaId(), userId);
         return new ResponseEntity<>(new UserTo(user), HttpStatus.OK);
     }
 
     /**
-     * Retrieves all User instances with.
-     * @return ResponseEntity instance with the following values upon successful completion of the request:
+     * <p>Retrieves all {@link User} objects in the {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea}.</p>
+     *
+     * <table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px;">
+     *     <tr>
+     *         <td>HTTP Request</td>
+     *         <td><font style="color:green">{@code HTTP GET /api/areas/{areaId}/members/ 200}</font><br>
+     *             <b>{areaId}</b> existing {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea} ID
+     *             </td>
+     *     </tr>
+     *     <tr>
+     *         <td>Requires role</td>
+     *         <td><strong>ADMIN</strong></td>
+     *     </tr>
+     * </table>
+     *
+     * <p>The {@link User}  must belong to the same EatingArea as the {@link User}  whose credentials were submitted.</p>
+     * @return ResponseEntity instance with the following values upon success:
      *  <ul>
      *      <li>HTTP Status 200 Ok </li>
-     *      <li>User instances in JSON format with fields
-     *      {@code id, name, email, roles, registeredDate, activated} </li>
+     *      <li>JSON array where each object has fields {@code id, name, email, roles, registeredDate, activated} </li>
      *  </ul>
      */
     @GetMapping
     public ResponseEntity<Collection<UserTo>> getAll() {
-        Collection<User> users = userService.getAll(AuthorizedUser.get().getAreaId());
+        String areaId = AuthorizedUser.get().getAreaId();
+        Collection<User> users = userService.getAll(areaId);
         Collection<UserTo> userTos = users.stream()
                 .map(UserTo::new)
                 .collect(Collectors.toList());
@@ -95,51 +181,122 @@ public class UserManagementController {
     }
 
     /**
-     * Deletes a User instance with ID {@code id}
-     * @param id existing user ID
-     * @return ResponseEntity instance with the following values upon successful completion of the request:
+     * <p>Deletes a {@link User} with a given ID.</p>
+     *
+     * <table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px;">
+     *     <tr>
+     *         <td>HTTP Request</td>
+     *         <td><font style="color:green">{@code HTTP DELETE /api/areas/{areaId}/members/{userId} 204}</font><br>
+     *             <b>{areaId}</b> existing {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea} ID<br>
+     *             <b>{userId}</b> existing {@link User} ID
+     *             </td>
+     *     </tr>
+     *     <tr>
+     *         <td>Requires role</td>
+     *         <td><strong>ADMIN</strong></td>
+     *     </tr>
+     * </table>
+     *
+     * <p>The {@link User}  must belong to the same EatingArea as the {@link User}  whose credentials were submitted.</p>
+     *
+     * @param userId existing user ID
+     * @return ResponseEntity instance with the following values upon success:
      *  <ul>
      *      <li>HTTP Status 204 No_Content </li>
-     *  </ul>     */
-    @DeleteMapping("/{id}")
-    public ResponseEntity delete(@PathVariable String id) {
-        userService.delete(AuthorizedUser.get().getAreaId(), id);
+     *  </ul>
+     *  If the request fails:
+     *  <ul>
+     *      <li>HTTP Status 404 Not_Found is returned if a {@link User}  with the given ID does not exist
+     *      in the {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea}</li>
+     *  </ul>
+     *  */
+    @DeleteMapping("/{userId}")
+    public ResponseEntity delete(@PathVariable String userId) {
+        userService.delete(AuthorizedUser.get().getAreaId(), userId);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
     /**
-     * Activates/deactivates a user account. Expects a JSON body with fields {@code id, activated}
-     * @param userTo represents request parameters and must contain:
-     * <ul>
-     *   <li>{@code id} - existing user ID</li>
-*        <li>{@code activated} - boolean true/false</li>
-     * </ul>
+     * <p>Activates/deactivates a user account.</p>
+     *
+     * <table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px; padding:3px;">
+     *     <tr>
+     *         <td>HTTP Request</td>
+     *         <td><font style="color:green">{@code HTTP PUT /api/areas/{areaId}/members/{userId} 204}</font><br>
+     *             <b>{areaId}</b> existing {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea} ID<br>
+     *             <b>{userId}</b> existing {@link User} ID
+     *             </td>
+     *     </tr>
+     *     <tr>
+     *         <td>Required Parameters</td>
+     *         <td>{@code activated}</td>
+     *     </tr>
+     *     <tr>
+     *         <td>Requires role</td>
+     *         <td><strong>ADMIN</strong></td>
+     *     </tr>
+     * </table>
+     *
+     * <p>The {@link User}  must belong to the same EatingArea as the {@link User}  whose credentials were submitted.</p>
+     *
+     * @param userId  {@code true} to activate the account, {@code false} to deactivate the account
+     * @param activated  {@code true} to activate the account, {@code false} to deactivate the account
      * @return ResponseEntity instance with the following values upon successful completion of the request:
      *  <ul>
      *      <li>HTTP Status 204 No_Content </li>
      *  </ul>
+     *  If the request fails:
+     *  <ul>
+     *      <li>HTTP Status 404 Not_Found is returned if a {@link User}  with the given ID does not exist
+     *      in the {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea}</li>
+     *  </ul>
      */
-    @PutMapping("/activate")
-    public ResponseEntity activate(@RequestBody @Validated(UserTo.Activate.class) UserTo userTo) {
-        userService.activate(AuthorizedUser.get().getAreaId(), userTo.getId(), userTo.isActivated());
+    @PutMapping(value = "{/userId}", params = {"activated"}, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    public ResponseEntity activate(@PathVariable String userId, Boolean activated) {
+        String areaId = AuthorizedUser.get().getAreaId();
+        userService.activate(areaId, userId, activated);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
     /**
-     * Sets user rights for user account. Expects a JSON body with fields {@code id, roles}
-     * @param userTo represents request parameters and must contain:
+     * <p>Sets roles for a user account.</p>
+     *
+     * <table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px; padding:3px;">
+     *     <tr>
+     *         <td>HTTP Request</td>
+     *         <td><font style="color:green">{@code HTTP PUT /api/areas/{areaId}/members/{userId} 204}</font><br>
+     *             <b>{areaId}</b> existing {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea} ID<br>
+     *             <b>{userId}</b> existing {@link User} ID
+     *             </td>
+     *     </tr>
+     *     <tr>
+     *         <td>Required Parameters</td>
+     *         <td>{@code roles}</td>
+     *     </tr>
+     *     <tr>
+     *         <td>Requires role</td>
+     *         <td><strong>ADMIN</strong></td>
+     *     </tr>
+     * </table>
+     *
+     * <p>The {@link User} must belong to the same EatingArea as the {@link User}  whose credentials were submitted.</p>
+     *
+     * @param roles represents request parameters and must contain:
      * <ul>
-     *   <li>{@code id} - existing user ID</li>
- *       <li>{@code roles} - JSON array of roles. Valid values are: ADMIN, VOTER</li>
+     *   <li>{@code userId}  existing user ID</li>
+ *       <li>{@code roles}  comma-separated list of values. Valid values are: ADMIN, VOTER</li>
      * </ul>
      * @return ResponseEntity instance with the following values upon successful completion of the request:
+     *  If the request fails:
      *  <ul>
-     *      <li>HTTP Status 204 No_Content </li>
+     *      <li>HTTP Status 404 Not_Found is returned if a {@link User}  with the given ID does not exist
+     *      in the {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea}</li>
      *  </ul>
      */
-    @PutMapping("/roles")
-    public ResponseEntity setRoles(@RequestBody @Validated(UserTo.Roles.class) UserTo userTo) {
-        userService.setRoles(AuthorizedUser.get().getAreaId(), userTo.getId(), userTo.getRoles());
+    @PutMapping(value = "/{userId}", params = {"roles"}, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    public ResponseEntity setRoles(@PathVariable String userId, UserRole[] roles) {
+        String areaId = AuthorizedUser.get().getAreaId();
+        userService.setRoles(areaId, userId, Sets.newHashSet(roles));
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 }

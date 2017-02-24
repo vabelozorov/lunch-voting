@@ -9,6 +9,8 @@ import ua.belozorov.lunchvoting.config.WebConfig;
 import ua.belozorov.lunchvoting.config.WebSecurityConfig;
 
 /**
+ * Application Initializer class
+ *
  * Created by vabelozorov on 14.11.16.
  */
 

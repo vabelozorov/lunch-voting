@@ -5,9 +5,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ContextConfiguration;
 import ua.belozorov.*;
-import ua.belozorov.lunchvoting.mocks.ServicesTestConfig;
 import ua.belozorov.lunchvoting.model.voting.polling.LunchPlacePoll;
 import ua.belozorov.lunchvoting.model.voting.polling.PollItem;
 import ua.belozorov.lunchvoting.model.voting.polling.TimeConstraint;
@@ -26,8 +24,8 @@ import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static ua.belozorov.lunchvoting.DateTimeFormatters.WEB_DATE_FORMATTER;
-import static ua.belozorov.lunchvoting.DateTimeFormatters.WEB_DATE_TIME_FORMATTER;
+import static ua.belozorov.lunchvoting.DateTimeFormatters.DATE_FORMATTER;
+import static ua.belozorov.lunchvoting.DateTimeFormatters.DATE_TIME_FORMATTER;
 
 /**
  * <h2></h2>
@@ -58,7 +56,7 @@ public class PollControllerTest extends AbstractControllerTest {
         );
         this.converter = new SimpleObjectToMapConverter<>(
                 new FieldMappingEntry<>("id", PollTo::getId),
-                new FieldMappingEntry<>("menuDate", to -> to.getMenuDate().format(WEB_DATE_FORMATTER)),
+                new FieldMappingEntry<>("menuDate", to -> to.getMenuDate().format(DATE_FORMATTER)),
                 new ObjectMappingEntry<>("timeConstraint", PollTo::getTimeConstraint, timeConstraintConverter),
                 new CollectionMappingEntry<>("pollItems", PollTo::getPollItems, pollItemConverter)
         );
@@ -114,8 +112,8 @@ public class PollControllerTest extends AbstractControllerTest {
 
     @Test
     public void testGetPollsByActivePeriod() throws Exception {
-        String start = NOW_DATE_TIME.minusDays(2).format(WEB_DATE_TIME_FORMATTER);
-        String end = NOW_DATE_TIME.format(WEB_DATE_TIME_FORMATTER);
+        String start = NOW_DATE_TIME.minusDays(2).format(DATE_TIME_FORMATTER);
+        String end = NOW_DATE_TIME.format(DATE_TIME_FORMATTER);
 
         List<LunchPlacePoll> polls = Stream.of(
                     testPolls.getPastPoll(),

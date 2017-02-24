@@ -23,19 +23,20 @@ import java.util.Set;
 @Getter
 @Setter
 public final class UserTo {
-    @NotBlank(groups = {Update.class, Activate.class, Roles.class})
+    @NotBlank(groups = {Roles.class})
     @SafeHtml
     private String id;
 
     @NotBlank(groups = {Create.class, Update.class})
     @SafeHtml
+    @Size(min = 2, max = 100)
     private String name;
 
     @Email(groups = {Create.class, Update.class})
     @NotBlank(groups = {Create.class, Update.class})
     private String email;
 
-    @Size(min = 6, groups = {Create.class, Update.class})
+    @Size(min = 6, max = 30, groups = {Create.class, Update.class})
     private String password;
 
     @Size(min = 1, groups = Roles.class)
@@ -44,7 +45,6 @@ public final class UserTo {
 
     private LocalDateTime registeredDate;
 
-    @NotNull(groups = Activate.class)
     @Getter(AccessLevel.NONE)
     private Boolean activated;
 

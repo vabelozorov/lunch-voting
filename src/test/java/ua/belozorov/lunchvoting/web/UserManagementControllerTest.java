@@ -49,10 +49,10 @@ public class UserManagementControllerTest extends AbstractControllerTest {
 
     @Test
     public void testUpdate() throws Exception {
-        UserTo userTo = new UserTo(VOTER_ID, VOTER.getName(), "newEmail@email.com", "newPassword");
+        UserTo userTo = new UserTo(VOTER.getName(), "newEmail@email.com", "newPassword");
 
         mockMvc.perform(
-                put(REST_URL, testAreas.getFirstAreaId())
+                put(REST_URL + "/{userId}", testAreas.getFirstAreaId(), VOTER_ID)
                 .content(jsonUtils.toJson(userTo))
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(god())
@@ -139,7 +139,7 @@ public class UserManagementControllerTest extends AbstractControllerTest {
         mockMvc.perform(
                 put(REST_URL  + "/activate", testAreas.getFirstAreaId())
                 .content(jsonUtils.toJson(map))
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .with(god())
                 .with(csrf())
         )
@@ -153,14 +153,12 @@ public class UserManagementControllerTest extends AbstractControllerTest {
         Set<UserRole> expectedRoles = new HashSet<>();
         expectedRoles.add(UserRole.VOTER);
         expectedRoles.add(UserRole.ADMIN);
+        String rolesString = expectedRoles.stream().map(UserRole::name).collect(Collectors.joining(","));
 
-        Map<String, Object> map = new HashMap<>();
-        map.put("id", VOTER_ID);
-        map.put("roles", expectedRoles);
         mockMvc.perform(
-                put(REST_URL + "/roles", testAreas.getFirstAreaId())
-                .content(jsonUtils.toJson(map))
-                .contentType(MediaType.APPLICATION_JSON)
+                put(REST_URL + "/{id}", testAreas.getFirstAreaId(), VOTER_ID)
+                .param("roles", rolesString)
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .with(god())
                 .with(csrf())
         )

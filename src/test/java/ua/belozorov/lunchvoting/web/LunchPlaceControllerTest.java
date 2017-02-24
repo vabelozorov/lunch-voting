@@ -6,12 +6,10 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MvcResult;
 import ua.belozorov.lunchvoting.DateTimeFormatters;
 import ua.belozorov.lunchvoting.exceptions.DuplicateDataException;
 import ua.belozorov.lunchvoting.exceptions.NotFoundException;
-import ua.belozorov.lunchvoting.mocks.ServicesTestConfig;
 import ua.belozorov.lunchvoting.model.lunchplace.LunchPlace;
 import ua.belozorov.lunchvoting.model.lunchplace.Menu;
 import ua.belozorov.lunchvoting.service.lunchplace.LunchPlaceService;
@@ -159,7 +157,7 @@ public class LunchPlaceControllerTest extends AbstractControllerTest {
         String actualJson = mockMvc
                 .perform(
                         get(REST_URL + "/{id}", areaId, PLACE4_ID)
-                        .param("startDate", NOW_DATE.format(DateTimeFormatters.WEB_DATE_FORMATTER))
+                        .param("startDate", NOW_DATE.format(DateTimeFormatters.DATE_FORMATTER))
                         .param("fields", "menus")
                         .with(voter())
                 )
@@ -222,8 +220,8 @@ public class LunchPlaceControllerTest extends AbstractControllerTest {
                         get(REST_URL, areaId)
                         .param("ids", PLACE3_ID + "," + PLACE4_ID)
                         .param("fields", "menus, name")
-                        .param("startDate", NOW_DATE.minusDays(2).format(DateTimeFormatters.WEB_DATE_FORMATTER))
-                        .param("endDate", NOW_DATE.minusDays(1).format(DateTimeFormatters.WEB_DATE_FORMATTER))
+                        .param("startDate", NOW_DATE.minusDays(2).format(DateTimeFormatters.DATE_FORMATTER))
+                        .param("endDate", NOW_DATE.minusDays(1).format(DateTimeFormatters.DATE_FORMATTER))
                         .with(voter())
                 )
                 .andExpect(status().isOk())
@@ -318,8 +316,8 @@ public class LunchPlaceControllerTest extends AbstractControllerTest {
                         get(REST_URL, areaId)
                         .param("ids", PLACE3_ID + "," + "I_DO_NOT_EXIST")
                         .param("fields", "menus, name")
-                        .param("startDate", LocalDate.now().minusDays(2).format(DateTimeFormatters.WEB_DATE_FORMATTER))
-                        .param("endDate", LocalDate.now().minusDays(1).format(DateTimeFormatters.WEB_DATE_FORMATTER))
+                        .param("startDate", LocalDate.now().minusDays(2).format(DateTimeFormatters.DATE_FORMATTER))
+                        .param("endDate", LocalDate.now().minusDays(1).format(DateTimeFormatters.DATE_FORMATTER))
                         .with(voter())
                 )
                 .andExpect(status().isNotFound())

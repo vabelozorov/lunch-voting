@@ -15,6 +15,7 @@ import ua.belozorov.lunchvoting.service.user.UserProfileService;
 import ua.belozorov.lunchvoting.to.UserTo;
 import ua.belozorov.lunchvoting.util.ExceptionUtils;
 import ua.belozorov.lunchvoting.web.exceptionhandling.ErrorCode;
+import ua.belozorov.lunchvoting.web.security.AuthorizedUser;
 import ua.belozorov.lunchvoting.web.security.InSecure;
 import ua.belozorov.lunchvoting.web.security.IsAdminOrVoter;
 
@@ -23,7 +24,7 @@ import java.net.URI;
 import static ua.belozorov.lunchvoting.util.ControllerUtils.toMap;
 
 /**
- * <h2><A controller that manages user requests about updating his/her own profile/h2>
+ * A controller that manages user requests about updating user's own profile.
  *
  * @author vabelozorov on 15.11.16.
  */
@@ -39,16 +40,53 @@ public class UserProfileController {
     }
 
     /**
-     * Creates a new User object via a HTTP POST request. Three non-empty parameters must be present in the request:
-     * {@code name, password, email}. Other parameters are ignored.
+     * <p>Registers a new {@link User}.</p>
+     *
+     * <table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px; padding:3px;">
+     *     <tr>
+     *         <td>HTTP Request</td>
+     *         <td><font style="color:green">{@code HTTP POST /api/profile/ 201}</font><br></td>
+     *     </tr>
+     *     <tr>
+     *         <td>Content-Type</td>
+     *         <td>{@code application/json}</td>
+     *     </tr>
+     *     <tr>
+     *         <td>Required Parameters</td>
+     *         <td><code>name<br>email<br>password<br></code></td>
+     *     </tr>
+     *     <tr>
+     *         <td>Requires role</td>
+     *         <td>does not require</td>
+     *     </tr>
+     * </table>
+     *
+     * <p>The {@link User}  must belong to the same {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea}
+     * as the {@link User} whose credentials were submitted.<br>
+     * Content of the request must a JSON object and {@code Content-Type} must be set to {@code application/json}
+     *
+     * </p>
+     * Three non-empty parameters must be present in the JSON object:
+     * <ul>
+     *  <li><strong>name</strong>  new name of the User, must be between 2 and 100 characters long</li>
+     *  <li><strong> password</strong>  new password of the User, must be between 6 and 30 characters long</li>
+     *  <li><strong>email</strong>  new email of the User. The application enforces a unique contraint on this value and
+     *  {@code DuplicateDataException} is thrown if value happens to be not unique</li>
+     * </ul>
+     * Other parameters are ignored.
+     *
      * @param userTo represents request parameters and must contain non-empty {@code name, password, email} fields
-     * @return ResponseEntity instance with the following values upon successful completion of the request:
+     * @return ResponseEntity instance with the following values upon success:
      *  <ul>
-     *      <li>HTTP Status 201 Created </li>
-     *      <li>URL to access the created object in HTTP Location Header</li>
-     *      <li>ID of created object in JSON format {"id" : <ID>}</li>
+     *      <li>An HTTP Status 201 Created </li>
+     *      <li>A URL to access the created object in HTTP Location Header</li>
+     *      <li>A JSON object with a field {@code id} containing the ID of the newly created {@code User}</li>
      *  </ul>
-     *  @throws DuplicateDataException if a provided email already exists in the database
+     *  If the request fails:
+     *  <ul>
+     *      <li>HTTP Status 400 Bad_Syntax is returned if parameter validation fails</li>
+     *      <li>HTTP Status 409 Conflict is returned if the submitted email value is not unique</li>
+     *  </ul>
      */
     @PostMapping
     @InSecure
@@ -63,12 +101,62 @@ public class UserProfileController {
         return ResponseEntity.created(uri).body(toMap("id", created.getId()));
     }
 
-    @PutMapping
+    /**
+     * <p>Updates an existing {@link User}.</p>
+     *
+     * <table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px; padding:3px;">
+     *     <tr>
+     *         <td>HTTP Request</td>
+     *         <td><font style="color:green">{@code HTTP PUT /api/profile/{userId} 204}</font><br>
+     *             <b>{userId}</b> existing {@link User} ID
+     *         </td>
+     *     </tr>
+     *     <tr>
+     *         <td>Content-Type</td>
+     *         <td>{@code application/json}</td>
+     *     </tr>
+     *     <tr>
+     *         <td>Required Parameters</td>
+     *         <td><code>name<br>email<br>password<br></code></td>
+     *     </tr>
+     *     <tr>
+     *         <td>Requires role</td>
+     *         <td>any authenticated user</td>
+     *     </tr>
+     * </table>
+     *
+     * <p>Content of the request must a JSON object and {@code Content-Type} must be set to {@code application/json}</p>
+     * Three non-empty parameters must be present in the JSON object:
+     *
+     * <ul>
+     *  <li><strong>name</strong>  new name of the User, must be between 2 and 100 characters long</li>
+     *  <li><strong> password</strong>  new password of the User, must be between 6 and 30 characters long</li>
+     *  <li><strong>email</strong>  new email of the User. The application enforces a unique contraint on this value and
+     *  {@code DuplicateDataException} is thrown if value happens to be not unique</li>
+     * </ul>
+     * Other parameters are ignored.
+     *
+     * If a certain {@link User}  property is not changed, its old value should be included in the request.
+     * @param userId  existing {@link User} ID
+     * @param userTo  represents request parameters and must contain non-empty {@code name, password, email} fields
+     * @return ResponseEntity instance with the following values upon success:
+     *  <ul>
+     *      <li>HTTP Status 204 No_Content</li>
+     *  </ul>
+     *  If the request fails:
+     *  <ul>
+     *      <li>HTTP Status 400 Bad_Syntax is returned if parameter validation fails</li>
+     *      <li>HTTP Status 409 Conflict is returned if the submitted email value is not unique</li>
+     *      <li>HTTP Status 404 Not_Found is returned if a {@link User}  with the given ID does not exist</li>
+     *  </ul>
+     */
+    @PutMapping("/{userId}")
     @IsAdminOrVoter
-    public ResponseEntity update(@RequestBody @Validated(UserTo.Update.class)UserTo userTo) {
+    public ResponseEntity update(@PathVariable String userId,
+                                 @RequestBody @Validated(UserTo.Update.class)UserTo userTo) {
         ExceptionUtils.executeAndUnwrapException(
                 () -> {
-                    profileService.updateMainInfo(userTo.getId(), userTo.getName(), userTo.getEmail(), userTo.getPassword());
+                    profileService.updateMainInfo(userId, userTo.getName(), userTo.getEmail(), userTo.getPassword());
                     return  null;
                 },
                 DataIntegrityViolationException.class,
@@ -77,10 +165,30 @@ public class UserProfileController {
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
-    @GetMapping("/{id}")
+    /**
+     * <p>Retrieves an authenticated {@link User}</p>
+     *
+     * <table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px;">
+     *     <tr>
+     *         <td>HTTP Request</td>
+     *         <td><font style="color:green">{@code HTTP GET /api/profile 200}</font><br>
+     *             </td>
+     *     </tr>
+     *     <tr>
+     *         <td>Requires role</td>
+     *         <td>any authenticated user</td>
+     *     </tr>
+     * </table>
+     *
+     * @return ResponseEntity instance with the following values upon success:
+     *  <ul>
+     *      <li>HTTP Status 200 Ok </li>
+     *      <li>JSON object with fields {@code userId, name, email, roles, registeredDate, activated} </li>
+     *  </ul>
+     *  */
+    @GetMapping
     @IsAdminOrVoter
-    public ResponseEntity<UserTo> get(@PathVariable String id) {
-        User user = profileService.get(id);
-        return new ResponseEntity<>(new UserTo(user), HttpStatus.OK);
+    public ResponseEntity<UserTo> get() {
+        return new ResponseEntity<>(new UserTo(AuthorizedUser.get()), HttpStatus.OK);
     }
 }

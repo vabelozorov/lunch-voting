@@ -6,11 +6,9 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MvcResult;
 import ua.belozorov.*;
 import ua.belozorov.lunchvoting.exceptions.DuplicateDataException;
-import ua.belozorov.lunchvoting.mocks.ServicesTestConfig;
 import ua.belozorov.lunchvoting.model.lunchplace.LunchPlace;
 import ua.belozorov.lunchvoting.service.user.UserService;
 import ua.belozorov.lunchvoting.to.AreaTo;
@@ -39,7 +37,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static ua.belozorov.lunchvoting.DateTimeFormatters.WEB_DATE_FORMATTER;
+import static ua.belozorov.lunchvoting.DateTimeFormatters.DATE_FORMATTER;
 import static ua.belozorov.lunchvoting.model.UserTestData.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
 
@@ -79,7 +77,7 @@ public class EatingAreaControllerTest extends AbstractControllerTest {
         );
         this.converter = new SimpleObjectToMapConverter<>(
                 new FieldMappingEntry<>("id", PollTo::getId),
-                new FieldMappingEntry<>("menuDate", to -> to.getMenuDate().format(WEB_DATE_FORMATTER)),
+                new FieldMappingEntry<>("menuDate", to -> to.getMenuDate().format(DATE_FORMATTER)),
                 new ObjectMappingEntry<>("timeConstraint", PollTo::getTimeConstraint, timeConstraintConverter),
                 new CollectionMappingEntry<>("pollItems", PollTo::getPollItems, pollItemConverter)
         );
@@ -295,7 +293,7 @@ public class EatingAreaControllerTest extends AbstractControllerTest {
 
     @Test
     public void testCreatePollForMenuDate() throws Exception {
-        String date = NOW_DATE.plusDays(2).format(WEB_DATE_FORMATTER);
+        String date = NOW_DATE.plusDays(2).format(DATE_FORMATTER);
 
         when(areaService.createPollInArea(areaId, NOW_DATE.plusDays(2))).thenReturn(testPolls.getFuturePoll());
 

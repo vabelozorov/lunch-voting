@@ -15,10 +15,6 @@ import ua.belozorov.lunchvoting.util.SecurityEnforcerBeanFactoryPostProcessor;
 @Import({JpaConfig.class, InitDatabaseConfig.class, DataSourceConfig.class})
 public class RootConfig {
 
-    public RootConfig() {
-        System.out.println("I am root");
-    }
-
     @Bean
     public static BeanFactoryPostProcessor securityEnforcer() {
         return new SecurityEnforcerBeanFactoryPostProcessor();

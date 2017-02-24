@@ -72,10 +72,10 @@ public class UserProfileControllerTest extends AbstractControllerTest {
 
     @Test
     public void testUpdate() throws Exception {
-        UserTo userTo = new UserTo(VOTER_ID, VOTER.getName(), "newEmail@email.com", "newPassword");
+        UserTo userTo = new UserTo(VOTER.getName(), "newEmail@email.com", "newPassword");
 
         mockMvc.perform(
-                put(REST_URL)
+                put(REST_URL + "/{userId}", VOTER_ID)
                 .content(jsonUtils.toJson(userTo))
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(csrf())
