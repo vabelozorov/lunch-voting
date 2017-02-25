@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
  * <h2></h2>
  * @param <I> represents grouping item (key)
  *
- * @author vabelozorov on 29.11.16.
+ * Created on 29.11.16.
  */
 public class PollVoteResult<I> implements VotingResult<I> {
     private final LunchPlacePoll poll;

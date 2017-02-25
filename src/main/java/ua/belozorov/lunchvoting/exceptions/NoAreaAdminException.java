@@ -5,7 +5,7 @@ import ua.belozorov.lunchvoting.web.exceptionhandling.ErrorCode;
 /**
  * <h2></h2>
  *
- * @author vabelozorov on 15.02.17.
+ * Created on 15.02.17.
  */
 public class NoAreaAdminException extends RuntimeException implements ApplicationException {
     private final ErrorCode code = ErrorCode.AREA_HAS_ONE_ADMIN;

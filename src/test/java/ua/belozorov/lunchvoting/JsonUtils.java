@@ -19,7 +19,7 @@ import java.util.Map;
 /**
  * <h2></h2>
  *
- * @author vabelozorov on 18.11.16.
+ * Created on 18.11.16.
  */
 public class JsonUtils {
     private ObjectMapper mapper;

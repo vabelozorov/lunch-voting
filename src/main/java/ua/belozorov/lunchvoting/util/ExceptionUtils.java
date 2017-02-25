@@ -9,7 +9,7 @@ import static java.util.Optional.ofNullable;
 /**
  * Provides several helper methods to deal with exceptions.
  *
- * @author vabelozorov on 12.01.17.
+ * Created on 12.01.17.
  */
 public final class ExceptionUtils {
     public static final Object NOT_CHECK = new Object();

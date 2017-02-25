@@ -19,7 +19,7 @@ import java.util.Properties;
 /**
  * <h2></h2>
  *
- * @author vabelozorov on 16.11.16.
+ * Created on 16.11.16.
  */
 @Configuration
 @EnableJpaRepositories(basePackages = "ua.belozorov.lunchvoting.repository", considerNestedRepositories = true)

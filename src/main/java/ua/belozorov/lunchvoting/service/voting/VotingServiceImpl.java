@@ -22,7 +22,7 @@ import static java.util.Optional.ofNullable;
 /**
  * <h2></h2>
  *
- * @author vabelozorov on 29.11.16.
+ * Created on 29.11.16.
  */
 @Service
 @Transactional(readOnly = true)

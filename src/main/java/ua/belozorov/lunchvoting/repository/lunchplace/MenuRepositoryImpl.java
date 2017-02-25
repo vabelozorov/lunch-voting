@@ -14,7 +14,7 @@ import static ua.belozorov.lunchvoting.util.Pair.pairOf;
 /**
  * <h2></h2>
  *
- * @author vabelozorov on 02.12.16.
+ * Created on 02.12.16.
  */
 @Repository
 public class MenuRepositoryImpl extends BaseRepository implements MenuRepository  {

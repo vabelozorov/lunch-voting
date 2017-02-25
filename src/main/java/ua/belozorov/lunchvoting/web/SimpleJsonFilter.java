@@ -11,7 +11,7 @@ import java.util.Set;
 /**
  * <h2></h2>
  *
- * @author vabelozorov on 02.02.17.
+ * Created on 02.02.17.
  */
 @Component("simpleJsonFilter")
 public class SimpleJsonFilter implements JsonFilter {

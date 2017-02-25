@@ -25,7 +25,7 @@ import static ua.belozorov.lunchvoting.model.UserTestData.A2_USERS;
 /**
  * <h2></h2>
  *
- * @author vabelozorov on 09.02.17.
+ * Created on 09.02.17.
  */
 @Getter
 public final class AreaTestData {

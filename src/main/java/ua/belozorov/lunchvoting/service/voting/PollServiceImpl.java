@@ -17,9 +17,8 @@ import java.util.List;
 import static java.util.Optional.ofNullable;
 
 /**
- * <h2></h2>
  *
- * @author vabelozorov on 01.02.17.
+ * Created on 01.02.17.
  */
 @Transactional(readOnly = true)
 @Service
@@ -63,6 +62,8 @@ public final class PollServiceImpl implements PollService {
 
     @Override
     public List<LunchPlacePoll> getPollsByActivePeriod(String areaId, LocalDateTime startDt, LocalDateTime endDt) {
+        startDt = startDt == null ? LocalDateTime.of(1900, 1, 1, 0, 0) : startDt;
+        endDt = endDt == null ? LocalDateTime.of(7777, 1, 1, 0, 0) : endDt;
         return pollRepository.getPollByActivePeriod(areaId, startDt, endDt);
     }
 

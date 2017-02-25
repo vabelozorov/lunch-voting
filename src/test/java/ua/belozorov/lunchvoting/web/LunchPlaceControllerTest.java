@@ -31,9 +31,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
- * <h2></h2>
  *
- * @author vabelozorov on 25.11.16.
+ * Created on 25.11.16.
  */
 public class LunchPlaceControllerTest extends AbstractControllerTest {
     private static final String REST_URL = LunchPlaceController.REST_URL;
@@ -82,8 +81,9 @@ public class LunchPlaceControllerTest extends AbstractControllerTest {
                         put(REST_URL + "/{id}", areaId, PLACE4_ID)
                         .content(jsonUtils.toJson(to))
                         .contentType(MediaType.APPLICATION_JSON)
-                                .with(csrf())
-                                .with(god())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .with(csrf())
+                        .with(god())
                 )
                 .andExpect(status().isConflict()).andReturn();
         ErrorInfo errorInfo = new ErrorInfo(
@@ -105,6 +105,7 @@ public class LunchPlaceControllerTest extends AbstractControllerTest {
         String actualJson = mockMvc
                 .perform(
                         get(REST_URL + "/{id}", areaId, PLACE4_ID)
+                        .accept(MediaType.APPLICATION_JSON)
                         .with(voter())
                 )
                 .andExpect(status().isOk())
@@ -130,6 +131,7 @@ public class LunchPlaceControllerTest extends AbstractControllerTest {
                 .perform(
                         get(REST_URL + "/{id}", areaId, PLACE4_ID)
                         .param("fields", "name,description,menus")
+                        .accept(MediaType.APPLICATION_JSON)
                         .with(voter())
                 )
                 .andExpect(status().isOk())
@@ -159,6 +161,7 @@ public class LunchPlaceControllerTest extends AbstractControllerTest {
                         get(REST_URL + "/{id}", areaId, PLACE4_ID)
                         .param("startDate", NOW_DATE.format(DateTimeFormatters.DATE_FORMATTER))
                         .param("fields", "menus")
+                        .accept(MediaType.APPLICATION_JSON)
                         .with(voter())
                 )
                 .andExpect(status().isOk())
@@ -187,6 +190,7 @@ public class LunchPlaceControllerTest extends AbstractControllerTest {
                 .perform(
                         get(REST_URL, areaId)
                         .param("ids", PLACE3_ID + "," + PLACE4_ID)
+                        .accept(MediaType.APPLICATION_JSON)
                         .with(voter())
                 )
                 .andExpect(status().isOk())
@@ -222,6 +226,7 @@ public class LunchPlaceControllerTest extends AbstractControllerTest {
                         .param("fields", "menus, name")
                         .param("startDate", NOW_DATE.minusDays(2).format(DateTimeFormatters.DATE_FORMATTER))
                         .param("endDate", NOW_DATE.minusDays(1).format(DateTimeFormatters.DATE_FORMATTER))
+                        .accept(MediaType.APPLICATION_JSON)
                         .with(voter())
                 )
                 .andExpect(status().isOk())
@@ -256,6 +261,7 @@ public class LunchPlaceControllerTest extends AbstractControllerTest {
         String actualJson = mockMvc
                 .perform(
                         get(REST_URL, areaId)
+                        .accept(MediaType.APPLICATION_JSON)
                         .with(voter())
                 )
                 .andExpect(status().isOk())
@@ -287,6 +293,7 @@ public class LunchPlaceControllerTest extends AbstractControllerTest {
                 .perform(
                         get(REST_URL, areaId)
                         .param("fields", "name,description")
+                        .accept(MediaType.APPLICATION_JSON)
                         .with(voter())
         )
                 .andExpect(status().isOk())
@@ -318,6 +325,7 @@ public class LunchPlaceControllerTest extends AbstractControllerTest {
                         .param("fields", "menus, name")
                         .param("startDate", LocalDate.now().minusDays(2).format(DateTimeFormatters.DATE_FORMATTER))
                         .param("endDate", LocalDate.now().minusDays(1).format(DateTimeFormatters.DATE_FORMATTER))
+                        .accept(MediaType.APPLICATION_JSON)
                         .with(voter())
                 )
                 .andExpect(status().isNotFound())

@@ -1,5 +1,6 @@
 package ua.belozorov.lunchvoting.service.voting;
 
+import org.jetbrains.annotations.Nullable;
 import org.springframework.transaction.annotation.Transactional;
 import ua.belozorov.lunchvoting.model.voting.polling.LunchPlacePoll;
 import ua.belozorov.lunchvoting.model.voting.polling.TimeConstraint;
@@ -27,7 +28,7 @@ public interface PollService {
 
     List<LunchPlacePoll> getAll(String areaId);
 
-    List<LunchPlacePoll> getPollsByActivePeriod(String areaId, LocalDateTime startDt, LocalDateTime endDt);
+    List<LunchPlacePoll> getPollsByActivePeriod(String areaId, @Nullable LocalDateTime startDt, @Nullable LocalDateTime endDt);
 
     List<LunchPlacePoll> getPastPolls(String areaId);
 

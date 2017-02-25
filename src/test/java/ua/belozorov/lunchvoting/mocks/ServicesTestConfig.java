@@ -20,7 +20,7 @@ import static org.mockito.Mockito.mock;
 /**
  * <h2></h2>
  *
- * @author vabelozorov on 22.02.17.
+ * Created on 22.02.17.
  */
 @Configuration
 public class ServicesTestConfig {

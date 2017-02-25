@@ -34,7 +34,7 @@ import static ua.belozorov.lunchvoting.model.UserTestData.GOD_ID;
 /**
  * <h2>Base class for all tests that require Spring framework components</h2>
  *
- * @author vabelozorov on 14.01.17.
+ * Created on 14.01.17.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ActiveProfiles(SPRING_PROFILES.DB_PROXY)

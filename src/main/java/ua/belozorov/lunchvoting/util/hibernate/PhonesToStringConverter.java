@@ -15,7 +15,7 @@ import java.util.stream.Stream;
 /**
  * <h2></h2>
  *
- * @author vabelozorov on 12.12.16.
+ * Created on 12.12.16.
  */
 public class PhonesToStringConverter implements AttributeConverter<Set<String>, String> {
     @Override

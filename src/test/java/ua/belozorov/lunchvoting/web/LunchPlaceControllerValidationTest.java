@@ -21,7 +21,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 /**
  * <h2></h2>
  *
- * @author vabelozorov on 22.02.17.
+ * Created on 22.02.17.
  */
 public class LunchPlaceControllerValidationTest extends AbstractControllerTest {
     private static final String REST_URL = LunchPlaceController.REST_URL;

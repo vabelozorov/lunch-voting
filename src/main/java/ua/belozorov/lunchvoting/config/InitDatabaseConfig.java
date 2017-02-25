@@ -15,7 +15,7 @@ import javax.sql.DataSource;
 /**
  * <h2></h2>
  *
- * @author vabelozorov on 16.11.16.
+ * Created on 16.11.16.
  */
 @Configuration
 @Profile(SPRING_PROFILES.DEVELOPMENT)

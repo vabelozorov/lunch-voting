@@ -11,7 +11,7 @@ import java.io.IOException;
 /**
  * <h2></h2>
  *
- * @author vabelozorov on 19.02.17.
+ * Created on 19.02.17.
  */
 @Component( "restAuthenticationEntryPoint" )
 public class RestAuthenticationEntryPoint

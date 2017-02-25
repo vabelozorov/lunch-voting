@@ -15,7 +15,7 @@ import java.util.Set;
 /**
  * <h2></h2>
  *
- * @author vabelozorov on 26.11.16.
+ * Created on 26.11.16.
  */
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED, force = true)

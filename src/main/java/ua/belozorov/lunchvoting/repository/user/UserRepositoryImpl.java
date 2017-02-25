@@ -19,7 +19,7 @@ import java.util.Optional;
 /**
  * <h2></h2>
  *
- * @author vabelozorov on 16.11.16.
+ * Created on 16.11.16.
  */
 @Repository
 public class UserRepositoryImpl extends BaseRepository implements UserRepository {
@@ -69,7 +69,7 @@ public class UserRepositoryImpl extends BaseRepository implements UserRepository
     /**
      * <h2></h2>
      *
-     * @author vabelozorov on 16.11.16.
+     * Created on 16.11.16.
      */
     public interface CrudUserRepository extends JpaRepository<User, String> {
 

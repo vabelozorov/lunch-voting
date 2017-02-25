@@ -6,7 +6,7 @@ import ua.belozorov.lunchvoting.web.exceptionhandling.ErrorCode;
 /**
  * <h2></h2>
  *
- * @author vabelozorov on 07.02.17.
+ * Created on 07.02.17.
  */
 public class DuplicateDataException extends RuntimeException implements ApplicationException{
     private final ErrorCode code;

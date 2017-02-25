@@ -16,9 +16,8 @@ import javax.persistence.Table;
 import java.util.*;
 
 /**
- * <h2></h2>
  *
- * @author vabelozorov on 15.11.16.
+ * Created on 15.11.16.
  */
 @Entity
 @Table(name = "places")

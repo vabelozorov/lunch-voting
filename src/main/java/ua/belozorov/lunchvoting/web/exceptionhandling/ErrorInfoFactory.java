@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 /**
  * <h2></h2>
  *
- * @author vabelozorov on 17.02.17.
+ * Created on 17.02.17.
  */
 public class ErrorInfoFactory {
 

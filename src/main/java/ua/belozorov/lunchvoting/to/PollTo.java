@@ -9,9 +9,8 @@ import java.time.LocalDate;
 import java.util.List;
 
 /**
- * <h2></h2>
  *
- * @author vabelozorov on 31.01.17.
+ * Created on 31.01.17.
  */
 @Getter
 public final class PollTo {

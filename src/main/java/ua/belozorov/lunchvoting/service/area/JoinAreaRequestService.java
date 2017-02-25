@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * <h2></h2>
  *
- * @author vabelozorov on 15.02.17.
+ * Created on 15.02.17.
  */
 public interface JoinAreaRequestService {
 

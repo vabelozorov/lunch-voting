@@ -7,7 +7,7 @@ import java.util.Set;
 /**
  * <h2></h2>
  *
- * @author vabelozorov on 19.01.17.
+ * Created on 19.01.17.
  */
 public class ContinueCheckDecision implements VotePolicyDecision {
     @Override

@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 /**
  * <h2></h2>
  *
- * @author vabelozorov on 05.02.17.
+ * Created on 05.02.17.
  */
 public final class CountPerItemTo {
     private final String pollId;

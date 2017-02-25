@@ -25,7 +25,7 @@ import java.util.Optional;
  *     <li>During the process of retrieving the entity from a database, the JPA provider reflectively creates a empty entity which has all traits of a new entity
  *     Then the provider invokes {@code setId} method and replaces a the entity's id for its actual id from a database</li>
  * </ol>
- * @author vabelozorov on 09.10.16.
+ * Created on 09.10.16.
  * @see IdGenerator
  */
 @MappedSuperclass

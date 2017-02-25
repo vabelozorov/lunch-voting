@@ -27,7 +27,7 @@ import static ua.belozorov.lunchvoting.model.voting.polling.VoteTestData.VOTE_CO
 /**
  * <h2></h2>
  *
- * @author vabelozorov on 04.01.17.
+ * Created on 04.01.17.
  */
 @WithMockVoter
 public class VotingServiceImplTest extends AbstractServiceTest {

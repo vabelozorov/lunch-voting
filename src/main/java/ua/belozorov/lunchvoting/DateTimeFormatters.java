@@ -11,7 +11,7 @@ import java.util.Locale;
 /**
  * Provides a single date and datetime format for the whole application
  *
- * @author vabelozorov on 29.12.16.
+ * Created on 29.12.16.
  */
 public class DateTimeFormatters {
     public static final DateTimeFormatter DATE_FORMATTER =  DateTimeFormatter.ISO_LOCAL_DATE;

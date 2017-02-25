@@ -10,7 +10,7 @@ import java.util.Collection;
 /**
  * <h2></h2>
  *
- * @author vabelozorov on 17.11.16.
+ * Created on 17.11.16.
  */
 @ResponseStatus(code = HttpStatus.BAD_REQUEST)
 public class NotFoundException extends RuntimeException implements ApplicationException{

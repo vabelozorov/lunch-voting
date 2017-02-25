@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 /**
  * <h2></h2>
  *
- * @author vabelozorov on 09.02.17.
+ * Created on 09.02.17.
  */
 @Getter
 @Entity

@@ -29,7 +29,7 @@ import static ua.belozorov.lunchvoting.model.UserTestData.VOTER_ID;
 /**
  * <h2></h2>
  *
- * @author vabelozorov on 08.02.17.
+ * Created on 08.02.17.
  */
 public class UserProfileControllerTest extends AbstractControllerTest {
     public static final String REST_URL = UserProfileController.REST_URL;

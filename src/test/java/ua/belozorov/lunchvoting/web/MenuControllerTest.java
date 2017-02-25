@@ -30,7 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 /**
  * <h2></h2>
  *
- * @author vabelozorov on 26.11.16.
+ * Created on 26.11.16.
  */
 public class MenuControllerTest extends AbstractControllerTest {
     public static final String REST_URL = MenuController.REST_URL;

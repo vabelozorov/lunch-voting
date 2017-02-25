@@ -15,7 +15,7 @@ import static org.junit.Assert.*;
 /**
  * <h2></h2>
  *
- * @author vabelozorov on 09.12.16.
+ * Created on 09.12.16.
  */
 public class TimeConstraintTest extends AbstractTest{
 

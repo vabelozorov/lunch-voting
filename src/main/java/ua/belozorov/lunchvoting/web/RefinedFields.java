@@ -3,10 +3,10 @@ package ua.belozorov.lunchvoting.web;
 import java.util.Set;
 
 /**
- * Given a set of object fields that a user wishes to include in JSON response,
+ * Given a set of object fields that a user wishes to include in a JSON response,
  * an instance makes mandatory removal, addition or replacement of predefined fields
  *
- * @author vabelozorov on 31.12.16.
+ * Created on 31.12.16.
  */
 interface RefinedFields {
 

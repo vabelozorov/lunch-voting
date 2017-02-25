@@ -11,7 +11,7 @@ import ua.belozorov.lunchvoting.model.voting.polling.votedecisions.VotePolicyDec
  * If the voter hasn't voted for the poll before, the policy ends the checking sequence with accepting the vote,
  * otherwise the right to made a decision is passed to the next policy
  *
- * @author vabelozorov on 19.01.17.
+ * Created on 19.01.17.
  */
 public class AcceptPolicy implements VotePolicy {
 

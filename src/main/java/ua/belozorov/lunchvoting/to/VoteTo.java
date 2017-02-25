@@ -5,7 +5,7 @@ import ua.belozorov.lunchvoting.model.voting.polling.Vote;
 /**
  * <h2></h2>
  *
- * @author vabelozorov on 31.01.17.
+ * Created on 31.01.17.
  */
 public class VoteTo {
     private String id;

@@ -6,7 +6,7 @@ import ua.belozorov.lunchvoting.web.exceptionhandling.ErrorCode;
 /**
  * <h2></h2>
  *
- * @author vabelozorov on 18.02.17.
+ * Created on 18.02.17.
  */
 public class NoVotePolicyMatchException extends RuntimeException implements ApplicationException {
     private final ErrorCode code;

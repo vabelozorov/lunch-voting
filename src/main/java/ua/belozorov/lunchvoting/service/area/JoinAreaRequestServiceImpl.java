@@ -16,7 +16,7 @@ import static java.util.Optional.ofNullable;
 /**
  * <h2></h2>
  *
- * @author vabelozorov on 15.02.17.
+ * Created on 15.02.17.
  */
 @Service
 public final class JoinAreaRequestServiceImpl implements JoinAreaRequestService {

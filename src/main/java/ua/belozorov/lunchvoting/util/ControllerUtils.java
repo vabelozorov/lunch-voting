@@ -9,7 +9,7 @@ import java.util.function.Supplier;
 /**
  * <h2></h2>
  *
- * @author vabelozorov on 07.02.17.
+ * Created on 07.02.17.
  */
 public final class ControllerUtils {
     private ControllerUtils() {

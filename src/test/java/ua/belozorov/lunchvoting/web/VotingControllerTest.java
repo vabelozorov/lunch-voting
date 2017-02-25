@@ -25,7 +25,7 @@ import static ua.belozorov.lunchvoting.model.UserTestData.*;
 /**
  * <h2></h2>
  *
- * @author vabelozorov on 05.02.17.
+ * Created on 05.02.17.
  */
 public class VotingControllerTest extends AbstractControllerTest {
     public static final String REST_URL = VotingController.REST_URL;

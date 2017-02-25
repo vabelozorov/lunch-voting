@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * <h2></h2>
  *
- * @author vabelozorov on 08.02.17.
+ * Created on 08.02.17.
  */
 public interface EatingAreaRepository {
 

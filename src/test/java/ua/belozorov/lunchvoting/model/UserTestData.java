@@ -18,7 +18,7 @@ import static org.mockito.ArgumentMatchers.argThat;
 /**
  * <h2></h2>
  *
- * @author vabelozorov on 17.11.16.
+ * Created on 17.11.16.
  */
 @Getter
 public class UserTestData {

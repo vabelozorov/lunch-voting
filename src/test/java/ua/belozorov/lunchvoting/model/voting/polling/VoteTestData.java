@@ -13,7 +13,7 @@ import java.util.*;
 /**
  * <h2></h2>
  *
- * @author vabelozorov on 14.01.17.
+ * Created on 14.01.17.
  */
 @Getter
 public class VoteTestData {

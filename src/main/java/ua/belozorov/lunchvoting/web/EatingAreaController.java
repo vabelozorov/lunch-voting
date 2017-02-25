@@ -71,7 +71,7 @@ public class EatingAreaController {
      *         <td>{@code application/x-www-form-urlencoded}</td>
      *     </tr>
      *     <tr>
-     *         <td>Required Parameters</td>
+     *         <td>Required Request Parameters</td>
      *         <td>{@code name}</td>
      *     </tr>
      *     <tr>
@@ -127,7 +127,7 @@ public class EatingAreaController {
      *         <td>{@code application/json}</td>
      *     </tr>
      *     <tr>
-     *         <td>Required Parameters</td>
+     *         <td>Required Request Parameters</td>
      *         <td><code>name<br>email<br>password<br></code></td>
      *     </tr>
      *     <tr>
@@ -142,10 +142,9 @@ public class EatingAreaController {
      *
      * <p>The {@link User}  will be created in the same {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea}
      * as the {@link User} whose credentials were submitted.<br>
-     * Content of the request must a JSON object and {@code Content-Type} must be set to {@code application/json}
-     *
      * </p>
-     * Three non-empty parameters must be present in the JSON object:
+     *
+     *  Three non-empty parameters must be present in the JSON object:
      * <ul>
      *  <li><strong>name</strong>  name of the User, must be between 2 and 100 characters long</li>
      *  <li><strong> password</strong>  password of the User, must be between 6 and 30 characters long</li>
@@ -198,12 +197,12 @@ public class EatingAreaController {
      *         <td>{@code application/json}</td>
      *     </tr>
      *     <tr>
-     *         <td>Required Parameters</td>
+     *         <td>Required Request Parameters</td>
      *         <td>{@code name}</td>
      *     </tr>
      *     <tr>
      *         <td>Optional Parameters</td>
-     *         <td>{@code address, description, phones}</td>
+     *         <td>{@code address<br>description<br>phones}</td>
      *     </tr>
      *     <tr>
      *         <td>Requires role</td>
@@ -217,7 +216,7 @@ public class EatingAreaController {
      * The following parameters must be present in the JSON object:
      * <ul>
      *  <li><strong>name</strong>  name of a new {@link LunchPlace}, should not exist and must be between 2 and 50 characters long.
-     *  The application enforces a unique contraint on this value and
+     *  The application enforces a unique constraint on this value and
      *  {@code DuplicateDataException} is thrown if value happens to be not unique</li>
      *  <li><strong>address</strong>  address of the {@link LunchPlace}, must not exceed 200 characters, optional field</li>
      *  <li><strong>description</strong>  description of the {@link LunchPlace}, must not exceed 1000 characters, optional field</li>
@@ -270,7 +269,7 @@ public class EatingAreaController {
      *         <td>{@code application/x-www-form-urlencoded}</td>
      *     </tr>
      *     <tr>
-     *         <td>Required Parameters</td>
+     *         <td>Required Request Parameters</td>
      *         <td>none</td>
      *     </tr>
      *     <tr>
@@ -282,26 +281,15 @@ public class EatingAreaController {
      *         <td><strong>ADMIN</strong></td>
      *     </tr>
      * </table>
-     * <p>Items of the poll are LunchPlace objects with menus for given date or a current day, if not given.</p>
+     * <p>Items of the poll are LunchPlace objects with menus for given date or a current day,, if not given.</p>
      * <p>
-     *     The poll starts at <code>start</code> time or will be 09-00 of a current day.<br>
-     *     The poll ends at <code>end</code> time or will be 12-00 of a current day.<br>
-     *     The poll final time to change a vote is <code>change</code> time or will be 11-00 of a current day.
+     *     The poll starts at {@code start} time or will be 09-00 of a current day.<br>
+     *     The poll ends at {@code end} time or will be 12-00 of a current day.<br>
+     *     The poll final time to change a vote is {@code change} time or will be 11-00 of a current day.
      * </p>
      * <p>The {@link LunchPlacePoll} will be created in the same {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea}
      * as the {@link User} whose credentials were submitted.<br>
      * </p>
-     * @return ResponseEntity instance with the following values upon success:
-     *  <ul>
-     *      <li>HTTP Status 201 Created</li>
-     *      <li>A URL to access the created object in HTTP Location Header</li>
-     *      <li>A JSON object with a field {@code id} containing the ID of the newly created {@code LunchPlacePoll}</li>
-     *  </ul>
-     *  If the request fails:
-     *  <ul>
-     *      <li>HTTP Status 422 Unprocessable_Entity is returned
-     *      if the area does not contain LunchPlace objects with Menu for today</li>
-     *  </ul>
      * @param menuDate date of Menu which determines which LunchPlace objects will be added as items to the LunchPlacePoll
      *                 optional. Default value is 09-00 of a current day
      * @param start time when the poll starts, optional. Default value is 12-00 of a current day
@@ -351,7 +339,7 @@ public class EatingAreaController {
      *         <td>{@code application/x-www-form-urlencoded}</td>
      *     </tr>
      *     <tr>
-     *         <td>Required Parameters</td>
+     *         <td>Required Request Parameters</td>
      *         <td>{@code name}</td>
      *     </tr>
      *     <tr>
@@ -402,7 +390,7 @@ public class EatingAreaController {
      *         <td>none</td>
      *     </tr>
      *     <tr>
-     *         <td>Required Parameters</td>
+     *         <td>Required Request Parameters</td>
      *         <td>none</td>
      *     </tr>
      *     <tr>
@@ -416,7 +404,7 @@ public class EatingAreaController {
      * </table>
      *
      *
-     * @param id id of existing {@code EatingArea}
+     * @param id ID of existing {@code EatingArea}
      * @param summary true causes the summary information to be included into a response instead of IDs
      *                of {@link User}, {@link LunchPlacePoll} and {@link LunchPlace} objects. {@code true} means that IDs
      *                are included, but summary info is not.
@@ -443,7 +431,7 @@ public class EatingAreaController {
     }
 
     /**
-     * <p>Returns an EatingArea objects that start with a given parameter.</p>
+     * <p>Returns an EatingArea objects which name starts with a given string.</p>
      *
      * <table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px; padding:3px;">
      *     <tr>
@@ -457,7 +445,7 @@ public class EatingAreaController {
      *         <td>none</td>
      *     </tr>
      *     <tr>
-     *         <td>Required Parameters</td>
+     *         <td>Required Request Parameters</td>
      *         <td>{@code name}</td>
      *     </tr>
      *     <tr>
@@ -490,7 +478,7 @@ public class EatingAreaController {
     }
 
     /**
-     * <p>Deletes an EatingArea objects and all LunchPlace, LunchPlace poll objects that area associated with it.</p>
+     * <p>Deletes an EatingArea objects and all LunchPlace, LunchPlacePoll objects that area associated with it.</p>
      *
      * <table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px; padding:3px;">
      *     <tr>
@@ -504,7 +492,7 @@ public class EatingAreaController {
      *         <td>none</td>
      *     </tr>
      *     <tr>
-     *         <td>Required Parameters</td>
+     *         <td>Required Request Parameters</td>
      *         <td>none</td>
      *     </tr>
      *     <tr>

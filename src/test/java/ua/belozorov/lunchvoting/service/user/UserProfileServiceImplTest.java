@@ -15,7 +15,7 @@ import static ua.belozorov.lunchvoting.model.UserTestData.VOTER_ID;
 /**
  * <h2></h2>
  *
- * @author vabelozorov on 21.02.17.
+ * Created on 21.02.17.
  */
 @WithMockVoter
 public class UserProfileServiceImplTest extends AbstractServiceTest {

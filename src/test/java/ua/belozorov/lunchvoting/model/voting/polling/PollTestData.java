@@ -23,7 +23,7 @@ import static ua.belozorov.lunchvoting.model.UserTestData.VOTER_ID;
 /**
  * <h2></h2>
  *
- * @author vabelozorov on 11.12.16.
+ * Created on 11.12.16.
  */
 @Getter
 public class PollTestData {

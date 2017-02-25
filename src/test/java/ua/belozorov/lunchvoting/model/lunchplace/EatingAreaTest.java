@@ -9,7 +9,7 @@ import static ua.belozorov.lunchvoting.model.UserTestData.ALIEN_USER1;
 /**
  * <h2></h2>
  *
- * @author vabelozorov on 10.02.17.
+ * Created on 10.02.17.
  */
 public class EatingAreaTest extends AbstractTest {
 

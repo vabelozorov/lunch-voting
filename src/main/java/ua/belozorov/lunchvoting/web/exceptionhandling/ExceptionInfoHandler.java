@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 /**
  * <h2></h2>
  *
- * @author vabelozorov on 07.02.17.
+ * Created on 07.02.17.
  */
 @ControllerAdvice(annotations = RestController.class)
 public final class ExceptionInfoHandler {

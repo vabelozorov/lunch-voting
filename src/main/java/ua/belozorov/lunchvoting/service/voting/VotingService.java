@@ -13,7 +13,7 @@ import java.util.Set;
 /**
  * <h2></h2>
  *
- * @author vabelozorov on 29.11.16.
+ * Created on 29.11.16.
  */
 public interface VotingService {
 

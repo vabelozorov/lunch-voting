@@ -18,7 +18,7 @@ import static ua.belozorov.lunchvoting.model.UserTestData.VOTER_ID;
 /**
  * <h2></h2>
  *
- * @author vabelozorov on 09.12.16.
+ * Created on 09.12.16.
  */
 public class PollTest extends AbstractTest {
     private final List<LunchPlace> places = LunchPlaceTestData.getWithFilteredMenu(NOW_DATE, testPlaces.getPlace3(), testPlaces.getPlace4());

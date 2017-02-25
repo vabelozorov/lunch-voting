@@ -25,7 +25,7 @@ import static ua.belozorov.lunchvoting.model.voting.polling.PollTestData.*;
 /**
  * <h2></h2>
  *
- * @author vabelozorov on 03.02.17.
+ * Created on 03.02.17.
  */
 public class PollServiceTest extends AbstractServiceTest {
 
@@ -107,9 +107,9 @@ public class PollServiceTest extends AbstractServiceTest {
 
     @Test
     @WithMockVoter
-    public void getPollsByActivePeriod() throws Exception {
+    public void getPollsByActivePeriodWithStartEndSet() throws Exception {
         reset();
-        List<LunchPlacePoll> actual = pollService.getPollsByActivePeriod(areaId, NOW_DATE_TIME.minusDays(2), NOW_DATE_TIME);
+        List<LunchPlacePoll> actual = pollService.getPollsByActivePeriod(areaId, NOW_DATE_TIME.minusDays(2), null);
         assertSelect(1);
 
         List<LunchPlacePoll> expected = Stream.of(testPolls.getPastPoll(), testPolls.getActivePollNoUpdate(), testPolls.getActivePoll())
@@ -121,6 +121,26 @@ public class PollServiceTest extends AbstractServiceTest {
                 contains(matchCollection(expected, POLL_COMPARATOR_NO_ASSOC))
         );
     }
+
+    @Test
+    @WithMockVoter
+    public void getPollsByActivePeriodWithEndTimeNull() throws Exception {
+        reset();
+        List<LunchPlacePoll> actual = pollService.getPollsByActivePeriod(areaId,
+                null, NOW_DATE_TIME.withHour(0).minusHours(1));
+        assertSelect(1);
+
+        List<LunchPlacePoll> expected = Stream.of(testPolls.getPastPoll())
+                .sorted()
+                .collect(Collectors.toList());
+
+        assertThat(
+                actual,
+                contains(matchCollection(expected, POLL_COMPARATOR_NO_ASSOC))
+        );
+    }
+
+
 
     @Test
     @WithMockVoter

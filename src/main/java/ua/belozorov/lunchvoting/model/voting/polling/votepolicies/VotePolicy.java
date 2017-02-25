@@ -6,7 +6,7 @@ import ua.belozorov.lunchvoting.model.voting.polling.votedecisions.VotePolicyDec
 /**
  * <h2></h2>
  *
- * @author vabelozorov on 19.01.17.
+ * Created on 19.01.17.
  */
 public interface VotePolicy {
     VotePolicyDecision checkCompliance(VoteIntention intention);

@@ -10,7 +10,7 @@ import ua.belozorov.lunchvoting.service.user.UserServiceImpl;
 /**
  * <h2></h2>
  *
- * @author vabelozorov on 14.12.16.
+ * Created on 14.12.16.
  */
 @Configuration
 public class TestConfig {

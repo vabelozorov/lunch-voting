@@ -15,7 +15,7 @@ import java.util.function.Function;
 /**
  * <h2></h2>
  *
- * @author vabelozorov on 08.02.17.
+ * Created on 08.02.17.
  */
 @Repository
 public class EatingAreaRepositoryImpl extends BaseRepository implements EatingAreaRepository {

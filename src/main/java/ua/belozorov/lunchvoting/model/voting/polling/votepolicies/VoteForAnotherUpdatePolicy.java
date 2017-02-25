@@ -26,7 +26,7 @@ import java.util.function.Consumer;
  *     <li>A vote time is after poll start and before time threshold for updating a vote</li>
  *     <li>If VoteIntention has a set of votes that have been made earlier, the latest vote will be submitted for removal</li>
  * </ul>
- * @author vabelozorov on 19.01.17.
+ * Created on 19.01.17.
  */
 public final class VoteForAnotherUpdatePolicy implements VotePolicy {
 

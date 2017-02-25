@@ -31,7 +31,7 @@ import static ua.belozorov.lunchvoting.model.lunchplace.AreaTestData.REQUEST_COM
 /**
  * <h2></h2>
  *
- * @author vabelozorov on 15.02.17.
+ * Created on 15.02.17.
  */
 public class JoinAreaRequestServiceTest extends AbstractServiceTest {
 

@@ -16,7 +16,7 @@ import static ua.belozorov.lunchvoting.util.Pair.*;
 /**
  * <h2></h2>
  *
- * @author vabelozorov on 21.11.16.
+ * Created on 21.11.16.
  */
 
 //TODO make delete with area in one request

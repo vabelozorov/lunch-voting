@@ -8,7 +8,7 @@ import java.util.Map;
 /**
  * <h2></h2>
  * @param <I> classification item of VoteStatistics implementation
- * @author vabelozorov on 10.12.16.
+ * Created on 10.12.16.
  */
 public interface VotingResult<I> {
 

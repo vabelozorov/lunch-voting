@@ -11,7 +11,7 @@ import java.util.Set;
  * <p/>
  * {@code id} field is used to support the representation of a user roles set as a bitmask
  *
- * @author vabelozorov on 15.11.16.
+ * Created on 15.11.16.
  */
 public enum UserRole implements GrantedAuthority {
     VOTER((byte)1),

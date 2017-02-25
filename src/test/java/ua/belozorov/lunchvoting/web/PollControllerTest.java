@@ -30,7 +30,7 @@ import static ua.belozorov.lunchvoting.DateTimeFormatters.DATE_TIME_FORMATTER;
 /**
  * <h2></h2>
  *
- * @author vabelozorov on 04.02.17.
+ * Created on 04.02.17.
  */
 public class PollControllerTest extends AbstractControllerTest {
     private static final String REST_URL = PollController.REST_URL;

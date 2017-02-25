@@ -12,7 +12,7 @@ import ua.belozorov.lunchvoting.model.lunchplace.Menu;
 /**
  * <h2></h2>
  *
- * @author vabelozorov on 31.12.16.
+ * Created on 31.12.16.
  */
 @Component("lunchPlaceJsonFilter")
 class LunchPlaceJsonFilter extends SimpleJsonFilter {

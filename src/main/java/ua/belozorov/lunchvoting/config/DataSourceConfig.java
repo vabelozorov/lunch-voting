@@ -14,7 +14,7 @@ import javax.sql.DataSource;
 /**
  * <h2></h2>
  *
- * @author vabelozorov on 08.02.17.
+ * Created on 08.02.17.
  */
 @PropertySource("classpath:db/db-connection.properties")
 public class DataSourceConfig {

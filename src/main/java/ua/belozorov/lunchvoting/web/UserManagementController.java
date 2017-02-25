@@ -37,7 +37,7 @@ public class UserManagementController {
     /**
      * <p>Class constructor.</p>
      *
-     * @param userService   an instance which class implements {@link UserService} interface
+     * @param userService   an instance of a class which implements {@link UserService} interface
      */
     @Autowired
     public UserManagementController(UserService userService) {
@@ -60,8 +60,12 @@ public class UserManagementController {
      *         <td>{@code application/json}</td>
      *     </tr>
      *     <tr>
-     *         <td>Required Parameters</td>
+     *         <td>Required Request Parameters</td>
      *         <td><code>name<br>email<br>password<br></code></td>
+     *     </tr>
+     *     <tr>
+     *         <td>Optional Parameters</td>
+     *         <td>none</td>
      *     </tr>
      *     <tr>
      *         <td>Requires role</td>
@@ -71,13 +75,12 @@ public class UserManagementController {
      *
      * <p>The {@link User}  must belong to the same {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea}
      * as the {@link User} whose credentials were submitted.<br>
-     * Content of the request must a JSON object and {@code Content-Type} must be set to {@code application/json}
      * </p>
      * Three non-empty parameters must be present in the JSON object:
      * <ul>
      *  <li><strong>name</strong>  new name of the User, must be between 2 and 100 characters long</li>
      *  <li><strong> password</strong>  new password of the User, must be between 6 and 30 characters long</li>
-     *  <li><strong>email</strong>  new email of the User. The application enforces a unique contraint on this value and
+     *  <li><strong>email</strong>  new email of the User. The application enforces a unique constraint on this value and
      *  {@code DuplicateDataException} is thrown if value happens to be not unique</li>
      * </ul>
      * Other parameters are ignored.
@@ -98,7 +101,7 @@ public class UserManagementController {
      */
     @PutMapping(value = "/{userId}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity update(@PathVariable String userId, @RequestBody @Validated(UserTo.Update.class)UserTo userTo) {
-        String areaId = AuthorizedUser.get().getAreaId();
+        String areaId = AuthorizedUser.getAreaId();
         ExceptionUtils.executeAndUnwrapException(
                 () -> {
                     userService.updateMainInfo(areaId, userId, userTo.getName(), userTo.getEmail(), userTo.getPassword());
@@ -119,7 +122,19 @@ public class UserManagementController {
      *         <td><font style="color:green">{@code HTTP GET /api/areas/{areaId}/members/{userId} 200}</font><br>
      *             <b>{areaId}</b> existing {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea} ID<br>
      *             <b>{userId}</b> existing {@link User} ID
- *             </td>
+     *        </td>
+     *     </tr>
+     *     <tr>
+     *         <td>Content-Type</td>
+     *         <td>none</td>
+     *     </tr>
+     *     <tr>
+     *         <td>Required Request Parameters</td>
+     *         <td><none</td>
+     *     </tr>
+     *     <tr>
+     *         <td>Optional Parameters</td>
+     *         <td>none</td>
      *     </tr>
      *     <tr>
      *         <td>Requires role</td>
@@ -133,11 +148,11 @@ public class UserManagementController {
      * @return ResponseEntity instance with the following values upon success:
      *  <ul>
      *      <li>HTTP Status 200 Ok </li>
-     *      <li>JSON object with fields {@code userId, name, email, roles, registeredDate, activated} </li>
+     *      <li>JSON object with fields {@code userId, name, email, roles, registeredDate, activated, areaId} </li>
      *  </ul>
      *  If the request fails:
      *  <ul>
-     *      <li>HTTP Status 404 Not_Found is returned if a {@link User}  with the given ID does not exist<
+     *      <li>HTTP Status 404 Not_Found is returned if a {@link User} with the given ID does not exist<
      *      in the {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea}/li>
      *  </ul>
      *  */
@@ -153,9 +168,21 @@ public class UserManagementController {
      * <table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px;">
      *     <tr>
      *         <td>HTTP Request</td>
-     *         <td><font style="color:green">{@code HTTP GET /api/areas/{areaId}/members/ 200}</font><br>
+     *         <td><font style="color:green">{@code HTTP GET /api/areas/{areaId}/members 200}</font><br>
      *             <b>{areaId}</b> existing {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea} ID
      *             </td>
+     *     </tr>
+     *     <tr>
+     *         <td>Content-Type</td>
+     *         <td>none</td>
+     *     </tr>
+     *     <tr>
+     *         <td>Required Request Parameters</td>
+     *         <td><none</td>
+     *     </tr>
+     *     <tr>
+     *         <td>Optional Parameters</td>
+     *         <td>none</td>
      *     </tr>
      *     <tr>
      *         <td>Requires role</td>
@@ -163,11 +190,11 @@ public class UserManagementController {
      *     </tr>
      * </table>
      *
-     * <p>The {@link User}  must belong to the same EatingArea as the {@link User}  whose credentials were submitted.</p>
      * @return ResponseEntity instance with the following values upon success:
      *  <ul>
      *      <li>HTTP Status 200 Ok </li>
-     *      <li>JSON array where each object has fields {@code id, name, email, roles, registeredDate, activated} </li>
+     *      <li>JSON array where each object has fields {@code id, name, email, roles, registeredDate,
+     *      activated, areaId} </li>
      *  </ul>
      */
     @GetMapping
@@ -192,6 +219,18 @@ public class UserManagementController {
      *             </td>
      *     </tr>
      *     <tr>
+     *         <td>Content-Type</td>
+     *         <td>none</td>
+     *     </tr>
+     *     <tr>
+     *         <td>Required Request Parameters</td>
+     *         <td><none</td>
+     *     </tr>
+     *     <tr>
+     *         <td>Optional Parameters</td>
+     *         <td>none</td>
+     *     </tr>
+     *     <tr>
      *         <td>Requires role</td>
      *         <td><strong>ADMIN</strong></td>
      *     </tr>
@@ -206,7 +245,7 @@ public class UserManagementController {
      *  </ul>
      *  If the request fails:
      *  <ul>
-     *      <li>HTTP Status 404 Not_Found is returned if a {@link User}  with the given ID does not exist
+     *      <li>HTTP Status 404 Not_Found is returned if a {@link User} with the given ID does not exist
      *      in the {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea}</li>
      *  </ul>
      *  */
@@ -232,8 +271,12 @@ public class UserManagementController {
      *         <td>{@code application/x-www-form-urlencoded}</td>
      *     </tr>
      *     <tr>
-     *         <td>Required Parameters</td>
+     *         <td>Required Request Parameters</td>
      *         <td>{@code activated}</td>
+     *     </tr>
+     *     <tr>
+     *         <td>Optional Parameters</td>
+     *         <td>none</td>
      *     </tr>
      *     <tr>
      *         <td>Requires role</td>
@@ -243,9 +286,9 @@ public class UserManagementController {
      *
      * <p>The {@link User} must belong to the same EatingArea as the {@link User}  whose credentials were submitted.</p>
      *
-     * @param userId  {@code true} to activate the account, {@code false} to deactivate the account
+     * @param userId  existing {@code User} ID
      * @param activated  {@code true} to activate the account, {@code false} to deactivate the account
-     * @return ResponseEntity instance with the following values upon successful completion of the request:
+     * @return ResponseEntity instance with the following values upon success:
      *  <ul>
      *      <li>HTTP Status 204 No_Content </li>
      *  </ul>
@@ -278,8 +321,12 @@ public class UserManagementController {
      *         <td>{@code application/x-www-form-urlencoded}</td>
      *     </tr>
      *     <tr>
-     *         <td>Required Parameters</td>
+     *         <td>Required Request Parameters</td>
      *         <td>{@code roles}</td>
+     *     </tr>
+     *     <tr>
+     *         <td>Optional Parameters</td>
+     *         <td>none</td>
      *     </tr>
      *     <tr>
      *         <td>Requires role</td>
@@ -294,9 +341,13 @@ public class UserManagementController {
      *   <li>{@code userId}  existing user ID</li>
  *       <li>{@code roles}  comma-separated list of values. Valid values are: ADMIN, VOTER</li>
      * </ul>
-     * @return ResponseEntity instance with the following values upon successful completion of the request:
+     * @return ResponseEntity instance with the following values upon success:
+     *  <ul>
+     *      <li>HTTP Status 204 No_Content </li>
+     *  </ul>
      *  If the request fails:
      *  <ul>
+     *      <li>HTTP Status 400 Bad_Syntax is returned if parameter validation fails</li>
      *      <li>HTTP Status 404 Not_Found is returned if a {@link User}  with the given ID does not exist
      *      in the {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea}</li>
      *  </ul>

@@ -16,7 +16,7 @@ import static ua.belozorov.lunchvoting.util.Pair.*;
 /**
  * <h2></h2>
  *
- * @author vabelozorov on 30.11.16.
+ * Created on 30.11.16.
  */
 @Repository
 public class PollRepositoryImpl extends BaseRepository implements PollRepository {
@@ -109,8 +109,7 @@ public class PollRepositoryImpl extends BaseRepository implements PollRepository
     @Override
     public List<LunchPlacePoll> getPollByActivePeriod(String areaId, LocalDateTime startDt, LocalDateTime endDt) {
         String sql = "SELECT DISTINCT p FROM LunchPlacePoll p " +
-                "WHERE (:startDt BETWEEN p.timeConstraint.startTime AND p.timeConstraint.endTime "+
-                    "OR :endDt BETWEEN p.timeConstraint.startTime AND p.timeConstraint.endTime) " +
+                "WHERE (p.timeConstraint.startTime <= :endDt AND p.timeConstraint.endTime >= :startDt) "+
                     "AND p IN (" +
                         "SELECT p1 FROM EatingArea ea JOIN ea.polls p1 WHERE ea.id= :areaId) " +
                 "ORDER BY p.menuDate DESC, p.id";
@@ -157,7 +156,8 @@ public class PollRepositoryImpl extends BaseRepository implements PollRepository
     public Boolean isActive(String areaId, String pollId) {
         String sql = "SELECT CASE WHEN count(p) > 0 THEN false ELSE true END " +
                 "FROM LunchPlacePoll p  " +
-                "WHERE p.timeConstraint.endTime < :now AND p.id= :id " +
+                "WHERE (:now BETWEEN p.timeConstraint.startTime AND p.timeConstraint.endTime) " +
+                    "AND p.id= :id " +
                     "AND p IN (SELECT p1 FROM EatingArea ea JOIN ea.polls p1 WHERE ea.id= :areaId)";
         return em.createQuery(sql, Boolean.class)
                 .setParameter("areaId", areaId)

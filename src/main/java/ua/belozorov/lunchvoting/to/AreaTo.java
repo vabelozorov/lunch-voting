@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * <h2></h2>
  *
- * @author vabelozorov on 12.02.17.
+ * Created on 12.02.17.
  */
 @Getter
 public final class AreaTo {

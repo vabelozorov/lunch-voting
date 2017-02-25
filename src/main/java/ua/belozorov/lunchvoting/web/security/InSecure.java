@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
  * by {@link Secured} annotation
  *
  * @see ua.belozorov.lunchvoting.util.SecurityEnforcerBeanFactoryPostProcessor
- * @author vabelozorov on 20.02.17.
+ * Created on 20.02.17.
  */
 @Target({ ElementType.METHOD, ElementType.TYPE })
 @Retention(RetentionPolicy.RUNTIME)

@@ -48,7 +48,7 @@ import static ua.belozorov.lunchvoting.model.voting.polling.PollTestData.POLL_CO
 /**
  * <h2></h2>
  *
- * @author vabelozorov on 09.02.17.
+ * Created on 09.02.17.
  */
 public class EatingAreaServiceTest extends AbstractServiceTest {
 

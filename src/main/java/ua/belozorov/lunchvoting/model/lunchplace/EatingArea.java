@@ -24,7 +24,7 @@ import static java.util.Optional.ofNullable;
 /**
  * <h2></h2>
  *
- * @author vabelozorov on 08.02.17.
+ * Created on 08.02.17.
  */
 @Entity
 @Table(name = "areas")

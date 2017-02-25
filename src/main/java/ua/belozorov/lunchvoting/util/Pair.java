@@ -3,7 +3,7 @@ package ua.belozorov.lunchvoting.util;
 /**
  * <h2></h2>
  *
- * @author vabelozorov on 14.02.17.
+ * Created on 14.02.17.
  */
 public final class Pair<A,B> {
 

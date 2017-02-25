@@ -24,7 +24,7 @@ import java.util.function.Consumer;
  *     <li>If above rules are passed, the right to made a decision is passed to the next policy</li>
  * </ul>
  *
- * @author vabelozorov on 19.01.17.
+ * Created on 19.01.17.
  */
 public final class CommonPolicy implements VotePolicy {
 

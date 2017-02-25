@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * <h2></h2>
  *
- * @author vabelozorov on 02.12.16.
+ * Created on 02.12.16.
  */
 public abstract class BaseRepository {
 

@@ -21,7 +21,7 @@ import static ua.belozorov.lunchvoting.AbstractTest.NOW_DATE;
 /**
  * <h2></h2>
  *
- * @author vabelozorov on 22.11.16.
+ * Created on 22.11.16.
  */
 @Getter
 public class LunchPlaceTestData {

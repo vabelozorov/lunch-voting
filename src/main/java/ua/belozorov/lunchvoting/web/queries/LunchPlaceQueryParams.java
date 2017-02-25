@@ -17,7 +17,7 @@ import java.util.Set;
 /**
  * <h2>A value object that aggregates query parameters for LunchPlaceController</h2>
  *
- * @author vabelozorov on 29.12.16.
+ * Created on 29.12.16.
  */
 @Setter
 public final class LunchPlaceQueryParams {

@@ -3,7 +3,7 @@ package ua.belozorov.lunchvoting.web.exceptionhandling;
 /**
  * <h2></h2>
  *
- * @author vabelozorov on 07.02.17.
+ * Created on 07.02.17.
  */
 public enum ErrorCode {
     DUPLICATE_EMAIL("error.model.user.duplicate_email"),

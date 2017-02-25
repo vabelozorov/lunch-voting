@@ -13,7 +13,7 @@ import java.util.function.Supplier;
 /**
  * <h2></h2>
  *
- * @author vabelozorov on 15.11.16.
+ * Created on 15.11.16.
  */
 public interface UserService {
 

@@ -13,7 +13,7 @@ import java.util.Objects;
 /**
  * <h2></h2>
  *
- * @author vabelozorov on 03.12.16.
+ * Created on 03.12.16.
  */
 @Getter(AccessLevel.PACKAGE)
 @Entity

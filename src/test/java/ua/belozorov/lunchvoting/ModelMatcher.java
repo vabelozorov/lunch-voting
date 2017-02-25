@@ -9,7 +9,7 @@ import java.util.Objects;
 /**
  * <h2></h2>
  *
- * @author vabelozorov on 17.11.16.
+ * Created on 17.11.16.
  */
 public class ModelMatcher<T> extends BaseMatcher<T>{
     private final static EqualsComparator DEFAULT_COMPARATOR = (o1, o2) -> String.valueOf(o1).equals(String.valueOf(o2));

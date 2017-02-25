@@ -44,7 +44,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 /**
  * <h2></h2>
  *
- * @author vabelozorov on 12.02.17.
+ * Created on 12.02.17.
  */
 public class EatingAreaControllerTest extends AbstractControllerTest {
     private static final String REST_URL = EatingAreaController.REST_URL;

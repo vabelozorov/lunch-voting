@@ -28,7 +28,7 @@ import ua.belozorov.lunchvoting.service.voting.VotingServiceImpl;
 /**
  * <h2></h2>
  *
- * @author vabelozorov on 23.02.17.
+ * Created on 23.02.17.
  */
 @Configuration
 @ComponentScan(basePackages = {

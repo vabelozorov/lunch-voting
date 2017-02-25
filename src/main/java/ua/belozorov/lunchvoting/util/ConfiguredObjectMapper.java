@@ -11,7 +11,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 /**
  * <h2></h2>
  *
- * @author vabelozorov on 18.11.16.
+ * Created on 18.11.16.
  */
 public class ConfiguredObjectMapper extends ObjectMapper {
     private static final ObjectMapper mapper = new ConfiguredObjectMapper();

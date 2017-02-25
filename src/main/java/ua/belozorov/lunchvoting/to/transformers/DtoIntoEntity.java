@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 /**
  * <h2></h2>
  *
- * @author vabelozorov on 21.11.16.
+ * Created on 21.11.16.
  */
 public class DtoIntoEntity {
 

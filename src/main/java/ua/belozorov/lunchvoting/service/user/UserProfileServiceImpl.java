@@ -13,7 +13,7 @@ import static java.util.Optional.ofNullable;
 /**
  * <h2></h2>
  *
- * @author vabelozorov on 14.02.17.
+ * Created on 14.02.17.
  */
 @Service
 public final class UserProfileServiceImpl implements UserProfileService {

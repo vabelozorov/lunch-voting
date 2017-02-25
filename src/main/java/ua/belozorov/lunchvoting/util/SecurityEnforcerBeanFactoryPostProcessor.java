@@ -20,7 +20,7 @@ import java.util.List;
  * with {@code RestConroller}. If such classes' public methods are not marked with {@link org.springframework.security.access.annotation.Secured}
  * annotation/meta-annotation, {@link InSecuredControllerMethodException} exception is thrown
  *
- * @author vabelozorov on 22.02.17.
+ * Created on 22.02.17.
  */
 public class SecurityEnforcerBeanFactoryPostProcessor implements BeanFactoryPostProcessor {
 

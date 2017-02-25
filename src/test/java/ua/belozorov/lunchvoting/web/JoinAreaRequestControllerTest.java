@@ -31,7 +31,7 @@ import static ua.belozorov.lunchvoting.util.ControllerUtils.toMap;
 /**
  * <h2></h2>
  *
- * @author vabelozorov on 12.02.17.
+ * Created on 12.02.17.
  */
 
 public class JoinAreaRequestControllerTest extends AbstractControllerTest {
@@ -61,14 +61,14 @@ public class JoinAreaRequestControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    public void testMakeRequest() throws Exception {
+    public void makeRequest() throws Exception {
         JoinAreaRequest madeRequest = new JoinAreaRequest(ALIEN_USER1, testAreas.getFirstArea());
         when(requestService.make(ALIEN_USER1, areaId))
                 .thenReturn(madeRequest);
 
         MvcResult mvcResult = mockMvc
                 .perform(
-                        post(REST_URL).param("id", areaId)
+                        post(REST_URL, areaId)
                         .accept(MediaType.APPLICATION_JSON)
                         .with(csrf())
                         .with(alien())
@@ -98,7 +98,7 @@ public class JoinAreaRequestControllerTest extends AbstractControllerTest {
                 .thenReturn(madeRequest);
         String actual = mockMvc
                 .perform(
-                        get(REST_URL + "/{id}", madeRequest.getId())
+                        get(REST_URL + "/{id}", areaId, madeRequest.getId())
                         .accept(MediaType.APPLICATION_JSON)
                         .with(csrf())
                         .with(alien())
@@ -128,7 +128,7 @@ public class JoinAreaRequestControllerTest extends AbstractControllerTest {
 
         String actual = mockMvc
                 .perform(
-                        get(REST_URL)
+                        get(REST_URL, areaId)
                         .param("status", "PENDING")
                         .accept(MediaType.APPLICATION_JSON)
                         .with(csrf())
@@ -162,7 +162,7 @@ public class JoinAreaRequestControllerTest extends AbstractControllerTest {
 
         String actual = mockMvc
                 .perform(
-                        get(REST_URL)
+                        get(REST_URL, areaId)
                         .accept(MediaType.APPLICATION_JSON)
                         .with(csrf())
                         .with(voter())
@@ -183,7 +183,9 @@ public class JoinAreaRequestControllerTest extends AbstractControllerTest {
         String requestId = "req_id";
         mockMvc
                 .perform(
-                        put(REST_URL + "/{id}/approve", requestId)
+                        put(REST_URL + "/{id}", areaId, requestId)
+                        .param("status", JoinAreaRequest.JoinStatus.APPROVED.name())
+                        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                         .accept(MediaType.APPLICATION_JSON)
                         .with(csrf())
                         .with(god())
@@ -198,8 +200,9 @@ public class JoinAreaRequestControllerTest extends AbstractControllerTest {
         String requestId = "req_id";
         mockMvc
                 .perform(
-                        put(REST_URL + "/{id}/reject", requestId)
-                        .accept(MediaType.APPLICATION_JSON)
+                        put(REST_URL + "/{id}", areaId, requestId)
+                        .param("status", JoinAreaRequest.JoinStatus.REJECTED.name())
+                        .contentType(MediaType.APPLICATION_FORM_URLENCODED).accept(MediaType.APPLICATION_JSON)
                         .with(csrf())
                         .with(god())
                 )
@@ -214,7 +217,9 @@ public class JoinAreaRequestControllerTest extends AbstractControllerTest {
 
         mockMvc
                 .perform
-                        (put("{base}/{id}/cancel", REST_URL, requestId)
+                        (put(REST_URL + "/{id}", areaId, requestId)
+                        .param("status", JoinAreaRequest.JoinStatus.CANCELLED.name())
+                        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                         .accept(MediaType.APPLICATION_JSON)
                         .with(csrf())
                         .with(alien())

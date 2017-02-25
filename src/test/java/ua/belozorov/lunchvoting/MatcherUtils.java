@@ -15,7 +15,7 @@ import static com.vladmihalcea.sql.SQLStatementCountValidator.*;
 /**
  * <h2></h2>
  *
- * @author vabelozorov on 22.11.16.
+ * Created on 22.11.16.
  */
 public class MatcherUtils {
 

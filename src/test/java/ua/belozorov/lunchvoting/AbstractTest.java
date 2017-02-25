@@ -24,7 +24,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * <h2>Base class for all tests. Provides access to a test data. Intended subclasses are model classes</h2>
  *
- * @author vabelozorov on 02.12.16.
+ * Created on 02.12.16.
  */
 public abstract class AbstractTest {
     public static final LocalDateTime NOW_DATE_TIME = LocalDateTime.now().withNano(0);

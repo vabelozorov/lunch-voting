@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
 /**
  * <h2></h2>
  *
- * @author vabelozorov on 20.02.17.
+ * Created on 20.02.17.
  */
 @Target({ ElementType.METHOD, ElementType.TYPE })
 @Retention(RetentionPolicy.RUNTIME)

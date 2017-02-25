@@ -45,6 +45,8 @@ public final class UserTo {
     @Getter(AccessLevel.NONE)
     private Boolean activated;
 
+    private String areaId;
+
     protected UserTo() {
     }
 
@@ -68,6 +70,7 @@ public final class UserTo {
         this.roles = user.getRoles();
         this.registeredDate = user.getRegisteredDate();
         this.activated = user.isActivated();
+        this.areaId = user.getAreaId();
     }
 
     @Override

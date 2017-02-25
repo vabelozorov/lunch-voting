@@ -5,7 +5,7 @@ import ua.belozorov.lunchvoting.model.lunchplace.Menu;
 /**
  * <h2></h2>
  *
- * @author vabelozorov on 02.12.16.
+ * Created on 02.12.16.
  */
 public interface MenuRepository {
 

@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
  * {@link org.springframework.security.access.annotation.Secured}
  * annotation/meta-annotation
  *
- * @author vabelozorov on 22.02.17.
+ * Created on 22.02.17.
  */
 public class InSecuredControllerMethodException extends RuntimeException {
     private final List<Pair<Class<?>, Method>> unSecuredMethods;

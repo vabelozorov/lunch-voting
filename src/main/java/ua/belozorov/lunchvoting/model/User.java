@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 /**
  * <h2></h2>
  *
- * @author vabelozorov on 15.11.16.
+ * Created on 15.11.16.
  */
 @Getter
 @Entity

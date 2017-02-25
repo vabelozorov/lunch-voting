@@ -6,7 +6,7 @@ import java.util.Set;
 /**
  * <h2></h2>
  *
- * @author vabelozorov on 01.02.17.
+ * Created on 01.02.17.
  */
 public interface JsonFilter {
     void includingFilter(Object object, RefinedFields fields);

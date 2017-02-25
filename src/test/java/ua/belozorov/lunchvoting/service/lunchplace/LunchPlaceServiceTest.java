@@ -31,7 +31,7 @@ import static ua.belozorov.lunchvoting.model.lunchplace.LunchPlaceTestData.*;
 /**
  * <h2></h2>
  *
- * @author vabelozorov on 22.11.16.
+ * Created on 22.11.16.
  */
 public class LunchPlaceServiceTest extends AbstractServiceTest {
 

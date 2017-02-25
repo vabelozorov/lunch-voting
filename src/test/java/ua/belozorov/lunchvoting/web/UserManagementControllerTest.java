@@ -33,7 +33,7 @@ import static ua.belozorov.lunchvoting.model.UserTestData.*;
 /**
  * <h2></h2>
  *
- * @author vabelozorov on 17.11.16.
+ * Created on 17.11.16.
  */
 public class UserManagementControllerTest extends AbstractControllerTest {
     private static final String REST_URL = UserManagementController.REST_URL;

@@ -6,7 +6,7 @@ import java.util.Set;
 /**
  * <h2></h2>
  *
- * @author vabelozorov on 17.01.17.
+ * Created on 17.01.17.
  */
 public interface VoteIntention {
     boolean isVoteAgainForCurrentItem();

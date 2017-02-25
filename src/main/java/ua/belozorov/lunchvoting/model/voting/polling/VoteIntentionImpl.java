@@ -12,7 +12,7 @@ import java.util.Set;
 /**
  * <h2></h2>
  *
- * @author vabelozorov on 07.12.16.
+ * Created on 07.12.16.
  */
 @Getter(AccessLevel.PACKAGE)
 final class VoteIntentionImpl implements VoteIntention {

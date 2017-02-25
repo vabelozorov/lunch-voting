@@ -14,7 +14,7 @@ import javax.validation.constraints.NotNull;
 /**
  * <h2></h2>
  *
- * @author vabelozorov on 15.11.16.
+ * Created on 15.11.16.
  */
 @Embeddable
 @Getter
