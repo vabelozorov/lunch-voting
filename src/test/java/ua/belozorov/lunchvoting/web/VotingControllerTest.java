@@ -23,7 +23,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static ua.belozorov.lunchvoting.model.UserTestData.*;
 
 /**
- * <h2></h2>
  *
  * Created on 05.02.17.
  */
@@ -50,7 +49,10 @@ public class VotingControllerTest extends AbstractControllerTest {
 
         String actual = mockMvc
                 .perform(
-                    post(REST_URL + "/polls/{pollid}/{pollItemId}", areaId, pollId, itemId)
+                    post(REST_URL, areaId)
+                    .param("pollId", pollId)
+                    .param("pollItemId", itemId)
+                    .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                     .accept(MediaType.APPLICATION_JSON)
                     .with(csrf())
                     .with(god()) // actually VOTER right is enough, but GOD is the only who hasn't voted
@@ -74,7 +76,8 @@ public class VotingControllerTest extends AbstractControllerTest {
                 .thenReturn(new ArrayList<>(testVotes.getVotesForPastPoll()));
         String actual = mockMvc
                 .perform(
-                    get(REST_URL + "/polls/{pollid}", areaId, id)
+                    get(REST_URL, areaId)
+                    .param("pollId", id)
                     .accept(MediaType.APPLICATION_JSON)
                     .with(voter())
                 )
@@ -101,8 +104,9 @@ public class VotingControllerTest extends AbstractControllerTest {
 
         String actual = mockMvc
                 .perform(
-                        get(REST_URL + "/polls/{pollId}", areaId, id)
-                        .param("item", "")
+                        get(REST_URL + "/results", areaId)
+                        .param("pollId", id)
+                        .param("type", "item")
                         .accept(MediaType.APPLICATION_JSON)
                         .with(voter())
                 )
@@ -110,17 +114,7 @@ public class VotingControllerTest extends AbstractControllerTest {
                 .andReturn()
                     .getResponse().getContentAsString();
 
-        Map<String, Object> resultMap1 = new LinkedHashMap<>();
-        resultMap1.put("id", testPolls.getPastPollPollItem1().getId());
-        resultMap1.put("itemId", testPolls.getPastPollPollItem1().getItemId());
-        resultMap1.put("count", 3);
-        Map<String, Object> resultMap2 = new LinkedHashMap<>();
-        resultMap2.put("id", testPolls.getPastPollPollItem2().getId());
-        resultMap2.put("itemId", testPolls.getPastPollPollItem2().getItemId());
-        resultMap2.put("count", 2);
-        Map<String, Object> objectProperties = new LinkedHashMap<>();
-        objectProperties.put("pollId", id);
-        objectProperties.put("result", Arrays.asList(resultMap1, resultMap2));
+        Map<String, Object> objectProperties = this.getExpectedPollResultByItem(id);
 
         String expected = jsonUtils.toJson(objectProperties);
 
@@ -136,8 +130,9 @@ public class VotingControllerTest extends AbstractControllerTest {
 
         String actual = mockMvc
                 .perform(
-                        get(REST_URL + "/polls/{pollId}", areaId, id)
-                        .param("voter", "")
+                        get(REST_URL, areaId, id)
+                        .param("pollId", id)
+                        .param("filterBy", "voter")
                         .accept(MediaType.APPLICATION_JSON)
                         .with(voter())
                 )
@@ -147,7 +142,7 @@ public class VotingControllerTest extends AbstractControllerTest {
         Map<String, Object> objectProperties = new LinkedHashMap<>();
         objectProperties.put("pollId", id);
         objectProperties.put("voterId", VOTER_ID);
-        objectProperties.put("votedItems", votedItemIds);
+        objectProperties.put("votedPollItems", votedItemIds);
         String expected = jsonUtils.toJson(objectProperties);
 
         assertJson(expected, actual);
@@ -168,5 +163,20 @@ public class VotingControllerTest extends AbstractControllerTest {
                 .getResponse().getContentAsString();
 
         verify(votingService).revokeVote(VOTER_ID, voteId);
+    }
+
+    private Map<String, Object> getExpectedPollResultByItem(String pollId) {
+        Map<String, Object> resultMap1 = new LinkedHashMap<>();
+        resultMap1.put("pollItemId", testPolls.getPastPollPollItem1().getId());
+        resultMap1.put("itemId", testPolls.getPastPollPollItem1().getItemId());
+        resultMap1.put("count", 3);
+        Map<String, Object> resultMap2 = new LinkedHashMap<>();
+        resultMap2.put("pollItemId", testPolls.getPastPollPollItem2().getId());
+        resultMap2.put("itemId", testPolls.getPastPollPollItem2().getItemId());
+        resultMap2.put("count", 2);
+        Map<String, Object> objectProperties = new LinkedHashMap<>();
+        objectProperties.put("pollId", pollId);
+        objectProperties.put("result", Arrays.asList(resultMap1, resultMap2));;
+        return objectProperties;
     }
 }

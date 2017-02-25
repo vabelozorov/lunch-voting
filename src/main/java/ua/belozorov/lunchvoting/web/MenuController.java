@@ -24,7 +24,9 @@ import java.time.LocalDate;
 import java.util.Collections;
 
 /**
- * Created by vabelozorov on 14.11.16.
+ * A controller to manage {@link Menu} objects
+ *
+ * Created on 14.11.16.
  */
 @RestController
 @RequestMapping(MenuController.REST_URL)
@@ -35,6 +37,11 @@ public class MenuController {
 
     private final JsonFilter jsonFilter;
 
+    /**
+     * A constructor
+     * @param placeService an instance of a class that implements {@link LunchPlaceService} interface
+     * @param jsonFilter an instance of a class that implements {@link JsonFilter} interface
+     */
     @Autowired
     public MenuController(LunchPlaceService placeService,
                           @Qualifier("simpleJsonFilter") JsonFilter jsonFilter) {
@@ -43,7 +50,7 @@ public class MenuController {
     }
 
     @InitBinder
-    protected void initBinder(WebDataBinder binder) {
+    public void initBinder(WebDataBinder binder) {
         binder.addValidators(new MenuToValidator());
     }
 

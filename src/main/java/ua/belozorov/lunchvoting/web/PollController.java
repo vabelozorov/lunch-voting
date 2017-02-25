@@ -236,7 +236,7 @@ public class PollController {
      *              refers to a {@link ua.belozorov.lunchvoting.model.lunchplace.LunchPlace} object</li>
      *  </ul>
      */
-    @GetMapping("/past")
+    @GetMapping(value = "/past", produces = MediaType.APPLICATION_JSON_VALUE)
     @IsAdminOrVoter
     public ResponseEntity<List<PollTo>> getPastPolls() {
         String areaId = AuthorizedUser.get().getAreaId();
@@ -282,7 +282,7 @@ public class PollController {
      *              refers to a {@link ua.belozorov.lunchvoting.model.lunchplace.LunchPlace} object</li>
      *  </ul>
      */
-    @GetMapping("/active")
+    @GetMapping(value = "/active", produces = MediaType.APPLICATION_JSON_VALUE)
     @IsAdminOrVoter
     public ResponseEntity<List<PollTo>> getActivePolls() {
         String areaId = AuthorizedUser.get().getAreaId();
@@ -328,7 +328,7 @@ public class PollController {
      *              refers to a {@link ua.belozorov.lunchvoting.model.lunchplace.LunchPlace} object</li>
      *  </ul>
      */
-    @GetMapping("/future")
+    @GetMapping(value = "/future", produces = MediaType.APPLICATION_JSON_VALUE)
     @IsAdminOrVoter
     public ResponseEntity<List<PollTo>> getFuturePolls() {
         String areaId = AuthorizedUser.get().getAreaId();
@@ -353,7 +353,7 @@ public class PollController {
      *     </tr>
      *     <tr>
      *         <td>Required Request Parameters</td>
-     *         <td>{@code id}</td>
+     *         <td>{@code pollId}</td>
      *     </tr>
      *     <tr>
      *         <td>Optional Parameters</td>
@@ -364,30 +364,30 @@ public class PollController {
      *         <td><strong>VOTER</strong> or <strong>ADMIN</strong></td>
      *     </tr>
      * </table>
-     * @param id ID of {@link LunchPlacePoll} in the area of authenticated user
+     * @param pollId ID of {@link LunchPlacePoll} in the area of authenticated user
      * @return ResponseEntity instance with the following values upon success:
      * <ul>
      *      <li>HTTP Status 200 Ok</li>
      *      <li>a JSON object with a fields:
      *      <ul>
-     *          <li>{@code id} specifies requested poll ID</li>
+     *          <li>{@code pollId} specifies requested poll ID</li>
      *          <li>{@code active} specifies the poll state as {@code true} or {@code false}</li>
      *      </ul>
      *      </li>
      *  </ul>
      *  If the request fails:
      *  <ul>
-     *      <li>HTTP Status 404, if {@code id} refers to a non-existent {@link LunchPlacePoll} in the area of
+     *      <li>HTTP Status 404, if {@code pollId} refers to a non-existent {@link LunchPlacePoll} in the area of
      *      authenticated user</li>
      *  </ul>
      */
-    @GetMapping(value = "/active", params = {"id"})
+    @GetMapping(value = "/active", params = {"pollId"}, produces = MediaType.APPLICATION_JSON_VALUE)
     @IsAdminOrVoter
-    public ResponseEntity isPollActive(@RequestParam String id) {
+    public ResponseEntity isPollActive(@RequestParam String pollId) {
         String areaId = AuthorizedUser.get().getAreaId();
         Map<String,Object> map = new HashMap<>();
-        map.put("id", id);
-        map.put("active", pollService.isPollActive(areaId, id));
+        map.put("pollId", pollId);
+        map.put("active", pollService.isPollActive(areaId, pollId));
         return ResponseEntity.ok(map);
     }
 

@@ -220,7 +220,8 @@ public class PollControllerTest extends AbstractControllerTest {
         when(pollService.isPollActive(areaId, id)).thenReturn(false);
         String actual = mockMvc
                 .perform(
-                        get(REST_URL + "/active/{pollId}", areaId, id)
+                        get(REST_URL + "/active", areaId)
+                        .param("pollId", id)
                         .accept(MediaType.APPLICATION_JSON)
                         .with(voter())
                 ).andExpect(status().isOk())
@@ -228,8 +229,9 @@ public class PollControllerTest extends AbstractControllerTest {
                 .getResponse().getContentAsString();
         verify(pollService).isPollActive(areaId, id);
 
-        Map<String,Boolean> map = new HashMap<>();
-        map.put(id, false);
+        Map<String,Object> map = new HashMap<>();
+        map.put("pollId", id);
+        map.put("active", false);
         String expected = jsonUtils.toJson(map);
 
         assertJson(expected, actual);

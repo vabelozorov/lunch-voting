@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * <h2></h2>
  *
  * Created on 05.02.17.
  */
@@ -26,7 +25,7 @@ public final class CountPerItemTo {
 
     private Map<String, Object> convertEntryToMap(PollItem item, Integer value) {
         Map<String, Object> map = new LinkedHashMap<>();
-        map.put("id", item.getId());
+        map.put("pollItemId", item.getId());
         map.put("itemId", item.getItemId());
         map.put("count", value);
         return map;
