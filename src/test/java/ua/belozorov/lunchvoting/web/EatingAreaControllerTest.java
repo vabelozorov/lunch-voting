@@ -102,6 +102,7 @@ public class EatingAreaControllerTest extends AbstractControllerTest {
         MvcResult mvcResult = mockMvc
                 .perform(
                         post(REST_URL).param("name", name)
+                        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                         .accept(MediaType.APPLICATION_JSON)
                         .with(csrf())
                         .with(voter())
@@ -124,6 +125,22 @@ public class EatingAreaControllerTest extends AbstractControllerTest {
     }
 
     @Test
+    public void failseWhenAreaNameIsTooShort() throws Exception {
+        String tooShortName = "n";
+        MvcResult result = mockMvc
+                .perform(
+                        post(REST_URL).param("name", tooShortName)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                                .with(csrf())
+                                .with(voter())
+                )
+                .andExpect(status().isBadRequest())
+                .andReturn();
+        //TODO complete test
+    }
+
+    @Test
     public void e409AndMessageOnCreateAreaWithDuplicateName() throws Exception {
         String duplicateName = "name";
         when(areaService.create(duplicateName, VOTER))
@@ -131,6 +148,7 @@ public class EatingAreaControllerTest extends AbstractControllerTest {
         MvcResult result = mockMvc
                 .perform(
                         post(REST_URL).param("name", duplicateName)
+                        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                         .accept(MediaType.APPLICATION_JSON)
                         .with(csrf())
                         .with(voter())
@@ -262,45 +280,17 @@ public class EatingAreaControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    public void testCreatePollForTodayMenus() throws Exception {
-        when(areaService.createPollInArea(areaId)).thenReturn(testPolls.getActivePoll());
-        MvcResult mvcResult = mockMvc
-                .perform(
-                    post(REST_URL + "/{id}/polls", areaId)
-                    .accept(MediaType.APPLICATION_JSON)
-                    .with(csrf())
-                    .with(god())
-                )
-                .andExpect(status().isCreated())
-                .andReturn();
-
-        verify(areaService).createPollInArea(areaId);
-
-        String location = jsonUtils.locationFromMvcResult(mvcResult);
-        String id = getCreatedId(location);
-
-        when(pollService.getWithPollItems(areaId, id)).thenReturn(testPolls.getActivePoll());
-
-        String expected = mockMvc.perform(get(location).with(voter()).accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse().getContentAsString();
-
-        LunchPlacePoll poll = pollService.getWithPollItems(areaId, id);
-        Map<String, Object> objProperties = this.converter.convert(new PollTo(poll));
-        String actual = jsonUtils.toJson(objProperties);
-
-        assertJson(expected, actual);
-    }
-
-    @Test
-    public void testCreatePollForMenuDate() throws Exception {
+    public void createPollForMenuDate() throws Exception {
         String date = NOW_DATE.plusDays(2).format(DATE_FORMATTER);
 
-        when(areaService.createPollInArea(areaId, NOW_DATE.plusDays(2))).thenReturn(testPolls.getFuturePoll());
+        when(areaService.createPollInArea(areaId, NOW_DATE.plusDays(2), null, null, null))
+                .thenReturn(testPolls.getFuturePoll());
 
         MvcResult mvcResult = mockMvc
                 .perform(
                         post(REST_URL + "/{id}/polls", areaId)
                         .param("menuDate", date)
+                        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                         .accept(MediaType.APPLICATION_JSON)
                         .with(csrf())
                         .with(god())
@@ -308,7 +298,7 @@ public class EatingAreaControllerTest extends AbstractControllerTest {
                 .andExpect(status().isCreated())
                 .andReturn();
 
-        verify(areaService).createPollInArea(areaId, NOW_DATE.plusDays(2));
+        verify(areaService).createPollInArea(areaId, NOW_DATE.plusDays(2), null, null, null);
 
         String location = jsonUtils.locationFromMvcResult(mvcResult);
         String id = getCreatedId(location);
@@ -327,13 +317,14 @@ public class EatingAreaControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    public void testUpdateAreaName() throws Exception {
+    public void updateAreaName() throws Exception {
         mockMvc
                 .perform(
                         put(REST_URL)
-                                .param("name", "NEW_AWESOME_NAME")
-                                .with(csrf())
-                                .with(god())
+                        .param("name", "NEW_AWESOME_NAME")
+                        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                        .with(csrf())
+                        .with(god())
                 )
                 .andExpect(status().isNoContent());
 
@@ -350,6 +341,7 @@ public class EatingAreaControllerTest extends AbstractControllerTest {
                 .perform(
                         put(REST_URL)
                                 .param("name", duplicateName)
+                                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                                 .with(csrf())
                                 .with(god())
                 )
@@ -418,7 +410,7 @@ public class EatingAreaControllerTest extends AbstractControllerTest {
 
         String actual = mockMvc
                 .perform(
-                        get("{base}/filter", REST_URL)
+                        get(REST_URL)
                         .param("name", "Chow")
                         .accept(MediaType.APPLICATION_JSON)
                         .with(voter())
@@ -437,8 +429,7 @@ public class EatingAreaControllerTest extends AbstractControllerTest {
 
     @Test
     public void testDelete() throws Exception {
-        mockMvc.perform(delete("{base}/{id}", REST_URL, testAreas.getFirstAreaId())
-                .accept(MediaType.APPLICATION_JSON)
+        mockMvc.perform(delete(REST_URL)
                 .with(csrf())
                 .with(god())
         )

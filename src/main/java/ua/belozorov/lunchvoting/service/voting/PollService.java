@@ -1,6 +1,8 @@
 package ua.belozorov.lunchvoting.service.voting;
 
+import org.springframework.transaction.annotation.Transactional;
 import ua.belozorov.lunchvoting.model.voting.polling.LunchPlacePoll;
+import ua.belozorov.lunchvoting.model.voting.polling.TimeConstraint;
 import ua.belozorov.lunchvoting.model.voting.polling.Vote;
 import ua.belozorov.lunchvoting.repository.voting.PollRepository;
 import ua.belozorov.lunchvoting.web.security.IsAdmin;
@@ -12,21 +14,12 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * <h2></h2>
  *
- * @author vabelozorov on 01.02.17.
+ * Created on 01.02.17.
  */
 public interface PollService {
 
-    /**
-     * Creates a Poll instance where PollItems are a set of LunchPlace instances and each such instance has a Menu
-     * for today
-     * @return ID of the created Poll instance
-     * @param areaId
-     */
-    LunchPlacePoll createPollForTodayMenus(String areaId);
-
-    LunchPlacePoll createPollForMenuDate(String areaId, LocalDate date);
+    LunchPlacePoll createPollForMenuDate(String areaId, LocalDate menuDate, TimeConstraint timeConstraint);
 
     LunchPlacePoll getWithPollItems(String areaId, String pollId);
 

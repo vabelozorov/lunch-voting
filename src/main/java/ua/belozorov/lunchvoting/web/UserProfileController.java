@@ -26,7 +26,7 @@ import static ua.belozorov.lunchvoting.util.ControllerUtils.toMap;
 /**
  * A controller that manages user requests about updating user's own profile.
  *
- * @author vabelozorov on 15.11.16.
+ * Generated on 15.11.16.
  */
 @RestController
 @RequestMapping(UserProfileController.REST_URL)
@@ -70,7 +70,7 @@ public class UserProfileController {
      * <ul>
      *  <li><strong>name</strong>  new name of the User, must be between 2 and 100 characters long</li>
      *  <li><strong> password</strong>  new password of the User, must be between 6 and 30 characters long</li>
-     *  <li><strong>email</strong>  new email of the User. The application enforces a unique contraint on this value and
+     *  <li><strong>email</strong>  new email of the User. The application enforces a unique constraint on this value and
      *  {@code DuplicateDataException} is thrown if value happens to be not unique</li>
      * </ul>
      * Other parameters are ignored.
@@ -80,12 +80,11 @@ public class UserProfileController {
      *  <ul>
      *      <li>An HTTP Status 201 Created </li>
      *      <li>A URL to access the created object in HTTP Location Header</li>
-     *      <li>A JSON object with a field {@code id} containing the ID of the newly created {@code User}</li>
      *  </ul>
      *  If the request fails:
      *  <ul>
      *      <li>HTTP Status 400 Bad_Syntax is returned if parameter validation fails</li>
-     *      <li>HTTP Status 409 Conflict is returned if the submitted email value is not unique</li>
+     *      <li>HTTP Status 409 Conflict is returned if the submitted email is not unique</li>
      *  </ul>
      */
     @PostMapping
@@ -97,8 +96,8 @@ public class UserProfileController {
                 new DuplicateDataException(ErrorCode.DUPLICATE_EMAIL, new Object[]{userTo.getEmail()})
         );
         URI uri = ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path(REST_URL + "/{id}").buildAndExpand(created.getId()).toUri();
-        return ResponseEntity.created(uri).body(toMap("id", created.getId()));
+                .path(REST_URL).build().toUri();
+        return ResponseEntity.created(uri).build();
     }
 
     /**

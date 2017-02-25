@@ -23,6 +23,7 @@ import java.util.List;
  * @author vabelozorov on 22.02.17.
  */
 public class SecurityEnforcerBeanFactoryPostProcessor implements BeanFactoryPostProcessor {
+
     @Override
     public void postProcessBeanFactory(ConfigurableListableBeanFactory factory) throws BeansException {
         List<Pair<Class<?>,Method>> unSecuredMethods = new ArrayList<>();

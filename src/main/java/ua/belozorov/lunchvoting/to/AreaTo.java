@@ -17,7 +17,7 @@ public final class AreaTo {
     private final LocalDateTime created;
     private final List<String> users;
     private final List<String> polls;
-    private final List<String> placeIds;
+    private final List<String> places;
     private final Long userCount;
     private final Long placeCount;
     private final Long pollCount;
@@ -28,7 +28,7 @@ public final class AreaTo {
         this.created = created;
         this.users = userIds;
         this.polls = pollIds;
-        this.placeIds = placeIds;
+        this.places = placeIds;
         this.userCount = null;
         this.placeCount = null;
         this.pollCount = null;
@@ -43,7 +43,7 @@ public final class AreaTo {
         this.pollCount = pollCount;
         this.users = null;
         this.polls = null;
-        this.placeIds = null;
+        this.places = null;
     }
 
     @Override
@@ -54,7 +54,7 @@ public final class AreaTo {
                 ", created=" + created +
                 ", users=" + users +
                 ", polls=" + polls +
-                ", placeIds=" + placeIds +
+                ", places=" + places +
                 ", userCount=" + userCount +
                 ", placeCount=" + placeCount +
                 ", pollCount=" + pollCount +

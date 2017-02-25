@@ -228,6 +228,10 @@ public class UserManagementController {
      *             </td>
      *     </tr>
      *     <tr>
+     *         <td>Content-Type</td>
+     *         <td>{@code application/x-www-form-urlencoded}</td>
+     *     </tr>
+     *     <tr>
      *         <td>Required Parameters</td>
      *         <td>{@code activated}</td>
      *     </tr>
@@ -237,7 +241,7 @@ public class UserManagementController {
      *     </tr>
      * </table>
      *
-     * <p>The {@link User}  must belong to the same EatingArea as the {@link User}  whose credentials were submitted.</p>
+     * <p>The {@link User} must belong to the same EatingArea as the {@link User}  whose credentials were submitted.</p>
      *
      * @param userId  {@code true} to activate the account, {@code false} to deactivate the account
      * @param activated  {@code true} to activate the account, {@code false} to deactivate the account
@@ -251,7 +255,7 @@ public class UserManagementController {
      *      in the {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea}</li>
      *  </ul>
      */
-    @PutMapping(value = "{/userId}", params = {"activated"}, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    @PutMapping(value = "/{userId}", params = {"activated"}, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     public ResponseEntity activate(@PathVariable String userId, Boolean activated) {
         String areaId = AuthorizedUser.get().getAreaId();
         userService.activate(areaId, userId, activated);
@@ -268,6 +272,10 @@ public class UserManagementController {
      *             <b>{areaId}</b> existing {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea} ID<br>
      *             <b>{userId}</b> existing {@link User} ID
      *             </td>
+     *     </tr>
+     *     <tr>
+     *         <td>Content-Type</td>
+     *         <td>{@code application/x-www-form-urlencoded}</td>
      *     </tr>
      *     <tr>
      *         <td>Required Parameters</td>

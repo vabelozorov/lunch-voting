@@ -43,7 +43,7 @@ public class UserProfileControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    public void testRegister() throws Exception {
+    public void newUserRegisters() throws Exception {
         UserTo userTo = new UserTo("New User", "new@email.com", "strongPassword");
         User newUser = new User(userTo.getName(), userTo.getEmail(), userTo.getPassword());
 
@@ -61,11 +61,7 @@ public class UserProfileControllerTest extends AbstractControllerTest {
 
         String location = jsonUtils.locationFromMvcResult(result);
         String id = super.getCreatedId(location);
-        String expected = jsonUtils.toJson(ControllerUtils.toMap("id", id));
 
-        assertJson(expected, result.getResponse().getContentAsString());
-
-        when(profileService.get(id)).thenReturn(newUser);
         mockMvc.perform(get(location).with(voter()).accept(MediaType.APPLICATION_JSON))
                                 .andExpect(status().isOk());
     }
@@ -86,17 +82,15 @@ public class UserProfileControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    public void testGet() throws Exception {
-        when(profileService.get(VOTER_ID)).thenReturn(VOTER);
+    public void getUser() throws Exception {
         String actual = mockMvc
                 .perform(
-                        get(REST_URL + "/" + VOTER_ID)
+                        get(REST_URL)
                         .with(csrf())
                         .with(voter())
                 )
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
-        verify(profileService).get(VOTER_ID);
 
         String expected = jsonUtils.toJson(new UserTo(VOTER));
         assertJson(expected, actual);

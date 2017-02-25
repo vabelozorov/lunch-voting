@@ -1,5 +1,6 @@
 package ua.belozorov.lunchvoting.web;
 
+import com.google.common.collect.Sets;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -48,7 +49,7 @@ public class UserManagementControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    public void testUpdate() throws Exception {
+    public void updateUserEmailAndPassword() throws Exception {
         UserTo userTo = new UserTo(VOTER.getName(), "newEmail@email.com", "newPassword");
 
         mockMvc.perform(
@@ -59,11 +60,11 @@ public class UserManagementControllerTest extends AbstractControllerTest {
                 .with(csrf()))
         .andExpect(status().isNoContent());
         verify(userService)
-                .updateMainInfo(areaId, userTo.getId(), userTo.getName(), userTo.getEmail(), userTo.getPassword());
+                .updateMainInfo(areaId, VOTER_ID, userTo.getName(), userTo.getEmail(), userTo.getPassword());
     }
 
     @Test
-    public void testGet() throws Exception {
+    public void getUser() throws Exception {
         when(userService.get(areaId, VOTER_ID)).thenReturn(VOTER);
         String actual = mockMvc
                 .perform(
@@ -133,12 +134,9 @@ public class UserManagementControllerTest extends AbstractControllerTest {
 
     @Test
     public void deactivateUser() throws Exception {
-        Map<String, Object> map = new HashMap<>();
-        map.put("id", VOTER_ID);
-        map.put("activated", false);
         mockMvc.perform(
-                put(REST_URL  + "/activate", testAreas.getFirstAreaId())
-                .content(jsonUtils.toJson(map))
+                put(REST_URL  + "/{id}", testAreas.getFirstAreaId(), VOTER_ID)
+                .param("activated", "false")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .with(god())
                 .with(csrf())
@@ -150,9 +148,7 @@ public class UserManagementControllerTest extends AbstractControllerTest {
 
     @Test
     public void setRoles() throws Exception {
-        Set<UserRole> expectedRoles = new HashSet<>();
-        expectedRoles.add(UserRole.VOTER);
-        expectedRoles.add(UserRole.ADMIN);
+        Set<UserRole> expectedRoles = Sets.newHashSet(UserRole.VOTER, UserRole.ADMIN);
         String rolesString = expectedRoles.stream().map(UserRole::name).collect(Collectors.joining(","));
 
         mockMvc.perform(

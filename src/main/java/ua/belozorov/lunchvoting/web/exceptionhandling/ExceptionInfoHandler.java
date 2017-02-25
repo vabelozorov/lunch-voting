@@ -11,8 +11,11 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import ua.belozorov.lunchvoting.exceptions.*;
+import ua.belozorov.lunchvoting.util.ExceptionUtils;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
 import java.nio.file.AccessDeniedException;
 import java.util.stream.Collectors;
 
@@ -58,6 +61,21 @@ public final class ExceptionInfoHandler {
         return this.logAndCreate(errorInfo);
     }
 
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)  // 400
+    @ExceptionHandler(ConstraintViolationException.class)
+    @ResponseBody
+    public ErrorInfo handleValidationFailure(HttpServletRequest req, ConstraintViolationException ex) {
+        String msg = ex.getConstraintViolations().stream()
+                .map(cv -> String.format(ERROR_MESSAGE_TEMPLATE,
+                        "unknown", //TODO fix error message for Spring method parameter validation
+                        cv.getInvalidValue(),
+                        cv.getMessage())
+                ).collect(Collectors.joining("\n"));
+
+        ErrorInfo errorInfo = new ErrorInfo(req.getRequestURL(), ErrorCode.PARAMS_VALIDATION_FAILED, msg);
+        return this.logAndCreate(errorInfo);
+    }
+
     @ResponseStatus(HttpStatus.NOT_FOUND)  //404
     @ExceptionHandler(NotFoundException.class)
     @ResponseBody
@@ -70,6 +88,16 @@ public final class ExceptionInfoHandler {
     @ResponseBody
     public ErrorInfo handleFor422(HttpServletRequest req, ApplicationException ex) {
         return this.logAndCreate(req, ex);
+    }
+
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)  //500
+    @ExceptionHandler({IllegalStateException.class})
+    public void handleApplicationUnexpectedState(HttpServletRequest req, IllegalStateException ex) throws Exception {
+        int lineNumber = ex.getStackTrace()[0].getLineNumber();
+        String className = ex.getStackTrace()[0].getClassName();
+        String methodName = ex.getStackTrace()[0].getMethodName();
+        String message = ex.getMessage();
+        LOG.error(String.format("%s %s:%d %s", className, message, lineNumber, message));
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)  //500

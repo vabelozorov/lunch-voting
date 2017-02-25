@@ -20,6 +20,7 @@ import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.validation.Validator;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
+import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import ua.belozorov.lunchvoting.DateTimeFormatters;
@@ -93,5 +94,10 @@ public class WebConfig extends WebMvcConfigurerAdapter {
     @Bean
     public ErrorInfoFactory errorInfoFactory() {
         return new ErrorInfoFactory(messageSource());
+    }
+
+    @Bean
+    public MethodValidationPostProcessor methodValidationPostProcessor() {
+        return new MethodValidationPostProcessor();
     }
 }

@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ua.belozorov.lunchvoting.exceptions.NotFoundException;
 import ua.belozorov.lunchvoting.model.lunchplace.LunchPlace;
 import ua.belozorov.lunchvoting.model.voting.polling.LunchPlacePoll;
+import ua.belozorov.lunchvoting.model.voting.polling.TimeConstraint;
 import ua.belozorov.lunchvoting.repository.lunchplace.LunchPlaceRepository;
 import ua.belozorov.lunchvoting.repository.voting.PollRepository;
 
@@ -34,22 +35,11 @@ public final class PollServiceImpl implements PollService {
         this.pollRepository = pollRepository;
     }
 
-    /**
-     * Create a poll where poll items are composed of all currently available menus for today date.
-     * @return Poll
-     * @param areaId
-     */
     @Override
     @Transactional
-    public LunchPlacePoll createPollForTodayMenus(String areaId) {
-        return this.createPollForMenuDate(areaId, LocalDate.now());
-    }
-
-    @Override
-    @Transactional
-    public LunchPlacePoll createPollForMenuDate(String areaId, LocalDate menuDate) {
+    public LunchPlacePoll createPollForMenuDate(String areaId, LocalDate menuDate, TimeConstraint timeConstraint) {
         List<LunchPlace> places = lunchPlaceRepository.getIfMenuForDate(areaId, menuDate);
-        LunchPlacePoll poll = new LunchPlacePoll(places, menuDate);
+        LunchPlacePoll poll = new LunchPlacePoll(timeConstraint, places, menuDate);
         pollRepository.save(poll);
         return poll;
     }

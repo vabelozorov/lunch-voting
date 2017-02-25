@@ -8,17 +8,26 @@ import ua.belozorov.lunchvoting.web.exceptionhandling.ErrorCode;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Objects;
 
 /**
- * <h2></h2>
  *
- * @author vabelozorov on 09.12.16.
+ * Created on 09.12.16.
  */
 @Embeddable
 @Getter(AccessLevel.PUBLIC)
 public final class TimeConstraint {
+    private static final LocalTime DEFAULT_START_TIME = LocalTime.of(9, 0);
+    private static final LocalTime DEFAULT_END_TIME = LocalTime.of(12, 0);
+    private static final LocalTime DEFAULT_ALLOW_CHANGE_VOTE_TIME = LocalTime.of(11, 0);
+
+    public static TimeConstraint getDefault() {
+        return new TimeConstraint();
+    }
+
     @Column(name = "start_time")
     private final LocalDateTime startTime;
 
@@ -29,13 +38,21 @@ public final class TimeConstraint {
     private final LocalDateTime voteChangeThreshold;
 
     protected TimeConstraint() {
-        startTime = null;
-        endTime = null;
-        voteChangeThreshold = null;
+        this(null, null, null);
     }
 
-    TimeConstraint(LocalDateTime startTime, LocalDateTime endTime, LocalDateTime voteChangeThreshold) {
-        ExceptionUtils.checkParamsNotNull(startTime, endTime, voteChangeThreshold);
+    /**
+     *
+     * @param startTime time from which the poll starts to accept votes.
+     * @param endTime starting from this time votes will be rejected.
+     * @param voteChangeThreshold time until which (included) a voter is allowed to change his/her mind.
+     */
+    public TimeConstraint(LocalDateTime startTime, LocalDateTime endTime, LocalDateTime voteChangeThreshold) {
+        LocalDate now = LocalDate.now();
+        startTime = startTime == null ? LocalDateTime.of(now, DEFAULT_START_TIME) : startTime;
+        endTime = endTime == null ? LocalDateTime.of(now, DEFAULT_END_TIME) : endTime;
+        voteChangeThreshold = voteChangeThreshold == null ?
+                LocalDateTime.of(now, DEFAULT_ALLOW_CHANGE_VOTE_TIME) : voteChangeThreshold;
 
         this.startTime = startTime.withNano(0);
         this.endTime = endTime.withNano(0);

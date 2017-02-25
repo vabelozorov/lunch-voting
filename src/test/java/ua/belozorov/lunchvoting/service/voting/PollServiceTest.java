@@ -7,6 +7,7 @@ import ua.belozorov.lunchvoting.WithMockVoter;
 import ua.belozorov.lunchvoting.exceptions.NotFoundException;
 import ua.belozorov.lunchvoting.exceptions.PollException;
 import ua.belozorov.lunchvoting.model.voting.polling.LunchPlacePoll;
+import ua.belozorov.lunchvoting.model.voting.polling.TimeConstraint;
 import ua.belozorov.lunchvoting.repository.voting.PollRepository;
 import ua.belozorov.lunchvoting.service.AbstractServiceTest;
 
@@ -35,24 +36,12 @@ public class PollServiceTest extends AbstractServiceTest {
     private PollRepository pollRepository;
 
     private final String areaId = testAreas.getFirstAreaId();
-    
-    @Test
-    @WithMockAdmin
-    public void createsPollForTodayMenus() throws Exception {
-        reset();
-        LunchPlacePoll expected  = pollService.createPollForTodayMenus(areaId);
-        assertSql(1, 3, 2, 0); //TODO expected 0 updates; consider changing LunchPlacePoll#pollItems to Set?
-
-        LunchPlacePoll actual = pollRepository.getWithPollItems(expected.getId());
-
-        assertThat(actual, matchSingle(expected, POLL_COMPARATOR.noVotes()));
-    }
 
     @Test
     @WithMockAdmin
     public void createPollForMenuDate() throws Exception {
         reset();
-        LunchPlacePoll expected = pollService.createPollForMenuDate(areaId, NOW_DATE.plusDays(2));
+        LunchPlacePoll expected = pollService.createPollForMenuDate(areaId, NOW_DATE.plusDays(2), TimeConstraint.getDefault());
         assertSql(1, 3, 2, 0); //TODO expected 0 updates; consider changing LunchPlacePoll#pollItems to Set?
 
         LunchPlacePoll actual = pollRepository.getWithPollItems(expected.getId());
@@ -63,7 +52,7 @@ public class PollServiceTest extends AbstractServiceTest {
     @Test(expected = PollException.class)
     @WithMockAdmin
     public void failOnCreatePollWhenNoMenusForTheDate() throws Exception {
-        pollService.createPollForMenuDate(areaId, NOW_DATE.plusDays(1));
+        pollService.createPollForMenuDate(areaId, NOW_DATE.plusDays(1), TimeConstraint.getDefault());
     }
 
     @Test

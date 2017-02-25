@@ -16,14 +16,13 @@ import java.time.LocalDateTime;
 import java.util.Set;
 
 /**
- * <h2></h2>
  *
- * @author vabelozorov on 15.11.16.
+ * Created on 15.11.16.
  */
 @Getter
 @Setter
 public final class UserTo {
-    @NotBlank(groups = {Roles.class})
+
     @SafeHtml
     private String id;
 
@@ -39,8 +38,6 @@ public final class UserTo {
     @Size(min = 6, max = 30, groups = {Create.class, Update.class})
     private String password;
 
-    @Size(min = 1, groups = Roles.class)
-    @NotNull(groups = Roles.class)
     private Set<UserRole> roles;
 
     private LocalDateTime registeredDate;
@@ -94,8 +91,4 @@ public final class UserTo {
     public interface Create {}
 
     public interface Update {}
-
-    public interface Activate {}
-
-    public interface Roles {}
 }

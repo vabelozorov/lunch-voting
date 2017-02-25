@@ -3,6 +3,7 @@ package ua.belozorov.lunchvoting.model.voting.polling;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
+import org.jetbrains.annotations.Nullable;
 import ua.belozorov.lunchvoting.exceptions.*;
 import ua.belozorov.lunchvoting.model.base.AbstractPersistableObject;
 import ua.belozorov.lunchvoting.model.lunchplace.LunchPlace;
@@ -27,18 +28,13 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * <h2></h2>
  *
- * @author vabelozorov on 29.11.16.
+ * Created on 29.11.16.
  */
 @Entity
 @Table(name = "polls")
 @Getter(AccessLevel.PUBLIC)
 public class LunchPlacePoll extends AbstractPersistableObject implements Comparable<LunchPlacePoll> {
-    private static final LocalTime DEFAULT_START_TIME = LocalTime.of(9, 0);
-    private static final LocalTime DEFAULT_END_TIME = LocalTime.of(12, 0);
-    private static final LocalTime DEFAULT_ALLOW_CHANGE_VOTE_TIME = LocalTime.of(11, 0);
-
     private final TimeConstraint timeConstraint;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "poll", cascade = CascadeType.PERSIST)
@@ -65,11 +61,9 @@ public class LunchPlacePoll extends AbstractPersistableObject implements Compara
         this.policies = new ArrayList<>();
     }
 
-    public LunchPlacePoll(List<LunchPlace> lunchPlaces, LocalDate menuDate) {
+    public LunchPlacePoll(List<LunchPlace> lunchPlaces, @Nullable LocalDate menuDate) {
         this(
-                LocalDateTime.of(LocalDate.now(), DEFAULT_START_TIME),
-                LocalDateTime.of(LocalDate.now(), DEFAULT_END_TIME),
-                LocalDateTime.of(LocalDate.now(), DEFAULT_ALLOW_CHANGE_VOTE_TIME),
+                TimeConstraint.getDefault(),
                 lunchPlaces,
                 menuDate
         );
@@ -77,18 +71,18 @@ public class LunchPlacePoll extends AbstractPersistableObject implements Compara
 
     /**
      * Primary constructor
-     * @param startTime time from which the poll starts to accept votes.
-     * @param endTime starting from this time votes will be rejected.
-     * @param voteChangeTimeThreshold time until which (included) a voter is allowed to change his/her mind.
+
      * @param lunchPlaces non-null, non-empty list of items to vote for
      */
-    public LunchPlacePoll(LocalDateTime startTime, LocalDateTime endTime, LocalDateTime voteChangeTimeThreshold, List<LunchPlace> lunchPlaces, LocalDate menuDate) {
+    public LunchPlacePoll(TimeConstraint timeConstraint, List<LunchPlace> lunchPlaces, @Nullable LocalDate menuDate) {
         ExceptionUtils.requireNonNullNotEmpty(lunchPlaces, () -> new PollException(ErrorCode.NO_POLL_ITEMS));
+        ExceptionUtils.checkParamsNotNull(timeConstraint);
+
+        this.menuDate = menuDate == null ? LocalDate.now() : menuDate;
         this.checkMenuDate(lunchPlaces, menuDate);
 
-        this.timeConstraint = new TimeConstraint(startTime, endTime,voteChangeTimeThreshold);
+        this.timeConstraint = timeConstraint;
         this.pollItems = this.convertToPollItems(lunchPlaces);
-        this.menuDate = menuDate;
         this.votes = new HashSet<>();
         this.policies = this.registerPolicies();
     }

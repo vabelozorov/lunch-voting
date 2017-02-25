@@ -45,7 +45,6 @@ public class LunchPlace extends AbstractPersistableObject implements Comparable<
     private final Set<Menu> menus;
 
     protected LunchPlace() {
-        super(null, null);
         this.phones = Collections.emptySet();
         this.menus = Collections.emptySet();
         this.description = null;
@@ -54,11 +53,7 @@ public class LunchPlace extends AbstractPersistableObject implements Comparable<
     }
 
     public LunchPlace(String name) {
-        this.name = name;
-        this.address = "";
-        this.description = "";
-        this.phones = new HashSet<>();
-        this.menus = new HashSet<>();
+        this(null, name, null, null, Collections.emptySet());
     }
 
     public LunchPlace(@Nullable String id, String name, String address, String description,

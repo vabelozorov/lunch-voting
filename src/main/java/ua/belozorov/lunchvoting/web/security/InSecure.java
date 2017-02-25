@@ -10,6 +10,7 @@ import java.lang.annotation.Target;
 /**
  * Indicates that an applied target element does not require protection
  * by {@link Secured} annotation
+ *
  * @see ua.belozorov.lunchvoting.util.SecurityEnforcerBeanFactoryPostProcessor
  * @author vabelozorov on 20.02.17.
  */

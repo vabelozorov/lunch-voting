@@ -116,7 +116,7 @@ public final class AreaTestData {
                     && obj.getName().equals(another.getName())
                     && obj.getCreated().equals(another.getCreated())
                     && Objects.equals(obj.getPlaceCount(), another.getPlaceCount())
-                    && Objects.equals(obj.getPlaceIds(), another.getPlaceIds())
+                    && Objects.equals(obj.getPlaces(), another.getPlaces())
                     && Objects.equals(obj.getPollCount(), another.getPollCount())
                     && Objects.equals(obj.getPolls(), another.getPolls())
                     && Objects.equals(obj.getUserCount(), another.getUserCount())

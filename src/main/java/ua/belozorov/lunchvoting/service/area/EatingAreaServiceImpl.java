@@ -11,6 +11,7 @@ import ua.belozorov.lunchvoting.model.UserRole;
 import ua.belozorov.lunchvoting.model.lunchplace.EatingArea;
 import ua.belozorov.lunchvoting.model.lunchplace.LunchPlace;
 import ua.belozorov.lunchvoting.model.voting.polling.LunchPlacePoll;
+import ua.belozorov.lunchvoting.model.voting.polling.TimeConstraint;
 import ua.belozorov.lunchvoting.repository.lunchplace.EatingAreaRepository;
 import ua.belozorov.lunchvoting.repository.lunchplace.EatingAreaRepositoryImpl;
 import ua.belozorov.lunchvoting.service.lunchplace.LunchPlaceService;
@@ -20,6 +21,7 @@ import ua.belozorov.lunchvoting.to.AreaTo;
 import ua.belozorov.lunchvoting.util.ExceptionUtils;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -83,17 +85,25 @@ public final class EatingAreaServiceImpl implements EatingAreaService {
 
     @Override
     @Transactional
-    public LunchPlacePoll createPollInArea(String areaId) {
-        return this.createPollInArea(areaId, LocalDate.now());
+    public LunchPlacePoll createPollInArea(String areaId, LocalDate menuDate, TimeConstraint timeConstraint) {
+        ExceptionUtils.checkParamsNotNull(areaId, ExceptionUtils.NOT_CHECK, timeConstraint);
+
+        LunchPlacePoll poll = pollService.createPollForMenuDate(areaId, menuDate, timeConstraint);
+        EatingArea area = this.getArea(areaId, EatingAreaRepositoryImpl.Fields.POLLS);
+        areaRepository.update(area.addPoll(poll));
+        return poll;
     }
 
     @Override
     @Transactional
-    public LunchPlacePoll createPollInArea(String areaId, LocalDate menuDate) {
-        LunchPlacePoll poll = pollService.createPollForMenuDate(areaId, menuDate);
-        EatingArea area = this.getArea(areaId, EatingAreaRepositoryImpl.Fields.POLLS);
-        areaRepository.update(area.addPoll(poll));
-        return poll;
+    public LunchPlacePoll createPollInArea(String areaId, LocalDate menuDate,
+                                           LocalDateTime startTime,
+                                           LocalDateTime endTime,
+                                           LocalDateTime voteChangeTime) {
+        ExceptionUtils.checkParamsNotNull(areaId);
+
+        TimeConstraint timeConstraint = new TimeConstraint(startTime, endTime, voteChangeTime);
+        return this.createPollInArea(areaId, menuDate, timeConstraint);
     }
 
     @Override

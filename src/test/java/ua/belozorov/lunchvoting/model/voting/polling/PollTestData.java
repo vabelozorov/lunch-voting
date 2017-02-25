@@ -8,6 +8,7 @@ import ua.belozorov.lunchvoting.EqualsComparator;
 import ua.belozorov.lunchvoting.model.lunchplace.LunchPlaceTestData;
 import ua.belozorov.objtosql.*;
 
+import java.sql.Time;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -85,10 +86,12 @@ public class PollTestData {
     private LunchPlacePoll createPastPoll(LunchPlaceTestData placeTestData) {
         LocalDate menuDatePast = NOW_DATE.minusDays(2);
 
-        LunchPlacePoll poll = new LunchPlacePoll(
+        TimeConstraint timeConstraint = new TimeConstraint(
                 NOW_DATE_TIME.minusDays(2).minusHours(2),
                 NOW_DATE_TIME.minusDays(2).plusHours(2),
-                NOW_DATE_TIME.minusDays(2).plusMinutes(10),
+                NOW_DATE_TIME.minusDays(2).plusMinutes(10)
+        );
+        LunchPlacePoll poll = new LunchPlacePoll(timeConstraint,
                 Arrays.asList(
                         getWithFilteredMenu(menuDatePast, placeTestData.getPlace1()),
                         getWithFilteredMenu(menuDatePast, placeTestData.getPlace2())
@@ -105,10 +108,11 @@ public class PollTestData {
 
     private LunchPlacePoll createActivePoll(LunchPlaceTestData placeTestData) {
         LocalDate menuDateToday = NOW_DATE;
-        LunchPlacePoll poll =  new LunchPlacePoll(
-                NOW_DATE_TIME.minusHours(2),
+        TimeConstraint timeConstraint = new TimeConstraint(NOW_DATE_TIME.minusHours(2),
                 NOW_DATE_TIME.plusHours(2),
-                NOW_DATE_TIME.plusMinutes(10),
+                NOW_DATE_TIME.plusMinutes(10)
+        );
+        LunchPlacePoll poll =  new LunchPlacePoll(timeConstraint,
                 Arrays.asList(
                         getWithFilteredMenu(menuDateToday, placeTestData.getPlace3()),
                         getWithFilteredMenu(menuDateToday, placeTestData.getPlace4())
@@ -125,10 +129,10 @@ public class PollTestData {
 
     private LunchPlacePoll createActivePollNoUpdate(LunchPlaceTestData placeTestData) {
         LocalDate menuDateToday = NOW_DATE;
-        LunchPlacePoll poll = new LunchPlacePoll(
-                NOW_DATE_TIME.minusHours(2),
+        TimeConstraint timeConstraint = new TimeConstraint(NOW_DATE_TIME.minusHours(2),
                 NOW_DATE_TIME.plusHours(2),
-                NOW_DATE_TIME.minusMinutes(10),
+                NOW_DATE_TIME.minusMinutes(10));
+        LunchPlacePoll poll = new LunchPlacePoll(timeConstraint,
                 Arrays.asList(
                         getWithFilteredMenu(menuDateToday, placeTestData.getPlace3()),
                         getWithFilteredMenu(menuDateToday, placeTestData.getPlace4())
@@ -141,10 +145,12 @@ public class PollTestData {
 
     private LunchPlacePoll createFuturePoll(LunchPlaceTestData placeTestData) {
         LocalDate menuDateFuture = NOW_DATE.plusDays(2);
-        return new LunchPlacePoll(
+        TimeConstraint timeConstraint = new TimeConstraint(
                 NOW_DATE_TIME.plusDays(1).minusHours(2),
                 NOW_DATE_TIME.plusDays(1).plusHours(2),
-                NOW_DATE_TIME.plusDays(1).plusMinutes(10),
+                NOW_DATE_TIME.plusDays(1).plusMinutes(10)
+        );
+        return new LunchPlacePoll(timeConstraint,
                 Arrays.asList(
                         getWithFilteredMenu(menuDateFuture, placeTestData.getPlace1()),
                         getWithFilteredMenu(menuDateFuture, placeTestData.getPlace2())
@@ -155,10 +161,12 @@ public class PollTestData {
 
     private LunchPlacePoll createA2Poll1(LunchPlaceTestData placeTestData) {
         LocalDate menuDateToday = NOW_DATE;
-        return new LunchPlacePoll(
+        TimeConstraint timeConstraint = new TimeConstraint(
                 NOW_DATE_TIME.minusHours(2),
                 NOW_DATE_TIME.plusHours(2),
-                NOW_DATE_TIME.plusMinutes(10),
+                NOW_DATE_TIME.plusMinutes(10)
+        );
+        return new LunchPlacePoll(timeConstraint,
                 Arrays.asList(
                         getWithFilteredMenu(menuDateToday, placeTestData.getArea2place1()),
                         getWithFilteredMenu(menuDateToday, placeTestData.getArea2place2())

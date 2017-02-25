@@ -1,10 +1,12 @@
 package ua.belozorov.lunchvoting.service.area;
 
 import org.jetbrains.annotations.Nullable;
+import org.springframework.transaction.annotation.Transactional;
 import ua.belozorov.lunchvoting.model.User;
 import ua.belozorov.lunchvoting.model.lunchplace.EatingArea;
 import ua.belozorov.lunchvoting.model.lunchplace.LunchPlace;
 import ua.belozorov.lunchvoting.model.voting.polling.LunchPlacePoll;
+import ua.belozorov.lunchvoting.model.voting.polling.TimeConstraint;
 import ua.belozorov.lunchvoting.repository.lunchplace.EatingAreaRepository;
 import ua.belozorov.lunchvoting.repository.lunchplace.EatingAreaRepositoryImpl;
 import ua.belozorov.lunchvoting.to.AreaTo;
@@ -12,13 +14,13 @@ import ua.belozorov.lunchvoting.web.security.IsAdmin;
 import ua.belozorov.lunchvoting.web.security.IsAdminOrVoter;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
 /**
- * <h2></h2>
  *
- * @author vabelozorov on 08.02.17.
+ * Created on 08.02.17.
  */
 public interface EatingAreaService {
 
@@ -47,9 +49,12 @@ public interface EatingAreaService {
     LunchPlace createPlaceInArea(String areaId, @Nullable String id, String name, @Nullable String address, @Nullable String description,
                                  Set<String> phones);
 
-    LunchPlacePoll createPollInArea(String areaId);
+    LunchPlacePoll createPollInArea(String areaId, LocalDate menuDate, TimeConstraint timeConstraint);
 
-    LunchPlacePoll createPollInArea(String areaId, LocalDate menuDate);
+    LunchPlacePoll createPollInArea(String areaId, LocalDate menuDate,
+                                    LocalDateTime startTime,
+                                    LocalDateTime endTime,
+                                    LocalDateTime voteChangeTime);
 
     void updateAreaName(String name, User user);
 

@@ -160,21 +160,9 @@ public class EatingAreaServiceTest extends AbstractServiceTest {
 
     @Test
     @WithMockAdmin
-    public void createPollInAreaForTodayMenus() throws Exception {
-        reset();
-        LunchPlacePoll expected  = areaService.createPollInArea(areaId);
-        assertSql(3, 3, 4, 0); //TODO expected 2 update; consider changing LunchPlacePoll#pollItems to Set?
-
-        LunchPlacePoll actual = pollService.getRepository().getWithPollItems(areaId, expected.getId());
-
-        assertThat(actual, matchSingle(expected, POLL_COMPARATOR.noVotes()));
-    }
-
-    @Test
-    @WithMockAdmin
     public void createPollInAreaForMenuDate() throws Exception {
         reset();
-        LunchPlacePoll expected = areaService.createPollInArea(areaId, NOW_DATE.plusDays(2));
+        LunchPlacePoll expected = areaService.createPollInArea(areaId, NOW_DATE.plusDays(2), null, null, null);
         assertSql(3, 3, 4, 0); //TODO expected 2 update; consider changing LunchPlacePoll#pollItems to Set?
 
         LunchPlacePoll actual = pollService.getRepository().getWithPollItems(areaId, expected.getId());
