@@ -6,7 +6,7 @@ import javax.persistence.AttributeConverter;
 import java.util.Set;
 
 /**
- * <h2></h2>
+
  *
  * Created on 07.02.17.
  */

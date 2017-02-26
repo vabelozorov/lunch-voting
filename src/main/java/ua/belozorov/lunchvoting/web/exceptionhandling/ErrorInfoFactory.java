@@ -8,7 +8,7 @@ import ua.belozorov.lunchvoting.exceptions.ApplicationException;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * <h2></h2>
+
  *
  * Created on 17.02.17.
  */

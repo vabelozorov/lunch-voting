@@ -13,7 +13,7 @@ import java.util.List;
 import static org.junit.Assert.*;
 
 /**
- * <h2></h2>
+
  *
  * Created on 09.12.16.
  */

@@ -7,7 +7,7 @@ import static org.junit.Assert.*;
 import static ua.belozorov.lunchvoting.model.UserTestData.ALIEN_USER1;
 
 /**
- * <h2></h2>
+
  *
  * Created on 10.02.17.
  */

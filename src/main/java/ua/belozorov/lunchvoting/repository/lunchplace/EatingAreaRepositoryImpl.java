@@ -13,7 +13,7 @@ import java.util.*;
 import java.util.function.Function;
 
 /**
- * <h2></h2>
+
  *
  * Created on 08.02.17.
  */

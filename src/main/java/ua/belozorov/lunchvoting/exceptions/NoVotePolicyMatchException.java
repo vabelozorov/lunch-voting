@@ -4,7 +4,7 @@ import ua.belozorov.lunchvoting.model.voting.polling.VoteIntention;
 import ua.belozorov.lunchvoting.web.exceptionhandling.ErrorCode;
 
 /**
- * <h2></h2>
+
  *
  * Created on 18.02.17.
  */

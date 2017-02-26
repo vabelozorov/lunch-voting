@@ -29,7 +29,7 @@ import static ua.belozorov.lunchvoting.model.UserTestData.*;
 import static ua.belozorov.lunchvoting.model.lunchplace.AreaTestData.REQUEST_COMPARATOR;
 
 /**
- * <h2></h2>
+
  *
  * Created on 15.02.17.
  */

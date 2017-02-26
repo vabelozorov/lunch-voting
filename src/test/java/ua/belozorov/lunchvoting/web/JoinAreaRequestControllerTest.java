@@ -29,7 +29,7 @@ import static ua.belozorov.lunchvoting.model.UserTestData.*;
 import static ua.belozorov.lunchvoting.util.ControllerUtils.toMap;
 
 /**
- * <h2></h2>
+
  *
  * Created on 12.02.17.
  */

@@ -8,7 +8,7 @@ import ua.belozorov.lunchvoting.to.AreaTo;
 import java.util.List;
 
 /**
- * <h2></h2>
+
  *
  * Created on 08.02.17.
  */

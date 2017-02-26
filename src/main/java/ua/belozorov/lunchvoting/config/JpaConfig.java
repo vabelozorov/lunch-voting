@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.Properties;
 
 /**
- * <h2></h2>
+
  *
  * Created on 16.11.16.
  */

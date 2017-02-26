@@ -27,7 +27,7 @@ import static ua.belozorov.lunchvoting.model.UserTestData.VOTER;
 import static ua.belozorov.lunchvoting.model.UserTestData.VOTER_ID;
 
 /**
- * <h2></h2>
+
  *
  * Created on 08.02.17.
  */

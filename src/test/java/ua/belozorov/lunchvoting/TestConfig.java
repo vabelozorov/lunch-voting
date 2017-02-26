@@ -8,7 +8,7 @@ import ua.belozorov.lunchvoting.repository.user.UserRepository;
 import ua.belozorov.lunchvoting.service.user.UserServiceImpl;
 
 /**
- * <h2></h2>
+
  *
  * Created on 14.12.16.
  */

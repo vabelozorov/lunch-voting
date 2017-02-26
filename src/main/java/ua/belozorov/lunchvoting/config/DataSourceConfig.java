@@ -12,7 +12,6 @@ import ua.belozorov.lunchvoting.SPRING_PROFILES;
 import javax.sql.DataSource;
 
 /**
- * <h2></h2>
  *
  * Created on 08.02.17.
  */

@@ -1,7 +1,7 @@
 package ua.belozorov.lunchvoting.web.exceptionhandling;
 
 /**
- * <h2></h2>
+
  *
  * Created on 07.02.17.
  */

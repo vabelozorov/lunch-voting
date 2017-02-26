@@ -3,7 +3,7 @@ package ua.belozorov.lunchvoting.repository.lunchplace;
 import ua.belozorov.lunchvoting.model.lunchplace.Menu;
 
 /**
- * <h2></h2>
+
  *
  * Created on 02.12.16.
  */

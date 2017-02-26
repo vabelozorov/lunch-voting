@@ -11,7 +11,7 @@ import static org.junit.Assert.assertTrue;
 import static ua.belozorov.lunchvoting.model.UserTestData.*;
 
 /**
- * <h2></h2>
+
  *
  * Created on 09.12.16.
  */

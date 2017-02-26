@@ -11,7 +11,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
- * <h2></h2>
+
  *
  * Created on 21.11.16.
  */

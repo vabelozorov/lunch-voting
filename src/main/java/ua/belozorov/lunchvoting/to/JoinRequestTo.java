@@ -6,7 +6,7 @@ import ua.belozorov.lunchvoting.model.lunchplace.JoinAreaRequest;
 import java.time.LocalDateTime;
 
 /**
- * <h2></h2>
+
  *
  * Created on 12.02.17.
  */

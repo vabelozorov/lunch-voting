@@ -1,7 +1,7 @@
 package ua.belozorov.lunchvoting;
 
 /**
- * <h2></h2>
+
  *
  * Created on 02.12.16.
  */

@@ -23,7 +23,7 @@ import static ua.belozorov.lunchvoting.model.UserTestData.A1_USERS;
 import static ua.belozorov.lunchvoting.model.UserTestData.A2_USERS;
 
 /**
- * <h2></h2>
+
  *
  * Created on 09.02.17.
  */

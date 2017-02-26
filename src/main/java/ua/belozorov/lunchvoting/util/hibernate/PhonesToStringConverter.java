@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * <h2></h2>
+
  *
  * Created on 12.12.16.
  */

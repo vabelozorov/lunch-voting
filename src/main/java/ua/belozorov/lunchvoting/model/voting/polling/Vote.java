@@ -12,7 +12,7 @@ import java.util.Objects;
 import static java.util.Optional.ofNullable;
 
 /**
- * <h2></h2>
+
  *
  * Created on 20.11.16.
  */

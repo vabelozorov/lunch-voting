@@ -19,7 +19,7 @@ import java.util.stream.Stream;
 import static ua.belozorov.lunchvoting.AbstractTest.NOW_DATE;
 
 /**
- * <h2></h2>
+
  *
  * Created on 22.11.16.
  */

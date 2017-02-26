@@ -11,7 +11,7 @@ import ua.belozorov.lunchvoting.util.ExceptionUtils;
 import static java.util.Optional.ofNullable;
 
 /**
- * <h2></h2>
+
  *
  * Created on 14.02.17.
  */

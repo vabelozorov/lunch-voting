@@ -308,7 +308,7 @@ public class LunchPlaceController  {
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
-    /**
+    /*
      * @see RefinedFields
      */
     private final static class LunchPlaceRefinedFields implements RefinedFields {

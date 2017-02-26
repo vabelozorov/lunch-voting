@@ -12,7 +12,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
 /**
- * <h2></h2>
+
  *
  * Created on 15.11.16.
  */

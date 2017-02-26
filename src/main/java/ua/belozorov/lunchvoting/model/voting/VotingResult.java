@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * <h2></h2>
+
  * @param <I> classification item of VoteStatistics implementation
  * Created on 10.12.16.
  */

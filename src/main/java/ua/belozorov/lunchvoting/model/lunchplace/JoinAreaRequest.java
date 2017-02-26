@@ -9,7 +9,7 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 
 /**
- * <h2></h2>
+
  *
  * Created on 09.02.17.
  */

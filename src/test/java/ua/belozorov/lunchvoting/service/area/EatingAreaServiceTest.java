@@ -46,7 +46,7 @@ import static ua.belozorov.lunchvoting.model.voting.polling.PollTestData.*;
 import static ua.belozorov.lunchvoting.model.voting.polling.PollTestData.POLL_COMPARATOR;
 
 /**
- * <h2></h2>
+
  *
  * Created on 09.02.17.
  */

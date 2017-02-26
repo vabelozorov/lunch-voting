@@ -8,7 +8,7 @@ import ua.belozorov.lunchvoting.web.security.IsAdminOrVoter;
 import java.util.List;
 
 /**
- * <h2></h2>
+
  *
  * Created on 15.02.17.
  */

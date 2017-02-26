@@ -18,7 +18,7 @@ import ua.belozorov.lunchvoting.service.voting.VotingService;
 import static org.mockito.Mockito.mock;
 
 /**
- * <h2></h2>
+
  *
  * Created on 22.02.17.
  */

@@ -25,7 +25,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
- * <h2></h2>
+
  *
  * Created on 17.11.16.
  */

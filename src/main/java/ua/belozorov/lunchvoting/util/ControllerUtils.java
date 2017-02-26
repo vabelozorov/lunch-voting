@@ -7,7 +7,7 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 /**
- * <h2></h2>
+
  *
  * Created on 07.02.17.
  */

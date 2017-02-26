@@ -9,7 +9,7 @@ import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 /**
- * <h2></h2>
+
  * @param <I> represents grouping item (key)
  *
  * Created on 29.11.16.

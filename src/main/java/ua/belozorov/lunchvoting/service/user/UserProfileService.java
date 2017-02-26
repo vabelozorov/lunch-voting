@@ -4,7 +4,7 @@ import ua.belozorov.lunchvoting.model.User;
 import ua.belozorov.lunchvoting.repository.user.UserRepository;
 
 /**
- * <h2></h2>
+
  *
  * Created on 14.02.17.
  */

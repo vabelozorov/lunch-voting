@@ -23,7 +23,7 @@ import static ua.belozorov.lunchvoting.MatcherUtils.matchSingle;
 import static ua.belozorov.lunchvoting.model.UserTestData.*;
 
 /**
- * <h2></h2>
+
  *
  * Created on 17.11.16.
  */

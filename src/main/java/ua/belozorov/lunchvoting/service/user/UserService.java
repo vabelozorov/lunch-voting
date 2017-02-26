@@ -11,7 +11,7 @@ import java.util.Set;
 import java.util.function.Supplier;
 
 /**
- * <h2></h2>
+
  *
  * Created on 15.11.16.
  */

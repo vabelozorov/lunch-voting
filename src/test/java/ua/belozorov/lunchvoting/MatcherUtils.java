@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 import static com.vladmihalcea.sql.SQLStatementCountValidator.*;
 
 /**
- * <h2></h2>
+
  *
  * Created on 22.11.16.
  */

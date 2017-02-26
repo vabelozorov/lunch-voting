@@ -11,7 +11,7 @@ import ua.belozorov.objtosql.StringSqlColumn;
 import java.util.*;
 
 /**
- * <h2></h2>
+
  *
  * Created on 14.01.17.
  */

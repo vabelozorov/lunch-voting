@@ -9,7 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
- * <h2></h2>
+
  *
  * Created on 19.02.17.
  */

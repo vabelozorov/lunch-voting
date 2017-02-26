@@ -3,7 +3,7 @@ package ua.belozorov.lunchvoting.web.exceptionhandling;
 import ua.belozorov.lunchvoting.exceptions.ApplicationException;
 
 /**
- * <h2></h2>
+
  *
  * Created on 07.02.17.
  */

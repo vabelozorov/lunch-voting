@@ -42,7 +42,7 @@ import static ua.belozorov.lunchvoting.model.UserTestData.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
 
 /**
- * <h2></h2>
+
  *
  * Created on 12.02.17.
  */

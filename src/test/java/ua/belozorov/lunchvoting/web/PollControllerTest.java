@@ -28,7 +28,7 @@ import static ua.belozorov.lunchvoting.DateTimeFormatters.DATE_FORMATTER;
 import static ua.belozorov.lunchvoting.DateTimeFormatters.DATE_TIME_FORMATTER;
 
 /**
- * <h2></h2>
+
  *
  * Created on 04.02.17.
  */

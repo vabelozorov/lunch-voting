@@ -12,7 +12,7 @@ import java.util.Set;
 import static ua.belozorov.lunchvoting.util.Pair.pairOf;
 
 /**
- * <h2></h2>
+
  *
  * Created on 02.12.16.
  */

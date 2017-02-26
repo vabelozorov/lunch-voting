@@ -6,6 +6,7 @@ import ua.belozorov.lunchvoting.model.lunchplace.Dish;
 import ua.belozorov.lunchvoting.model.lunchplace.LunchPlace;
 import ua.belozorov.lunchvoting.model.lunchplace.Menu;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.Collections;
@@ -21,8 +22,10 @@ import java.util.Set;
 public final class MenuTo {
 
     private final String id;
+
     @NotNull
     private final LocalDate effectiveDate;
+
     @NotNull
     private final Set<Dish> dishes;
 

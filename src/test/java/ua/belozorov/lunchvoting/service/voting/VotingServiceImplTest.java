@@ -25,7 +25,7 @@ import static ua.belozorov.lunchvoting.model.voting.polling.VoteTestData.VOTE_CO
 
 
 /**
- * <h2></h2>
+
  *
  * Created on 04.01.17.
  */

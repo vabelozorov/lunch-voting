@@ -26,7 +26,7 @@ import ua.belozorov.lunchvoting.service.voting.VotingService;
 import ua.belozorov.lunchvoting.service.voting.VotingServiceImpl;
 
 /**
- * <h2></h2>
+
  *
  * Created on 23.02.17.
  */

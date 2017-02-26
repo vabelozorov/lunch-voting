@@ -14,7 +14,7 @@ import java.util.Set;
 import static ua.belozorov.lunchvoting.util.Pair.*;
 
 /**
- * <h2></h2>
+
  *
  * Created on 21.11.16.
  */

@@ -8,7 +8,7 @@ import ua.belozorov.lunchvoting.web.exceptionhandling.ErrorCode;
 import java.util.Collection;
 
 /**
- * <h2></h2>
+
  *
  * Created on 17.11.16.
  */

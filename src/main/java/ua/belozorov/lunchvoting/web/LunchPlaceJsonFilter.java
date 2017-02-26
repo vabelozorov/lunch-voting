@@ -10,7 +10,7 @@ import ua.belozorov.lunchvoting.model.lunchplace.Menu;
 
 
 /**
- * <h2></h2>
+
  *
  * Created on 31.12.16.
  */

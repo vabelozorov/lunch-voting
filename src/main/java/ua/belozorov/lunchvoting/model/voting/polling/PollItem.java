@@ -11,7 +11,7 @@ import javax.validation.constraints.NotNull;
 import java.util.Objects;
 
 /**
- * <h2></h2>
+
  *
  * Created on 03.12.16.
  */

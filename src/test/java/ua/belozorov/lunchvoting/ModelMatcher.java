@@ -7,7 +7,7 @@ import java.util.Comparator;
 import java.util.Objects;
 
 /**
- * <h2></h2>
+
  *
  * Created on 17.11.16.
  */

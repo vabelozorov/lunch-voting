@@ -8,7 +8,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * <h2></h2>
+
  *
  * Created on 20.02.17.
  */

@@ -5,7 +5,7 @@ import ua.belozorov.lunchvoting.model.voting.polling.Vote;
 import java.util.Set;
 
 /**
- * <h2></h2>
+
  *
  * Created on 19.01.17.
  */
