@@ -3,6 +3,7 @@ package ua.belozorov.lunchvoting.model;
 import com.google.common.collect.Sets;
 import lombok.Getter;
 import org.hibernate.annotations.DynamicUpdate;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -48,6 +49,7 @@ public final class User extends AbstractPersistableObject implements Comparable<
     private final boolean activated;
 
     @Column(name = "area_id")
+    @Getter(onMethod = @__({@Nullable}))
     private final String areaId;
 
     /**

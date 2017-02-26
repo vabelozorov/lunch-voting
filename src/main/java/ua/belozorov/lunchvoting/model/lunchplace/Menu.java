@@ -9,17 +9,21 @@ import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.hibernate.validator.constraints.NotEmpty;
+import org.jetbrains.annotations.Nullable;
 import ua.belozorov.lunchvoting.model.base.AbstractPersistableObject;
+import ua.belozorov.lunchvoting.util.ExceptionUtils;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static java.util.Optional.ofNullable;
+import static ua.belozorov.lunchvoting.util.ExceptionUtils.NOT_CHECK;
 
 /**
-
+ * Immutable class that represents menu of a certain {@link LunchPlace}
  *
  * Created on 21.11.16.
  */
@@ -30,88 +34,69 @@ import static java.util.Optional.ofNullable;
 public final class Menu extends AbstractPersistableObject implements Comparable<Menu> {
 
     @Column(name = "effective_date", nullable = false)
-    @NotNull
     private final LocalDate effectiveDate;
 
     @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name = "dishes", joinColumns = @JoinColumn(name = "menu_id"))
-    @NotEmpty
     private final Set<Dish> dishes;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "place_id")
-    @NotNull
     @JsonIgnore
     private final LunchPlace lunchPlace;
 
     /**
-     *  For JPA only
+     *  JPA
      */
-    protected Menu() {
-        super(null, null);
+    Menu() {
         effectiveDate = null;
-        dishes = null;
+        dishes = Collections.emptySet();
         lunchPlace = null;
     }
 
-    @Builder
+    /**
+     * Simple constructor with auto-generating for ID
+     * @param effectiveDate a date for which this menu will be considered valid
+     * @param dishes
+     * @param lunchPlace
+     */
     public Menu(LocalDate effectiveDate, Set<Dish> dishes, LunchPlace lunchPlace) {
         this(null, null, effectiveDate, dishes, lunchPlace);
     }
 
     /**
-     * All-args constructor. Intended for using in tests
-     *
-     * @param id should be null when creating a new entity, non-empty/non-blank string otherwise
-     * @param version must be null for a new entity
-     * @param effectiveDate - if null, the current time is used
-     * @param dishes must not be empty collection or null. Empty menu does not make much sense
+     * All-args constructor for cloning setters
+     * @param id any string or null to auto-generate
+     * @param version a positive value to indicate a persisted instance or null for a transient instance
+     * @param effectiveDate a date for which this menu will be considered valid
+     * @param dishes
      * @param lunchPlace
      */
-    private Menu(String id, Integer version, LocalDate effectiveDate, Collection<Dish> dishes, LunchPlace lunchPlace) {
+    private Menu(@Nullable String id, @Nullable Integer version, LocalDate effectiveDate, Set<Dish> dishes, LunchPlace lunchPlace) {
         super(id, version);
-        this.effectiveDate = Objects.requireNonNull(effectiveDate, "effectiveDate must not be null");
-        this.dishes = Objects.requireNonNull(new HashSet<>(dishes));
-        this.lunchPlace = Objects.requireNonNull(lunchPlace);
+
+        ExceptionUtils.checkParamsNotNull(NOT_CHECK, NOT_CHECK, effectiveDate, dishes, lunchPlace);
+
+        this.effectiveDate = effectiveDate;
+        this.dishes = dishes;
+        this.lunchPlace = lunchPlace;
     }
 
     public Set<Dish> getDishes() {
         return ImmutableSortedSet.copyOf(this.dishes);
     }
 
-    public static MenuBuilder builder() {
-        return new MenuBuilder();
+    public Menu withEffectiveDate(LocalDate effectiveDate) {
+        return new Menu(id, version, effectiveDate, dishes, lunchPlace);
     }
 
-    public static MenuBuilder builder(Menu menu) {
-        return new MenuBuilder(menu);
+    public Menu withDishes(Set<Dish> dishes) {
+        return new Menu(id, version, effectiveDate, dishes, lunchPlace);
     }
 
     @Override
     public int compareTo(Menu o) {
         int i = (-1) * this.effectiveDate.compareTo(o.effectiveDate);
         return i != 0 ? i : this.id.compareTo(o.id);
-    }
-
-    public static class MenuBuilder {
-        private LocalDate effectiveDate;
-        private Collection<Dish> dishes;
-        private LunchPlace lunchPlace;
-        private Integer version;
-        private String id;
-
-        public MenuBuilder() { }
-
-        public MenuBuilder(Menu menu) {
-            this.id = menu.id;
-            this.version = menu.version;
-            this.effectiveDate = menu.effectiveDate;
-            this.dishes = menu.dishes;
-            this.lunchPlace = menu.lunchPlace;
-        }
-
-        public Menu build() {
-            return new Menu(id, version, effectiveDate, dishes, lunchPlace);
-        }
     }
 }

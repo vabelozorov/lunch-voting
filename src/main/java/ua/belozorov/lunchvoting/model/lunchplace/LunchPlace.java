@@ -18,6 +18,7 @@ import java.util.*;
 import static ua.belozorov.lunchvoting.util.ExceptionUtils.NOT_CHECK;
 
 /**
+ * Immutable class that represent a place where a voter can have a meal
  *
  * Created on 15.11.16.
  */
@@ -103,10 +104,16 @@ public class LunchPlace extends AbstractPersistableObject implements Comparable<
         this.menus = menus;
     }
 
+    /**
+     * @return set of strings for phones sorted in the natural order
+     */
     public Set<String> getPhones() {
         return ImmutableSortedSet.copyOf(this.phones);
     }
 
+    /**
+     * @return Menu objects sorted according to string natural sorting
+     */
     public Set<Menu> getMenus() {
         return ImmutableSortedSet.copyOf(this.menus);
     }
