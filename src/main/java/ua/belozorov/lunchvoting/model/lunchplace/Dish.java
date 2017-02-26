@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.validator.constraints.NotBlank;
+import ua.belozorov.lunchvoting.util.ExceptionUtils;
 
 import javax.annotation.PostConstruct;
 import javax.persistence.Embeddable;
@@ -12,13 +13,12 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
 /**
-
+ * Immutable Dish for {@link Menu}
  *
  * Created on 15.11.16.
  */
 @Embeddable
 @Getter
-@Immutable
 public final class Dish implements Comparable<Dish> {
 
     private final String name;
@@ -27,13 +27,27 @@ public final class Dish implements Comparable<Dish> {
 
     private final int position;
 
-    protected Dish() {
+    /**
+     * JPA
+     */
+    Dish() {
         name = "";
         price = -1f;
         position = -1;
     }
 
+    /**
+     * @param name
+     * @param price >=0
+     * @param position must be unique within the same menu and >=0
+     */
     public Dish(String name, float price, int position) {
+        ExceptionUtils.checkParamsNotNull(name);
+
+        if (price < 0 || position < 0) {
+            throw new IllegalStateException("price or position cannot be less than 0");
+        }
+
         this.name = name;
         this.price = price;
         this.position = position;
