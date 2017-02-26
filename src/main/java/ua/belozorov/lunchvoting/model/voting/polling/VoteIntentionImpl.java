@@ -69,6 +69,6 @@ final class VoteIntentionImpl implements VoteIntention {
 
     @Override
     public Vote toVote() {
-        return new Vote(this.voterId, this.pollItem.getPoll(), this.pollItem, this.time);
+        return new Vote(this.voterId, this.pollItem.getPoll(), this.pollItem).withVoteTime(this.time);
     }
 }

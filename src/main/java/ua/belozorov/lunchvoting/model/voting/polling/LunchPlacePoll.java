@@ -33,6 +33,15 @@ import static ua.belozorov.lunchvoting.util.ExceptionUtils.NOT_CHECK;
  * his/her vote.
  * This implementation does not accepts {@link LunchPlace} objects which have no
  * {@link Menu} objects for a configured {@code menuDate}.
+ * <p>
+ *     Default set of policies for this implementation prohibits multiple votes for the same poll from the same voter.
+ *     Votes are accepted only when the poll is active which is between its start and end time as configured by
+ *     {@link TimeConstraint}.
+ * </p>
+ * <p>
+ *     Also policy allow to change the vote before a time threshold as configured by
+ *     {@link TimeConstraint}.
+ * </p>
  * <p>This class implements {@link Comparable} to support a natural sorting which is by its {@code menuDate},
  * then by ID.</p>
  * <p><b>NOTE:</b>

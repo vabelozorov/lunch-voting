@@ -101,7 +101,8 @@ public class PollTestData {
         PollItem[] items = new PollItem[]{poll.getPollItems().get(0), poll.getPollItems().get(1)};
         Set<Vote> votes = new HashSet<>();
         for (int i = 0; i < A1_VOTERS.size(); i++) {
-            votes.add(new Vote(A1_VOTERS.get(i).getId(), poll, items[i & 1], NOW_DATE_TIME.minusDays(2).plusSeconds(10*i)));
+            votes.add(new Vote(A1_VOTERS.get(i).getId(), poll, items[i & 1])
+                            .withVoteTime(NOW_DATE_TIME.minusDays(2).plusSeconds(10*i)));
         }
         return poll.withVotes(votes);
     }
@@ -122,7 +123,8 @@ public class PollTestData {
         PollItem[] items = new PollItem[]{poll.getPollItems().get(0), poll.getPollItems().get(1)};
         Set<Vote> votes = new HashSet<>();
         for (int i = 0; i < A1_VOTERS.size(); i++) {
-            votes.add(new Vote(A1_VOTERS.get(i).getId(), poll, items[i & 1], NOW_DATE_TIME.minusHours(1).plusSeconds(10*i)));
+            votes.add(new Vote(A1_VOTERS.get(i).getId(), poll, items[i & 1])
+                            .withVoteTime(NOW_DATE_TIME.minusHours(1).plusSeconds(10*i)));
         }
         return poll.withVotes(votes);
     }
@@ -139,7 +141,7 @@ public class PollTestData {
                 ),
                 menuDateToday
         );
-        Vote vote = new Vote(VOTER_ID, poll, poll.getPollItems().get(0), NOW_DATE_TIME);
+        Vote vote = new Vote(VOTER_ID, poll, poll.getPollItems().get(0));
         return poll.withVotes(Collections.singleton(vote));
     }
 
