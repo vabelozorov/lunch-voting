@@ -103,7 +103,7 @@ public class PollTestData {
         for (int i = 0; i < A1_VOTERS.size(); i++) {
             votes.add(new Vote(A1_VOTERS.get(i).getId(), poll, items[i & 1], NOW_DATE_TIME.minusDays(2).plusSeconds(10*i)));
         }
-        return poll.toBuilder().votes(votes).build();
+        return poll.withVotes(votes);
     }
 
     private LunchPlacePoll createActivePoll(LunchPlaceTestData placeTestData) {
@@ -124,7 +124,7 @@ public class PollTestData {
         for (int i = 0; i < A1_VOTERS.size(); i++) {
             votes.add(new Vote(A1_VOTERS.get(i).getId(), poll, items[i & 1], NOW_DATE_TIME.minusHours(1).plusSeconds(10*i)));
         }
-        return poll.toBuilder().votes(votes).build();
+        return poll.withVotes(votes);
     }
 
     private LunchPlacePoll createActivePollNoUpdate(LunchPlaceTestData placeTestData) {
@@ -140,7 +140,7 @@ public class PollTestData {
                 menuDateToday
         );
         Vote vote = new Vote(VOTER_ID, poll, poll.getPollItems().get(0), NOW_DATE_TIME);
-        return poll.toBuilder().votes(Collections.singleton(vote)).build();
+        return poll.withVotes(Collections.singleton(vote));
     }
 
     private LunchPlacePoll createFuturePoll(LunchPlaceTestData placeTestData) {

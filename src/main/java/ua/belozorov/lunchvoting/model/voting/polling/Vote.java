@@ -12,7 +12,7 @@ import java.util.Objects;
 import static java.util.Optional.ofNullable;
 
 /**
-
+ *
  *
  * Created on 20.11.16.
  */
@@ -66,7 +66,7 @@ public final class Vote extends AbstractPersistableObject implements Comparable<
      * @param voterId string value conforming to UUID format representing an ID of a voting subject. Must not be null
      * @param pollItem must not be null
      */
-    Vote(String id, Integer version, String voterId, LunchPlacePoll poll, PollItem pollItem, LocalDateTime voteTime) {
+    private Vote(String id, Integer version, String voterId, LunchPlacePoll poll, PollItem pollItem, LocalDateTime voteTime) {
         super(id, version);
         this.voterId = Objects.requireNonNull(voterId);
         this.poll = Objects.requireNonNull(poll);

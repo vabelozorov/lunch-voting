@@ -118,7 +118,7 @@ public class PollServiceTest extends AbstractServiceTest {
     public void getPollsByActivePeriodWithEndTimeNull() throws Exception {
         reset();
         List<LunchPlacePoll> actual = pollService.getPollsByActivePeriod(areaId,
-                null, NOW_DATE_TIME.withHour(0).minusHours(1));
+                null, NOW_DATE_TIME.minusHours(3));
         assertSelect(1);
 
         List<LunchPlacePoll> expected = Stream.of(testPolls.getPastPoll())

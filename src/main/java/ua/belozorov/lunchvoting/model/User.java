@@ -3,7 +3,6 @@ package ua.belozorov.lunchvoting.model;
 import com.google.common.collect.Sets;
 import lombok.Getter;
 import org.hibernate.annotations.DynamicUpdate;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -20,7 +19,7 @@ import static ua.belozorov.lunchvoting.util.ExceptionUtils.NOT_CHECK;
 
 /**
  * An immutable class that combines roles of a voter and a security principal.
- *
+ * <p>This class implements {@link Comparable} to support a natural sorting which is by its {@code email}.</p>
  * Created on 15.11.16.
  */
 @Getter
@@ -141,7 +140,7 @@ public final class User extends AbstractPersistableObject implements Comparable<
     }
 
     public User withRoles(Set<UserRole> roles) {
-        return new User(id, version, name, email, password, roles, registeredDate, activated, areaId);
+        return new User(id, version, name, email, password, Sets.newHashSet(roles), registeredDate, activated, areaId);
     }
 
     public User addRole(UserRole role) {

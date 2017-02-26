@@ -2,6 +2,7 @@ package ua.belozorov.lunchvoting.model.lunchplace;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.collect.ImmutableSortedSet;
+import com.google.common.collect.Sets;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -24,7 +25,8 @@ import static ua.belozorov.lunchvoting.util.ExceptionUtils.NOT_CHECK;
 
 /**
  * Immutable class that represents menu of a certain {@link LunchPlace}
- *
+ * <p>This class implements {@link Comparable} to support a natural sorting which is by its {@code email},
+ * then by ID</p>
  * Created on 21.11.16.
  */
 @Entity
@@ -91,7 +93,7 @@ public final class Menu extends AbstractPersistableObject implements Comparable<
     }
 
     public Menu withDishes(Set<Dish> dishes) {
-        return new Menu(id, version, effectiveDate, dishes, lunchPlace);
+        return new Menu(id, version, effectiveDate, Sets.newHashSet(dishes), lunchPlace);
     }
 
     @Override

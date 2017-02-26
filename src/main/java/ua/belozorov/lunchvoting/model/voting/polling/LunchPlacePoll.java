@@ -1,7 +1,7 @@
 package ua.belozorov.lunchvoting.model.voting.polling;
 
+import com.google.common.collect.Sets;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import org.jetbrains.annotations.Nullable;
 import ua.belozorov.lunchvoting.exceptions.*;
@@ -19,16 +19,27 @@ import ua.belozorov.lunchvoting.web.exceptionhandling.ErrorCode;
 import javax.persistence.*;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.OrderBy;
 import javax.persistence.Table;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static ua.belozorov.lunchvoting.util.ExceptionUtils.NOT_CHECK;
+
 /**
- *
+ * <p>Immutable class that implements a voting functionality for LunchPlace in the application.</p>
+ * It processes votes according to modularized, pre-configured policies that implement {@link VotePolicy}
+ * interface. It is configured with a start and end time, as well as the time before which a voter can change
+ * his/her vote.
+ * This implementation does not accepts {@link LunchPlace} objects which have no
+ * {@link Menu} objects for a configured {@code menuDate}.
+ * <p>This class implements {@link Comparable} to support a natural sorting which is by its {@code menuDate},
+ * then by ID.</p>
+ * <p><b>NOTE:</b>
+ * As Hibernate cannot create a proxy for {@code One-To-One} and {@code Many-To-One} final classes,
+ * {@code final} modifier here is omitted, yet inheritance of this class in not desired.
+ * /p>
+ * {@see ua.belozorov.lunchvoting.model.voting.polling.votepolicies.VotePolicy}
  * Created on 29.11.16.
  */
 @Entity
@@ -49,19 +60,27 @@ public class LunchPlacePoll extends AbstractPersistableObject implements Compara
     private final LocalDate menuDate;
 
     @Transient
+    @Getter(AccessLevel.NONE)
     private final List<VotePolicy> policies;
 
     /**
-     * Meant for Spring and JPA
+     * JPA
      */
-    protected LunchPlacePoll() {
+    LunchPlacePoll() {
         this.menuDate = null;
         this.timeConstraint = null;
-        this.pollItems = null;
-        this.votes = null;
+        this.pollItems = Collections.emptyList();
+        this.votes = Collections.emptySet();
         this.policies = new ArrayList<>();
     }
 
+    /**
+     * Constructor that uses a default {@link TimeConstraint} settings.
+     *
+     * @param lunchPlaces represents items that a voter can vote for. Valid list contains {@link LunchPlace}s with {@link Menu}s
+     *                  where {@link Menu#getEffectiveDate()} == {@code menuDate}. This implies that this list cannot be empty
+     * @param menuDate date which validates {@link LunchPlace}s through the active date of their menus
+     */
     public LunchPlacePoll(List<LunchPlace> lunchPlaces, @Nullable LocalDate menuDate) {
         this(
                 TimeConstraint.getDefault(),
@@ -71,9 +90,12 @@ public class LunchPlacePoll extends AbstractPersistableObject implements Compara
     }
 
     /**
-     * Primary constructor
-
-     * @param lunchPlaces non-null, non-empty list of items to vote for
+     * All-args public constructor.
+     *
+     * @param timeConstraint represents time parameters for this poll
+     * @param lunchPlaces represents items that a voter can vote for. Valid list contains {@link LunchPlace}s with {@link Menu}s
+     *                  where {@link Menu#getEffectiveDate()} == {@code menuDate}. This implies that this list cannot be empty
+     * @param menuDate date which validates {@link LunchPlace}s through the active date of their menus
      */
     public LunchPlacePoll(TimeConstraint timeConstraint, List<LunchPlace> lunchPlaces, @Nullable LocalDate menuDate) {
         ExceptionUtils.requireNonNullNotEmpty(lunchPlaces, () -> new PollException(ErrorCode.NO_POLL_ITEMS));
@@ -84,19 +106,31 @@ public class LunchPlacePoll extends AbstractPersistableObject implements Compara
 
         this.timeConstraint = timeConstraint;
         this.pollItems = this.convertToPollItems(lunchPlaces);
-        this.votes = new HashSet<>();
+        this.votes = Collections.emptySet();
         this.policies = this.registerPolicies();
     }
 
-    @Builder(toBuilder = true)
-    private LunchPlacePoll(String id, Integer version, TimeConstraint timeConstraint,
-                           List<PollItem> pollItems, LocalDate menuDate, Set<Vote> votes) {
+    /**
+     * All-args constructor for cloning setters
+     * @param id any string or null to auto-generate
+     * @param version a positive value to indicate a persisted instance or null for a transient instance
+     * @param timeConstraint represents time parameters for this poll
+     * @param pollItems represents item that a voter can vote for. Valid list contains {@link LunchPlace}s with {@link Menu}s
+     *                  where {@link Menu#getEffectiveDate()} == {@code menuDate}. This implies that this list cannot be empty
+     * @param menuDate date which validates {@link LunchPlace}s through the active date of their menus
+     * @param votes
+     */
+    private LunchPlacePoll(@Nullable String id, @Nullable Integer version, TimeConstraint timeConstraint,
+                           List<PollItem> pollItems, LocalDate menuDate, Set<Vote> votes, List<VotePolicy> policies) {
         super(id, version);
+
+        ExceptionUtils.checkParamsNotNull(NOT_CHECK, NOT_CHECK, timeConstraint, pollItems, menuDate, votes, policies);
+
         this.timeConstraint = timeConstraint;
         this.pollItems = pollItems;
         this.menuDate = menuDate;
         this.votes = votes;
-        this.policies = this.registerPolicies();
+        this.policies = policies;
     }
 
     @PostLoad
@@ -130,19 +164,8 @@ public class LunchPlacePoll extends AbstractPersistableObject implements Compara
         return policies;
     }
 
-    private LunchPlacePoll addVote(Vote vote) {
-        this.votes.add(vote);
-        return this;
-    }
-
-    private LunchPlacePoll addVotes(Set<Vote> votes) {
-        this.votes.addAll(votes);
-        return this;
-    }
-
-    private void replaceVotes(Collection<Vote> oldVotes, Vote newVote) {
-        oldVotes.forEach(this.votes::remove);
-        this.votes.add(newVote);
+    public LunchPlacePoll withVotes(Set<Vote> votes) {
+        return new LunchPlacePoll(id, version, timeConstraint, pollItems, menuDate, Sets.newHashSet(votes), policies);
     }
 
     public VotePolicyDecision registerVote(String voterId, String pollItemId) {
@@ -160,22 +183,27 @@ public class LunchPlacePoll extends AbstractPersistableObject implements Compara
                                 voterId, this.id, pollItemId)));
     }
 
-    private PollItem pollItemById(String id) {
-        Objects.requireNonNull(id, "PollItemId must not be null");
-        return pollItems.stream()
-                .filter(pollItem -> id.equals(pollItem.getId()))
-                .findFirst()
-                .orElseThrow(() -> new IllegalStateException(String.format("Poll %s does not contain item %s", this.getId(), id)));
-    }
-
+    /**
+     * @return unmodifiable {@code List<PollItem>}
+     */
     public List<PollItem> getPollItems() {
         return Collections.unmodifiableList(this.pollItems);
     }
 
+    /**
+     * @return unmodifiable {@code Set<Vote>}
+     */
     public Set<Vote> getVotes() {
         return Collections.unmodifiableSet(this.votes);
     }
 
+    @Override
+    public int compareTo(LunchPlacePoll o) {
+        int r = this.getMenuDate().compareTo(o.getMenuDate());
+        return r != 0 ? (-1)*r : this.getId().compareTo(o.getId());
+    }
+
+    @Override
     public String toString() {
         return "LunchPlacePoll{" +
                 "id=" + id +
@@ -184,9 +212,11 @@ public class LunchPlacePoll extends AbstractPersistableObject implements Compara
                 '}';
     }
 
-    @Override
-    public int compareTo(LunchPlacePoll o) {
-        int r = this.getMenuDate().compareTo(o.getMenuDate());
-        return r != 0 ? (-1)*r : this.getId().compareTo(o.getId());
+    private PollItem pollItemById(String id) {
+        Objects.requireNonNull(id, "PollItemId must not be null");
+        return pollItems.stream()
+                .filter(pollItem -> id.equals(pollItem.getId()))
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException(String.format("Poll %s does not contain item %s", this.getId(), id)));
     }
 }

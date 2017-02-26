@@ -14,7 +14,7 @@ import javax.validation.constraints.NotNull;
 
 /**
  * Immutable Dish for {@link Menu}
- *
+ * <p>This class implements {@link Comparable} to support a natural sorting which is by its {@code position}</p>
  * Created on 15.11.16.
  */
 @Embeddable
