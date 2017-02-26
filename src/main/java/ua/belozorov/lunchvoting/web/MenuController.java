@@ -69,12 +69,12 @@ public class MenuController {
      *          </td>
      *     </tr>
      *     <tr>
-     *         <td>Content-Type</td>
-     *         <td>{@code application/json}</td>
+     *         <td>Request Content-Type</td>
+     *         <td><code>application/json</code></td>
      *     </tr>
      *     <tr>
      *         <td>Required Request Parameters</td>
-     *         <td>{@code effectiveDate<br>dishes : {name, price, position}}</td>
+     *         <td><code>effectiveDate<br>dishes : {name, price, position}</code></td>
      *     </tr>
      *     <tr>
      *         <td>Optional Parameters</td>
@@ -102,12 +102,12 @@ public class MenuController {
      * <ul>
      *      <li>HTTP Status 201 Created</li>
      *      <li>A URL to access the created object in HTTP Location Header</li>
-     *      <li>A JSON object with a field {@code id} containing the ID of the newly created {@code Menu}</li>
+     *      <li>A JSON object with a field <code>id</code> containing the ID of the newly created <code>Menu</code></li>
      * </ul>
      *  If the request fails:
      *  <ul>
      *      <li>HTTP Status 400 Bad_Syntax is returned if parameter validation fails</li>
-     *      <li>HTTP Status 404 Not_Found, if {@code placeId} refers to a non-existent object
+     *      <li>HTTP Status 404 Not_Found, if <code>placeId</code> refers to a non-existent object
      *      in the area of an authenticated user</li>
      *  </ul>
      */
@@ -131,7 +131,7 @@ public class MenuController {
      *         </td>
      *     </tr>
      *     <tr>
-     *         <td>Content-Type</td>
+     *         <td>Request Content-Type</td>
      *         <td>none</td>
      *     </tr>
      *     <tr>
@@ -153,13 +153,13 @@ public class MenuController {
      * @return ResponseEntity instance with the following values upon success:
      * <ul>
      *      <li>HTTP Status 200 Ok</li>
-     *      <li>a JSON object with fields {@code id, effectiveDate, lunchPlaceId, dishes}</li>
-     *      <li>{@code dishes} is a JSON array of Dish object with fields {@code name, price, position}
+     *      <li>a JSON object with fields <code>id, effectiveDate, lunchPlaceId, dishes</code></li>
+     *      <li><code>dishes</code> is a JSON array of Dish object with fields <code>name, price, position</code>
      *      </li>
      * </ul>
      *  If the request fails:
      *  <ul>
-     *      <li>HTTP Status 404 Not_Found, if {@code placeId} or {@code menuId} refers to a non-existent object
+     *      <li>HTTP Status 404 Not_Found, if <code>placeId</code> or <code>menuId</code> refers to a non-existent object
      *      in the area of an authenticated user</li>
      *  </ul>
      */
@@ -182,7 +182,7 @@ public class MenuController {
      *         </td>
      *     </tr>
      *     <tr>
-     *         <td>Content-Type</td>
+     *         <td>Request Content-Type</td>
      *         <td>none</td>
      *     </tr>
      *     <tr>
@@ -207,7 +207,7 @@ public class MenuController {
      * </ul>
      *  If the request fails:
      *  <ul>
-     *      <li>HTTP Status 404 Not_Found, if {@code placeId} or {@code menuId} refers to a non-existent object
+     *      <li>HTTP Status 404 Not_Found, if <code>placeId</code> or <code>menuId</code> refers to a non-existent object
      *      in the area of an authenticated user</li>
      *  </ul>
      */

@@ -64,15 +64,15 @@ public class EatingAreaController {
      * <table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px; padding:3px;">
      *     <tr>
      *         <td>HTTP Request</td>
-     *         <td><font style="color:green">{@code HTTP POST /api/areas/ 201}</font></td>
+     *         <td><font style="color:green"><code>HTTP POST /api/areas/ 201</code></font></td>
      *     </tr>
      *     <tr>
-     *         <td>Content-Type</td>
-     *         <td>{@code application/x-www-form-urlencoded}</td>
+     *         <td>Request Content-Type</td>
+     *         <td><code>application/x-www-form-urlencoded</code></td>
      *     </tr>
      *     <tr>
      *         <td>Required Request Parameters</td>
-     *         <td>{@code name}</td>
+     *         <td><code>name</code></td>
      *     </tr>
      *     <tr>
      *         <td>Optional Parameters</td>
@@ -85,12 +85,12 @@ public class EatingAreaController {
      * </table>
      *
      * @param name a unique name for the area, must 2-50 characters long. The application enforces a unique constraint on this value and
-     *  {@code DuplicateDataException} is thrown if value happens to be not unique
+     *  <code>DuplicateDataException</code>is thrown if value happens to be not unique
      * @return ResponseEntity instance with the following values upon success:
      *  <ul>
      *      <li>An HTTP Status 201 Created </li>
      *      <li>A URL to access the created object in HTTP Location Header</li>
-     *      <li>A JSON object with a field {@code id} containing the ID of the newly created {@code EatingArea}</li>
+     *      <li>A JSON object with a field <code>id</code> containing the ID of the newly created <code>EatingArea</code></li>
      *  </ul>
      *  If the request fails:
      *  <ul>
@@ -118,13 +118,13 @@ public class EatingAreaController {
      * <table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px; padding:3px;">
      *     <tr>
      *         <td>HTTP Request</td>
-     *         <td><font style="color:green">{@code HTTP POST /api/areas/{areaId}/members/ 201}</font><br>
+     *         <td><font style="color:green"><code>HTTP POST /api/areas/{areaId}/members/ 201</code></font><br>
      *              <b>{areaId}</b> existing {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea} ID
      *        </td>
      *     </tr>
      *     <tr>
-     *         <td>Content-Type</td>
-     *         <td>{@code application/json}</td>
+     *         <td>Request Content-Type</td>
+     *         <td><code>application/json</code></td>
      *     </tr>
      *     <tr>
      *         <td>Required Request Parameters</td>
@@ -149,16 +149,16 @@ public class EatingAreaController {
      *  <li><strong>name</strong>  name of the User, must be between 2 and 100 characters long</li>
      *  <li><strong> password</strong>  password of the User, must be between 6 and 30 characters long</li>
      *  <li><strong>email</strong>  email of the User. The application enforces a unique constraint on this value and
-     *  {@code DuplicateDataException} is thrown if value happens to be not unique</li>
+     *  <code>DuplicateDataException</code> is thrown if value happens to be not unique</li>
      * </ul>
      * Other parameters are ignored.
      *
-     * @param userTo represents request parameters and must contain non-empty {@code name, password, email} fields
+     * @param userTo represents request parameters and must contain non-empty <code>name, password, email</code> fields
      * @return ResponseEntity instance with the following values upon success:
      *  <ul>
      *      <li>An HTTP Status 201 Created </li>
      *      <li>A URL to access the created object in HTTP Location Header</li>
-     *      <li>A JSON object with a field {@code id} containing the ID of the newly created {@code User}</li>
+     *      <li>A JSON object with a field <code>id</code> containing the ID of the newly created <code>User</code></li>
      *  </ul>
      *  If the request fails:
      *  <ul>
@@ -183,26 +183,26 @@ public class EatingAreaController {
     }
 
     /**
-     * <p>Creates a new {@link LunchPlace} object in the area of an authenticated {@code User}.</p>
+     * <p>Creates a new {@link LunchPlace} object in the area of an authenticated <code>User</code>.</p>
      *
      * <table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px; padding:3px;">
      *     <tr>
      *         <td>HTTP Request</td>
-     *         <td><font style="color:green">{@code HTTP POST /api/areas/{areaId}/places 201}</font><br>
+     *         <td><font style="color:green"><code>HTTP POST /api/areas/{areaId}/places 201</code></font><br>
      *             <b>{areaId}</b> existing {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea} ID
      *         </td>
      *     </tr>
      *     <tr>
-     *         <td>Content-Type</td>
-     *         <td>{@code application/json}</td>
+     *         <td>Request Content-Type</td>
+     *         <td><code>application/json</code></td>
      *     </tr>
      *     <tr>
      *         <td>Required Request Parameters</td>
-     *         <td>{@code name}</td>
+     *         <td><code>name</code></td>
      *     </tr>
      *     <tr>
      *         <td>Optional Parameters</td>
-     *         <td>{@code address<br>description<br>phones}</td>
+     *         <td><code>address<br>description<br>phones</code></td>
      *     </tr>
      *     <tr>
      *         <td>Requires role</td>
@@ -217,7 +217,7 @@ public class EatingAreaController {
      * <ul>
      *  <li><strong>name</strong>  name of a new {@link LunchPlace}, should not exist and must be between 2 and 50 characters long.
      *  The application enforces a unique constraint on this value and
-     *  {@code DuplicateDataException} is thrown if value happens to be not unique</li>
+     *  <code>DuplicateDataException</code> is thrown if value happens to be not unique</li>
      *  <li><strong>address</strong>  address of the {@link LunchPlace}, must not exceed 200 characters, optional field</li>
      *  <li><strong>description</strong>  description of the {@link LunchPlace}, must not exceed 1000 characters, optional field</li>
      *  <li><strong>phones</strong> phones ofthe {@link LunchPlace}, comma-separated list of strings, each string is 10-digit value</li>
@@ -229,7 +229,7 @@ public class EatingAreaController {
      *  <ul>
      *      <li>HTTP Status 201 Created</li>
      *      <li>A URL to access the created object in HTTP Location Header</li>
-     *      <li>A JSON object with a field {@code id} containing the ID of the newly created {@code LunchPlace}</li>
+     *      <li>A JSON object with a field <code>id</code> containing the ID of the newly created <code>LunchPlace</code></li>
      *  </ul>
      *  If the request fails:
      *  <ul>
@@ -255,18 +255,18 @@ public class EatingAreaController {
     }
 
     /**
-     * <p>Creates a new {@link LunchPlacePoll} object in the area of an authenticated {@code User}.</p>
+     * <p>Creates a new {@link LunchPlacePoll} object in the area of an authenticated <code>User</code>.</p>
      *
      * <table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px; padding:3px;">
      *     <tr>
      *         <td>HTTP Request</td>
-     *         <td><font style="color:green">{@code HTTP POST /api/areas/{areaId}/polls 201}</font><br>
+     *         <td><font style="color:green"><code>HTTP POST /api/areas/{areaId}/polls 201</code></font><br>
      *             <b>{areaId}</b> existing {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea} ID
      *         </td>
      *     </tr>
      *     <tr>
-     *         <td>Content-Type</td>
-     *         <td>{@code application/x-www-form-urlencoded}</td>
+     *         <td>Request Content-Type</td>
+     *         <td><code>application/x-www-form-urlencoded</code></td>
      *     </tr>
      *     <tr>
      *         <td>Required Request Parameters</td>
@@ -274,7 +274,7 @@ public class EatingAreaController {
      *     </tr>
      *     <tr>
      *         <td>Optional Parameters</td>
-     *         <td>{@code menuDate<br>start<br>end<br>change}</td>
+     *         <td><code>menuDate<br>start<br>end<br>change</code></td>
      *     </tr>
      *     <tr>
      *         <td>Requires role</td>
@@ -283,9 +283,9 @@ public class EatingAreaController {
      * </table>
      * <p>Items of the poll are LunchPlace objects with menus for given date or a current day,, if not given.</p>
      * <p>
-     *     The poll starts at {@code start} time or will be 09-00 of a current day.<br>
-     *     The poll ends at {@code end} time or will be 12-00 of a current day.<br>
-     *     The poll final time to change a vote is {@code change} time or will be 11-00 of a current day.
+     *     The poll starts at <code>start</code> time or will be 09-00 of a current day.<br>
+     *     The poll ends at <code>end</code> time or will be 12-00 of a current day.<br>
+     *     The poll final time to change a vote is <code>change</code> time or will be 11-00 of a current day.
      * </p>
      * <p>The {@link LunchPlacePoll} will be created in the same {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea}
      * as the {@link User} whose credentials were submitted.<br>
@@ -300,13 +300,13 @@ public class EatingAreaController {
      *  <ul>
      *      <li>HTTP Status 201 Created</li>
      *      <li>A URL to access the created object in HTTP Location Header</li>
-     *      <li>A JSON object with a field {@code id} containing the ID of the newly created {@code LunchPlacePoll}</li>
+     *      <li>A JSON object with a field <code>id</code> containing the ID of the newly created <code>LunchPlacePoll</code></li>
      *  </ul>
      *  If the request fails:
      *  <ul>
      *      <li>HTTP Status 400 Bad_Syntax is returned if parameter validation fails</li>
-     *      <li>HTTP Status 422 Unprocessable_entity is returned if no {@code LunchPlace} objects
-     *      with {@code menudate}</li>
+     *      <li>HTTP Status 422 Unprocessable_entity is returned if no <code>LunchPlace</code> objects
+     *      with <code>menudate</code></li>
      *  </ul>
      */
     @PostMapping(value = "/{areaId}/polls", params = "menuDate",
@@ -330,17 +330,17 @@ public class EatingAreaController {
      * <table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px; padding:3px;">
      *     <tr>
      *         <td>HTTP Request</td>
-     *         <td><font style="color:green">{@code HTTP PUT /api/areas/{areaId} 204}</font><br>
+     *         <td><font style="color:green"><code>HTTP PUT /api/areas/{areaId} 204</code></font><br>
      *             <b>{areaId}</b> existing {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea} ID
      *         </td>
      *     </tr>
      *     <tr>
-     *         <td>Content-Type</td>
-     *         <td>{@code application/x-www-form-urlencoded}</td>
+     *         <td>Request Content-Type</td>
+     *         <td><code>application/x-www-form-urlencoded</code></td>
      *     </tr>
      *     <tr>
      *         <td>Required Request Parameters</td>
-     *         <td>{@code name}</td>
+     *         <td><code>name</code></td>
      *     </tr>
      *     <tr>
      *         <td>Optional Parameters</td>
@@ -353,7 +353,7 @@ public class EatingAreaController {
      * </table>
      *
      * @param name a unique name for the area, must 2-50 characters long. The application enforces a unique constraint on this value and
-     *  {@code DuplicateDataException} is thrown if value happens to be not unique
+     *  <code>DuplicateDataException</code> is thrown if value happens to be not unique
      * @return ResponseEntity instance with the following values upon success:
      *  <ul>
      *      <li>An HTTP Status 204 Created </li>
@@ -381,12 +381,12 @@ public class EatingAreaController {
      * <table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px; padding:3px;">
      *     <tr>
      *         <td>HTTP Request</td>
-     *         <td><font style="color:green">{@code HTTP GET /api/areas/{areaId} 200}</font><br>
+     *         <td><font style="color:green"><code>HTTP GET /api/areas/{areaId} 200</code></font><br>
      *             <b>{areaId}</b> existing {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea} ID
      *         </td>
      *     </tr>
      *     <tr>
-     *         <td>Content-Type</td>
+     *         <td>Request Content-Type</td>
      *         <td>none</td>
      *     </tr>
      *     <tr>
@@ -404,17 +404,17 @@ public class EatingAreaController {
      * </table>
      *
      *
-     * @param id ID of existing {@code EatingArea}
+     * @param id ID of existing <code>EatingArea</code>
      * @param summary true causes the summary information to be included into a response instead of IDs
-     *                of {@link User}, {@link LunchPlacePoll} and {@link LunchPlace} objects. {@code true} means that IDs
+     *                of {@link User}, {@link LunchPlacePoll} and {@link LunchPlace} objects. <code>true</code> means that IDs
      *                are included, but summary info is not.
      * @return ResponseEntity instance with the following values upon success:
      *  <ul>
      *      <li>An HTTP Status 200 Ok</li>
      *      <li>JSON object with the following fields:
      *          <ul>
-     *              <li>if {@code summary=true}, {@code id, name, created, userCount, placeCount, pollCount} are included</li>
-     *              <li>if {@code summary=false}, {@code id, name, created, users, places, polls} are included</li>
+     *              <li>if <code>summary=true</code>, <code>id, name, created, userCount, placeCount, pollCount</code> are included</li>
+     *              <li>if <code>summary=false</code>, <code>id, name, created, users, places, polls</code> are included</li>
      *          </ul>
      *      </li>
      *  </ul>
@@ -436,17 +436,17 @@ public class EatingAreaController {
      * <table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px; padding:3px;">
      *     <tr>
      *         <td>HTTP Request</td>
-     *         <td><font style="color:green">{@code HTTP GET /api/areas 200}</font><br>
+     *         <td><font style="color:green"><code>HTTP GET /api/areas 200</code></font><br>
      *             <b>{areaId}</b> existing {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea} ID
      *         </td>
      *     </tr>
      *     <tr>
-     *         <td>Content-Type</td>
+     *         <td>Request Content-Type</td>
      *         <td>none</td>
      *     </tr>
      *     <tr>
      *         <td>Required Request Parameters</td>
-     *         <td>{@code name}</td>
+     *         <td><code>name</code></td>
      *     </tr>
      *     <tr>
      *         <td>Optional Parameters</td>
@@ -458,11 +458,11 @@ public class EatingAreaController {
      *     </tr>
      * </table>
      *
-     * @param name start of {@code EatingArea} name, must be 2-50 characters long
+     * @param name start of <code>EatingArea</code> name, must be 2-50 characters long
      * @return ResponseEntity instance with the following values upon success:
      *  <ul>
      *      <li>An HTTP Status 200 Ok</li>
-     *      <li>JSON object with the following fields: {@code id, name, created} are included</li>
+     *      <li>JSON object with the following fields: <code>id, name, created</code> are included</li>
      *  </ul>
      *  If the request fails:
      *  <ul>
@@ -483,12 +483,12 @@ public class EatingAreaController {
      * <table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px; padding:3px;">
      *     <tr>
      *         <td>HTTP Request</td>
-     *         <td><font style="color:green">{@code HTTP DELETE /api/areas 204}</font><br>
+     *         <td><font style="color:green"><code>HTTP DELETE /api/areas 204</code></font><br>
      *             <b>{areaId}</b> existing {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea} ID
      *         </td>
      *     </tr>
      *     <tr>
-     *         <td>Content-Type</td>
+     *         <td>Request Content-Type</td>
      *         <td>none</td>
      *     </tr>
      *     <tr>

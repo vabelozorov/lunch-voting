@@ -55,12 +55,12 @@ public class VotingController {
      *         </td>
      *     </tr>
      *     <tr>
-     *         <td>Content-Type</td>
-     *         <td>{@code application/x-www-form-urlencoded}</td>
+     *         <td>Request Content-Type</td>
+     *         <td><code>application/x-www-form-urlencoded</code></td>
      *     </tr>
      *     <tr>
      *         <td>Required Request Parameters</td>
-     *         <td>{@code pollId, pollItemId}</td>
+     *         <td><code>pollId, pollItemId</code></td>
      *     </tr>
      *     <tr>
      *         <td>Optional Parameters</td>
@@ -82,11 +82,11 @@ public class VotingController {
      * @return ResponseEntity instance with the following values upon success:
      * <ul>
      *      <li>HTTP Status 201 Created</li>
-     *      <li>a JSON object with fields {@code id, voterId, pollId, itemId}</li>
+     *      <li>a JSON object with fields <code>id, voterId, pollId, itemId</code></li>
      * </ul>
      *  If the request fails:
      *  <ul>
-     *      <li>HTTP Status 404 Not_Found, if {@code pollId} or {@code pollItemId} refers to a non-existent object
+     *      <li>HTTP Status 404 Not_Found, if <code>pollId</code> or <code>pollItemId</code> refers to a non-existent object
      *      in the area of an authenticated user</li>
      *      <li>HTTP Status 422 Unprocessable_Entity, if:
      *          <ul>
@@ -120,7 +120,7 @@ public class VotingController {
      *         </td>
      *     </tr>
      *     <tr>
-     *         <td>Content-Type</td>
+     *         <td>Request Content-Type</td>
      *         <td>none</td>
      *     </tr>
      *     <tr>
@@ -144,13 +144,13 @@ public class VotingController {
      *      <li>a JSON object with fields:
      *          <ul>
      *              <li><code>pollId</code></li>
-     *              <li><code>votes</code> a JSON array of Vote objects with fields {@code id, voterId, itemId}</li>
+     *              <li><code>votes</code> a JSON array of Vote objects with fields <code>id, voterId, itemId</code></li>
      *          </ul>
      *      </li>
      * </ul>
      *  If the request fails:
      *  <ul>
-     *      <li>HTTP Status 404 Not_Found, if {@code pollId} refers to a non-existent object
+     *      <li>HTTP Status 404 Not_Found, if <code>pollId</code> refers to a non-existent object
      *      in the area of an authenticated user</li>
      *  </ul>
      */
@@ -176,12 +176,12 @@ public class VotingController {
      *         </td>
      *     </tr>
      *     <tr>
-     *         <td>Content-Type</td>
+     *         <td>Request Content-Type</td>
      *         <td>none</td>
      *     </tr>
      *     <tr>
      *         <td>Required Request Parameters</td>
-     *         <td>{@code type}</td>
+     *         <td><code>type</code></td>
      *     </tr>
      *     <tr>
      *         <td>Optional Parameters</td>
@@ -199,9 +199,9 @@ public class VotingController {
      *      <li>HTTP Status 200</li>
      *      <li>a JSON object with fields
      *          <ul>
-     *              <li>{@code pollId}</li>
-     *              <li>{@code result} a JSON object representing a poll result.
-     *              Contains fields {@code pollItemId, itemId, count}, where {@code itemId } refers to
+     *              <li><code>pollId</code></li>
+     *              <li><code>result</code> a JSON object representing a poll result.
+     *              Contains fields <code>pollItemId, itemId, count</code>, where <code>itemId </code> refers to
      *              an ID of {@link ua.belozorov.lunchvoting.model.lunchplace.LunchPlace}</li>
      *          </ul>
      *      </li>
@@ -209,7 +209,7 @@ public class VotingController {
      *  If the request fails:
      *  <ul>
      *      <li>HTTP Status 400, if parameter validation fails</li>
-     *      <li>HTTP Status 404 Not_Found, if {@code pollId} refers to a non-existent object
+     *      <li>HTTP Status 404 Not_Found, if <code>pollId</code> refers to a non-existent object
      *      in the area of an authenticated user</li>
      *  </ul>
      */
@@ -231,12 +231,12 @@ public class VotingController {
      *         </td>
      *     </tr>
      *     <tr>
-     *         <td>Content-Type</td>
+     *         <td>Request Content-Type</td>
      *         <td>none</td>
      *     </tr>
      *     <tr>
      *         <td>Required Request Parameters</td>
-     *         <td>{@code filterBy, pollId}</td>
+     *         <td><code>filterBy, pollId</code></td>
      *     </tr>
      *     <tr>
      *         <td>Optional Parameters</td>
@@ -256,7 +256,7 @@ public class VotingController {
      *  If the request fails:
      *  <ul>
      *      <li>HTTP Status 400, if parameter validation fails</li>
-     *      <li>HTTP Status 404 Not_Found, if {@code pollId} refers to a non-existent object
+     *      <li>HTTP Status 404 Not_Found, if <code>pollId</code> refers to a non-existent object
      *      in the area of an authenticated user</li>
      *  </ul>
      */
@@ -281,7 +281,7 @@ public class VotingController {
      *         </td>
      *     </tr>
      *     <tr>
-     *         <td>Content-Type</td>
+     *         <td>Request Content-Type</td>
      *         <td>none</td>
      *     </tr>
      *     <tr>
@@ -305,7 +305,7 @@ public class VotingController {
      * </ul>
      *  If the request fails:
      *  <ul>
-     *      <li>HTTP Status 404 Not_Found, if {@code voteId} refers to a non-existent object or the vote has been
+     *      <li>HTTP Status 404 Not_Found, if <code>voteId</code> refers to a non-existent object or the vote has been
      *      made by another voter.</li>
      *  </ul>
      */

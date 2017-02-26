@@ -50,14 +50,14 @@ public class UserManagementController {
      * <table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px; padding:3px;">
      *     <tr>
      *         <td>HTTP Request</td>
-     *         <td><font style="color:green">{@code HTTP PUT /api/areas/{areaId}/members/{userId} 204}</font><br>
+     *         <td><font style="color:green"><code>HTTP PUT /api/areas/{areaId}/members/{userId} 204</code></font><br>
      *             <b>{areaId}</b> existing {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea} ID<br>
      *             <b>{userId}</b> existing {@link User} ID
      *         </td>
      *     </tr>
      *     <tr>
-     *         <td>Content-Type</td>
-     *         <td>{@code application/json}</td>
+     *         <td>Request Content-Type</td>
+     *         <td><code>application/json</code></td>
      *     </tr>
      *     <tr>
      *         <td>Required Request Parameters</td>
@@ -81,12 +81,12 @@ public class UserManagementController {
      *  <li><strong>name</strong>  new name of the User, must be between 2 and 100 characters long</li>
      *  <li><strong> password</strong>  new password of the User, must be between 6 and 30 characters long</li>
      *  <li><strong>email</strong>  new email of the User. The application enforces a unique constraint on this value and
-     *  {@code DuplicateDataException} is thrown if value happens to be not unique</li>
+     *  <code>DuplicateDataException</code> is thrown if value happens to be not unique</li>
      * </ul>
      * Other parameters are ignored.
      * If a certain {@link User}  property is not changed, its old value should be included in the request.
      * @param userId  existing {@link User} ID
-     * @param userTo  represents request parameters and must contain non-empty {@code name, password, email} fields
+     * @param userTo  represents request parameters and must contain non-empty <code>name, password, email</code> fields
      * @return ResponseEntity instance with the following values upon success:
      *  <ul>
      *      <li>HTTP Status 204 No_Content</li>
@@ -119,13 +119,13 @@ public class UserManagementController {
      * <table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px;">
      *     <tr>
      *         <td>HTTP Request</td>
-     *         <td><font style="color:green">{@code HTTP GET /api/areas/{areaId}/members/{userId} 200}</font><br>
+     *         <td><font style="color:green"><code>HTTP GET /api/areas/{areaId}/members/{userId} 200</code></font><br>
      *             <b>{areaId}</b> existing {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea} ID<br>
      *             <b>{userId}</b> existing {@link User} ID
      *        </td>
      *     </tr>
      *     <tr>
-     *         <td>Content-Type</td>
+     *         <td>Request Content-Type</td>
      *         <td>none</td>
      *     </tr>
      *     <tr>
@@ -148,7 +148,7 @@ public class UserManagementController {
      * @return ResponseEntity instance with the following values upon success:
      *  <ul>
      *      <li>HTTP Status 200 Ok </li>
-     *      <li>JSON object with fields {@code userId, name, email, roles, registeredDate, activated, areaId} </li>
+     *      <li>JSON object with fields <code>userId, name, email, roles, registeredDate, activated, areaId</code> </li>
      *  </ul>
      *  If the request fails:
      *  <ul>
@@ -168,12 +168,12 @@ public class UserManagementController {
      * <table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px;">
      *     <tr>
      *         <td>HTTP Request</td>
-     *         <td><font style="color:green">{@code HTTP GET /api/areas/{areaId}/members 200}</font><br>
+     *         <td><font style="color:green"><code>HTTP GET /api/areas/{areaId}/members 200</code></font><br>
      *             <b>{areaId}</b> existing {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea} ID
      *             </td>
      *     </tr>
      *     <tr>
-     *         <td>Content-Type</td>
+     *         <td>Request Content-Type</td>
      *         <td>none</td>
      *     </tr>
      *     <tr>
@@ -213,13 +213,13 @@ public class UserManagementController {
      * <table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px;">
      *     <tr>
      *         <td>HTTP Request</td>
-     *         <td><font style="color:green">{@code HTTP DELETE /api/areas/{areaId}/members/{userId} 204}</font><br>
+     *         <td><font style="color:green"><code>HTTP DELETE /api/areas/{areaId}/members/{userId} 204</code></font><br>
      *             <b>{areaId}</b> existing {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea} ID<br>
      *             <b>{userId}</b> existing {@link User} ID
      *             </td>
      *     </tr>
      *     <tr>
-     *         <td>Content-Type</td>
+     *         <td>Request Content-Type</td>
      *         <td>none</td>
      *     </tr>
      *     <tr>
@@ -261,18 +261,18 @@ public class UserManagementController {
      * <table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px; padding:3px;">
      *     <tr>
      *         <td>HTTP Request</td>
-     *         <td><font style="color:green">{@code HTTP PUT /api/areas/{areaId}/members/{userId} 204}</font><br>
+     *         <td><font style="color:green"><code>HTTP PUT /api/areas/{areaId}/members/{userId} 204</code></font><br>
      *             <b>{areaId}</b> existing {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea} ID<br>
      *             <b>{userId}</b> existing {@link User} ID
      *             </td>
      *     </tr>
      *     <tr>
-     *         <td>Content-Type</td>
-     *         <td>{@code application/x-www-form-urlencoded}</td>
+     *         <td>Request Content-Type</td>
+     *         <td><code>application/x-www-form-urlencoded</code></td>
      *     </tr>
      *     <tr>
      *         <td>Required Request Parameters</td>
-     *         <td>{@code activated}</td>
+     *         <td><code>activated</code></td>
      *     </tr>
      *     <tr>
      *         <td>Optional Parameters</td>
@@ -286,8 +286,8 @@ public class UserManagementController {
      *
      * <p>The {@link User} must belong to the same EatingArea as the {@link User}  whose credentials were submitted.</p>
      *
-     * @param userId  existing {@code User} ID
-     * @param activated  {@code true} to activate the account, {@code false} to deactivate the account
+     * @param userId  existing <code>User</code> ID
+     * @param activated  <code>true</code> to activate the account, <code>false</code> to deactivate the account
      * @return ResponseEntity instance with the following values upon success:
      *  <ul>
      *      <li>HTTP Status 204 No_Content </li>
@@ -311,18 +311,18 @@ public class UserManagementController {
      * <table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px; padding:3px;">
      *     <tr>
      *         <td>HTTP Request</td>
-     *         <td><font style="color:green">{@code HTTP PUT /api/areas/{areaId}/members/{userId} 204}</font><br>
+     *         <td><font style="color:green"><code>HTTP PUT /api/areas/{areaId}/members/{userId} 204</code></font><br>
      *             <b>{areaId}</b> existing {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea} ID<br>
      *             <b>{userId}</b> existing {@link User} ID
      *             </td>
      *     </tr>
      *     <tr>
-     *         <td>Content-Type</td>
-     *         <td>{@code application/x-www-form-urlencoded}</td>
+     *         <td>Request Content-Type</td>
+     *         <td><code>application/x-www-form-urlencoded</code></td>
      *     </tr>
      *     <tr>
      *         <td>Required Request Parameters</td>
-     *         <td>{@code roles}</td>
+     *         <td><code>roles</code></td>
      *     </tr>
      *     <tr>
      *         <td>Optional Parameters</td>
@@ -338,8 +338,8 @@ public class UserManagementController {
      *
      * @param roles represents request parameters and must contain:
      * <ul>
-     *   <li>{@code userId}  existing user ID</li>
- *       <li>{@code roles}  comma-separated list of values. Valid values are: ADMIN, VOTER</li>
+     *   <li><code>userId</code>  existing user ID</li>
+ *       <li><code>roles</code>  comma-separated list of values. Valid values are: ADMIN, VOTER</li>
      * </ul>
      * @return ResponseEntity instance with the following values upon success:
      *  <ul>

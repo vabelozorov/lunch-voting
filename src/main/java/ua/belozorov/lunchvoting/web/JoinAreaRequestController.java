@@ -55,12 +55,12 @@ public class JoinAreaRequestController {
      * <table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px; padding:3px;">
      *     <tr>
      *         <td>HTTP Request</td>
-     *         <td><font style="color:green">{@code HTTP POST /api/{areaId}/requests 201}</font><br>
+     *         <td><font style="color:green"><code>HTTP POST /api/{areaId}/requests 201</code></font><br>
      *             <b>{areaId}</b> existing {@link EatingArea} ID<br>
      *         </td>
      *     </tr>
      *     <tr>
-     *         <td>Content-Type</td>
+     *         <td>Request Content-Type</td>
      *         <td>none</td>
      *     </tr>
      *     <tr>
@@ -84,7 +84,7 @@ public class JoinAreaRequestController {
      * @return ResponseEntity instance with the following values upon success:
      *  <ul>
      *      <li>An HTTP Status 201 Created</li>
-     *      <li>JSON object with a field {@code id} which contains the ID of the newly created {@link JoinAreaRequest}</li>
+     *      <li>JSON object with a field <code>id</code> which contains the ID of the newly created {@link JoinAreaRequest}</li>
      *  </ul>
      */
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
@@ -102,13 +102,13 @@ public class JoinAreaRequestController {
      * <table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px; padding:3px;">
      *     <tr>
      *         <td>HTTP Request</td>
-     *         <td><font style="color:green">{@code HTTP GET /api/{areaId}/requests/{requestId} 200}</font><br>
+     *         <td><font style="color:green"><code>HTTP GET /api/{areaId}/requests/{requestId} 200</code></font><br>
      *             <b>{areaId}</b> existing {@link EatingArea} ID<br>
      *             <b>{areaId}</b> existing {@link JoinAreaRequest} ID<br>
      *         </td>
      *     </tr>
      *     <tr>
-     *         <td>Content-Type</td>
+     *         <td>Request Content-Type</td>
      *         <td>none</td>
      *     </tr>
      *     <tr>
@@ -128,7 +128,7 @@ public class JoinAreaRequestController {
      * @return ResponseEntity instance with the following values upon success:
      *  <ul>
      *      <li>HTTP Status 200 Ok </li>
-     *      <li>JSON object with fields {@code id, area, requester, status, created, decidedOn}</li>
+     *      <li>JSON object with fields <code>id, area, requester, status, created, decidedOn</code></li>
      *  </ul>
      *  If the request fails:
      *  <ul>
@@ -150,12 +150,12 @@ public class JoinAreaRequestController {
      * <table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px; padding:3px;">
      *     <tr>
      *         <td>HTTP Request</td>
-     *         <td><font style="color:green">{@code HTTP GET /api/{areaId}/requests 200}</font><br>
+     *         <td><font style="color:green"><code>HTTP GET /api/{areaId}/requests 200</code></font><br>
      *             <b>{areaId}</b> existing {@link EatingArea} ID<br>
      *         </td>
      *     </tr>
      *     <tr>
-     *         <td>Content-Type</td>
+     *         <td>Request Content-Type</td>
      *         <td>none</td>
      *     </tr>
      *     <tr>
@@ -176,7 +176,7 @@ public class JoinAreaRequestController {
      * @return ResponseEntity instance with the following values upon success:
      *  <ul>
      *      <li>HTTP Status 200 Ok</li>
-     *      <li>JSON array where each object has fields {@code id, area, requester, status, created, decidedOn}</li>
+     *      <li>JSON array where each object has fields <code>id, area, requester, status, created, decidedOn</code></li>
      *  </ul>
      *  If the request fails:
      *  <ul>
@@ -198,12 +198,12 @@ public class JoinAreaRequestController {
      * <table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px; padding:3px;">
      *     <tr>
      *         <td>HTTP Request</td>
-     *         <td><font style="color:green">{@code HTTP GET /api/{areaId}/requests 200}</font><br>
+     *         <td><font style="color:green"><code>HTTP GET /api/{areaId}/requests 200</code></font><br>
      *             <b>{areaId}</b> existing {@link EatingArea} ID<br>
      *         </td>
      *     </tr>
      *     <tr>
-     *         <td>Content-Type</td>
+     *         <td>Request Content-Type</td>
      *         <td>none</td>
      *     </tr>
      *     <tr>
@@ -223,7 +223,7 @@ public class JoinAreaRequestController {
      * @return ResponseEntity instance with the following values upon success:
      *  <ul>
      *      <li>HTTP Status 200 Ok</li>
-     *      <li>JSON array where each object has fields {@code id, area, requester, status, created, decidedOn}</li>
+     *      <li>JSON array where each object has fields <code>id, area, requester, status, created, decidedOn</code></li>
      *  </ul>
      */
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
@@ -240,18 +240,18 @@ public class JoinAreaRequestController {
      * <table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px; padding:3px;">
      *     <tr>
      *         <td>HTTP Request</td>
-     *         <td><font style="color:green">{@code HTTP PUT /api/{areaId}/requests/{requestId} 204}</font><br>
+     *         <td><font style="color:green"><code>HTTP PUT /api/{areaId}/requests/{requestId} 204</code></font><br>
      *             <b>{areaId}</b> existing {@link EatingArea} ID<br>
      *             <b>{requestId}</b> existing {@link JoinAreaRequest} ID
      *         </td>
      *     </tr>
      *     <tr>
-     *         <td>Content-Type</td>
-     *         <td>{@code application/x-www-form-urlencoded}</td>
+     *         <td>Request Content-Type</td>
+     *         <td><code>application/x-www-form-urlencoded</code></td>
      *     </tr>
      *     <tr>
      *         <td>Required Request Parameters</td>
-     *         <td>{@code status}</td>
+     *         <td><code>status</code></td>
      *     </tr>
      *     <tr>
      *         <td>Optional Parameters</td>
@@ -297,18 +297,18 @@ public class JoinAreaRequestController {
      * <table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px; padding:3px;">
      *     <tr>
      *         <td>HTTP Request</td>
-     *         <td><font style="color:green">{@code HTTP PUT /api/{areaId}/requests/{requestId} 204}</font><br>
+     *         <td><font style="color:green"><code>HTTP PUT /api/{areaId}/requests/{requestId} 204</code></font><br>
      *             <b>{areaId}</b> existing {@link EatingArea} ID<br>
      *             <b>{requestId}</b> existing {@link JoinAreaRequest} ID
      *         </td>
      *     </tr>
      *     <tr>
-     *         <td>Content-Type</td>
-     *         <td>{@code application/x-www-form-urlencoded}</td>
+     *         <td>Request Content-Type</td>
+     *         <td><code>application/x-www-form-urlencoded</code></td>
      *     </tr>
      *     <tr>
      *         <td>Required Request Parameters</td>
-     *         <td>{@code status}</td>
+     *         <td><code>status</code></td>
      *     </tr>
      *     <tr>
      *         <td>Optional Parameters</td>
@@ -347,18 +347,18 @@ public class JoinAreaRequestController {
      * <table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px; padding:3px;">
      *     <tr>
      *         <td>HTTP Request</td>
-     *         <td><font style="color:green">{@code HTTP PUT /api/{areaId}/requests/{requestId} 204}</font><br>
+     *         <td><font style="color:green"><code>HTTP PUT /api/{areaId}/requests/{requestId} 204</code></font><br>
      *             <b>{areaId}</b> existing {@link EatingArea} ID<br>
      *             <b>{requestId}</b> existing {@link JoinAreaRequest} ID
      *         </td>
      *     </tr>
      *     <tr>
-     *         <td>Content-Type</td>
-     *         <td>{@code application/x-www-form-urlencoded}</td>
+     *         <td>Request Content-Type</td>
+     *         <td><code>application/x-www-form-urlencoded</code></td>
      *     </tr>
      *     <tr>
      *         <td>Required Request Parameters</td>
-     *         <td>{@code status}</td>
+     *         <td><code>status</code></td>
      *     </tr>
      *     <tr>
      *         <td>Optional Parameters</td>

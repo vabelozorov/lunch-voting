@@ -64,7 +64,7 @@ public class PollController {
      *         </td>
      *     </tr>
      *     <tr>
-     *         <td>Content-Type</td>
+     *         <td>Request Content-Type</td>
      *         <td>none</td>
      *     </tr>
      *     <tr>
@@ -85,14 +85,14 @@ public class PollController {
      * @return ResponseEntity instance with the following values upon success:
      * <ul>
      *      <li>HTTP Status 200 Ok</li>
-     *      <li>JSON object with fields {@code id, menuDate, timeConstraint, pollItems}<br>
-     *          {@code timeConstraint} is an object with fields {@code startTime, endTime, voteChangeThreshold}<br>
-     *              {@code pollItems} is an array of objects with fields {@code id, position, itemId}, where <code>itemId</code>
+     *      <li>JSON object with fields <code>id, menuDate, timeConstraint, pollItems</code><br>
+     *          <code>timeConstraint</code> is an object with fields <code>startTime, endTime, voteChangeThreshold</code><br>
+     *              <code>pollItems</code> is an array of objects with fields <code>id, position, itemId</code>, where <code>itemId</code>
      *              refers to a {@link ua.belozorov.lunchvoting.model.lunchplace.LunchPlace} object</li>
      * </ul>
      *  If the request fails:
      *  <ul>
-     *      <li>HTTP Status 404 Not_Found is returned if {@code pollId} refers to non-existent {@link LunchPlacePoll}
+     *      <li>HTTP Status 404 Not_Found is returned if <code>pollId</code> refers to non-existent {@link LunchPlacePoll}
      *      in the authenticated user's {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea}</li>
      *  </ul>
      */
@@ -116,7 +116,7 @@ public class PollController {
      *         </td>
      *     </tr>
      *     <tr>
-     *         <td>Content-Type</td>
+     *         <td>Request Content-Type</td>
      *         <td>none</td>
      *     </tr>
      *     <tr>
@@ -136,9 +136,9 @@ public class PollController {
      * @return ResponseEntity instance with the following values upon success:
      * <ul>
      *      <li>HTTP Status 200 Ok</li>
-     *      <li>JSON array where each object contains fields {@code id, menuDate, timeConstraint, pollItems}<br>
-     *          {@code timeConstraint} is an object with fields {@code startTime, endTime, voteChangeThreshold}<br>
-     *              {@code pollItems} is an array of objects with fields {@code id, position, itemId}, where <code>itemId</code>
+     *      <li>JSON array where each object contains fields <code>id, menuDate, timeConstraint, pollItems</code><br>
+     *          <code>timeConstraint</code> is an object with fields <code>startTime, endTime, voteChangeThreshold</code><br>
+     *              <code>pollItems</code> is an array of objects with fields <code>id, position, itemId</code>, where <code>itemId</code>
      *              refers to a {@link ua.belozorov.lunchvoting.model.lunchplace.LunchPlace} object</li>
      * </ul>
      */
@@ -162,7 +162,7 @@ public class PollController {
      *         </td>
      *     </tr>
      *     <tr>
-     *         <td>Content-Type</td>
+     *         <td>Request Content-Type</td>
      *         <td>none</td>
      *     </tr>
      *     <tr>
@@ -183,9 +183,9 @@ public class PollController {
      * @return ResponseEntity instance with the following values upon success:
      * <ul>
      *      <li>HTTP Status 200 Ok</li>
-     *      <li>JSON array where each object contains fields {@code id, menuDate, timeConstraint, pollItems}<br>
-     *          {@code timeConstraint} is an object with fields {@code startTime, endTime, voteChangeThreshold}<br>
-     *              {@code pollItems} is an array of objects with fields {@code id, position, itemId}, where <code>itemId</code>
+     *      <li>JSON array where each object contains fields <code>id, menuDate, timeConstraint, pollItems</code><br>
+     *          <code>timeConstraint</code> is an object with fields <code>startTime, endTime, voteChangeThreshold</code><br>
+     *              <code>pollItems</code> is an array of objects with fields <code>id, position, itemId</code>, where <code>itemId</code>
      *              refers to a {@link ua.belozorov.lunchvoting.model.lunchplace.LunchPlace} object</li>
      *  </ul>
      */
@@ -210,7 +210,7 @@ public class PollController {
      *         </td>
      *     </tr>
      *     <tr>
-     *         <td>Content-Type</td>
+     *         <td>Request Content-Type</td>
      *         <td>none</td>
      *     </tr>
      *     <tr>
@@ -230,9 +230,9 @@ public class PollController {
      * @return ResponseEntity instance with the following values upon success:
      * <ul>
      *      <li>HTTP Status 200 Ok</li>
-     *      <li>JSON array where each object contains fields {@code id, menuDate, timeConstraint, pollItems}<br>
-     *          {@code timeConstraint} is an object with fields {@code startTime, endTime, voteChangeThreshold}<br>
-     *              {@code pollItems} is an array of objects with fields {@code id, position, itemId}, where <code>itemId</code>
+     *      <li>JSON array where each object contains fields <code>id, menuDate, timeConstraint, pollItems</code><br>
+     *          <code>timeConstraint</code> is an object with fields <code>startTime, endTime, voteChangeThreshold</code><br>
+     *              <code>pollItems</code> is an array of objects with fields <code>id, position, itemId</code>, where <code>itemId</code>
      *              refers to a {@link ua.belozorov.lunchvoting.model.lunchplace.LunchPlace} object</li>
      *  </ul>
      */
@@ -256,7 +256,7 @@ public class PollController {
      *         </td>
      *     </tr>
      *     <tr>
-     *         <td>Content-Type</td>
+     *         <td>Request Content-Type</td>
      *         <td>none</td>
      *     </tr>
      *     <tr>
@@ -276,9 +276,9 @@ public class PollController {
      * @return ResponseEntity instance with the following values upon success:
      * <ul>
      *      <li>HTTP Status 200 Ok</li>
-     *      <li>JSON array where each object contains fields {@code id, menuDate, timeConstraint, pollItems}<br>
-     *          {@code timeConstraint} is an object with fields {@code startTime, endTime, voteChangeThreshold}<br>
-     *              {@code pollItems} is an array of objects with fields {@code id, position, itemId}, where <code>itemId</code>
+     *      <li>JSON array where each object contains fields <code>id, menuDate, timeConstraint, pollItems</code><br>
+     *          <code>timeConstraint</code> is an object with fields <code>startTime, endTime, voteChangeThreshold</code><br>
+     *              <code>pollItems</code> is an array of objects with fields <code>id, position, itemId</code>, where <code>itemId</code>
      *              refers to a {@link ua.belozorov.lunchvoting.model.lunchplace.LunchPlace} object</li>
      *  </ul>
      */
@@ -302,7 +302,7 @@ public class PollController {
      *         </td>
      *     </tr>
      *     <tr>
-     *         <td>Content-Type</td>
+     *         <td>Request Content-Type</td>
      *         <td>none</td>
      *     </tr>
      *     <tr>
@@ -322,9 +322,9 @@ public class PollController {
      * @return ResponseEntity instance with the following values upon success:
      * <ul>
      *      <li>HTTP Status 200 Ok</li>
-     *      <li>JSON array where each object contains fields {@code id, menuDate, timeConstraint, pollItems}<br>
-     *          {@code timeConstraint} is an object with fields {@code startTime, endTime, voteChangeThreshold}<br>
-     *              {@code pollItems} is an array of objects with fields {@code id, position, itemId}, where <code>itemId</code>
+     *      <li>JSON array where each object contains fields <code>id, menuDate, timeConstraint, pollItems</code><br>
+     *          <code>timeConstraint</code> is an object with fields <code>startTime, endTime, voteChangeThreshold</code><br>
+     *              <code>pollItems</code> is an array of objects with fields <code>id, position, itemId</code>, where <code>itemId</code>
      *              refers to a {@link ua.belozorov.lunchvoting.model.lunchplace.LunchPlace} object</li>
      *  </ul>
      */
@@ -348,12 +348,12 @@ public class PollController {
      *         </td>
      *     </tr>
      *     <tr>
-     *         <td>Content-Type</td>
+     *         <td>Request Content-Type</td>
      *         <td>none</td>
      *     </tr>
      *     <tr>
      *         <td>Required Request Parameters</td>
-     *         <td>{@code pollId}</td>
+     *         <td><code>pollId</code></td>
      *     </tr>
      *     <tr>
      *         <td>Optional Parameters</td>
@@ -370,14 +370,14 @@ public class PollController {
      *      <li>HTTP Status 200 Ok</li>
      *      <li>a JSON object with a fields:
      *      <ul>
-     *          <li>{@code pollId} specifies requested poll ID</li>
-     *          <li>{@code active} specifies the poll state as {@code true} or {@code false}</li>
+     *          <li><code>pollId</code> specifies requested poll ID</li>
+     *          <li><code>active</code> specifies the poll state as <code>true</code> or <code>false</code></li>
      *      </ul>
      *      </li>
      *  </ul>
      *  If the request fails:
      *  <ul>
-     *      <li>HTTP Status 404, if {@code pollId} refers to a non-existent {@link LunchPlacePoll} in the area of
+     *      <li>HTTP Status 404, if <code>pollId</code> refers to a non-existent {@link LunchPlacePoll} in the area of
      *      authenticated user</li>
      *  </ul>
      */
@@ -402,7 +402,7 @@ public class PollController {
      *         </td>
      *     </tr>
      *     <tr>
-     *         <td>Content-Type</td>
+     *         <td>Request Content-Type</td>
      *         <td>none</td>
      *     </tr>
      *     <tr>
@@ -425,7 +425,7 @@ public class PollController {
      *  </ul>
      *  If the request fails:
      *  <ul>
-     *      <li>HTTP Status 404, if {@code pollId} refers to a non-existent {@link LunchPlacePoll} in the area of
+     *      <li>HTTP Status 404, if <code>pollId</code> refers to a non-existent {@link LunchPlacePoll} in the area of
      *      authenticated user</li>
      *  </ul>
      */

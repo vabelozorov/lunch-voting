@@ -57,13 +57,13 @@ public class LunchPlaceController  {
      * <table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px; padding:3px;">
      *     <tr>
      *         <td>HTTP Request</td>
-     *         <td><font style="color:green">{@code HTTP PUT /api/areas/{areaId}/places/{placeId} 204}</font><br>
+     *         <td><font style="color:green"><code>HTTP PUT /api/areas/{areaId}/places/{placeId} 204</code></font><br>
      *             <b>{areaId}</b> existing {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea} ID<br>
      *             <b>{placeId}</b> existing {@link LunchPlace} ID
      *         </td>
      *     </tr>
      *     <tr>
-     *         <td>Content-Type</td>
+     *         <td>Request Content-Type</td>
      *         <td><code>application/json</code></td>
      *     </tr>
      *     <tr>
@@ -121,13 +121,13 @@ public class LunchPlaceController  {
      * <table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px; padding:3px;">
      *     <tr>
      *         <td>HTTP Request</td>
-     *         <td><font style="color:green">{@code HTTP GET /api/areas/{areaId}/places/{placeId} 200}</font><br>
+     *         <td><font style="color:green"><code>HTTP GET /api/areas/{areaId}/places/{placeId} 200</code></font><br>
      *             <b>{areaId}</b> existing {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea} ID<br>
      *             <b>{placeId}</b> existing {@link LunchPlace} ID
      *         </td>
      *     </tr>
      *     <tr>
-     *         <td>Content-Type</td>
+     *         <td>Request Content-Type</td>
      *         <td><code>application/x-www-form-urlencoded</code></td>
      *     </tr>
      *     <tr>
@@ -148,7 +148,7 @@ public class LunchPlaceController  {
      * @param params represents query parameters. Can contain the following fields:
      *               <ul>
      *                  <li><strong>fields</strong>  fields to display in the returned JSON response. Available values:
-     *               {@code name, address, description, phones, menus}. Additionally, a field {@code id} is always contained
+     *               <code>name, address, description, phones, menus</code>. Additionally, a field <code>id</code> is always contained
      *               in the response.</li>
      *                  <li><strong>startDate</strong>  instructs to include in the response {@link LunchPlace} objects which
      *               have menus belonging to the time range starting with <strong>startDate</strong>. Only matching menus are
@@ -160,8 +160,8 @@ public class LunchPlaceController  {
      * @return ResponseEntity instance with the following values upon success:
      * <ul>
      *      <li>HTTP Status 200 Ok</li>
-     *      <li>JSON array of objects each containing fields {@code id, name} if {@code fields} parameter
-     *      was not specified in the request. Otherwise each JSON object will contain a mandatory {@code id} field and
+     *      <li>JSON array of objects each containing fields <code>id, name</code> if <code>fields</code> parameter
+     *      was not specified in the request. Otherwise each JSON object will contain a mandatory <code>id</code> field and
      *      fields that were specified by a user.</li>
      * </ul>
      *  If the request fails:
@@ -188,12 +188,12 @@ public class LunchPlaceController  {
      * <table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px; padding:3px;">
      *     <tr>
      *         <td>HTTP Request</td>
-     *         <td><font style="color:green">{@code HTTP GET /api/areas/{areaId}/places 200}</font><br>
+     *         <td><font style="color:green"><code>HTTP GET /api/areas/{areaId}/places 200</code></font><br>
      *             <b>{areaId}</b> existing {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea} ID
      *         </td>
      *     </tr>
      *     <tr>
-     *         <td>Content-Type</td>
+     *         <td>Request Content-Type</td>
      *         <td><code>application/x-www-form-urlencoded</code></td>
      *     </tr>
      *     <tr>
@@ -215,7 +215,7 @@ public class LunchPlaceController  {
      *                  <li><strong>ids</strong>  specifies which objects a user wants to request. If not provided, all objects
      *               will be returned</li>
      *                  <li><strong>fields</strong>  fields to display in the returned JSON response. Available values:
-     *               {@code name, address, description, phones, menus}. Additionally, a field {@code id} is always contained
+     *               <code>name, address, description, phones, menus</code>. Additionally, a field <code>id</code> is always contained
      *               in the response</li>
      *                  <li><strong>startDate</strong>  instructs to include in the response {@link LunchPlace} objects which
      *               have menus belonging to the time range starting with <strong>startDate</strong>. Only matching menus are
@@ -227,8 +227,8 @@ public class LunchPlaceController  {
      * @return ResponseEntity instance with the following values upon success:
      * <ul>
      *      <li>HTTP Status 200 Ok</li>
-     *      <li>JSON array of objects each containing fields {@code id, name} if {@code fields} parameter
-     *      was not specified in the request. Otherwise each JSON object will contain a mandatory {@code id} field and
+     *      <li>JSON array of objects each containing fields <code>id, name</code> if <code>fields</code> parameter
+     *      was not specified in the request. Otherwise each JSON object will contain a mandatory <code>id</code> field and
      *      fields that were specified by a user.</li>
      * </ul>
      *  If the request fails:
@@ -273,7 +273,7 @@ public class LunchPlaceController  {
      *         </td>
      *     </tr>
      *     <tr>
-     *         <td>Content-Type</td>
+     *         <td>Request Content-Type</td>
      *         <td>none</td>
      *     </tr>
      *     <tr>
