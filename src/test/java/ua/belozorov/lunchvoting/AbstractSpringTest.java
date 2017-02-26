@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
 import static ua.belozorov.lunchvoting.model.UserTestData.GOD_ID;
 
 /**
- * <h2>Base class for all tests that require Spring framework components</h2>
+ * Base class for all tests that require Spring framework components
  *
  * Created on 14.01.17.
  */
@@ -50,30 +50,4 @@ public abstract class AbstractSpringTest extends AbstractTest {
     @Autowired
     protected DataSource dataSource;
 
-    public <T> T asAdmin(Supplier<T> supplier) {
-        return asRole(supplier, "ROLE_ADMIN");
-    }
-
-    public static <T> T asVoter(Supplier<T> supplier) {
-        return asRole(supplier, "ROLE_VOTER");
-    }
-
-    private static <T> T asRole(Supplier<T> supplier, String... roles) {
-        SecurityContext original = SecurityContextHolder.getContext();
-        createSecurityContext(roles);
-        T result = supplier.get();
-        SecurityContextHolder.setContext(original);
-        return result;
-    }
-
-    private static void createSecurityContext(String... roles) {
-        Collection<GrantedAuthority> authorities = Arrays.stream(roles).map(r -> (GrantedAuthority) () -> r).collect(Collectors.toList());
-        org.springframework.security.core.userdetails.User principal = new org.springframework.security.core.userdetails.User("user123", "pass123", true, true, true, true,
-                authorities);
-        Authentication authentication = new UsernamePasswordAuthenticationToken(
-                principal, principal.getPassword(), principal.getAuthorities());
-        SecurityContext context = SecurityContextHolder.createEmptyContext();
-        context.setAuthentication(authentication);
-        SecurityContextHolder.setContext(context);
-    }
 }

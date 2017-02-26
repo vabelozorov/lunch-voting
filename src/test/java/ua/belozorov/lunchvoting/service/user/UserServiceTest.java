@@ -102,7 +102,6 @@ public class UserServiceTest extends AbstractServiceTest {
     }
 
     @Test
-    @WithMockAdmin
     public void activate() throws Exception {
         reset();
         userService.activate(areaId, VOTER_ID, false);
@@ -113,7 +112,6 @@ public class UserServiceTest extends AbstractServiceTest {
     }
 
     @Test
-    @WithMockAdmin
     public void setRoles() throws Exception {
         Set<UserRole> expectedRoles = new HashSet<>();
         expectedRoles.add(UserRole.VOTER);
@@ -128,7 +126,6 @@ public class UserServiceTest extends AbstractServiceTest {
     }
 
     @Test
-    @WithMockAdmin
     public void getUsersInAreaByRole() throws Exception {
         reset();
         List<User> actual = userService.getUsersByRole(areaId, UserRole.ADMIN);
@@ -140,25 +137,21 @@ public class UserServiceTest extends AbstractServiceTest {
     }
 
     @Test(expected = NotFoundException.class)
-    @WithMockAdmin
     public void getNotExisting() {
         userService.get(areaId, "NotExistingId");
     }
 
     @Test(expected = NotFoundException.class)
-    @WithMockAdmin
     public void updateNotExisting() {
         userService.updateMainInfo(areaId, "I_DO_NOT_EXIST", VOTER.getName(), VOTER.getEmail(), VOTER.getPassword());
     }
 
     @Test(expected = NotFoundException.class)
-    @WithMockAdmin
     public void deleteNotExisting() {
         userService.delete(areaId, "NotExistingId");
     }
 
     @Test(expected = DuplicateDataException.class)
-    @WithMockAdmin
     public void createWithDuplicateEmail() {
         User duplicate = userService.get(areaId, VOTER_ID).withEmail(GOD.getEmail());
         ExceptionUtils.executeAndUnwrapException(

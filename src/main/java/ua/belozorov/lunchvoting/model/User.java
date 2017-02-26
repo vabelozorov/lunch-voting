@@ -1,11 +1,9 @@
 package ua.belozorov.lunchvoting.model;
 
-import lombok.Builder;
+import com.google.common.collect.Sets;
 import lombok.Getter;
 import org.hibernate.annotations.DynamicUpdate;
-import org.hibernate.validator.constraints.Email;
-import org.hibernate.validator.constraints.Length;
-import org.hibernate.validator.constraints.NotEmpty;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import ua.belozorov.lunchvoting.model.base.AbstractPersistableObject;
@@ -17,7 +15,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
-
+ * An immutable class that combines roles of a voter and a security principal.
  *
  * Created on 15.11.16.
  */
@@ -50,39 +48,56 @@ public final class User extends AbstractPersistableObject implements Comparable<
     private final String areaId;
 
     /**
-     * Primarily for Hibernate. Constructs a User instance with default values.
+     * JPA
      */
-    protected User() {
+    User() {
         this( null, null, null);
     }
 
     /**
-     * For a convenient creation from a DTO.
+     * Simple constructor. All values must be non-null.
+     * Time of user registration is set to a current time, user is active and
+     * has a role of <code>VOTER</code>. User does not belong to any area.
      *
-     * @param name
-     * @param email
-     * @param password
+     * @param name username
+     * @param email email
+     * @param password password
      */
     public User(String name, String email, String password) {
-        this(null, null, name, email, password,  new HashSet<>(Collections.singletonList(UserRole.VOTER)),
+        this(null, null, name, email, password, Sets.newHashSet(UserRole.VOTER),
                 LocalDateTime.now(), true, null);
     }
 
-    public User(String id, String name, String email, String password, Set<UserRole> roles,
-                LocalDateTime registeredDate, boolean activated) {
-        this(id, null, name, email, password,roles, registeredDate, activated, null);
-    }
     /**
-     * A constructor that accepts all available parameters
-     *
+     * All-args public constructor.
+     * <code>id, areaId</code> can be null.
+     * @param id
      * @param name
      * @param email
      * @param password
      * @param roles
      * @param registeredDate
      * @param activated
+     * @param areaId
      */
-    User(String id, Integer version, String name, String email, String password, Set<UserRole> roles,
+    public User(@Nullable String id, String name, String email, String password, Set<UserRole> roles,
+                LocalDateTime registeredDate, boolean activated, @Nullable String areaId) {
+        this(id, null, name, email, password,roles, registeredDate, activated, areaId);
+    }
+
+    /**
+     * All-args constructor for cloning setters
+     * @param id
+     * @param version
+     * @param name
+     * @param email
+     * @param password
+     * @param roles
+     * @param registeredDate
+     * @param activated
+     * @param areaId
+     */
+    private User(String id, Integer version, String name, String email, String password, Set<UserRole> roles,
                 LocalDateTime registeredDate, boolean activated, String areaId) {
         super(id, version);
         this.name = name;
@@ -92,6 +107,10 @@ public final class User extends AbstractPersistableObject implements Comparable<
         this.registeredDate = registeredDate;
         this.activated = activated;
         this.areaId = areaId;
+    }
+
+    public Set<UserRole> getRoles() {
+        return Collections.unmodifiableSet(this.roles);
     }
 
     public User withName(String name) {

@@ -29,7 +29,10 @@ import static ua.belozorov.lunchvoting.model.UserTestData.*;
 import static ua.belozorov.lunchvoting.model.lunchplace.AreaTestData.REQUEST_COMPARATOR;
 
 /**
-
+ * This test suite in the beginning of each test query a DB for user(s), while they are available from UserTestData.
+ * This is due to the fact, that execution of {@link JoinAreaRequestService#make(User, String)} re-attaches
+ * a User object to a persistent context, resulting in revealing a mismatch between
+ * @Version attribute of that UserTestData object and a corresponding persisted object.
  *
  * Created on 15.02.17.
  */
@@ -47,13 +50,14 @@ public class JoinAreaRequestServiceTest extends AbstractServiceTest {
     @Autowired
     private UserProfileService profileService;
 
+    private final String areaId = testAreas.getFirstAreaId();
+
     @Test
-    @WithMockVoter
     public void makeJoinRequest() throws Exception {
-        String areaId = testAreas.getFirstArea().getId();
+        User requester = profileService.get(ALIEN_USER1.getId());
 
         reset();
-        JoinAreaRequest expected = requestService.make(ALIEN_USER1, areaId);
+        JoinAreaRequest expected = requestService.make(requester, areaId);
         assertSql(2, 1, 0, 0);
 
         JoinAreaRequest actual = areaService.getRepository()
@@ -63,34 +67,27 @@ public class JoinAreaRequestServiceTest extends AbstractServiceTest {
     }
 
     @Test
-    @WithMockVoter
     public void userCanChangeArea() throws Exception {
-        String areaId = testAreas.getFirstAreaId();
-        JoinAreaRequest request = requestService.make(A2_USER1, areaId);
-
-        asAdmin(() -> {
-            requestService.approve(GOD, request.getId());
-            return null;
-        });
-
+        User requester = profileService.get(A2_USER1.getId());
+        JoinAreaRequest request = requestService.make(requester, areaId);
+        requestService.approve(GOD, request.getId());
         User updatedUser = profileService.getRepository().get(areaId, A2_USER1.getId());
         assertEquals(areaId, updatedUser.getAreaId());
     }
 
     @Test
-    @WithMockAdmin
     public void getJoinRequestByStatus() throws Exception {
-        String areaId = asVoter(() -> areaService.create("ChowArea", ALIEN_USER1).getId());
-        JoinAreaRequest request1 = asVoter(() -> requestService.make(VOTER1, areaId));
-        JoinAreaRequest request2 = asVoter(() -> requestService.make(VOTER2, areaId));
-        JoinAreaRequest request3 = asVoter(() -> requestService.make(VOTER3, areaId));
-        requestService.approve(
-                ALIEN_USER1.assignAreaId(areaId),
-                request1.getId()
-        );
+        User requester1 = profileService.get(VOTER1_ID);
+        User requester2 = profileService.get(VOTER2_ID);
+        User requester3 = profileService.get(VOTER3_ID);
+
+        JoinAreaRequest request1 = requestService.make(requester1, testAreas.getSecondAreaId());
+        JoinAreaRequest request2 = requestService.make(requester2, testAreas.getSecondAreaId());
+        JoinAreaRequest request3 = requestService.make(requester3, testAreas.getSecondAreaId());
+        requestService.approve(A2_ADMIN, request1.getId());
 
         reset();
-        List<JoinAreaRequest> requests = requestService.getByStatus(areaId, JoinAreaRequest.JoinStatus.PENDING);
+        List<JoinAreaRequest> requests = requestService.getByStatus(testAreas.getSecondAreaId(), JoinAreaRequest.JoinStatus.PENDING);
         assertSelect(1);
 
         assertThat(
@@ -100,15 +97,16 @@ public class JoinAreaRequestServiceTest extends AbstractServiceTest {
     }
 
     @Test
-    @WithMockVoter
     public void getJoinRequestsByRequester() throws Exception {
-        String areaId = areaService.create("ChowArea", ALIEN_USER1).getId();
-        JoinAreaRequest request1 = requestService.make(VOTER1, areaId);
-        JoinAreaRequest request2 = requestService.make(ALIEN_USER2, testAreas.getFirstArea().getId());
-        JoinAreaRequest request3 = requestService.make(ALIEN_USER2, areaId);
+        User requester1 = profileService.get(VOTER1_ID);
+        User requester2 = profileService.get(ALIEN_USER2.getId());
+
+        JoinAreaRequest request1 = requestService.make(requester1, testAreas.getSecondAreaId());
+        JoinAreaRequest request2 = requestService.make(requester2, testAreas.getFirstAreaId());
+        JoinAreaRequest request3 = requestService.make(requester2, testAreas.getSecondAreaId());
 
         reset();
-        List<JoinAreaRequest> requests = requestService.getByRequester(ALIEN_USER2);
+        List<JoinAreaRequest> requests = requestService.getByRequester(requester2);
         assertSelect(1);
 
         assertThat(
@@ -118,25 +116,25 @@ public class JoinAreaRequestServiceTest extends AbstractServiceTest {
     }
 
     @Test
-    @WithMockVoter
     public void getSingleJoinRequestByRequester() throws Exception {
-        String areaId = areaService.create("ChowArea", ALIEN_USER1).getId();
-        JoinAreaRequest request1 = requestService.make(VOTER1, areaId);
-        JoinAreaRequest expected = requestService.make(ALIEN_USER2, testAreas.getFirstArea().getId());
-        JoinAreaRequest request3 = requestService.make(ALIEN_USER2, areaId);
+        User requester1 = profileService.get(VOTER1_ID);
+        User requester2 = profileService.get(ALIEN_USER2.getId());
+
+        JoinAreaRequest request1 = requestService.make(requester1, testAreas.getSecondAreaId());
+        JoinAreaRequest expected = requestService.make(requester2, testAreas.getFirstAreaId());
+        JoinAreaRequest request3 = requestService.make(requester2, testAreas.getSecondAreaId());
 
         reset();
-        JoinAreaRequest actual = requestService.getByRequester(ALIEN_USER2, expected.getId());
+        JoinAreaRequest actual = requestService.getByRequester(requester2, expected.getId());
         assertSelect(1);
 
         assertThat(actual, matchSingle(expected, REQUEST_COMPARATOR));
     }
 
     @Test
-    @WithMockAdmin
     public void onRequestApprovalItsStatusUpdatedAndTimeSet() throws Exception {
-        String areaId = testAreas.getFirstArea().getId();
-        JoinAreaRequest request = asVoter(() -> requestService.make(ALIEN_USER1, areaId));
+        User requester = profileService.get(ALIEN_USER2.getId());
+        JoinAreaRequest request = requestService.make(requester, areaId);
 
         reset();
         requestService.approve(GOD, request.getId());
@@ -150,10 +148,9 @@ public class JoinAreaRequestServiceTest extends AbstractServiceTest {
     }
 
     @Test
-    @WithMockAdmin
     public void onRequestApprovalAreaIdOfUserIsSet() throws Exception {
-        String areaId = testAreas.getFirstArea().getId();
-        JoinAreaRequest request = asVoter(() -> requestService.make(ALIEN_USER1, areaId));
+        User requester = profileService.get(ALIEN_USER2.getId());
+        JoinAreaRequest request = requestService.make(requester, areaId);
 
         reset();
         requestService.approve(GOD, request.getId());
@@ -161,16 +158,14 @@ public class JoinAreaRequestServiceTest extends AbstractServiceTest {
 
         JoinAreaRequest approvedReq = areaService.getRepository()
                 .getJoinRequest(areaId, request.getId());
-        User requester = approvedReq.getRequester();
 
-        assertEquals(areaId, requester.getAreaId());
+        assertEquals(areaId, approvedReq.getRequester().getAreaId());
     }
 
     @Test
-    @WithMockAdmin
     public void onRequestApprovalUserIsInAreaUsersCollection() throws Exception {
-        String areaId = testAreas.getFirstArea().getId();
-        JoinAreaRequest request = asVoter(() -> requestService.make(ALIEN_USER1, areaId));
+        User requester = profileService.get(ALIEN_USER2.getId());
+        JoinAreaRequest request = requestService.make(requester, areaId);
 
         reset();
         requestService.approve(GOD, request.getId());
@@ -179,27 +174,26 @@ public class JoinAreaRequestServiceTest extends AbstractServiceTest {
         TransactionStatus transactionStatus = ptm.getTransaction(new DefaultTransactionDefinition());
         Set<User> users = areaService.getRepository()
                 .getArea(areaId, EatingAreaRepositoryImpl.Fields.USERS).getUsers();
-        assertTrue(users.contains(ALIEN_USER1));
+
+        assertTrue(users.contains(requester));
         ptm.commit(transactionStatus);
     }
 
     @Test(expected = NotFoundException.class)
-    @WithMockAdmin
     public void approverCannotApproveAnotherAreaRequest() throws Exception {
-        String areaId = asVoter(() -> areaService.create("ChowArea", ALIEN_USER1).getId());
-        JoinAreaRequest request = asVoter(() -> requestService.make(ALIEN_USER2, areaId));
+        User requester = profileService.get(ALIEN_USER2.getId());
+        JoinAreaRequest request = requestService.make(requester, areaId);
 
-        requestService.approve(GOD, request.getId());
+        requestService.approve(A2_ADMIN, request.getId());
     }
 
     @Test
-    @WithMockVoter
     public void requesterCanCancelOwnRequest() throws Exception {
-        String areaId = testAreas.getFirstArea().getId();
-        JoinAreaRequest request = requestService.make(ALIEN_USER1, areaId);
+        User requester = profileService.get(ALIEN_USER2.getId());
+        JoinAreaRequest request = requestService.make(requester, areaId);
 
         reset();
-        requestService.cancel(ALIEN_USER1, request.getId());
+        requestService.cancel(requester, request.getId());
         assertSql(1, 0, 1, 0);
 
         JoinAreaRequest actual = areaService.getRepository()
@@ -208,18 +202,16 @@ public class JoinAreaRequestServiceTest extends AbstractServiceTest {
     }
 
     @Test(expected = NotFoundException.class)
-    @WithMockVoter
     public void requesterCannotCancelNotOwnRequest() throws Exception {
-        String areaId = testAreas.getFirstArea().getId();
-        JoinAreaRequest request = requestService.make(ALIEN_USER1, areaId);
-        requestService.cancel(ALIEN_USER2, request.getId());
+        User requester = profileService.get(ALIEN_USER2.getId());
+        JoinAreaRequest request = requestService.make(requester, areaId);
+        requestService.cancel(ALIEN_USER1, request.getId());
     }
 
     @Test
-    @WithMockAdmin
     public void areaAdminRejectsRequest() throws Exception {
-        String areaId = testAreas.getFirstArea().getId();
-        JoinAreaRequest request = asVoter(() -> requestService.make(ALIEN_USER1, areaId));
+        User requester = profileService.get(ALIEN_USER2.getId());
+        JoinAreaRequest request = requestService.make(requester, areaId);
 
         reset();
         requestService.reject(GOD, request.getId());
@@ -232,10 +224,9 @@ public class JoinAreaRequestServiceTest extends AbstractServiceTest {
 
 
     @Test(expected = NotFoundException.class)
-    @WithMockAdmin
     public void adminCannotRejectsAnotherAreaRequest() throws Exception {
-        String areaId = testAreas.getFirstAreaId();
-        JoinAreaRequest request = asVoter(() -> requestService.make(A2_USER1, areaId));
+        User requester = profileService.get(ALIEN_USER2.getId());
+        JoinAreaRequest request = requestService.make(requester, areaId);
 
         requestService.reject(A2_ADMIN, request.getId());
     }

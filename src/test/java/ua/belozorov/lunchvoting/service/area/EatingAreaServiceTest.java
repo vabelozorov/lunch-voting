@@ -70,38 +70,36 @@ public class EatingAreaServiceTest extends AbstractServiceTest {
     private final String areaId = testAreas.getFirstAreaId();
 
     @Test
-    @WithMockVoter
     public void createArea() throws Exception {
+        User creator = profileService.get(ALIEN_USER1.getId());
+
         reset();
-        EatingArea expected = areaService.create("ChowChow", ALIEN_USER1);
+        EatingArea expected = areaService.create("ChowChow", creator);
         assertSql(3, 1,3, 0);
 
-        EatingArea actual = areaService.getRepository().getArea(expected.getId());
-        User alienUser = profileService.getRepository()
-                            .get(null, ALIEN_USER1.getId());
+        EatingArea actual = areaService.getArea(expected.getId());
 
         assertThat(actual, matchSingle(expected, AREA_COMPARATOR));
-        assertTrue(alienUser.getRoles().contains(UserRole.ADMIN));
+        assertTrue(profileService.get(ALIEN_USER1.getId()).getRoles().contains(UserRole.ADMIN));
     }
 
     @Test(expected = NoAreaAdminException.class)
     public void theOnlyAdminInAreaCannotCreateNewArea() throws Exception {
-        asAdmin(() -> {userService.setRoles(areaId, ADMIN_ID, Collections.singleton(UserRole.VOTER)); return null;});
-        asVoter(() -> areaService.create("NEW_AWESOME_SO_MUCH_BETTER_AREA", GOD));
+        userService.setRoles(areaId, ADMIN_ID, Collections.singleton(UserRole.VOTER));;
+        areaService.create("NEW_AWESOME_SO_MUCH_BETTER_AREA", GOD);
     }
 
     @Test(expected = DuplicateDataException.class)
-    @WithMockVoter
     public void areaNameIsUnique() throws Exception {
+        User creator = profileService.get(GOD_ID);
         ExceptionUtils.executeAndUnwrapException(
-                () -> areaService.create("AREA_NAME", ALIEN_USER1),
+                () -> areaService.create(testAreas.getFirstAreaName(), creator),
                 ConstraintViolationException.class,
-                new DuplicateDataException(ErrorCode.DUPLICATE_AREA_NAME, new Object[]{"AREA_NAME"})
+                new DuplicateDataException(ErrorCode.DUPLICATE_AREA_NAME, new Object[]{testAreas.getFirstAreaName()})
         );
     }
 
     @Test
-    @WithMockAdmin
     public void updateAreaName() throws Exception {
         reset();
         areaService.updateAreaName("NEW_AWESOME_NAME", GOD);
@@ -116,7 +114,6 @@ public class EatingAreaServiceTest extends AbstractServiceTest {
     }
 
     @Test
-    @WithMockAdmin
     public void createUserInArea() throws Exception {
         User newUser = new User("New User", "new@email.com", "strongPassword");
 
@@ -139,7 +136,6 @@ public class EatingAreaServiceTest extends AbstractServiceTest {
     }
 
     @Test
-    @WithMockAdmin
     public void createPlaceInArea() throws Exception {
         Set<String> phones = ImmutableSet.of("0661234567", "0441234567", "0123456789", "1234567890");
 
@@ -159,7 +155,6 @@ public class EatingAreaServiceTest extends AbstractServiceTest {
     }
 
     @Test
-    @WithMockAdmin
     public void createPollInAreaForMenuDate() throws Exception {
         reset();
         LunchPlacePoll expected = areaService.createPollInArea(areaId, NOW_DATE.plusDays(2), null, null, null);
@@ -171,15 +166,11 @@ public class EatingAreaServiceTest extends AbstractServiceTest {
     }
 
     @Test
-    @WithMockVoter
     public void getAreaBasicFieldsOnly() throws Exception {
-        EatingArea expected = areaService.create("ChowChow", ALIEN_USER1);
-
         reset();
-        EatingArea actual = areaService.getRepository().getArea(expected.getId());
+        EatingArea actual = areaService.getArea(areaId);
         assertSelect(1);
 
-        assertThat(actual, matchSingle(expected, AREA_COMPARATOR));
         assertExceptionCount(LazyInitializationException.class,
                 () -> actual.getUsers().size(),
                 () -> actual.getPolls().size(),
@@ -188,7 +179,6 @@ public class EatingAreaServiceTest extends AbstractServiceTest {
     }
 
     @Test
-    @WithMockVoter
     public void getAreaWithUsers() throws Exception {
         EatingArea expected = testAreas.getFirstArea();
 
@@ -208,7 +198,6 @@ public class EatingAreaServiceTest extends AbstractServiceTest {
     }
 
     @Test
-    @WithMockVoter
     public void getAreaWithUsersAndPolls() throws Exception {
         EatingArea expected = testAreas.getFirstArea();
 
@@ -227,7 +216,6 @@ public class EatingAreaServiceTest extends AbstractServiceTest {
     }
 
     @Test
-    @WithMockVoter
     public void getAreaAsToNoSummary() throws Exception {
         AreaTo actual = areaService.getAsTo(testAreas.getFirstAreaId(), false);
         AreaTo expected = AreaTestData.dto(testAreas.getFirstArea());
@@ -235,7 +223,6 @@ public class EatingAreaServiceTest extends AbstractServiceTest {
     }
 
     @Test
-    @WithMockVoter
     public void getAreaAsToWithSummary() throws Exception {
         AreaTo actual = areaService.getAsTo(testAreas.getFirstAreaId(), true);
         AreaTo expected = AreaTestData.dtoSummary(testAreas.getFirstArea());
@@ -244,7 +231,6 @@ public class EatingAreaServiceTest extends AbstractServiceTest {
 
     @Test
     //TODO check that polls and places are deleted too
-    @WithMockAdmin
     public void onAreaDeleteUserAreaIdSetsToNull() throws Exception {
         String areaId = testAreas.getFirstAreaId();
 
@@ -262,15 +248,11 @@ public class EatingAreaServiceTest extends AbstractServiceTest {
     }
 
     @Test
-    @WithMockVoter
     public void testSearch() throws Exception {
-        areaService.create("ChowArea", ALIEN_USER1);
-        areaService.create("ChowAreaNew", ALIEN_USER1);
-
         reset();
-        List<EatingArea> chow = areaService.getRepository().getByNameStarts("Chow");
+        List<EatingArea> chow = areaService.filterByNameStarts("AREA1");
         assertSelect(1);
 
-        assertTrue(chow.size() == 2);
+        assertTrue(chow.size() == 1);
     }
 }

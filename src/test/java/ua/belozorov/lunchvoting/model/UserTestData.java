@@ -24,33 +24,33 @@ import static org.mockito.ArgumentMatchers.argThat;
 public class UserTestData {
     public static final UserComparator USER_COMPARATOR = new UserComparator();
 
-    public static User GOD = new User("GOD_ID", 1, "Царь всея приложение", "god@email.com", "godpass",
+    public static User GOD = new User("GOD_ID", "Царь всея приложение", "god@email.com", "godpass",
             new HashSet<>(Arrays.asList(UserRole.VOTER, UserRole.ADMIN)), LocalDateTime.of(2016, 11, 16, 0, 0, 1), true, "AREA1_ID");
-    public static User VOTER = new User("VOTER_ID", 1, "Синий Гном", "voter@email.com", "voterpass",
+    public static User VOTER = new User("VOTER_ID", "Синий Гном", "voter@email.com", "voterpass",
             new HashSet<>(Arrays.asList(UserRole.VOTER)), LocalDateTime.of(2016, 11, 17, 13, 0, 0), true, "AREA1_ID");
-    public static User ADMIN = new User("ADMIN_ID", 1, "Just an admin", "admin@email.com", "adminpass",
+    public static User ADMIN = new User("ADMIN_ID", "Just an admin", "admin@email.com", "adminpass",
             new HashSet<>(Arrays.asList(UserRole.ADMIN)), LocalDateTime.of(2016, 11, 16, 13, 0, 0), true, "AREA1_ID");
-    public static User VOTER1 = new User("VOTER1_ID", 1, "Voter1_Name", "voter1@email.com", "voter1pass",
+    public static User VOTER1 = new User("VOTER1_ID", "Voter1_Name", "voter1@email.com", "voter1pass",
             new HashSet<>(Arrays.asList(UserRole.VOTER)), LocalDateTime.of(2016, 11, 17, 13, 0, 0), true, "AREA1_ID");
-    public static User VOTER2 = new User("VOTER2_ID", 1, "Voter2_Name", "voter2@email.com", "voter2pass",
+    public static User VOTER2 = new User("VOTER2_ID", "Voter2_Name", "voter2@email.com", "voter2pass",
             new HashSet<>(Arrays.asList(UserRole.VOTER)), LocalDateTime.of(2016, 11, 17, 13, 0, 0), true, "AREA1_ID");
-    public static User VOTER3 = new User("VOTER3_ID", 1, "Voter3_Name", "voter3@email.com", "voter3pass",
+    public static User VOTER3 = new User("VOTER3_ID", "Voter3_Name", "voter3@email.com", "voter3pass",
             new HashSet<>(Arrays.asList(UserRole.VOTER)), LocalDateTime.of(2016, 11, 17, 13, 0, 0), true, "AREA1_ID");
-    public static User VOTER4 = new User("VOTER4_ID", 1, "Voter4_Name", "voter4@email.com", "voter4pass",
+    public static User VOTER4 = new User("VOTER4_ID", "Voter4_Name", "voter4@email.com", "voter4pass",
             new HashSet<>(Arrays.asList(UserRole.VOTER)), LocalDateTime.of(2016, 11, 17, 13, 0, 0), true, "AREA1_ID");
 
-    public static User A2_ADMIN = new User("A2_ADMIN_ID", 1, "A2admin_Name", "a2admin@email.com", "a2_adminpass",
+    public static User A2_ADMIN = new User("A2_ADMIN_ID", "A2admin_Name", "a2admin@email.com", "a2_adminpass",
             new HashSet<>(Arrays.asList(UserRole.ADMIN)), LocalDateTime.of(2016, 11, 17, 13, 0, 0), true, "AREA2_ID"  );
-    public static User A2_USER1 = new User("A2_USER1_ID", 1, "A2_Name1", "a2_user1@email.com", "a2_user1pass",
+    public static User A2_USER1 = new User("A2_USER1_ID", "A2_Name1", "a2_user1@email.com", "a2_user1pass",
             new HashSet<>(Arrays.asList(UserRole.VOTER)), LocalDateTime.of(2016, 11, 17, 13, 0, 0), true, "AREA2_ID");
-    public static User A2_USER2 = new User("A2_USER2_ID", 1, "A2_Name2", "a2_user2@email.com", "a2_user2pass",
+    public static User A2_USER2 = new User("A2_USER2_ID", "A2_Name2", "a2_user2@email.com", "a2_user2pass",
             new HashSet<>(Arrays.asList(UserRole.VOTER)), LocalDateTime.of(2016, 11, 17, 13, 0, 0), true, "AREA2_ID");
-    public static User A2_USER3 = new User("A2_USER3_ID", 1, "A2_Name3", "a2_user3@email.com", "a2_user3pass",
+    public static User A2_USER3 = new User("A2_USER3_ID", "A2_Name3", "a2_user3@email.com", "a2_user3pass",
             new HashSet<>(Arrays.asList(UserRole.VOTER)), LocalDateTime.of(2016, 11, 17, 13, 0, 0), true, "AREA2_ID");
 
-    public static User ALIEN_USER1 = new User("ALIEN1_ID", 1, "Alien1_Name", "alien1@email.com", "a1lienpass",
+    public static User ALIEN_USER1 = new User("ALIEN1_ID", "Alien1_Name", "alien1@email.com", "a1lienpass",
             new HashSet<>(Arrays.asList(UserRole.VOTER)), LocalDateTime.of(2016, 11, 17, 13, 0, 0), true, null  );
-    public static User ALIEN_USER2 = new User("ALIEN2_ID", 1, "Alien2_Name", "alien2@email.com", "a2lienpass",
+    public static User ALIEN_USER2 = new User("ALIEN2_ID", "Alien2_Name", "alien2@email.com", "a2lienpass",
             new HashSet<>(Arrays.asList(UserRole.VOTER)), LocalDateTime.of(2016, 11, 17, 13, 0, 0), true, null  );
 
     public static String GOD_ID = GOD.getId();

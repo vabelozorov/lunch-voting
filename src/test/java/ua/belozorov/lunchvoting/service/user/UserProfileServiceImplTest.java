@@ -33,7 +33,6 @@ public class UserProfileServiceImplTest extends AbstractServiceTest {
     }
 
     @Test
-    @WithMockVoter
     public void updateMainInfo() throws Exception {
         profileService.updateMainInfo(VOTER_ID, "UpdatedName", VOTER.getEmail(), "UpdatedPassword");
         User actual = profileService.get(VOTER_ID);
@@ -43,7 +42,6 @@ public class UserProfileServiceImplTest extends AbstractServiceTest {
     }
 
     @Test
-    @WithMockVoter
     public void update() throws Exception {
         User voter = profileService.get(VOTER_ID);
         User expected = voter.withName("UpdatedName").withPassword("UpdatedPassword");
@@ -54,7 +52,6 @@ public class UserProfileServiceImplTest extends AbstractServiceTest {
     }
 
     @Test
-    @WithMockVoter
     public void get() throws Exception {
         User actual = profileService.get(VOTER_ID);
 
