@@ -41,7 +41,7 @@ public final class UserProfileServiceImpl implements UserProfileService {
         if (persistedUser == null) {
             throw new NotFoundException(id, User.class);
         }
-        User updatedUser = persistedUser.toBuilder().name(name).email(email).password(password).build();
+        User updatedUser = persistedUser.withName(name).withEmail(email).withPassword(password);
         userRepository.update(updatedUser);
     }
 

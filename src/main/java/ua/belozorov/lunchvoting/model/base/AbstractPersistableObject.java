@@ -1,5 +1,8 @@
 package ua.belozorov.lunchvoting.model.base;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.validator.constraints.NotBlank;
 
 import javax.persistence.Id;
@@ -44,6 +47,8 @@ public abstract class AbstractPersistableObject implements Persistable {
      * Is used to determine new|saved state of an entity
      */
     @Version
+    @Getter(AccessLevel.PROTECTED)
+    @Setter(AccessLevel.NONE)
     protected final Integer version;
 
     public AbstractPersistableObject() {
@@ -75,10 +80,4 @@ public abstract class AbstractPersistableObject implements Persistable {
     public int hashCode() {
         return id.hashCode();
     }
-//
-//
-//    @Override
-//    public boolean isNew() {
-//        return version == null;
-//    }
 }

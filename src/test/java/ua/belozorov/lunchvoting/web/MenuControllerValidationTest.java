@@ -46,7 +46,7 @@ public class MenuControllerValidationTest extends AbstractControllerTest {
                 result.getRequest().getRequestURL(),
                 ErrorCode.PARAMS_VALIDATION_FAILED,
                 "field 'effectiveDate', rejected value 'null', reason: may not be null\n" +
-                        "field 'dishes[0].name', rejected value '', reason: must be provided and not empty\n" +
+                        "field 'dishes[0].name', rejected value '', reason: name length must be between 2 and 50 included\n" +
                         "field 'dishes[0].price', rejected value '-1.0', reason: must be provided and greater or equal 0\n" +
                         "field 'dishes[1].position', rejected value '-1', reason: must be provided and greater or equal 0"
         );

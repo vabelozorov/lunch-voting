@@ -21,7 +21,6 @@ import javax.validation.constraints.NotNull;
 @Immutable
 public final class Dish implements Comparable<Dish> {
 
-    @NotBlank
     private final String name;
 
     private final float price;

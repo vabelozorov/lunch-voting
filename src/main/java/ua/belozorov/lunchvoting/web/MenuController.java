@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
@@ -233,8 +234,8 @@ public class MenuController {
         @Override
         public void validate(Object target, Errors errors) {
             MenuTo menuTo = (MenuTo) target;
-            if (menuTo.getEffectiveDate() == null && menuTo.getDishes() == null) {
-                errors.reject("error.model.menu.fields");
+            if (menuTo.getDishes() == null) {
+                return;
             }
             int i = 0;
             for (Dish dish : menuTo.getDishes()) {
@@ -259,8 +260,8 @@ public class MenuController {
         @Override
         public void validate(Object target, Errors errors) {
             Dish dish = (Dish) target;
-            ValidationUtils.rejectIfEmptyOrWhitespace(errors, "name", "error.model.dish.name_length_invalid");
-            if (dish.getName().length() < 2 || dish.getName().length() > 50) {
+            String name = dish.getName();
+            if (name == null || !StringUtils.hasText(name) || name.length() < 2 || name.length() > 50) {
                 errors.rejectValue("name", "error.model.dish.name_length_invalid");
             }
             if (dish.getPrice() < 0) {

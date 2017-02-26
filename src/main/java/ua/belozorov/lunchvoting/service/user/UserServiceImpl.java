@@ -59,7 +59,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         ExceptionUtils.checkParamsNotNull(areaId, id, name, email, password);
 
         User persistedUser = this.get(areaId, id);
-        User updatedUser = persistedUser.toBuilder().name(name).email(email).password(password).build();
+        User updatedUser = persistedUser.withName(name).withEmail(email).withPassword(password);
         userRepository.update(updatedUser);
     }
 
@@ -91,14 +91,14 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Transactional
     public void activate(String areaId, String userId, boolean isActive) {
         User user = this.get(areaId, userId);
-        userRepository.update(user.setActivated(isActive));
+        userRepository.update(user.withActivated(isActive));
     }
 
     @Override
     @Transactional
     public void setRoles(String areaId, String userId, Set<UserRole> roles) {
         User user = this.get(areaId, userId);
-        userRepository.update(user.setRoles(roles));
+        userRepository.update(user.withRoles(roles));
     }
 
     @Override

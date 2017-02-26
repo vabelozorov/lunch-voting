@@ -7,8 +7,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * <h2>Enum that describes user roles</h2>
- * <p/>
+ * Enum that describes user roles
+ *
  * {@code id} field is used to support the representation of a user roles set as a bitmask
  *
  * Created on 15.11.16.

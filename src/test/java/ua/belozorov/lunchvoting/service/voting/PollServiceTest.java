@@ -109,7 +109,7 @@ public class PollServiceTest extends AbstractServiceTest {
     @WithMockVoter
     public void getPollsByActivePeriodWithStartEndSet() throws Exception {
         reset();
-        List<LunchPlacePoll> actual = pollService.getPollsByActivePeriod(areaId, NOW_DATE_TIME.minusDays(2), null);
+        List<LunchPlacePoll> actual = pollService.getPollsByActivePeriod(areaId, NOW_DATE_TIME.minusDays(2), NOW_DATE_TIME);
         assertSelect(1);
 
         List<LunchPlacePoll> expected = Stream.of(testPolls.getPastPoll(), testPolls.getActivePollNoUpdate(), testPolls.getActivePoll())

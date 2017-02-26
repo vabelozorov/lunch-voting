@@ -82,7 +82,6 @@ public final class User extends AbstractPersistableObject implements Comparable<
      * @param registeredDate
      * @param activated
      */
-    @Builder(toBuilder = true)
     User(String id, Integer version, String name, String email, String password, Set<UserRole> roles,
                 LocalDateTime registeredDate, boolean activated, String areaId) {
         super(id, version);
@@ -95,8 +94,43 @@ public final class User extends AbstractPersistableObject implements Comparable<
         this.areaId = areaId;
     }
 
-    public User setActivated(boolean activated) {
-        return this.toBuilder().activated(activated).build();
+    public User withName(String name) {
+        return new User(id, version, name, email, password, roles, registeredDate, activated, areaId);
+    }
+
+    public User withEmail(String email) {
+        return new User(id, version, name, email, password, roles, registeredDate, activated, areaId);
+    }
+
+    public User withPassword(String password) {
+        return new User(id, version, name, email, password, roles, registeredDate, activated, areaId);
+    }
+
+    public User withRoles(Set<UserRole> roles) {
+        return new User(id, version, name, email, password, roles, registeredDate, activated, areaId);
+    }
+
+    public User addRole(UserRole role) {
+        Set<UserRole> roles = new HashSet<>(this.getRoles());
+        roles.add(role);
+        return new User(id, version, name, email, password, roles, registeredDate, activated, areaId);
+    }
+
+    public User withActivated(boolean activated) {
+        return new User(id, version, name, email, password, roles, registeredDate, activated, areaId);
+    }
+
+    public User assignAreaId(String areaId) {
+        return new User(id, version, name, email, password, roles, registeredDate, activated, areaId);
+    }
+
+    public boolean belongsToArea() {
+        return this.areaId != null;
+    }
+
+    @Override
+    public int compareTo(User o) {
+        return this.email.compareTo(o.email);
     }
 
     @Override
@@ -110,29 +144,6 @@ public final class User extends AbstractPersistableObject implements Comparable<
                 ", activated=" + activated +
                 ", areaId=" + areaId +
                 '}';
-    }
-
-    public User setRoles(Set<UserRole> roles) {
-        return this.toBuilder().roles(roles).build();
-    }
-
-    public User addRole(UserRole role) {
-        Set<UserRole> roles = new HashSet<>(this.getRoles());
-        roles.add(role);
-        return this.toBuilder().roles(roles).build();
-    }
-
-    public User assignAreaId(String id) {
-        return this.toBuilder().areaId(id).build();
-    }
-
-    public boolean belongsToArea() {
-        return this.areaId != null;
-    }
-
-    @Override
-    public int compareTo(User o) {
-        return this.email.compareTo(o.email);
     }
 
     /*

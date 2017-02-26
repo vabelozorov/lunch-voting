@@ -5,7 +5,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import ua.belozorov.lunchvoting.WithMockAdmin;
 import ua.belozorov.lunchvoting.WithMockVoter;
+import ua.belozorov.lunchvoting.exceptions.DuplicateDataException;
 import ua.belozorov.lunchvoting.exceptions.NotFoundException;
+import ua.belozorov.lunchvoting.util.ExceptionUtils;
+import ua.belozorov.lunchvoting.web.exceptionhandling.ErrorCode;
 import ua.belozorov.lunchvoting.web.security.AuthorizedUser;
 import ua.belozorov.lunchvoting.model.User;
 import ua.belozorov.lunchvoting.model.UserRole;
@@ -47,10 +50,7 @@ public class UserServiceTest extends AbstractServiceTest {
         User actual = userService.create(expected);
         assertInsertCount(1);
 
-        expected = expected.toBuilder()
-                .registeredDate(actual.getRegisteredDate())
-                .activated(true)
-                .build();
+        expected = expected.withActivated(true);
         assertThat(actual, matchSingle(expected, USER_COMPARATOR));
     }
 
@@ -91,7 +91,7 @@ public class UserServiceTest extends AbstractServiceTest {
     @Test
     public void update() throws Exception {
         User updated = userService.get(areaId, VOTER_ID);
-        updated = updated.toBuilder().password("newPassword").email("updated@email.com").build();
+        updated = updated.withPassword("newPassword").withEmail("updated@email.com");
 
         reset();
         userService.updateMainInfo(areaId, updated.getId(), updated.getName(), updated.getEmail(), updated.getPassword());
@@ -148,8 +148,7 @@ public class UserServiceTest extends AbstractServiceTest {
     @Test(expected = NotFoundException.class)
     @WithMockAdmin
     public void updateNotExisting() {
-        User updated = VOTER.toBuilder().id("NOT_EXISTING_ID").password("newPassword").email("updated@email.com").build();
-        userService.updateMainInfo(areaId, updated.getId(), updated.getName(), updated.getEmail(), updated.getPassword());
+        userService.updateMainInfo(areaId, "I_DO_NOT_EXIST", VOTER.getName(), VOTER.getEmail(), VOTER.getPassword());
     }
 
     @Test(expected = NotFoundException.class)
@@ -158,10 +157,14 @@ public class UserServiceTest extends AbstractServiceTest {
         userService.delete(areaId, "NotExistingId");
     }
 
-    @Test(expected = DataIntegrityViolationException.class)
+    @Test(expected = DuplicateDataException.class)
     @WithMockAdmin
-    public void createDuplicate() {
-        User duplicate = VOTER.toBuilder().id("XXX").email("god@email.com").build();
-        userService.create(duplicate);
+    public void createWithDuplicateEmail() {
+        User duplicate = userService.get(areaId, VOTER_ID).withEmail(GOD.getEmail());
+        ExceptionUtils.executeAndUnwrapException(
+                () -> userService.create(duplicate),
+                DataIntegrityViolationException.class,
+                new DuplicateDataException(ErrorCode.DUPLICATE_EMAIL, new Object[]{GOD.getEmail()})
+        );
     }
 }

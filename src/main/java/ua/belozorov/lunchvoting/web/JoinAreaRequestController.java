@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import ua.belozorov.lunchvoting.model.lunchplace.EatingArea;
+import ua.belozorov.lunchvoting.model.lunchplace.JoinAreaRequest.JoinStatus;
 import ua.belozorov.lunchvoting.web.security.AuthorizedUser;
 import ua.belozorov.lunchvoting.model.User;
 import ua.belozorov.lunchvoting.model.lunchplace.JoinAreaRequest;
@@ -145,7 +146,7 @@ public class JoinAreaRequestController {
 
     /**
      * <p>Retrieves all {@link JoinAreaRequest} objects in the area of a currently authenticated user
-     * with the given {@link JoinAreaRequest.JoinStatus}.</p>
+     * with the given {@link JoinStatus}.</p>
      *
      * <table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px; padding:3px;">
      *     <tr>
@@ -172,7 +173,7 @@ public class JoinAreaRequestController {
      *     </tr>
      * </table>
      *
-     * @param status {@link JoinAreaRequest.JoinStatus}
+     * @param status {@link JoinStatus}
      * @return ResponseEntity instance with the following values upon success:
      *  <ul>
      *      <li>HTTP Status 200 Ok</li>
@@ -185,7 +186,7 @@ public class JoinAreaRequestController {
      */
     @GetMapping(params = "status", produces = MediaType.APPLICATION_JSON_VALUE)
     @IsAdmin
-    public ResponseEntity<List<JoinRequestTo>> getAllInAreaOfStatus(@RequestParam JoinAreaRequest.JoinStatus status) {
+    public ResponseEntity<List<JoinRequestTo>> getAllInAreaOfStatus(@RequestParam JoinStatus status) {
         String areaId = ofNullable(AuthorizedUser.get()).map(User::getAreaId).orElse(null);
         List<JoinAreaRequest> requests = requestService.getByStatus(areaId, status);
         return ResponseEntity.ok(toDto(requests));

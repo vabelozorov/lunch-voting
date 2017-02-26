@@ -37,7 +37,7 @@ public class UserProfileServiceImplTest extends AbstractServiceTest {
     public void updateMainInfo() throws Exception {
         profileService.updateMainInfo(VOTER_ID, "UpdatedName", VOTER.getEmail(), "UpdatedPassword");
         User actual = profileService.get(VOTER_ID);
-        User expected = VOTER.toBuilder().name("UpdatedName").password("UpdatedPassword").build();
+        User expected = VOTER.withName("UpdatedName").withPassword("UpdatedPassword");
 
         assertThat(actual, matchSingle(expected, USER_COMPARATOR));
     }
@@ -46,7 +46,7 @@ public class UserProfileServiceImplTest extends AbstractServiceTest {
     @WithMockVoter
     public void update() throws Exception {
         User voter = profileService.get(VOTER_ID);
-        User expected = voter.toBuilder().name("UpdatedName").password("UpdatedPassword").build();
+        User expected = voter.withName("UpdatedName").withPassword("UpdatedPassword");
         profileService.update(expected);
         User actual = profileService.get(VOTER_ID);
 

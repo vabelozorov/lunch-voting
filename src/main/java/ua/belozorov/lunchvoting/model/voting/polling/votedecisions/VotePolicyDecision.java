@@ -12,7 +12,8 @@ import java.util.Set;
 public interface VotePolicyDecision {
     /**
      * Defines whether check should by continued by another policy checking instance
-     * if this method is true, {@code getAcceptedVote} method and {@code votesToBeRemoved} method must raise {@link sun.reflect.generics.reflectiveObjects.NotImplementedException}
+     * if this method is true, {@code getAcceptedVote} method and
+     * {@code votesToBeRemoved} method must raise {@link UnsupportedOperationException}
      * and {@code isAccept}, {@code isUpdate} methods must return false, as it follows a common sense
      * @return Returns true if the result of policy compliance check was to continue checking, false otherwise
      */
@@ -21,7 +22,7 @@ public interface VotePolicyDecision {
     /**
      * Defines that a policy checking instance came to conclusion that Vote meets requirements for accepting it
      * if this method is true, {@code getAcceptedVote} method must return a Vote instance to be added to a set of accepted votes
-     * and {@code votesToBeRemoved} method must raise {@link sun.reflect.generics.reflectiveObjects.NotImplementedException}.
+     * and {@code votesToBeRemoved} method must raise {@link UnsupportedOperationException}.
      * {@code isContinue}, {@code isUpdate} methods must return false, as it follows a common sense
      * @return Returns {@code true} if the result of policy compliance check was to accept (add) vote to accepted set of votes
      * or false otherwise
@@ -45,7 +46,7 @@ public interface VotePolicyDecision {
     Vote getAcceptedVote();
 
     /**
-     If {@code isUpdate()} method returns true, this method should return a Set<Vote> to be removed before adding the current Vote
+     If {@code isUpdate()} method returns true, this method should return a {@code Set<Vote>} to be removed before adding the current Vote
      * Otherwise {@code sun.reflect.generics.reflectiveObjects.NotImplementedException} must be raised
      * @return
      */

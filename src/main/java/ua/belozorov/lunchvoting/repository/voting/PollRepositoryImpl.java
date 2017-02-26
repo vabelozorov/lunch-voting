@@ -154,7 +154,7 @@ public class PollRepositoryImpl extends BaseRepository implements PollRepository
 
     @Override
     public Boolean isActive(String areaId, String pollId) {
-        String sql = "SELECT CASE WHEN count(p) > 0 THEN false ELSE true END " +
+        String sql = "SELECT CASE WHEN count(p) > 0 THEN true ELSE false END " +
                 "FROM LunchPlacePoll p  " +
                 "WHERE (:now BETWEEN p.timeConstraint.startTime AND p.timeConstraint.endTime) " +
                     "AND p.id= :id " +
