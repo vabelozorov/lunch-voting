@@ -35,6 +35,7 @@ import java.util.stream.Collectors;
 @Table(name = "polls")
 @Getter(AccessLevel.PUBLIC)
 public class LunchPlacePoll extends AbstractPersistableObject implements Comparable<LunchPlacePoll> {
+
     private final TimeConstraint timeConstraint;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "poll", cascade = CascadeType.PERSIST)

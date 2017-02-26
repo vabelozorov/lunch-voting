@@ -18,8 +18,9 @@ import java.util.*;
 import static ua.belozorov.lunchvoting.util.ExceptionUtils.NOT_CHECK;
 
 /**
- * Immutable class that represent a place where a voter can have a meal
- *
+ * Immutable class that represent a place where a voter can have a meal.
+ * As Hibernate cannot create a proxy for {@code One-To-One} and {@code Many-To-One} final classes,
+ * {@code final} modifier here is omitted, yet inheritance of this class in not desired.
  * Created on 15.11.16.
  */
 @Entity
