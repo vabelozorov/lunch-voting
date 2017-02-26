@@ -15,6 +15,8 @@ import javax.persistence.OrderBy;
 import javax.persistence.Table;
 import java.util.*;
 
+import static ua.belozorov.lunchvoting.util.ExceptionUtils.NOT_CHECK;
+
 /**
  *
  * Created on 15.11.16.
@@ -43,7 +45,10 @@ public class LunchPlace extends AbstractPersistableObject implements Comparable<
     @OneToMany(mappedBy = "lunchPlace")
     private final Set<Menu> menus;
 
-    protected LunchPlace() {
+    /**
+     * JPA
+     */
+    LunchPlace() {
         this.phones = Collections.emptySet();
         this.menus = Collections.emptySet();
         this.description = null;
@@ -51,20 +56,45 @@ public class LunchPlace extends AbstractPersistableObject implements Comparable<
         this.name = null;
     }
 
+    /**
+     * Simple constructor that accepts one non-null parameter.
+     * ID is auto-generated
+     * Other values are set to an empty string or an empty collection, depending on a field type
+     *
+     * @param name LunchPlace name, must be unique in its area
+     */
     public LunchPlace(String name) {
         this(null, name, null, null, Collections.emptySet());
     }
 
-    public LunchPlace(@Nullable String id, String name, String address, String description,
+    /**
+     *
+     * @param id any string or null to auto-generate
+     * @param name LunchPlace name, must be unique in its area
+     * @param address any string or null for setting an empty string
+     * @param description any string or null for setting an empty string
+     * @param phones
+     */
+    public LunchPlace(@Nullable String id, String name, @Nullable String address, @Nullable String description,
                       Set<String> phones) {
         this(id, null, name, address, description, phones, Collections.emptySet());
     }
 
-    @Builder(toBuilder = true)
-    LunchPlace(@Nullable String id, @Nullable Integer version, String name, String address, String description,
+    /**
+     * All-args constructor for cloning setters
+     * @param id any string or null to auto-generate
+     * @param version a positive value to indicate a persisted instance or null for a transient instance
+     * @param name LunchPlace name, must be unique in its area
+     * @param address
+     * @param description
+     * @param phones
+     * @param menus
+     */
+    private LunchPlace(@Nullable String id, @Nullable Integer version, String name, @Nullable String address, @Nullable String description,
                       Set<String> phones, Set<Menu> menus) {
         super(id, version);
-        ExceptionUtils.checkParamsNotNull(name, phones, menus);
+
+        ExceptionUtils.checkParamsNotNull(NOT_CHECK, NOT_CHECK, name, NOT_CHECK, NOT_CHECK, phones, menus);
 
         this.name = name;
         this.address = address == null ? "" : address;
@@ -81,8 +111,24 @@ public class LunchPlace extends AbstractPersistableObject implements Comparable<
         return ImmutableSortedSet.copyOf(this.menus);
     }
 
-    public LunchPlace setMenus(Set<Menu> menus) {
-        return this.toBuilder().menus(menus).build();
+    public LunchPlace withName(String name) {
+        return new LunchPlace(id, version, name, address, description, phones, menus);
+    }
+
+    public LunchPlace withAddress(String address) {
+        return new LunchPlace(id, version, name, address, description, phones, menus);
+    }
+
+    public LunchPlace withDescription(String description) {
+        return new LunchPlace(id, version, name, address, description, phones, menus);
+    }
+
+    public LunchPlace withPhones(Set<String> phones) {
+        return new LunchPlace(id, version, name, address, description, phones, menus);
+    }
+
+    public LunchPlace withMenus(Set<Menu> menus) {
+        return new LunchPlace(id, version, name, address, description, phones, menus);
     }
 
     @Override

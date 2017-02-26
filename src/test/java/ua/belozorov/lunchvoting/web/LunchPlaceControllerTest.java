@@ -154,7 +154,7 @@ public class LunchPlaceControllerTest extends AbstractControllerTest {
     public void getByMenuDates() throws Exception {
         Set<Menu> expectedMenus = Sets.newHashSet(testPlaces.getMenu3(), testPlaces.getMenu4());
         when(placeService.getMultipleWithMenu(any(), any(), any(), any()))
-                .thenReturn(Collections.singletonList(testPlaces.getPlace4().setMenus(expectedMenus)));
+                .thenReturn(Collections.singletonList(testPlaces.getPlace4().withMenus(expectedMenus)));
 
         String actualJson = mockMvc
                 .perform(
@@ -213,8 +213,8 @@ public class LunchPlaceControllerTest extends AbstractControllerTest {
 
     @Test
     public void testGetMultipleByMenuDates() throws Exception {
-        LunchPlace place3 = PLACE3.setMenus(Sets.newHashSet(testPlaces.getMenu6()));
-        LunchPlace place4 = PLACE4.setMenus(Sets.newHashSet(testPlaces.getMenu1(), testPlaces.getMenu2()));
+        LunchPlace place3 = PLACE3.withMenus(Sets.newHashSet(testPlaces.getMenu6()));
+        LunchPlace place4 = PLACE4.withMenus(Sets.newHashSet(testPlaces.getMenu1(), testPlaces.getMenu2()));
 
         when(placeService.getMultipleWithMenu(any(), any(), any(), any()))
                 .thenReturn(Arrays.asList(place4, place3));

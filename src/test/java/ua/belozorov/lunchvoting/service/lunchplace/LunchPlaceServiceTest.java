@@ -63,8 +63,8 @@ public class LunchPlaceServiceTest extends AbstractServiceTest {
         service.bulkUpdate(areaId,  place2.getId(), null, "Updated Address", null, Collections.singleton("0481234567"));
         assertSql(1, 0, 1, 0);
 
-        LunchPlace expected = place2.toBuilder().address("Updated Address")
-                                .phones(Collections.singleton("0481234567")).build();
+        LunchPlace expected = place2.withAddress("Updated Address")
+                                .withPhones(Collections.singleton("0481234567"));
 
         assertThat(
                 placeRepository.get(areaId, place2.getId()),
@@ -164,15 +164,6 @@ public class LunchPlaceServiceTest extends AbstractServiceTest {
     @Test(expected = NotFoundException.class)
     public void deleteNotExistingFails() {
         service.delete(areaId, "NOT_EXISTING_ID");
-    }
-
-    @Test(expected = DuplicateDataException.class)
-    public void createPlaceWithDuplicateNameFails() {
-        ExceptionUtils.executeAndUnwrapException(
-                () -> service.create(new LunchPlace(testPlaces.getPlace1().getName())),
-                DataIntegrityViolationException.class,
-                new DuplicateDataException(ErrorCode.DUPLICATE_PLACE_NAME, new Object[]{})
-        );
     }
 
     @Test

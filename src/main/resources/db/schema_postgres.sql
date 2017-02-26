@@ -62,7 +62,7 @@ CREATE TABLE IF NOT EXISTS places (
   phones VARCHAR(500),
   area_id VARCHAR(36) DEFAULT NULL,
   FOREIGN KEY (area_id) REFERENCES areas(id) ON DELETE CASCADE,
-  CONSTRAINT places_name_unique UNIQUE (name)
+  CONSTRAINT places_name_areaId_unique UNIQUE (name, area_id)
 );
 
 CREATE TABLE IF NOT EXISTS poll_items (

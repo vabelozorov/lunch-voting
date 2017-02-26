@@ -7,7 +7,7 @@ import javax.persistence.MappedSuperclass;
 import javax.persistence.Version;
 
 /**
- * 
+ *
  */
 @MappedSuperclass
 public abstract class AbstractPersistableObject implements Persistable {

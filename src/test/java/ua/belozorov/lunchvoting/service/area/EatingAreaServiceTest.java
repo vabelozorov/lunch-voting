@@ -5,7 +5,9 @@ import org.hibernate.LazyInitializationException;
 import org.hibernate.exception.ConstraintViolationException;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 import ua.belozorov.lunchvoting.WithMockAdmin;
@@ -146,11 +148,34 @@ public class EatingAreaServiceTest extends AbstractServiceTest {
 
         phones = phones.stream().sorted().collect(Collectors.toSet());
         LunchPlace actual = placeService.getRepository().get(areaId, created.getId());
-        LunchPlace expected = created.toBuilder().phones(phones).build();
+        LunchPlace expected = created.withPhones(phones);
 
         assertThat(
                 actual,
                 matchSingle(expected, LUNCH_PLACE_COMPARATOR)
+        );
+    }
+
+    @Test
+    public void createPlaceInAnotherAreaWithDuplicateName() throws Exception {
+        Set<String> phones = ImmutableSet.of("0661234567", "0441234567", "0123456789", "1234567890");
+
+        areaService.createPlaceInArea(testAreas.getFirstAreaId(),
+                null, "NEW_PLACE_NAME", "new address", "new description", phones);
+        areaService.createPlaceInArea(testAreas.getSecondAreaId(),
+                null, "NEW_PLACE_NAME", "new address", "new description", phones);
+    }
+
+    @Test(expected = DuplicateDataException.class)
+    public void createPlaceInAreaWithDuplicateNameFails() throws Exception {
+        Set<String> phones = ImmutableSet.of("0661234567", "0441234567", "0123456789", "1234567890");
+        areaService.createPlaceInArea(testAreas.getFirstAreaId(),
+                null, "NEW_PLACE_NAME", "new address", "new description", phones);
+        ExceptionUtils.executeAndUnwrapException(
+                () -> areaService.createPlaceInArea(testAreas.getFirstAreaId(),
+                        null, "NEW_PLACE_NAME", "new address", "new description", phones),
+                DataIntegrityViolationException.class,
+                new DuplicateDataException(ErrorCode.DUPLICATE_PLACE_NAME, new Object[]{})
         );
     }
 

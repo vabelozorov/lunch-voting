@@ -46,22 +46,23 @@ public class LunchPlaceServiceImpl implements LunchPlaceService {
 
     @Override
     @Transactional
-    public void bulkUpdate(String areaId, String placeId, @Nullable String name, @Nullable String address, @Nullable String description, @Nullable Set<String> phones) {
+    public void bulkUpdate(String areaId, String placeId, @Nullable String name, @Nullable String address,
+                           @Nullable String description, @Nullable Set<String> phones) {
         LunchPlace toBeUpdated = this.get(areaId, placeId);
-        LunchPlace.LunchPlaceBuilder builder = toBeUpdated.toBuilder();
+
         if (name != null) {
-            builder.name(name);
+            toBeUpdated = toBeUpdated.withName(name);
         }
         if(address != null) {
-            builder.address(address);
+            toBeUpdated = toBeUpdated.withAddress(address);
         }
         if(description != null) {
-            builder.description(description);
+            toBeUpdated = toBeUpdated.withDescription(description);
         }
         if (phones != null) {
-            builder.phones(phones);
+            toBeUpdated = toBeUpdated.withPhones(phones);
         }
-        lunchPlaceRepository.update(builder.build());
+        lunchPlaceRepository.update(toBeUpdated);
     }
 
     @Override

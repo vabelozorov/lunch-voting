@@ -31,19 +31,19 @@ public class LunchPlaceTestData {
     public static final EqualsComparator<Menu> MENU_WITH_DISHES_COMPARATOR = new MenuWithDishesComparator();
     private final Resource lunchPlaceSqlResource;
 
-    private LunchPlace place1 = new LunchPlace("FirstPlaceID", 1, "First Place", "First Address", "First Description",
-            Collections.singleton("0501234567"), Collections.emptySet());
-    private LunchPlace place2 = new LunchPlace("SecondPlaceID", 1, "Second Place", "Second Address", "Second Description",
-            ImmutableSet.of("0442345671", "0502345671"), Collections.emptySet());
-    private LunchPlace place3 = new LunchPlace("ThirdPlaceID", 1, "Third Place", "Third Address", "Third Description",
-           Collections.singleton("0503456712"), Collections.emptySet());
-    private LunchPlace place4 = new LunchPlace("FourthPlaceID", 1, "Fourth Place", "Fourth Address", "Fourth Description",
-            ImmutableSet.of("0444567123", "0444671235", "0504567123", "0934567123"), Collections.emptySet());
+    private LunchPlace place1 = new LunchPlace("FirstPlaceID",  "First Place", "First Address", "First Description",
+            Collections.singleton("0501234567"));
+    private LunchPlace place2 = new LunchPlace("SecondPlaceID", "Second Place", "Second Address", "Second Description",
+            ImmutableSet.of("0442345671", "0502345671"));
+    private LunchPlace place3 = new LunchPlace("ThirdPlaceID", "Third Place", "Third Address", "Third Description",
+           Collections.singleton("0503456712"));
+    private LunchPlace place4 = new LunchPlace("FourthPlaceID", "Fourth Place", "Fourth Address", "Fourth Description",
+            ImmutableSet.of("0444567123", "0444671235", "0504567123", "0934567123"));
 
-    private LunchPlace area2place1 = new LunchPlace("AREA2_PL1_ID", 1, "AREA2_PL_NAME1", "First Address", "First Description",
-            Collections.singleton("0501234567"), Collections.emptySet());
-    private LunchPlace area2place2 = new LunchPlace("AREA2_PL2_ID", 1, "AREA2_PL_NAME2", "Second Address", "Second Description",
-            ImmutableSet.of("0442345671", "0502345671"), Collections.emptySet());
+    private LunchPlace area2place1 = new LunchPlace("AREA2_PL1_ID", "AREA2_PL_NAME1", "First Address", "First Description",
+            Collections.singleton("0501234567"));
+    private LunchPlace area2place2 = new LunchPlace("AREA2_PL2_ID",  "AREA2_PL_NAME2", "Second Address", "Second Description",
+            ImmutableSet.of("0442345671", "0502345671"));
 
     private final String place1Id;
     private final String place2Id;
@@ -128,12 +128,12 @@ public class LunchPlaceTestData {
     private final Resource menuSqlResource;
 
     public LunchPlaceTestData() {
-        this.place1 = this.place1.setMenus(ImmutableSet.of(menu7, menu8));
-        this.place2 = this.place2.setMenus(ImmutableSet.of(menu9, menu10));
-        this.place3 = this.place3.setMenus(ImmutableSet.of(menu5, menu6));
-        this.place4 = this.place4.setMenus(ImmutableSet.of(menu1, menu2, menu3, menu4));
-        this.area2place1 = this.area2place1.setMenus(ImmutableSet.of(menu11));
-        this.area2place2 = this.area2place2.setMenus(ImmutableSet.of(menu12));
+        this.place1 = this.place1.withMenus(ImmutableSet.of(menu7, menu8));
+        this.place2 = this.place2.withMenus(ImmutableSet.of(menu9, menu10));
+        this.place3 = this.place3.withMenus(ImmutableSet.of(menu5, menu6));
+        this.place4 = this.place4.withMenus(ImmutableSet.of(menu1, menu2, menu3, menu4));
+        this.area2place1 = this.area2place1.withMenus(ImmutableSet.of(menu11));
+        this.area2place2 = this.area2place2.withMenus(ImmutableSet.of(menu12));
 
         this.place1Id = place1.getId();
         this.place2Id = place2.getId();
@@ -183,11 +183,11 @@ public class LunchPlaceTestData {
     }
 
     public static LunchPlace getWithFilteredMenu(LocalDate date, LunchPlace place) {
-        return place.toBuilder().menus(
+        return place.withMenus(
                 place.getMenus().stream()
                         .filter(m -> m.getEffectiveDate().equals(date))
                         .collect(Collectors.toSet())
-        ).build();
+        );
     }
 
     public static List<LunchPlace> getWithFilteredMenu(LocalDate date, LunchPlace... places) {
