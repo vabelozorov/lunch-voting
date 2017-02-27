@@ -57,8 +57,8 @@ public class LunchPlace extends AbstractPersistableObject implements Comparable<
      * JPA
      */
     LunchPlace() {
-        this.phones = Collections.emptySet();
-        this.menus = Collections.emptySet();
+        this.phones = new HashSet<>();
+        this.menus = new HashSet<>();
         this.description = null;
         this.address = null;
         this.name = null;

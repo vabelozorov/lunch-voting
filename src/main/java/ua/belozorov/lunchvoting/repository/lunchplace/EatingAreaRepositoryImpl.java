@@ -55,7 +55,7 @@ public class EatingAreaRepositoryImpl extends BaseRepository implements EatingAr
     public AreaTo getAreaTo(String areaId) {
         String sql = "SELECT new list(ea.id, ea.name, ea.created, u.id, pl.id, po.id) " +
                 "FROM EatingArea ea " +
-                "LEFT JOIN ea.users u " +
+                "LEFT JOIN ea.voters u " +
                 "LEFT JOIN ea.places pl " +
                 "LEFT JOIN ea.polls po " +
                 "WHERE ea.id= :id ";
@@ -81,7 +81,7 @@ public class EatingAreaRepositoryImpl extends BaseRepository implements EatingAr
     public AreaTo getAreaToSummary(String areaId) {
         String sql = "SELECT new ua.belozorov.lunchvoting.to.AreaTo(ea.id, ea.name, ea.created, count(DISTINCT u), count(DISTINCT pl), count(DISTINCT po)) " +
                 "FROM EatingArea ea " +
-                "LEFT JOIN ea.users u " +
+                "LEFT JOIN ea.voters u " +
                 "LEFT JOIN ea.places pl " +
                 "LEFT JOIN ea.polls po " +
                 "WHERE ea.id= :id " +
@@ -168,7 +168,7 @@ public class EatingAreaRepositoryImpl extends BaseRepository implements EatingAr
     }
 
     public enum Fields {
-        USERS(EatingArea::getUsers),
+        USERS(EatingArea::getVoters),
         POLLS(EatingArea::getPolls),
         PLACES(EatingArea::getPlaces);
 

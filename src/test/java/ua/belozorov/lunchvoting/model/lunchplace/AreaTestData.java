@@ -4,7 +4,6 @@ import lombok.Getter;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import ua.belozorov.lunchvoting.EqualsComparator;
-import ua.belozorov.lunchvoting.MatcherUtils;
 import ua.belozorov.lunchvoting.model.User;
 import ua.belozorov.lunchvoting.model.base.Persistable;
 import ua.belozorov.lunchvoting.model.voting.polling.PollTestData;
@@ -44,20 +43,17 @@ public final class AreaTestData {
     private final LocalDateTime secondAreaDate;
 
     public AreaTestData(PollTestData pollTestData, LunchPlaceTestData placeTestData) {
-        this.firstArea = new EatingArea("AREA1_ID", "AREA1_NAME").toBuilder()
-                .places(new HashSet<>(placeTestData.getA1Places()))
-                .polls(new HashSet<>(pollTestData.getA1Polls()))
-                .users(new HashSet<>(A1_USERS))
-                .build();
+        this.firstArea = new EatingArea("AREA1_ID", "AREA1_NAME")
+                .withPlaces(new HashSet<>(placeTestData.getA1Places()))
+                .withPolls(new HashSet<>(pollTestData.getA1Polls()))
+                .withVoters(new HashSet<>(A1_USERS));
         this.firstAreaName = firstArea.getName();
         this.firstAreaId = firstArea.getId();
         this.firstAreaDate = firstArea.getCreated();
 
-        this.secondArea = new EatingArea("AREA2_ID", "AREA2_NAME").toBuilder()
-                .places(new HashSet<>(placeTestData.getA2Places()))
-//                .polls(pollTestData.getA1Polls())
-                .users(new HashSet<>(A2_USERS))
-                .build();
+        this.secondArea = new EatingArea("AREA2_ID", "AREA2_NAME")
+                .withPlaces(new HashSet<>(placeTestData.getA2Places()))
+                .withVoters(new HashSet<>(A2_USERS));
         this.secondAreaName = secondArea.getName();
         this.secondAreaId = secondArea.getId();
         this.secondAreaDate = secondArea.getCreated();
@@ -72,7 +68,7 @@ public final class AreaTestData {
 
     public static AreaTo dto(EatingArea area) {
         return new AreaTo(area.getId(), area.getName(), area.getCreated(),
-            area.getUsers().stream().map(User::getId).sorted().collect(Collectors.toList()),
+            area.getVoters().stream().map(User::getId).sorted().collect(Collectors.toList()),
             area.getPolls().stream().map(Persistable::getId).sorted().collect(Collectors.toList()),
             area.getPlaces().stream().map(LunchPlace::getId).sorted().collect(Collectors.toList())
         );
@@ -80,7 +76,7 @@ public final class AreaTestData {
 
     public static AreaTo dtoSummary(EatingArea area) {
         return new AreaTo(area.getId(), area.getName(), area.getCreated(),
-                area.getUsers().stream().map(User::getId).count(),
+                area.getVoters().stream().map(User::getId).count(),
                 area.getPolls().stream().map(Persistable::getId).count(),
                 area.getPlaces().stream().map(LunchPlace::getId).count()
         );

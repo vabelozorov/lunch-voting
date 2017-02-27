@@ -58,7 +58,7 @@ public final class User extends AbstractPersistableObject implements Comparable<
         this.name = null;
         this.email = null;
         this.password = null;
-        this.roles = null;
+        this.roles = new HashSet<>();
         this.registeredDate = null;
         this.activated = false;
         this.areaId = null;

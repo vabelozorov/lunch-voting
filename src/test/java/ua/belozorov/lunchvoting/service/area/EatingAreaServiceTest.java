@@ -6,22 +6,16 @@ import org.hibernate.exception.ConstraintViolationException;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
-import ua.belozorov.lunchvoting.WithMockAdmin;
-import ua.belozorov.lunchvoting.WithMockVoter;
 import ua.belozorov.lunchvoting.exceptions.DuplicateDataException;
 import ua.belozorov.lunchvoting.exceptions.NoAreaAdminException;
-import ua.belozorov.lunchvoting.exceptions.NotFoundException;
 import ua.belozorov.lunchvoting.model.User;
 import ua.belozorov.lunchvoting.model.UserRole;
 import ua.belozorov.lunchvoting.model.lunchplace.AreaTestData;
 import ua.belozorov.lunchvoting.model.lunchplace.EatingArea;
 import ua.belozorov.lunchvoting.model.lunchplace.LunchPlace;
 import ua.belozorov.lunchvoting.model.voting.polling.LunchPlacePoll;
-import ua.belozorov.lunchvoting.repository.lunchplace.EatingAreaRepository;
 import ua.belozorov.lunchvoting.repository.lunchplace.EatingAreaRepositoryImpl;
 import ua.belozorov.lunchvoting.service.AbstractServiceTest;
 import ua.belozorov.lunchvoting.service.lunchplace.LunchPlaceService;
@@ -44,7 +38,6 @@ import static ua.belozorov.lunchvoting.model.UserTestData.*;
 import static ua.belozorov.lunchvoting.model.lunchplace.AreaTestData.AREA_COMPARATOR;
 import static ua.belozorov.lunchvoting.model.lunchplace.AreaTestData.AREA_TO_COMPARATOR;
 import static ua.belozorov.lunchvoting.model.lunchplace.LunchPlaceTestData.LUNCH_PLACE_COMPARATOR;
-import static ua.belozorov.lunchvoting.model.voting.polling.PollTestData.*;
 import static ua.belozorov.lunchvoting.model.voting.polling.PollTestData.POLL_COMPARATOR;
 
 /**
@@ -111,7 +104,7 @@ public class EatingAreaServiceTest extends AbstractServiceTest {
 
         assertThat(
                 actual,
-                matchSingle(testAreas.getFirstArea().changeName("NEW_AWESOME_NAME"), AREA_COMPARATOR)
+                matchSingle(testAreas.getFirstArea().withName("NEW_AWESOME_NAME"), AREA_COMPARATOR)
         );
     }
 
@@ -133,7 +126,7 @@ public class EatingAreaServiceTest extends AbstractServiceTest {
         EatingArea area = areaService.getRepository()
                 .getArea(areaId, EatingAreaRepositoryImpl.Fields.USERS);
 
-        assertTrue(area.getUsers().contains(created));
+        assertTrue(area.getVoters().contains(created));
         ptm.commit(transactionStatus);
     }
 
@@ -197,7 +190,7 @@ public class EatingAreaServiceTest extends AbstractServiceTest {
         assertSelect(1);
 
         assertExceptionCount(LazyInitializationException.class,
-                () -> actual.getUsers().size(),
+                () -> actual.getVoters().size(),
                 () -> actual.getPolls().size(),
                 () -> actual.getPlaces().size()
         );
@@ -215,7 +208,7 @@ public class EatingAreaServiceTest extends AbstractServiceTest {
         assertSelect(2);
 
         assertThat(expected, matchSingle(actual, AREA_COMPARATOR));
-        assertTrue(actual.getUsers().size() == 7);
+        assertTrue(actual.getVoters().size() == 7);
         assertExceptionCount(LazyInitializationException.class,
                 () -> actual.getPolls().size(),
                 () -> actual.getPlaces().size()
@@ -233,7 +226,7 @@ public class EatingAreaServiceTest extends AbstractServiceTest {
         assertSelect(3);
 
         assertThat(expected, matchSingle(actual, AREA_COMPARATOR));
-        assertTrue(actual.getUsers().size() == 7);
+        assertTrue(actual.getVoters().size() == 7);
         assertTrue(actual.getPolls().size() == 4);
         assertExceptionCount(LazyInitializationException.class,
                 () -> actual.getPlaces().size()

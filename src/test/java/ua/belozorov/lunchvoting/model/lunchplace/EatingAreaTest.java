@@ -17,7 +17,7 @@ public class EatingAreaTest extends AbstractTest {
     public void testJoin() throws Exception {
         EatingArea area = testAreas.getFirstArea();
         EatingArea updated = area.addMember(ALIEN_USER1.assignAreaId(area.getId()));
-        assertTrue(updated.getUsers().size() == 8);
+        assertTrue(updated.getVoters().size() == 8);
     }
 
     @Test(expected = IllegalStateException.class)

@@ -52,7 +52,7 @@ public final class Menu extends AbstractPersistableObject implements Comparable<
      */
     Menu() {
         effectiveDate = null;
-        dishes = Collections.emptySet();
+        dishes = new HashSet<>();
         lunchPlace = null;
     }
 

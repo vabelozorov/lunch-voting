@@ -523,7 +523,7 @@ public class EatingAreaController {
     private void filterArea(Object obj) {
         Map<Class<?>, Set<String>> filterMap = new HashMap<>();
         filterMap.put(
-                EatingArea.class, Stream.of("users", "places", "polls", "version").collect(Collectors.toSet())
+                EatingArea.class, Stream.of("voters", "places", "polls", "version").collect(Collectors.toSet())
         );
         jsonFilter.excludingFilter(obj, filterMap);
     }

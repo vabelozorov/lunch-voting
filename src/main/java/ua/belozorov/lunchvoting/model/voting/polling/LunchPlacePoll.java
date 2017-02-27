@@ -78,8 +78,8 @@ public class LunchPlacePoll extends AbstractPersistableObject implements Compara
     LunchPlacePoll() {
         this.menuDate = null;
         this.timeConstraint = null;
-        this.pollItems = Collections.emptyList();
-        this.votes = Collections.emptySet();
+        this.pollItems = new ArrayList<>();
+        this.votes = new HashSet<>();
         this.policies = new ArrayList<>();
     }
 

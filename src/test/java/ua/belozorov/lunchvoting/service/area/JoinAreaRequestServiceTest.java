@@ -4,13 +4,9 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
-import ua.belozorov.lunchvoting.WithMockAdmin;
-import ua.belozorov.lunchvoting.WithMockVoter;
 import ua.belozorov.lunchvoting.exceptions.NotFoundException;
 import ua.belozorov.lunchvoting.model.User;
-import ua.belozorov.lunchvoting.model.lunchplace.EatingArea;
 import ua.belozorov.lunchvoting.model.lunchplace.JoinAreaRequest;
-import ua.belozorov.lunchvoting.repository.lunchplace.EatingAreaRepository;
 import ua.belozorov.lunchvoting.repository.lunchplace.EatingAreaRepositoryImpl;
 import ua.belozorov.lunchvoting.service.AbstractServiceTest;
 import ua.belozorov.lunchvoting.service.user.UserProfileService;
@@ -173,7 +169,7 @@ public class JoinAreaRequestServiceTest extends AbstractServiceTest {
 
         TransactionStatus transactionStatus = ptm.getTransaction(new DefaultTransactionDefinition());
         Set<User> users = areaService.getRepository()
-                .getArea(areaId, EatingAreaRepositoryImpl.Fields.USERS).getUsers();
+                .getArea(areaId, EatingAreaRepositoryImpl.Fields.USERS).getVoters();
 
         assertTrue(users.contains(requester));
         ptm.commit(transactionStatus);

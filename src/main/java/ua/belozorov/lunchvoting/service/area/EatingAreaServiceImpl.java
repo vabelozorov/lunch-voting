@@ -1,6 +1,5 @@
 package ua.belozorov.lunchvoting.service.area;
 
-import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,7 +13,6 @@ import ua.belozorov.lunchvoting.model.voting.polling.LunchPlacePoll;
 import ua.belozorov.lunchvoting.model.voting.polling.TimeConstraint;
 import ua.belozorov.lunchvoting.repository.lunchplace.EatingAreaRepository;
 import ua.belozorov.lunchvoting.repository.lunchplace.EatingAreaRepositoryImpl;
-import ua.belozorov.lunchvoting.service.lunchplace.LunchPlaceService;
 import ua.belozorov.lunchvoting.service.user.UserService;
 import ua.belozorov.lunchvoting.service.voting.PollService;
 import ua.belozorov.lunchvoting.to.AreaTo;
@@ -110,7 +108,7 @@ public final class EatingAreaServiceImpl implements EatingAreaService {
     @Transactional
     public void updateAreaName(String name, User user) {
         EatingArea area = this.getArea(user.getAreaId());
-        areaRepository.update(area.changeName(name));
+        areaRepository.update(area.withName(name));
     }
 
     @Override
