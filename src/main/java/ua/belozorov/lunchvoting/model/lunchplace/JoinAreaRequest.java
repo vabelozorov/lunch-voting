@@ -4,13 +4,15 @@ import lombok.Builder;
 import lombok.Getter;
 import ua.belozorov.lunchvoting.model.User;
 import ua.belozorov.lunchvoting.model.base.AbstractPersistableObject;
+import ua.belozorov.lunchvoting.util.ExceptionUtils;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
-/**
+import static ua.belozorov.lunchvoting.util.ExceptionUtils.NOT_CHECK;
 
- *
+/**
+ *<p>Immutable class with stores data of a voter to join an area.</p>
  * Created on 09.02.17.
  */
 @Getter
@@ -33,9 +35,12 @@ public final class JoinAreaRequest extends AbstractPersistableObject {
     private final EatingArea area;
 
     @Column(name = "status")
-    private JoinStatus status;
+    private final JoinStatus status;
 
-    protected JoinAreaRequest() {
+    /**
+     * JPA
+     */
+    JoinAreaRequest() {
         this.requester = null;
         this.created = null;
         this.area = null;
@@ -43,13 +48,30 @@ public final class JoinAreaRequest extends AbstractPersistableObject {
         this.decidedOn = null;
     }
 
+    /**
+     * Constructor with auto-generating ID
+     * @param requester a voter who make a request
+     * @param area an area that a requester want to join
+     */
     public JoinAreaRequest(User requester, EatingArea area) {
         this(null, null, requester, area, LocalDateTime.now(), null, JoinStatus.PENDING);
     }
 
-    @Builder(toBuilder = true)
+    /**
+     * All-args constructor for cloning setters
+     * @param id any string or null to auto-generate
+     * @param version a positive value to indicate a persisted instance or null for a transient instance
+     * @param requester a voter who make a request
+     * @param area an area that a requester want to join
+     * @param created
+     * @param decidedOn
+     * @param status
+     */
     private JoinAreaRequest(String id, Integer version, User requester, EatingArea area, LocalDateTime created, LocalDateTime decidedOn, JoinStatus status) {
         super(id, version);
+
+        ExceptionUtils.checkParamsNotNull(NOT_CHECK, NOT_CHECK, requester, area, created, NOT_CHECK, status);
+
         this.requester = requester;
         this.area = area;
         this.created = created;
@@ -74,7 +96,7 @@ public final class JoinAreaRequest extends AbstractPersistableObject {
     }
 
     private JoinAreaRequest changeStatus(JoinStatus status) {
-        return this.toBuilder().status(status).decidedOn(LocalDateTime.now()).build();
+        return new JoinAreaRequest(id, version, requester, area, created, LocalDateTime.now(), status);
     }
 
     @Override
