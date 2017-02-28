@@ -64,7 +64,7 @@ public class EatingAreaController {
      * <table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px; padding:3px;">
      *     <tr>
      *         <td>HTTP Request</td>
-     *         <td><font style="color:green"><code>HTTP POST /api/areas/ 201</code></font></td>
+     *         <td><font style="color:green"><code>HTTP POST /api/areas 201</code></font></td>
      *     </tr>
      *     <tr>
      *         <td>Request Content-Type</td>
@@ -85,7 +85,7 @@ public class EatingAreaController {
      * </table>
      *
      * @param name a unique name for the area, must 2-50 characters long. The application enforces a unique constraint on this value and
-     *  <code>DuplicateDataException</code>is thrown if value happens to be not unique
+     *  <code>DuplicateDataException</code> is thrown if value happens to be not unique
      * @return ResponseEntity instance with the following values upon success:
      *  <ul>
      *      <li>An HTTP Status 201 Created </li>
@@ -113,7 +113,7 @@ public class EatingAreaController {
 
 
     /**
-     * <p>Registers a new {@link User} in the area of a currently authenticated user with <strong>ADMIN</strong> role.</p>
+     * <p>Registers a new {@link User} in the area of a currently authenticated user.</p>
      *
      * <table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px; padding:3px;">
      *     <tr>
@@ -140,11 +140,8 @@ public class EatingAreaController {
      *     </tr>
      * </table>
      *
-     * <p>The {@link User}  will be created in the same {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea}
-     * as the {@link User} whose credentials were submitted.<br>
-     * </p>
      *
-     *  Three non-empty parameters must be present in the JSON object:
+     * @param userTo three non-empty parameters must be present in the supplied JSON object:
      * <ul>
      *  <li><strong>name</strong>  name of the User, must be between 2 and 100 characters long</li>
      *  <li><strong> password</strong>  password of the User, must be between 6 and 30 characters long</li>
@@ -152,8 +149,6 @@ public class EatingAreaController {
      *  <code>DuplicateDataException</code> is thrown if value happens to be not unique</li>
      * </ul>
      * Other parameters are ignored.
-     *
-     * @param userTo represents request parameters and must contain non-empty <code>name, password, email</code> fields
      * @return ResponseEntity instance with the following values upon success:
      *  <ul>
      *      <li>An HTTP Status 201 Created </li>
@@ -210,21 +205,17 @@ public class EatingAreaController {
      *     </tr>
      * </table>
      *
-     * <p>The {@link LunchPlace} will be created in the same {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea}
-     * as the {@link User} whose credentials were submitted.<br>
-     * </p>
-     * The following parameters must be present in the JSON object:
+     * @param dto the following parameters must be present in the JSON object:
      * <ul>
      *  <li><strong>name</strong>  name of a new {@link LunchPlace}, should not exist and must be between 2 and 50 characters long.
      *  The application enforces a unique constraint on this value and
      *  <code>DuplicateDataException</code> is thrown if value happens to be not unique</li>
      *  <li><strong>address</strong>  address of the {@link LunchPlace}, must not exceed 200 characters, optional field</li>
      *  <li><strong>description</strong>  description of the {@link LunchPlace}, must not exceed 1000 characters, optional field</li>
-     *  <li><strong>phones</strong> phones ofthe {@link LunchPlace}, comma-separated list of strings, each string is 10-digit value</li>
+     *  <li><strong>phones</strong> phones of the {@link LunchPlace}, comma-separated list of strings, each string is 10-digit value</li>
      * </ul>
      * Other parameters are ignored.
      *
-     * @param dto represents request parameters
      * @return ResponseEntity instance with the following values upon success:
      *  <ul>
      *      <li>HTTP Status 201 Created</li>
@@ -281,14 +272,11 @@ public class EatingAreaController {
      *         <td><strong>ADMIN</strong></td>
      *     </tr>
      * </table>
-     * <p>Items of the poll are LunchPlace objects with menus for given date or a current day,, if not given.</p>
+     * <p>Items of the poll are LunchPlace objects with menus for given date or a current day, if not given.</p>
      * <p>
      *     The poll starts at <code>start</code> time or will be 09-00 of a current day.<br>
      *     The poll ends at <code>end</code> time or will be 12-00 of a current day.<br>
      *     The poll final time to change a vote is <code>change</code> time or will be 11-00 of a current day.
-     * </p>
-     * <p>The {@link LunchPlacePoll} will be created in the same {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea}
-     * as the {@link User} whose credentials were submitted.<br>
      * </p>
      * @param menuDate date of Menu which determines which LunchPlace objects will be added as items to the LunchPlacePoll
      *                 optional. Default value is 09-00 of a current day
