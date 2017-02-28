@@ -13,7 +13,6 @@ import org.springframework.web.context.WebApplicationContext;
 import ua.belozorov.lunchvoting.AbstractSpringTest;
 import ua.belozorov.lunchvoting.JsonUtils;
 import ua.belozorov.lunchvoting.TestConfig;
-import ua.belozorov.lunchvoting.config.RootConfig;
 import ua.belozorov.lunchvoting.config.WebConfig;
 import ua.belozorov.lunchvoting.config.WebSecurityConfig;
 import ua.belozorov.lunchvoting.mocks.ServicesTestConfig;
@@ -22,9 +21,7 @@ import java.util.Arrays;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
-import static ua.belozorov.lunchvoting.model.UserTestData.ALIEN_USER1;
-import static ua.belozorov.lunchvoting.model.UserTestData.GOD;
-import static ua.belozorov.lunchvoting.model.UserTestData.VOTER;
+import static ua.belozorov.lunchvoting.model.UserTestData.*;
 
 //import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 

@@ -1,33 +1,15 @@
 package ua.belozorov.lunchvoting.service;
 
-import com.google.common.collect.ImmutableSet;
 import org.junit.Before;
-import org.junit.Rule;
-import org.junit.rules.ExpectedException;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.datasource.init.DatabasePopulatorUtils;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import ua.belozorov.lunchvoting.AbstractSpringTest;
-import ua.belozorov.lunchvoting.AbstractTest;
-import ua.belozorov.lunchvoting.config.RootConfig;
 import ua.belozorov.lunchvoting.config.ServiceBeansConfig;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
-
 /**
-
  *
  * Created on 17.11.16.
  */
@@ -63,4 +45,5 @@ public abstract class AbstractServiceTest extends AbstractSpringTest {
 
         return new ByteArrayResource(sql.getBytes(), "CLEAR ALL TABLES");
     }
+
 }
