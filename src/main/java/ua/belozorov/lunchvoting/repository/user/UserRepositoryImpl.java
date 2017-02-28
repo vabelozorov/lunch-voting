@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Optional;
 
 /**
-
  *
  * Created on 16.11.16.
  */
@@ -57,7 +56,7 @@ public class UserRepositoryImpl extends BaseRepository implements UserRepository
 
     @Override
     public List<User> getUsersByRole(String areaId, UserRole role) {
-        String sql = "SELECT u FROM User u WHERE u.areaId= :areaId AND bitwise_and(u.roles, :mask) != 0";
+        String sql = "SELECT u FROM User u WHERE u.areaId= :areaId AND bitand(u.roles, :mask) != 0";
         return super.regularGetList(sql, User.class, new Pair<>("areaId", areaId), new Pair<>("mask", 1 << role.ordinal()));
     }
 
@@ -67,7 +66,6 @@ public class UserRepositoryImpl extends BaseRepository implements UserRepository
     }
 
     /**
-     * <h2></h2>
      *
      * Created on 16.11.16.
      */

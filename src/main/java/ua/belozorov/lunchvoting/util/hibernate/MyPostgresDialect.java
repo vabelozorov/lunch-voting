@@ -22,7 +22,7 @@ public class MyPostgresDialect extends org.hibernate.dialect.PostgreSQL94Dialect
 
     public MyPostgresDialect() {
         super();
-        registerFunction("bitwise_and", new BitwiseAndFunction("bitwise_and"));
+        registerFunction("bitand", new BitwiseAndFunction("bitand"));
     }
 
 

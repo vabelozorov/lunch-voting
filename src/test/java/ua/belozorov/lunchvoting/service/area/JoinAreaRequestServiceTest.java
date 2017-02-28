@@ -56,8 +56,7 @@ public class JoinAreaRequestServiceTest extends AbstractServiceTest {
         JoinAreaRequest expected = requestService.make(requester, areaId);
         assertSql(2, 1, 0, 0);
 
-        JoinAreaRequest actual = areaService.getRepository()
-                .getJoinRequest(areaId, expected.getId());
+        JoinAreaRequest actual = areaService.getRepository().getJoinRequest(areaId, expected.getId());
 
         assertThat(actual, matchSingle(expected, REQUEST_COMPARATOR));
     }
@@ -67,7 +66,7 @@ public class JoinAreaRequestServiceTest extends AbstractServiceTest {
         User requester = profileService.get(A2_USER1.getId());
         JoinAreaRequest request = requestService.make(requester, areaId);
         requestService.approve(GOD, request.getId());
-        User updatedUser = profileService.getRepository().get(areaId, A2_USER1.getId());
+        User updatedUser = profileService.get(A2_USER1.getId());
         assertEquals(areaId, updatedUser.getAreaId());
     }
 
@@ -168,7 +167,7 @@ public class JoinAreaRequestServiceTest extends AbstractServiceTest {
         assertSql(3, 0, 3, 0);
 
         TransactionStatus transactionStatus = ptm.getTransaction(new DefaultTransactionDefinition());
-        Set<User> users = areaService.getRepository()
+        Set<User> users = areaService
                 .getArea(areaId, EatingAreaRepositoryImpl.Fields.USERS).getVoters();
 
         assertTrue(users.contains(requester));

@@ -10,6 +10,7 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 import ua.belozorov.lunchvoting.exceptions.DuplicateDataException;
 import ua.belozorov.lunchvoting.exceptions.NoAreaAdminException;
+import ua.belozorov.lunchvoting.exceptions.NotFoundException;
 import ua.belozorov.lunchvoting.model.User;
 import ua.belozorov.lunchvoting.model.UserRole;
 import ua.belozorov.lunchvoting.model.lunchplace.AreaTestData;
@@ -100,7 +101,7 @@ public class EatingAreaServiceTest extends AbstractServiceTest {
         areaService.updateAreaName("NEW_AWESOME_NAME", GOD);
         assertSql(1, 0, 1, 0);
 
-        EatingArea actual = areaService.getRepository().getArea(GOD.getAreaId());
+        EatingArea actual = areaService.getArea(GOD.getAreaId());
 
         assertThat(
                 actual,
@@ -123,7 +124,7 @@ public class EatingAreaServiceTest extends AbstractServiceTest {
 
         //TODO Cannot get EatingArea#users collection without transaction (no Session), fuck knows why
         TransactionStatus transactionStatus = ptm.getTransaction(new DefaultTransactionDefinition());
-        EatingArea area = areaService.getRepository()
+        EatingArea area = areaService
                 .getArea(areaId, EatingAreaRepositoryImpl.Fields.USERS);
 
         assertTrue(area.getVoters().contains(created));
@@ -140,7 +141,7 @@ public class EatingAreaServiceTest extends AbstractServiceTest {
         assertSql(2, 1, 2, 0);
 
         phones = phones.stream().sorted().collect(Collectors.toSet());
-        LunchPlace actual = placeService.getRepository().get(areaId, created.getId());
+        LunchPlace actual = placeService.get(areaId, created.getId());
         LunchPlace expected = created.withPhones(phones);
 
         assertThat(
@@ -178,7 +179,7 @@ public class EatingAreaServiceTest extends AbstractServiceTest {
         LunchPlacePoll expected = areaService.createPollInArea(areaId, NOW_DATE.plusDays(2), null, null, null);
         assertSql(3, 3, 4, 0); //TODO expected 2 update; consider changing LunchPlacePoll#pollItems to Set?
 
-        LunchPlacePoll actual = pollService.getRepository().getWithPollItems(areaId, expected.getId());
+        LunchPlacePoll actual = pollService.getWithPollItems(areaId, expected.getId());
 
         assertThat(actual, matchSingle(expected, POLL_COMPARATOR.noVotes()));
     }
@@ -202,7 +203,7 @@ public class EatingAreaServiceTest extends AbstractServiceTest {
 
         reset();
         TransactionStatus transactionStatus = ptm.getTransaction(new DefaultTransactionDefinition());
-        EatingArea actual = areaService.getRepository()
+        EatingArea actual = areaService
                 .getArea(expected.getId(), EatingAreaRepositoryImpl.Fields.USERS);
         ptm.commit(transactionStatus);
         assertSelect(2);
@@ -221,7 +222,7 @@ public class EatingAreaServiceTest extends AbstractServiceTest {
 
         reset();
         TransactionStatus transactionStatus = ptm.getTransaction(new DefaultTransactionDefinition());
-        EatingArea actual = areaService.getRepository().getArea(expected.getId(), EatingAreaRepositoryImpl.Fields.USERS, EatingAreaRepositoryImpl.Fields.POLLS);
+        EatingArea actual = areaService.getArea(expected.getId(), EatingAreaRepositoryImpl.Fields.USERS, EatingAreaRepositoryImpl.Fields.POLLS);
         ptm.commit(transactionStatus);
         assertSelect(3);
 
@@ -248,21 +249,15 @@ public class EatingAreaServiceTest extends AbstractServiceTest {
     }
 
     @Test
-    //TODO check that polls and places are deleted too
     public void onAreaDeleteUserAreaIdSetsToNull() throws Exception {
-        String areaId = testAreas.getFirstAreaId();
-
-        //asserting state before deletion
-        String userArea = profileService.getRepository().get(null, VOTER1_ID).getAreaId();
-        assertEquals(userArea, areaId);
-
         reset();
         areaService.delete(areaId);
         assertDelete(1);
 
-        //asserting state after deletion
-        assertNull(profileService.getRepository().get(null, VOTER1_ID).getAreaId());
+        assertNull(profileService.get(VOTER1_ID).getAreaId());
         assertNull(areaService.getRepository().getArea(areaId));
+        assertNull(placeService.getRepository().get(testPlaces.getPlace2Id()));
+        assertNull(pollService.getRepository().get(testPolls.getActivePoll().getId()));
     }
 
     @Test
