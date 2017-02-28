@@ -11,6 +11,7 @@ import ua.belozorov.lunchvoting.SPRING_PROFILES;
 
 import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
+import java.util.Objects;
 
 /**
 
@@ -18,7 +19,6 @@ import javax.sql.DataSource;
  * Created on 16.11.16.
  */
 @Configuration
-@Profile(SPRING_PROFILES.DEVELOPMENT)
 public class InitDatabaseConfig {
 
     @Autowired
@@ -30,11 +30,13 @@ public class InitDatabaseConfig {
     @PostConstruct
     public void init() {
         ResourceDatabasePopulator databasePopulator = new ResourceDatabasePopulator();
-        if (env.getProperty("database.init").equals("true")) {
-            databasePopulator.addScript(new ClassPathResource(env.getProperty("database.initLocation")));
+        String initLocation = env.getProperty("database.initLocation");
+        if ( ! Objects.equals(initLocation, null)) {
+            databasePopulator.addScript(new ClassPathResource(initLocation));
         }
-        if (env.getProperty("database.populate").equals("true")) {
-            databasePopulator.addScript(new ClassPathResource(env.getProperty("database.dataLocation")));
+        String dataLocation = env.getProperty("database.dataLocation");
+        if ( ! Objects.equals(dataLocation, null)) {
+            databasePopulator.addScript(new ClassPathResource(dataLocation));
         }
         DatabasePopulatorUtils.execute(databasePopulator, dataSource);
     }

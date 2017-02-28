@@ -169,7 +169,7 @@ public class LunchPlaceTestData {
                         new StringSqlColumn<>("description", LunchPlace::getDescription),
                         new StringSqlColumn<>("phones", lp -> new PhonesToStringConverter().convertToDatabaseColumn(lp.getPhones()))
                 )
-        ).clearDbTable(false).convert(a2Places);
+        ).convert(a2Places);
         this.lunchPlaceSqlResource = new ByteArrayResource((a1PlaceSql+a2PlaceSql).getBytes(), "LunchPlaces");
         this.menuSqlResource = new ByteArrayResource(new MenuToResourceConverter().convert(this.allMenus).getBytes(), "Menus & Dishes");
     }

@@ -1,0 +1,106 @@
+DROP TABLE dishes IF EXISTS;
+DROP TABLE votes IF EXISTS;
+DROP TABLE menus IF EXISTS;
+DROP TABLE poll_items IF EXISTS;
+DROP TABLE places IF EXISTS;
+DROP TABLE join_requests IF EXISTS;
+DROP TABLE users IF EXISTS;
+DROP TABLE polls IF EXISTS;
+DROP TABLE areas IF EXISTS;
+
+CREATE TABLE IF NOT EXISTS areas (
+  id VARCHAR(36) NOT NULL PRIMARY KEY,
+  version INT DEFAULT 0 NOT NULL,
+  name VARCHAR NOT NULL,
+  created TIMESTAMP NOT NULL,
+  CONSTRAINT areas_name_unique UNIQUE (name)
+);
+
+CREATE TABLE IF NOT EXISTS polls (
+  id VARCHAR(36) NOT NULL PRIMARY KEY,
+  version INT DEFAULT 0 NOT NULL,
+  start_time TIMESTAMP NOT NULL,
+  end_time TIMESTAMP NOT NULL,
+  change_time TIMESTAMP NOT NULL,
+  menu_date DATE NOT NULL,
+  area_id VARCHAR(36),
+  FOREIGN KEY (area_id) REFERENCES areas(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS users (
+  id VARCHAR(36) NOT NULL PRIMARY KEY,
+  version INT DEFAULT 0 NOT NULL,
+  name VARCHAR NOT NULL,
+  email VARCHAR NOT NULL,
+  password VARCHAR NOT NULL,
+  roles INT NOT NULL,
+  registered_date TIMESTAMP NOT NULL,
+  activated BOOLEAN NOT NULL,
+  area_id VARCHAR(36),
+  FOREIGN KEY (area_id) REFERENCES areas(id) ON DELETE SET NULL,
+  CONSTRAINT users_email_unique UNIQUE (email)
+);
+
+CREATE TABLE IF NOT EXISTS join_requests (
+  id VARCHAR(36) NOT NULL PRIMARY KEY,
+  version INT DEFAULT 0 NOT NULL,
+  requester_id VARCHAR(36) NOT NULL,
+  created TIMESTAMP NOT NULL,
+  decided_on TIMESTAMP,
+  area_id VARCHAR NOT NULL,
+  status INT NOT NULL,
+  FOREIGN KEY (requester_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (area_id) REFERENCES areas(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS places (
+  id VARCHAR(36) NOT NULL PRIMARY KEY,
+  version INT DEFAULT 0 NOT NULL,
+  name VARCHAR NOT NULL,
+  address VARCHAR,
+  description VARCHAR,
+  phones VARCHAR(500),
+  area_id VARCHAR(36) DEFAULT NULL,
+  FOREIGN KEY (area_id) REFERENCES areas(id) ON DELETE CASCADE,
+  CONSTRAINT places_name_areaId_unique UNIQUE (name, area_id)
+);
+
+CREATE TABLE IF NOT EXISTS poll_items (
+  id VARCHAR(36) NOT NULL PRIMARY KEY,
+  version INT DEFAULT 0 NOT NULL,
+  poll_id VARCHAR(36) NOT NULL,
+  position INT NOT NULL,
+  item_id VARCHAR(36),
+  FOREIGN KEY (poll_id) REFERENCES polls(id) ON DELETE CASCADE,
+  FOREIGN KEY (item_id) REFERENCES places(id) ON DELETE SET NULL
+);
+
+CREATE TABLE IF NOT EXISTS menus (
+  id VARCHAR(36) NOT NULL PRIMARY KEY,
+  version INT DEFAULT 0 NOT NULL,
+  effective_date DATE NOT NULL,
+  place_id VARCHAR(36) NOT NULL,
+  FOREIGN KEY (place_id) REFERENCES places(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS votes (
+  id VARCHAR(36) NOT NULL PRIMARY KEY,
+  version INT DEFAULT 0 NOT NULL,
+  voter_id VARCHAR(36),
+  poll_id VARCHAR(36) NOT NULL,
+  item_id VARCHAR(36),
+  vote_time TIMESTAMP NOT NULL,
+  FOREIGN KEY (voter_id) REFERENCES users(id) ON DELETE SET NULL,
+  FOREIGN KEY (poll_id) REFERENCES polls(id) ON DELETE CASCADE,
+  FOREIGN KEY (item_id) REFERENCES poll_items(id)
+);
+
+CREATE TABLE IF NOT EXISTS dishes (
+  menu_id VARCHAR(36) NOT NULL,
+  name VARCHAR NOT NULL,
+  price FLOAT NOT NULL,
+  position INT NOT NULL,
+  CONSTRAINT dishes_menu_id_position_unique UNIQUE (menu_id, position),
+  FOREIGN KEY (menu_id) REFERENCES menus(id) ON DELETE CASCADE
+);
+

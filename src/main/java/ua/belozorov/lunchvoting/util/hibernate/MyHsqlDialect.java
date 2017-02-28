@@ -1,30 +1,23 @@
 package ua.belozorov.lunchvoting.util.hibernate;
 
-import org.hibernate.Hibernate;
 import org.hibernate.QueryException;
+import org.hibernate.dialect.HSQLDialect;
 import org.hibernate.dialect.function.SQLFunction;
-import org.hibernate.dialect.function.SQLFunctionTemplate;
 import org.hibernate.dialect.function.StandardSQLFunction;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.type.IntegerType;
-import org.hibernate.type.StandardBasicTypes;
 import org.hibernate.type.Type;
 
 import java.util.List;
 
 /**
-
- *
- * Created on 15.02.17.
+ * Created on 27.02.17.
  */
+public class MyHsqlDialect extends HSQLDialect {
 
-public class MyPostgresDialect extends org.hibernate.dialect.PostgreSQL94Dialect {
-
-    public MyPostgresDialect() {
+    public MyHsqlDialect() {
         super();
-        registerFunction("bitwise_and", new BitwiseAndFunction("bitwise_and"));
+        registerFunction("bitwise_and", new MyHsqlDialect.BitwiseAndFunction("bitwise_and"));
     }
-
 
     public class BitwiseAndFunction extends StandardSQLFunction implements SQLFunction {
 

@@ -13,7 +13,6 @@ import javax.persistence.Version;
 public abstract class AbstractPersistableObject implements Persistable {
 
     @Id
-    @NotBlank
     protected final String id;
 
     @Version

@@ -203,7 +203,7 @@ public class PollTestData {
                         new DateTimeSqlColumn<>("change_time", lpp -> lpp.getTimeConstraint().getVoteChangeThreshold()),
                         new DateSqlColumn<>("menu_date", LunchPlacePoll::getMenuDate)
                 )
-        ).clearDbTable(false).convert(Arrays.asList(polls));
+        ).convert(Arrays.asList(polls));
         return pollSql;
     }
 
