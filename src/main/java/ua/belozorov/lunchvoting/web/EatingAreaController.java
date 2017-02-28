@@ -466,7 +466,7 @@ public class EatingAreaController {
     }
 
     /**
-     * <p>Deletes an EatingArea objects and all LunchPlace, LunchPlacePoll objects that area associated with it.</p>
+     * <p>Deletes an EatingArea objects and its all LunchPlace, LunchPlacePoll objects.</p>
      *
      * <table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px; padding:3px;">
      *     <tr>

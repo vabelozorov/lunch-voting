@@ -242,7 +242,7 @@ Creates a new Poll in the area of an authenticated <code>User</code>
 </table>
 
 ###### Request Parameters
- * **menuDate** date of Menu which determines which LunchPlace objects will be added as items to the Poll
+ * **menuDate** date of Menu which determines which LunchPlace objects will be added as items to the Poll,
  optional. Default value is 09-00 of a current day
  * **start** time when the poll starts, optional. Default value is 12-00 of a current day
  * **end** time when the poll ends, optional. Default value is 11-00 of a current day
@@ -262,6 +262,497 @@ The following constraint applies: start <= change <= end
     <li>HTTP Status 422 Unprocessable_entity is returned if no <code>LunchPlace</code> objects
     with <code>menudate</code></li>
 </ul>
+
+---
+Updates an Area name.
+###### Summary
+<table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px; padding:3px;">
+    <tr>
+        <td>HTTP Request</td>
+        <td><font style="color:green"><code>HTTP PUT /api/areas/{areaId} 204</code></font><br>
+            <b>{areaId}</b> existing Area ID
+        </td>
+    </tr>
+    <tr>
+        <td>Request Content-Type</td>
+        <td><code>application/x-www-form-urlencoded</code></td>
+    </tr>
+    <tr>
+        <td>Required Request Parameters</td>
+        <td><code>name</code></td>
+    </tr>
+    <tr>
+        <td>Optional Parameters</td>
+        <td>none</td>
+    </tr>
+    <tr>
+        <td>Requires role</td>
+        <td><strong>ADMIN</strong></td>
+    </tr>
+</table>
+
+###### Request Parameters
+ * **name** a unique name for the area, must 2-50 characters long.
+###### Response
+<ul>
+ <li>An HTTP Status 204 Created </li>
+</ul>
+
+###### Response on failure
+<ul>
+    <li>HTTP Status 400 Bad_Syntax is returned if parameter validation fails</li>
+    <li>HTTP Status 409 Conflict is returned if the submitted name is not unique</li>
+</ul>
+
+---
+<p>Returns a requested Area by its ID.</p>
+
+###### Summary
+<table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px; padding:3px;">
+    <tr>
+        <td>HTTP Request</td>
+        <td><font style="color:green"><code>HTTP GET /api/areas/{areaId} 200</code></font><br>
+            <b>{areaId}</b> existing Area ID
+        </td>
+    </tr>
+    <tr>
+        <td>Request Content-Type</td>
+        <td>none</td>
+    </tr>
+    <tr>
+        <td>Required Request Parameters</td>
+        <td>none</td>
+    </tr>
+    <tr>
+        <td>Optional Parameters</td>
+        <td>none</td>
+    </tr>
+    <tr>
+        <td>Requires role</td>
+        <td><strong>VOTER</strong> or <strong>ADMIN</strong></td>
+    </tr>
+</table>
+
+###### Request Parameters
+  * **id** ID of existing <code>Area</code>
+  * **summary** true causes the summary information to be included into a response instead of IDs
+  *                of User, Poll and Lunch Place objects. <code>true</code> means that IDs
+  *                are included, but summary info is not.
+
+###### Response
+<ul>
+    <li>An HTTP Status 200 Ok</li>
+    <li>JSON object with the following fields:
+        <ul>
+            <li>if <code>summary=true</code>, <code>id, name, created, userCount, placeCount, pollCount</code> are included</li>
+            <li>if <code>summary=false</code>, <code>id, name, created, users, places, polls</code> are included</li>
+        </ul>
+    </li>
+</ul>
+
+###### Response on failure
+<ul>
+    <li>HTTP Status 400 Bad_Syntax is returned if parameter validation fails</li>
+</ul>
+
+---
+<p>Returns Area objects which name starts with a given string.</p>
+
+###### Summary
+<table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px; padding:3px;">
+    <tr>
+        <td>HTTP Request</td>
+        <td><font style="color:green"><code>HTTP GET /api/areas 200</code></font><br>
+            <b>{areaId}</b> existing Area ID
+        </td>
+    </tr>
+    <tr>
+        <td>Request Content-Type</td>
+        <td>none</td>
+    </tr>
+    <tr>
+        <td>Required Request Parameters</td>
+        <td><code>name</code></td>
+    </tr>
+    <tr>
+        <td>Optional Parameters</td>
+        <td>none</td>
+    </tr>
+    <tr>
+        <td>Requires role</td>
+        <td><strong>VOTER</strong> or <strong>ADMIN</strong></td>
+    </tr>
+</table>
+
+###### Request Parameters
+ * **name** start of <code>EatingArea</code> name, must be 2-50 characters long
+###### Response
+<ul>
+    <li>An HTTP Status 200 Ok</li>
+    <li>JSON object with the following fields: <code>id, name, created</code> are included</li>
+</ul>
+
+###### Response on failure
+ <ul>
+     <li>HTTP Status 400 Bad_Syntax is returned if parameter validation fails</li>
+ </ul>
+
+---
+<p>Deletes an Area objects and all its Lunch Place and Poll objects that area associated with it.
+Users of the area does not belong to any area after this request is complete</p>
+
+###### Summary
+<table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px; padding:3px;">
+    <tr>
+        <td>HTTP Request</td>
+        <td><font style="color:green"><code>HTTP DELETE /api/areas 204</code></font><br>
+            <b>{areaId}</b> existing Area ID
+        </td>
+    </tr>
+    <tr>
+        <td>Request Content-Type</td>
+        <td>none</td>
+    </tr>
+    <tr>
+        <td>Required Request Parameters</td>
+        <td>none</td>
+    </tr>
+    <tr>
+        <td>Optional Parameters</td>
+        <td>none</td>
+    </tr>
+    <tr>
+        <td>Requires role</td>
+        <td><<strong>ADMIN</strong></td>
+    </tr>
+</table>
+
+###### Request Parameters
+None
+###### Response
+<ul>
+    <li>An HTTP Status 204 No_Content</li>
+</ul>
+
+###### Response on failure
+No standard failure scenarios
+
+#### JoinRequest
+
+<p>Creates a new JoinRequest to join a given area.
+Any user can submit a request to join an area no matter whether he/she currently has a member of a particular
+ area. Certain restrictions applies to only approving the requests (check corresponding section below)</p>
+
+###### Summary
+<table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px; padding:3px;">
+    <tr>
+        <td>HTTP Request</td>
+        <td><font style="color:green"><code>HTTP POST /api/{areaId}/requests 201</code></font><br>
+            <b>{areaId}</b> existing Area ID<br>
+        </td>
+    </tr>
+    <tr>
+        <td>Request Content-Type</td>
+        <td>none</td>
+    </tr>
+    <tr>
+        <td>Required Request Parameters</td>
+        <td>none</td>
+    </tr>
+    <tr>
+        <td>Optional Parameters</td>
+        <td>none</td>
+    </tr>
+    <tr>
+        <td>Requires role</td>
+        <td><strong>VOTER</strong> or <strong>ADMIN</strong></td>
+    </tr>
+</table>
+
+###### Request Parameters
+ * **areaId**  ID of the Area a current user wants to join
+
+###### Response
+<ul>
+    <li>An HTTP Status 201 Created</li>
+    <li>JSON object with a field <code>id</code> which contains the ID of the newly created JoinRequest</li>
+</ul>
+
+###### Response on failure
+ * HTTP Status 404 Not_Found is returned if a <code>areaId</code> refers to a non-existent Area
+
+---
+<p>Retrieves a JoinRequest by its ID, previously made by a currently authenticated user.</p>
+
+###### Summary
+<table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px; padding:3px;">
+    <tr>
+        <td>HTTP Request</td>
+        <td><font style="color:green"><code>HTTP GET /api/{areaId}/requests/{requestId} 200</code></font><br>
+            <b>{areaId}</b> existing Area ID<br>
+            <b>{areaId}</b> existing JoinRequest ID<br>
+        </td>
+    </tr>
+    <tr>
+        <td>Request Content-Type</td>
+        <td>none</td>
+    </tr>
+    <tr>
+        <td>Required Request Parameters</td>
+        <td>none</td>
+    </tr>
+    <tr>
+        <td>Optional Parameters</td>
+        <td>none</td>
+    </tr>
+    <tr>
+        <td>Requires role</td>
+        <td><strong>VOTER</strong> or <strong>ADMIN</strong></td>
+    </tr>
+</table>
+
+###### Request Parameters
+ * **requestId**  ID of JoinRequest made in the area of a currently authenticated user
+###### Response
+<ul>
+    <li>HTTP Status 200 Ok </li>
+    <li>JSON object with fields <code>id, area, requester, status, created, decidedOn</code></li>
+</ul>
+
+###### Response on failure
+<ul>
+    <li>HTTP Status 404 Not_Found is returned if a {@link JoinAreaRequest} with the given ID does not exist
+    in the user's {@link EatingArea}</li>
+</ul>
+
+---
+<p>Retrieves all JoinRequest} objects in the area of a currently authenticated user
+ with the given JoinStatus.</p>
+
+###### Summary
+<table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px; padding:3px;">
+    <tr>
+        <td>HTTP Request</td>
+        <td><font style="color:green"><code>HTTP GET /api/{areaId}/requests 200</code></font><br>
+            <b>{areaId}</b> existing Area ID<br>
+        </td>
+    </tr>
+    <tr>
+        <td>Request Content-Type</td>
+        <td>none</td>
+    </tr>
+    <tr>
+        <td>Required Request Parameters</td>
+        <td><code>status</code></td>
+    </tr>
+    <tr>
+        <td>Optional Parameters</td>
+        <td>none</td>
+    </tr>
+    <tr>
+        <td>Requires role</td>
+        <td><strong>ADMIN</strong></td>
+    </tr>
+</table>
+
+###### Request Parameters
+ * **status** a request status. Can be: PENDING, APPROVED, REJECTED, CANCELLED
+###### Response
+<ul>
+    <li>HTTP Status 200 Ok</li>
+    <li>JSON array where each object has fields <code>id, area, requester, status, created, decidedOn</code></li>
+</ul>
+
+###### Response on failure
+<ul>
+    <li>HTTP Status 400 Bad_Syntax is returned if parameter validation fails</li>
+</ul>
+
+---
+<p>Retrieves all JoinRequests of a currently authenticated user.</p>
+
+###### Summary
+<table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px; padding:3px;">
+    <tr>
+        <td>HTTP Request</td>
+        <td><font style="color:green"><code>HTTP GET /api/{areaId}/requests 200</code></font><br>
+            <b>{areaId}</b> existing Area ID<br>
+        </td>
+    </tr>
+    <tr>
+        <td>Request Content-Type</td>
+        <td>none</td>
+    </tr>
+    <tr>
+        <td>Required Request Parameters</td>
+        <td>none</td>
+    </tr>
+    <tr>
+        <td>Optional Parameters</td>
+        <td>none</td>
+    </tr>
+    <tr>
+        <td>Requires role</td>
+        <td><strong>VOTER</strong> or <strong>ADMIN</strong></td>
+    </tr>
+</table>
+
+###### Request Parameters
+None
+###### Response
+<ul>
+    <li>HTTP Status 200 Ok</li>
+    <li>JSON array where each object has fields <code>id, area, requester, status, created, decidedOn</code></li>
+</ul>
+
+###### Response on failure
+No standard failure scenarios
+
+---
+<p>Approves a specified JoinRequest.
+The request can be approved regardless of the membership or its absence in a certain area. The requester can be
+a voter or an admin in an area. However, if the requester is the last user with <strong>ADMIN</strong> right in
+his current area, approval for such request fails.</p>
+
+###### Summary
+<table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px; padding:3px;">
+    <tr>
+        <td>HTTP Request</td>
+        <td><font style="color:green"><code>HTTP PUT /api/{areaId}/requests/{requestId} 204</code></font><br>
+            <b>{areaId}</b> existing Area ID<br>
+            <b>{requestId}</b> existing JoinRequest ID
+        </td>
+    </tr>
+    <tr>
+        <td>Request Content-Type</td>
+        <td><code>application/x-www-form-urlencoded</code></td>
+    </tr>
+    <tr>
+        <td>Required Request Parameters</td>
+        <td><code>status</code></td>
+    </tr>
+    <tr>
+        <td>Optional Parameters</td>
+        <td>none</td>
+    </tr>
+    <tr>
+        <td>Requires role</td>
+        <td><strong>ADMIN</strong></td>
+    </tr>
+</table>
+
+###### Request Parameters
+ * **requestId** ID of JoinRequest in the area of approving user
+###### Response
+<ul>
+    <li>HTTP Status 204 No_Content</li>
+</ul>
+
+###### Response on failure
+<ul>
+    <li>HTTP Status 400 Bad_Syntax if parameter validation fails</li>
+    <li>HTTP Status 404 Not_Found, if a JoinRequest with the given ID does not exist
+    in the approving user's Area </li>
+    <li>HTTP Status 422 Unprocessable entity, if the requester has an area membership and
+    is the only ADMIN in that area.</li>
+</ul>
+
+---
+<p>Rejects a specified JoinRequest.</p>
+
+###### Summary
+<table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px; padding:3px;">
+    <tr>
+        <td>HTTP Request</td>
+        <td><font style="color:green"><code>HTTP PUT /api/{areaId}/requests/{requestId} 204</code></font><br>
+            <b>{areaId}</b> existing Area ID<br>
+            <b>{requestId}</b> existing JoinRequest ID
+        </td>
+    </tr>
+    <tr>
+        <td>Request Content-Type</td>
+        <td><code>application/x-www-form-urlencoded</code></td>
+    </tr>
+    <tr>
+        <td>Required Request Parameters</td>
+        <td><code>status</code></td>
+    </tr>
+    <tr>
+        <td>Optional Parameters</td>
+        <td>none</td>
+    </tr>
+    <tr>
+        <td>Requires role</td>
+        <td><strong>ADMIN</strong></td>
+    </tr>
+</table>
+
+###### Request Parameters
+ * **requestId** ID of JoinRequest in the area of approving user
+
+###### Response
+<ul>
+    <li>HTTP Status 204 No_Content</li>
+</ul>
+
+###### Response on failure
+<ul>
+    <li>HTTP Status 400 Bad_Syntax is returned if parameter validation fails</li>
+    <li>HTTP Status 404 Not_Found is returned if a JoinRequest with the given ID does not exist
+    in the approving user's Area</li>
+</ul>
+
+---
+<p>Cancels a specified JoinRequest previously made by a currently authenticated user.</p>
+
+###### Summary
+<table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px; padding:3px;">
+    <tr>
+        <td>HTTP Request</td>
+        <td><font style="color:green"><code>HTTP PUT /api/{areaId}/requests/{requestId} 204</code></font><br>
+            <b>{areaId}</b> existing Area ID<br>
+            <b>{requestId}</b> existing JoinRequest ID
+        </td>
+    </tr>
+    <tr>
+        <td>Request Content-Type</td>
+        <td><code>application/x-www-form-urlencoded</code></td>
+    </tr>
+    <tr>
+        <td>Required Request Parameters</td>
+        <td><code>status</code></td>
+    </tr>
+    <tr>
+        <td>Optional Parameters</td>
+        <td>none</td>
+    </tr>
+    <tr>
+        <td>Requires role</td>
+        <td><strong>VOTER</strong></td>
+    </tr>
+</table>
+
+###### Request Parameters
+ * **requestId** ID of JoinRequest in the area of a currently authenticated user
+
+###### Response
+ <ul>
+     <li>HTTP Status 204 No_Content</li>
+ </ul>
+
+###### Response on failure
+<ul>
+    <li>HTTP Status 400 Bad_Syntax is returned if parameter validation fails</li>
+    <li>HTTP Status 404 Not_Found is returned if a JoinRequest with the given ID does not exist
+    in the currently authenticated user's Area</li>
+</ul>
+
+
+
+
+
+
+
 
 #### Voter
 

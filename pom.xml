@@ -304,6 +304,14 @@
         </profile>
     </profiles>
 
+    <repositories>
+        <repository>
+            <id>in-project</id>
+            <name>In Project Repo</name>
+            <url>file://${project.basedir}/libs</url>
+        </repository>
+    </repositories>
+
     <build>
         <finalName>lunch-voting</finalName>
         <defaultGoal>test</defaultGoal>

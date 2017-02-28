@@ -87,7 +87,11 @@ public class JoinAreaRequestController {
      *      <li>An HTTP Status 201 Created</li>
      *      <li>JSON object with a field <code>id</code> which contains the ID of the newly created {@link JoinAreaRequest}</li>
      *  </ul>
-     */
+     *  If the request fails:
+     *  <ul>
+     *      <li>HTTP Status 404 Not_Found is returned if a <code>areaId</code> refers to a non-existent {@link EatingArea}</li>
+     *  </ul>
+     *  */
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @IsAdminOrVoter
     public ResponseEntity makeRequest(@PathVariable("areaId") String areaId) {
@@ -125,6 +129,7 @@ public class JoinAreaRequestController {
      *         <td><strong>VOTER</strong> or <strong>ADMIN</strong></td>
      *     </tr>
      * </table>
+     *
      * @param requestId  ID of {@link JoinAreaRequest} made in the area of a currently authenticated user
      * @return ResponseEntity instance with the following values upon success:
      *  <ul>
@@ -235,8 +240,7 @@ public class JoinAreaRequestController {
     }
 
     /**
-     * <p>Approves a specified {@link JoinAreaRequest}.
-     * </p>
+     * <p>Approves a specified {@link JoinAreaRequest}.</p>
      *
      * <table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px; padding:3px;">
      *     <tr>
@@ -264,10 +268,10 @@ public class JoinAreaRequestController {
      *     </tr>
      * </table>
      *
-     * The request can be approved regardless of the membership or its absence in a certain area. The requester can be
+     * <p>The request can be approved regardless of the membership or its absence in a certain area. The requester can be
      * a voter or an admin in an area. However, if the requester is the last user with <strong>ADMIN</strong> right in
      * his current area, approval for such request fails and {@link ua.belozorov.lunchvoting.exceptions.NoAreaAdminException}
-     * is thrown
+     * is thrown.</p>
      *
      * @param requestId  ID of {@link JoinAreaRequest} in the area of approving user
      * @return ResponseEntity instance with the following values upon success:
@@ -292,8 +296,7 @@ public class JoinAreaRequestController {
     }
 
     /**
-     * <p>Rejects a specified {@link JoinAreaRequest}.
-     * </p>
+     * <p>Rejects a specified {@link JoinAreaRequest}.</p>
      *
      * <table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px; padding:3px;">
      *     <tr>
@@ -342,8 +345,7 @@ public class JoinAreaRequestController {
     }
 
     /**
-     * <p>Cancels a specified {@link JoinAreaRequest} previously made by a currently authenticated user.
-     * </p>
+     * <p>Cancels a specified {@link JoinAreaRequest} previously made by a currently authenticated user.</p>
      *
      * <table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px; padding:3px;">
      *     <tr>
