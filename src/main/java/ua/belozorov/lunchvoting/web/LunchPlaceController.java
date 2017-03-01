@@ -94,8 +94,8 @@ public class LunchPlaceController  {
      *  If the request fails:
      *  <ul>
      *      <li>HTTP Status 400 Bad_Syntax is returned if parameter validation fails</li>
-     *      <li>HTTP Status 404 Not_Found is returned if a {@link LunchPlace}  with the given ID does not exist
-     *      in the currently authenticated user's {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea}</li>
+ *          <li>HTTP Status 404 Not_Found is returned if <code>userId</code> refers to a non-existent object in the Area
+     *      of an authenticated user</li>
      *  </ul>
      */
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE,
@@ -144,7 +144,7 @@ public class LunchPlaceController  {
      *     </tr>
      * </table>
      *
-     * @param placeId ID of a {@link LunchPlace}
+     * @param placeId ID of a {@link LunchPlace} in the Area of an authenticated user
      * @param params represents query parameters. Can contain the following fields:
      *               <ul>
      *                  <li><strong>fields</strong>  fields to display in the returned JSON response. Available values:
@@ -167,8 +167,8 @@ public class LunchPlaceController  {
      *  If the request fails:
      *  <ul>
      *      <li>HTTP Status 400 Bad_Syntax is returned if parameter validation fails</li>
-     *      <li>HTTP Status 404 Not_Found is returned if a {@link LunchPlace}  with the given ID does not exist
-     *      in the currently authenticated user's {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea}</li>
+     *      <li>HTTP Status 404 Not_Found is returned, if <code>placeId</code> refers to a non-existent object in the Area
+     *      of an authenticated user</li>
      *  </ul>
      */
     @GetMapping(value = "/{placeId}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -290,7 +290,7 @@ public class LunchPlaceController  {
      *     </tr>
      * </table>
      *
-     * @param id ID of existing {@link LunchPlace}
+     * @param id ID of existing {@link LunchPlace} in the area of an authenticated user
      * @return ResponseEntity instance with the following values upon success:
      * <ul>
      *      <li>HTTP Status 204 No_Content</li>
@@ -298,7 +298,7 @@ public class LunchPlaceController  {
      *  If the request fails:
      *  <ul>
      *      <li>HTTP Status 404 Not_Found is returned if <code>ID</code> refers to non-existent {@link LunchPlace}
-     *      in the currently authenticated user's {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea}</li>
+     *      in the authenticated user's {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea}</li>
      *  </ul>
      */
     @DeleteMapping("/{id}")

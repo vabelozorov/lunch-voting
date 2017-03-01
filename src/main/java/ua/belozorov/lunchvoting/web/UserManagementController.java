@@ -73,20 +73,17 @@ public class UserManagementController {
      *     </tr>
      * </table>
      *
-     * <p>The {@link User}  must belong to the same {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea}
-     * as the {@link User} whose credentials were submitted.<br>
-     * </p>
-     * Three non-empty parameters must be present in the JSON object:
+     * <p>If a certain {@link User} property is not changed, its old value should be included in the request.</p>
+     *
+     * @param userId  existing {@link User} ID in the area of an authenticated user
+     * @param userTo three non-empty parameters must be present in the JSON object:
      * <ul>
      *  <li><strong>name</strong>  new name of the User, must be between 2 and 100 characters long</li>
      *  <li><strong> password</strong>  new password of the User, must be between 6 and 30 characters long</li>
      *  <li><strong>email</strong>  new email of the User. The application enforces a unique constraint on this value and
      *  <code>DuplicateDataException</code> is thrown if value happens to be not unique</li>
      * </ul>
-     * Other parameters are ignored.
-     * If a certain {@link User}  property is not changed, its old value should be included in the request.
-     * @param userId  existing {@link User} ID
-     * @param userTo  represents request parameters and must contain non-empty <code>name, password, email</code> fields
+     *
      * @return ResponseEntity instance with the following values upon success:
      *  <ul>
      *      <li>HTTP Status 204 No_Content</li>
@@ -95,8 +92,8 @@ public class UserManagementController {
      *  <ul>
      *      <li>HTTP Status 400 Bad_Syntax is returned if parameter validation fails</li>
      *      <li>HTTP Status 409 Conflict is returned if the submitted email value is not unique</li>
-     *      <li>HTTP Status 404 Not_Found is returned if a {@link User}  with the given ID does not exist<
-     *      in the {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea}/li>
+     *      <li>HTTP Status 404 Not_Found is returned if <code>userId</code> refers to a non-existent object in the Area
+     *      of an authenticated user</li>
      *  </ul>
      */
     @PutMapping(value = "/{userId}", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -142,9 +139,7 @@ public class UserManagementController {
      *     </tr>
      * </table>
      *
-     * <p>The {@link User}  must belong to the same EatingArea as the {@link User}  whose credentials were submitted.</p>
-     *
-     * @param userId existing user ID
+     * @param userId existing user ID in the area of an authenticated user
      * @return ResponseEntity instance with the following values upon success:
      *  <ul>
      *      <li>HTTP Status 200 Ok </li>
@@ -152,8 +147,8 @@ public class UserManagementController {
      *  </ul>
      *  If the request fails:
      *  <ul>
-     *      <li>HTTP Status 404 Not_Found is returned if a {@link User} with the given ID does not exist<
-     *      in the {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea}/li>
+     *      <li>HTTP Status 404 Not_Found is returned if <code>userId</code> refers to a non-existent object in the Area
+     *      of an authenticated user</li>
      *  </ul>
      *  */
     @GetMapping("/{userId}")
@@ -208,7 +203,7 @@ public class UserManagementController {
     }
 
     /**
-     * <p>Deletes a {@link User} with a given ID.</p>
+     * <p>Deletes a {@link User} with a given ID in the Area of an authenticated user..</p>
      *
      * <table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px;">
      *     <tr>
@@ -235,8 +230,6 @@ public class UserManagementController {
      *         <td><strong>ADMIN</strong></td>
      *     </tr>
      * </table>
-     *
-     * <p>The {@link User}  must belong to the same EatingArea as the {@link User}  whose credentials were submitted.</p>
      *
      * @param userId existing user ID
      * @return ResponseEntity instance with the following values upon success:
@@ -284,19 +277,17 @@ public class UserManagementController {
      *     </tr>
      * </table>
      *
-     * <p>The {@link User} must belong to the same EatingArea as the {@link User}  whose credentials were submitted.</p>
-     *
-     * @param userId  existing <code>User</code> ID
+     * @param userId  existing <code>User</code> ID in the Area of an authenticated User
      * @param activated  <code>true</code> to activate the account, <code>false</code> to deactivate the account
      * @return ResponseEntity instance with the following values upon success:
      *  <ul>
      *      <li>HTTP Status 204 No_Content </li>
      *  </ul>
      *  If the request fails:
-     *  <ul>
-     *      <li>HTTP Status 404 Not_Found is returned if a {@link User}  with the given ID does not exist
-     *      in the {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea}</li>
-     *  </ul>
+     * <ul>
+     *      <li>HTTP Status 404 Not_Found is returned if <code>userId</code> refers to a non-existent object in the Area
+     *      of an authenticated user/li>
+     * </ul>
      */
     @PutMapping(value = "/{userId}", params = {"activated"}, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     public ResponseEntity activate(@PathVariable String userId, Boolean activated) {
@@ -334,12 +325,10 @@ public class UserManagementController {
      *     </tr>
      * </table>
      *
-     * <p>The {@link User} must belong to the same EatingArea as the {@link User}  whose credentials were submitted.</p>
-     *
      * @param roles represents request parameters and must contain:
      * <ul>
-     *   <li><code>userId</code>  existing user ID</li>
- *       <li><code>roles</code>  comma-separated list of values. Valid values are: ADMIN, VOTER</li>
+     *    <li><code>userId</code>  existing user ID</li>
+     *    <li><code>roles</code>  comma-separated list of values. Valid values are: ADMIN, VOTER</li>
      * </ul>
      * @return ResponseEntity instance with the following values upon success:
      *  <ul>
@@ -348,8 +337,8 @@ public class UserManagementController {
      *  If the request fails:
      *  <ul>
      *      <li>HTTP Status 400 Bad_Syntax is returned if parameter validation fails</li>
-     *      <li>HTTP Status 404 Not_Found is returned if a {@link User}  with the given ID does not exist
-     *      in the {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea}</li>
+     *      <li>HTTP Status 404 Not_Found is returned if <code>userId</code> refers to a non-existent object in the Area
+ *          of an authenticated user</li>
      *  </ul>
      */
     @PutMapping(value = "/{userId}", params = {"roles"}, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)

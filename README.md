@@ -747,17 +747,1356 @@ his current area, approval for such request fails.</p>
     in the currently authenticated user's Area</li>
 </ul>
 
+#### User (Profile Management)
+<p>Registers a new User. This endpoint should be used when a new user is creating his/her profile.</p>
 
+###### Summary
+<table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px; padding:3px;">
+    <tr>
+        <td>HTTP Request</td>
+        <td><font style="color:green"><code>HTTP POST /api/profile/ 201</code></font><br></td>
+    </tr>
+    <tr>
+        <td>Request Content-Type</td>
+        <td><code>application/json</code></td>
+    </tr>
+    <tr>
+        <td>Required Request Parameters</td>
+        <td><code>name<br>email<br>password<br></code></td>
+    </tr>
+    <tr>
+        <td>Optional Parameters</td>
+        <td>none</td>
+    </tr>
+    <tr>
+        <td>Requires role</td>
+        <td>does not require</td>
+    </tr>
+</table>
 
+###### Request Parameters
+<ul>
+ <li><strong>name</strong>  name of the User, must be between 2 and 100 characters long</li>
+ <li><strong> password</strong>  password of the User, must be between 6 and 30 characters long</li>
+ <li><strong>email</strong>  email of the User. Must be unique.</li>
+</ul>
 
+###### Response
+<ul>
+    <li>An HTTP Status 201 Created </li>
+    <li>A URL to access the created object in HTTP Location Header</li>
+</ul>
 
+###### Response on failure
+<ul>
+    <li>HTTP Status 400 Bad_Syntax is returned if parameter validation fails</li>
+    <li>HTTP Status 409 Conflict is returned if the submitted email is not unique</li>
+</ul>
 
+---
+<p>Updates an existing User. If a certain user property is not changed,
+its current value should be included in the request.
+This endpoint should be used when a user is updating his/her profile</p>
 
+###### Summary
+<table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px; padding:3px;">
+    <tr>
+        <td>HTTP Request</td>
+        <td><font style="color:green"><code>HTTP PUT /api/profile/{userId} 204</code></font><br>
+            <b>{userId}</b> existing User ID
+        </td>
+    </tr>
+    <tr>
+        <td>Request Content-Type</td>
+        <td><code>application/json</code></td>
+    </tr>
+    <tr>
+        <td>Required Request Parameters</td>
+        <td><code>name<br>email<br>password<br></code></td>
+    </tr>
+    <tr>
+        <td>Optional Parameters</td>
+        <td>none</td>
+    </tr>
+    <tr>
+        <td>Requires role</td>
+        <td>any authenticated user</td>
+    </tr>
+</table>
 
-#### Voter
+###### Request Parameters
+<ul>
+    <li><b>userId</b> existing User ID</li>
+    <li><strong>name</strong>  new name of the User, must be between 2 and 100 characters long</li>
+    <li><strong> password</strong>  new password of the User, must be between 6 and 30 characters long</li>
+    <li><strong>email</strong>  new email of the User. Must be unique</li>
+</ul>
+
+###### Response
+<ul>
+    <li>HTTP Status 204 No_Content</li>
+</ul>
+
+###### Response on failure
+<ul>
+    <li>HTTP Status 400 Bad_Syntax is returned if parameter validation fails</li>
+    <li>HTTP Status 409 Conflict is returned if the submitted email value is not unique</li>
+    <li>HTTP Status 404 Not_Found is returned if a user with the given ID does not exist</li>
+</ul>
+
+---
+<p>Retrieves an authenticated User. This endpoint should be used when displaying a profile to a user</p>
+
+###### Summary
+<table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px;">
+    <tr>
+        <td>HTTP Request</td>
+        <td><font style="color:green"><code>HTTP GET /api/profile 200</code></font><br>
+            </td>
+    </tr>
+    <tr>
+        <td>Request Content-Type</td>
+        <td>none</td>
+    </tr>
+    <tr>
+        <td>Required Request Parameters</td>
+        <td>none</td>
+    </tr>
+    <tr>
+        <td>Optional Parameters</td>
+        <td>none</td>
+    </tr>
+    <tr>
+        <td>Requires role</td>
+        <td>any authenticated user</td>
+    </tr>
+</table>
+
+###### Request Parameters
+None
+###### Response
+<ul>
+    <li>HTTP Status 200 Ok </li>
+    <li>JSON object with fields <code>userId, name, email, roles, registeredDate, activated, areaId</code> </li>
+</ul>
+
+###### Response on failure
+No standard failure scenarios
+
+---
+<p>Updates an existing User. This endpoint should be used for creating a user by an admin.
+If a certain User property is not changed, its old value should be included in the request.</p>
+
+###### Summary
+<table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px; padding:3px;">
+    <tr>
+        <td>HTTP Request</td>
+        <td><font style="color:green"><code>HTTP PUT /api/areas/{areaId}/members/{userId} 204</code></font><br>
+            <b>{areaId}</b> existing Area ID<br>
+            <b>{userId}</b> existing User ID
+        </td>
+    </tr>
+    <tr>
+        <td>Request Content-Type</td>
+        <td><code>application/json</code></td>
+    </tr>
+    <tr>
+        <td>Required Request Parameters</td>
+        <td><code>name<br>email<br>password<br></code></td>
+    </tr>
+    <tr>
+        <td>Optional Parameters</td>
+        <td>none</td>
+    </tr>
+    <tr>
+        <td>Requires role</td>
+        <td><strong>ADMIN</strong></td>
+    </tr>
+</table>
+
+###### Request Parameters
+<ul>
+ <li><b>userId</b> existing User ID</li>
+ <li><strong>name</strong>  new name of the User, must be between 2 and 100 characters long</li>
+ <li><strong> password</strong>  new password of the User, must be between 6 and 30 characters long</li>
+ <li><strong>email</strong>  new email of the User. Must be unique</li>
+</ul>
+
+###### Response
+<ul>
+    <li>HTTP Status 204 No_Content</li>
+</ul>
+
+###### Response on failure
+<ul>
+    <li>HTTP Status 400 Bad_Syntax is returned if parameter validation fails</li>
+    <li>HTTP Status 409 Conflict is returned if the submitted email value is not unique</li>
+    <li>HTTP Status 404 Not_Found is returned if a <code>userId</code>  refers to a non-existent User
+    in the Area of an authenticated user/li>
+</ul>
+
+---
+<p>Retrieves a User with a given ID.</p>
+
+###### Summary
+<table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px;">
+    <tr>
+        <td>HTTP Request</td>
+        <td><font style="color:green"><code>HTTP GET /api/areas/{areaId}/members/{userId} 200</code></font><br>
+            <b>{areaId}</b> existing Area ID<br>
+            <b>{userId}</b> existing User ID
+       </td>
+    </tr>
+    <tr>
+        <td>Request Content-Type</td>
+        <td>none</td>
+    </tr>
+    <tr>
+        <td>Required Request Parameters</td>
+        <td><none</td>
+    </tr>
+    <tr>
+        <td>Optional Parameters</td>
+        <td>none</td>
+    </tr>
+    <tr>
+        <td>Requires role</td>
+        <td><strong>ADMIN</strong></td>
+    </tr>
+</table>
+
+###### Request Parameters
+ * **userId** existing user ID in the area of an authenticated user
+###### Response
+<ul>
+    <li>HTTP Status 200 Ok </li>
+    <li>JSON object with fields <code>userId, name, email, roles, registeredDate, activated, areaId</code> </li>
+</ul>
+
+###### Response on failure
+<ul>
+    <li>HTTP Status 404 Not_Found is returned if <code>userId</code> refers to a non-existent object in the Area
+    of an authenticated user/li>
+</ul>
+
+---
+<p>Retrieves all User objects in the Area of an authenticated user.</p>
+
+###### Summary
+<table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px;">
+    <tr>
+        <td>HTTP Request</td>
+        <td><font style="color:green"><code>HTTP GET /api/areas/{areaId}/members 200</code></font><br>
+            <b>{areaId}</b> existing Area ID
+            </td>
+    </tr>
+    <tr>
+        <td>Request Content-Type</td>
+        <td>none</td>
+    </tr>
+    <tr>
+        <td>Required Request Parameters</td>
+        <td><none</td>
+    </tr>
+    <tr>
+        <td>Optional Parameters</td>
+        <td>none</td>
+    </tr>
+    <tr>
+        <td>Requires role</td>
+        <td><strong>ADMIN</strong></td>
+    </tr>
+</table>
+
+###### Request Parameters
+None
+###### Response
+<ul>
+    <li>HTTP Status 200 Ok </li>
+    <li>JSON array where each object has fields {@code id, name, email, roles, registeredDate,
+    activated, areaId} </li>
+</ul>
+###### Response on failure
+No standard failure scenarios
+
+---
+<p>Deletes a User with a given ID in the Area of an authenticated user.</p>
+
+###### Summary
+<table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px;">
+    <tr>
+        <td>HTTP Request</td>
+        <td><font style="color:green"><code>HTTP DELETE /api/areas/{areaId}/members/{userId} 204</code></font><br>
+            <b>{areaId}</b> existing Area ID<br>
+            <b>{userId}</b> existing User ID
+            </td>
+    </tr>
+    <tr>
+        <td>Request Content-Type</td>
+        <td>none</td>
+    </tr>
+    <tr>
+        <td>Required Request Parameters</td>
+        <td><none</td>
+    </tr>
+    <tr>
+        <td>Optional Parameters</td>
+        <td>none</td>
+    </tr>
+    <tr>
+        <td>Requires role</td>
+        <td><strong>ADMIN</strong></td>
+    </tr>
+</table>
+
+###### Request Parameters
+ * **userId** existing user ID in the Area of an authenticated user
+###### Response
+<ul>
+    <li>HTTP Status 204 No_Content </li>
+</ul>
+
+###### Response on failure
+<ul>
+    <li>HTTP Status 404 Not_Found is returned if <code>userId</code> refers to a non-existent object in the Area
+    of an authenticated user/li>
+</ul>
+
+---
+<p>Activates/deactivates a user account.</p>
+
+###### Summary
+<table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px; padding:3px;">
+    <tr>
+        <td>HTTP Request</td>
+        <td><font style="color:green"><code>HTTP PUT /api/areas/{areaId}/members/{userId} 204</code></font><br>
+            <b>{areaId}</b> existing Area ID<br>
+            <b>{userId}</b> existing User ID
+            </td>
+    </tr>
+    <tr>
+        <td>Request Content-Type</td>
+        <td><code>application/x-www-form-urlencoded</code></td>
+    </tr>
+    <tr>
+        <td>Required Request Parameters</td>
+        <td><code>activated</code></td>
+    </tr>
+    <tr>
+        <td>Optional Parameters</td>
+        <td>none</td>
+    </tr>
+    <tr>
+        <td>Requires role</td>
+        <td><strong>ADMIN</strong></td>
+    </tr>
+</table>
+
+###### Request Parameters
+ * **userId** existing <code>User</code> ID in the Area of an authenticated User
+ * **activated** <code>true</code> to activate the account, <code>false</code> to deactivate the account
+
+###### Response
+<ul>
+    <li>HTTP Status 204 No_Content </li>
+</ul>
+
+###### Response on failure
+<ul>
+    <li>HTTP Status 404 Not_Found is returned if <code>userId</code> refers to a non-existent object in the Area
+    of an authenticated user/li>
+</ul>
+
+---
+<p>Sets roles for a user account.</p>
+
+###### Summary
+<table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px; padding:3px;">
+    <tr>
+        <td>HTTP Request</td>
+        <td><font style="color:green"><code>HTTP PUT /api/areas/{areaId}/members/{userId} 204</code></font><br>
+            <b>{areaId}</b> existing Area ID<br>
+            <b>{userId}</b> existing User ID
+            </td>
+    </tr>
+    <tr>
+        <td>Request Content-Type</td>
+        <td><code>application/x-www-form-urlencoded</code></td>
+    </tr>
+    <tr>
+        <td>Required Request Parameters</td>
+        <td><code>roles</code></td>
+    </tr>
+    <tr>
+        <td>Optional Parameters</td>
+        <td>none</td>
+    </tr>
+    <tr>
+        <td>Requires role</td>
+        <td><strong>ADMIN</strong></td>
+    </tr>
+</table>
+
+###### Request Parameters
+<ul>
+   <li><code>userId</code> existing user ID</li> in the area of an authenticated user
+   <li><code>roles</code> comma-separated list of values. Valid values are: ADMIN, VOTER</li>
+</ul>
+
+###### Response
+<ul>
+    <li>HTTP Status 204 No_Content </li>
+</ul>
+
+###### Response on failure
+<ul>
+    <li>HTTP Status 400 Bad_Syntax is returned if parameter validation fails</li>
+    <li>HTTP Status 404 Not_Found is returned if <code>userId</code> refers to a non-existent object in the Area
+    of an authenticated user/li>
+</ul>
 
 #### Lunch Place
+<p>Updates an existing LunchPlace object.</p>
+
+###### Summary
+<table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px; padding:3px;">
+    <tr>
+        <td>HTTP Request</td>
+        <td><font style="color:green"><code>HTTP PUT /api/areas/{areaId}/places/{placeId} 204</code></font><br>
+            <b>{areaId}</b> existing Area ID<br>
+            <b>{placeId}</b> existing LunchPlace ID
+        </td>
+    </tr>
+    <tr>
+        <td>Request Content-Type</td>
+        <td><code>application/json</code></td>
+    </tr>
+    <tr>
+        <td>Required Request Parameters</td>
+        <td>none</td>
+    </tr>
+    <tr>
+        <td>Optional Parameters</td>
+        <td><code>name<br>address<br>description<br>phones</code></td>
+    </tr>
+    <tr>
+        <td>Requires role</td>
+        <td><strong>ADMIN</strong></td>
+    </tr>
+</table>
+
+###### Request Parameters
+<ul>
+    <li><b>name</b> (2-50 characters)</li>
+    <li><b>address</b> string, up to 200 characters</li>
+    <li><b>description</b> string, up to 1000 characters</li>
+    <li><b>phones</b> an array of strings with length <=5, each string consists of 10 digits</li>
+</ul>
+
+###### Response
+<ul>
+     <li>HTTP Status 204 No_Content</li>
+</ul>
+
+###### Response on failure
+<ul>
+    <li>HTTP Status 400 Bad_Syntax is returned if parameter validation fails</li>
+    <li>HTTP Status 404 Not_Found is returned if <code>userId</code> refers to a non-existent object in the Area
+    of an authenticated user/li>
+</ul>
+
+---
+<p>Returns a LunchPlace with a given IDs in the area of an authenticated user.</p>
+
+###### Summary
+<table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px; padding:3px;">
+    <tr>
+        <td>HTTP Request</td>
+        <td><font style="color:green"><code>HTTP GET /api/areas/{areaId}/places/{placeId} 200</code></font><br>
+            <b>{areaId}</b> existing Area ID<br>
+            <b>{placeId}</b> existing LunchPlace ID
+        </td>
+    </tr>
+    <tr>
+        <td>Request Content-Type</td>
+        <td><code>application/x-www-form-urlencoded</code></td>
+    </tr>
+    <tr>
+        <td>Required Request Parameters</td>
+        <td>none</td>
+    </tr>
+    <tr>
+        <td>Optional Parameters</td>
+        <td><code>fields<br>startDate<br>endDate</code></td>
+    </tr>
+    <tr>
+        <td>Requires role</td>
+        <td><strong>VOTER</strong> or <strong>ADMIN</strong></td>
+    </tr>
+</table>
+
+###### Request Parameters
+<ul>
+    <li><b>placeId</b> ID of a LunchPlace in the Area of an authenticated user</li>
+   <li><strong>fields</strong>  fields to display in the returned JSON response. Available values:
+<code>name, address, description, phones, menus</code>. Additionally, a field <code>id</code> is always contained
+in the response.</li>
+   <li><strong>startDate</strong>  instructs to include in the response LunchPlace objects which
+have menus belonging to the time range starting with <strong>startDate</strong>. Only matching menus are
+included to the list of LunchPlace menus.</li>
+   <li><strong>endDate</strong>  instructs to include in the response LunchPlace objects which
+have menus belonging to the time range ending with <strong>endDate</strong>. Only matching menus are
+included to the list of LunchPlace menus.</li>
+</ul>
+
+###### Response
+<ul>
+     <li>HTTP Status 200 Ok</li>
+     <li>JSON array of objects each containing fields <code>id, name</code> if <code>fields</code> parameter
+     was not specified in the request. Otherwise each JSON object will contain a mandatory <code>id</code> field and
+     fields that were specified by a user.</li>
+</ul>
+
+###### Response on failure
+<ul>
+    <li>HTTP Status 400 Bad_Syntax is returned if parameter validation fails</li>
+    <li>HTTP Status 404 Not_Found is returned if <code>placeId</code> refers to a non-existent object in the Area
+    of an authenticated user/li>
+</ul>
+
+---
+<p>Returns multiple LunchPlace objects from the area of an authenticated user.</p>
+
+###### Summary
+<table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px; padding:3px;">
+    <tr>
+        <td>HTTP Request</td>
+        <td><font style="color:green"><code>HTTP GET /api/areas/{areaId}/places 200</code></font><br>
+            <b>{areaId}</b> existing Area ID
+        </td>
+    </tr>
+    <tr>
+        <td>Request Content-Type</td>
+        <td><code>application/x-www-form-urlencoded</code></td>
+    </tr>
+    <tr>
+        <td>Required Request Parameters</td>
+        <td>none</td>
+    </tr>
+    <tr>
+        <td>Optional Parameters</td>
+        <td><code>ids<br>fields<br>startDate<br>endDate</code></td>
+    </tr>
+    <tr>
+        <td>Requires role</td>
+        <td><strong>VOTER</strong> or <strong>ADMIN</strong></td>
+    </tr>
+</table>
+
+###### Request Parameters
+<ul>
+   <li><strong>ids</strong>  specifies which objects a user wants to request. If not provided, all objects
+will be returned</li>
+   <li><strong>fields</strong>  fields to display in the returned JSON response. Available values:
+<code>name, address, description, phones, menus</code>. Additionally, a field <code>id</code> is always contained
+in the response</li>
+   <li><strong>startDate</strong>  instructs to include in the response LunchPlace objects which
+have menus belonging to the time range starting with <strong>startDate</strong>. Only matching menus are
+included to the list of LunchPlace menus</li>
+   <li><strong>endDate</strong>  instructs to include in the response LunchPlace objects which
+have menus belonging to the time range ending with <strong>endDate</strong>. Only matching menus are
+included to the list of LunchPlace menus</li>
+</ul>
+
+###### Response
+<ul>
+     <li>HTTP Status 200 Ok</li>
+     <li>JSON array of objects each containing fields <code>id, name</code> if <code>fields</code> parameter
+     was not specified in the request. Otherwise each JSON object will contain a mandatory <code>id</code> field and
+     fields that were specified by a user.</li>
+</ul>
+
+###### Response on failure
+<ul>
+    <li>HTTP Status 400 Bad_Syntax is returned if parameter validation fails</li>
+    <li>HTTP Status 404 Not_Found is returned if a <code>ids</code> refers to
+    non-existing  LunchPlace in the authenticated user's Area.</li>
+</ul>
+
+---
+<p>Deletes a {@link LunchPlace} with a given ID in the area of the authenticated user. </p>
+
+###### Summary
+<table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px; padding:3px;">
+    <tr>
+        <td>HTTP Request</td>
+        <td><font style="color:green">HTTP DELETE /api/areas/{areaId}/places/{placeId} 204</font><br>
+            <b>{areaId}</b> existing Area ID<br>
+            <b>{placeId}</b> existing LunchPlace ID
+        </td>
+    </tr>
+    <tr>
+        <td>Request Content-Type</td>
+        <td>none</td>
+    </tr>
+    <tr>
+        <td>Required Request Parameters</td>
+        <td>none</td>
+    </tr>
+    <tr>
+        <td>Optional Parameters</td>
+        <td>none</td>
+    </tr>
+    <tr>
+        <td>Requires role</td>
+        <td><strong>ADMIN</strong></td>
+    </tr>
+</table>
+
+###### Request Parameters
+ * **id** ID of existing LunchPlace in the area of an authenticated user
+###### Response
+<ul>
+     <li>HTTP Status 204 No_Content</li>
+</ul>
+
+###### Response on failure
+<ul>
+    <li>HTTP Status 404 Not_Found is returned if a <code>ids</code> refers to
+    non-existing  LunchPlace in the authenticated user's Area.</li>
+</ul>
 
 #### Menu
+<p>Adds a new Menu to the LunchPlace specified by ID</p>
+
+###### Summary
+<table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px; padding:3px;">
+    <tr>
+        <td>HTTP Request</td>
+        <td><font style="color:green"><code>HTTP POST /api/areas/{areaId}/places/{placeId}/menus 201 </code></font>
+            <b>{areaId}</b> existing Area ID<br>
+            <b>{placeId}</b> existing LunchPlace ID
+         </td>
+    </tr>
+    <tr>
+        <td>Request Content-Type</td>
+        <td><code>application/json</code></td>
+    </tr>
+    <tr>
+        <td>Required Request Parameters</td>
+        <td><code>effectiveDate<br>dishes : {name, price, position}</code></td>
+    </tr>
+    <tr>
+        <td>Optional Parameters</td>
+        <td>none</td>
+    </tr>
+    <tr>
+        <td>Requires role</td>
+        <td><strong>ADMIN</strong></td>
+    </tr>
+</table>
+
+###### Request Parameters
+<ul>
+<li><b>placeId</b> an ID of an existing LunchPlace in the area of an authenticated user</li>
+<li><code>effectiveDate</code> date for which the created Menu will be valid</li>
+<li><code>dishes</code> array of Dish objects with mandatory fields
+   <ul>
+       <li><code>name</code> dish name, must be 2-50 characters long</li>
+       <li><code>price</code> floating value, must be >= 0 </li>
+       <li><code>position</code> integer value, must be >= 0 </li>
+   </ul>
+   </li>
+</ul>
+
+###### Response
+<ul>
+     <li>HTTP Status 201 Created</li>
+     <li>A URL to access the created object in HTTP Location Header</li>
+     <li>A JSON object with a field <code>id</code> containing the ID of the newly created <code>Menu</code></li>
+</ul>
+
+###### Response on failure
+<ul>
+    <li>HTTP Status 400 Bad_Syntax is returned if parameter validation fails</li>
+    <li>HTTP Status 404 Not_Found, if <code>placeId</code> refers to a non-existent object
+    in the area of an authenticated user</li>
+</ul>
+
+---
+<p>Returns a Menu with a given ID.</p>
+
+###### Summary
+<table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px; padding:3px;">
+    <tr>
+        <td>HTTP Request</td>
+        <td><font style="color:green"><code>HTTP POST /api/areas/{areaId}/places/{placeId}/menus/{menuId} 200</code></font>
+        </td>
+    </tr>
+    <tr>
+        <td>Request Content-Type</td>
+        <td>none</td>
+    </tr>
+    <tr>
+        <td>Required Request Parameters</td>
+        <td>none</td>
+    </tr>
+    <tr>
+        <td>Optional Parameters</td>
+        <td>none</td>
+    </tr>
+    <tr>
+        <td>Requires role</td>
+        <td><strong>VOTER</strong> or <strong>ADMIN</strong></td>
+    </tr>
+</table>
+
+###### Request Parameters
+ * **placeId** an ID of an existing LunchPlace in the area of an authenticated user
+ * **menuId** an ID of an existing Menu in the area of an authenticated user
+###### Response
+<ul>
+     <li>HTTP Status 200 Ok</li>
+     <li>a JSON object with fields <code>id, effectiveDate, lunchPlaceId, dishes</code></li>
+     <li><code>dishes</code> is a JSON array of Dish object with fields <code>name, price, position</code>
+     </li>
+</ul>
+
+###### Response on failure
+<ul>
+    <li>HTTP Status 404 Not_Found, if <code>placeId</code> or <code>menuId</code> refers to a non-existent object
+    in the area of an authenticated user</li>
+</ul>
+
+---
+<p>Deletes a Menu by its ID</p>
+
+###### Summary
+<table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px; padding:3px;">
+    <tr>
+        <td>HTTP Request</td>
+        <td><font style="color:green"><code>HTTP DELETE  /api/areas/{areaId}/places/{placeId}/menus/{menuId} 204</code></font>
+        </td>
+    </tr>
+    <tr>
+        <td>Request Content-Type</td>
+        <td>none</td>
+    </tr>
+    <tr>
+        <td>Required Request Parameters</td>
+        <td>none</td>
+    </tr>
+    <tr>
+        <td>Optional Parameters</td>
+        <td>none</td>
+    </tr>
+    <tr>
+        <td>Requires role</td>
+        <td><strong>ADMIN</strong></td>
+    </tr>
+</table>
+
+###### Request Parameters
+ * **placeId** an ID of an existing LunchPlace in the area of an authenticated user
+ * **menuId** an ID of an existing Menu in the area of an authenticated user
+###### Response
+<ul>
+     <li>HTTP Status 204 No_Content</li>
+</ul>
+
+###### Response on failure
+<ul>
+    <li>HTTP Status 404 Not_Found, if <code>placeId</code> or <code>menuId</code> refers to a non-existent object
+    in the area of an authenticated user</li>
+</ul>
 
 #### Poll
+
+<p>Returns a LunchPlacePoll object by its ID.</p>
+
+###### Summary
+<table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px; padding:3px;">
+    <tr>
+        <td>HTTP Request</td>
+        <td><font style="color:green"><code>HTTP GET /api/areas/{areaId}/polls/{pollId} 200</code></font><br>
+            <b>{areaId}</b> existing Area ID<br>
+            <b>{pollId}</b> existing Poll ID
+        </td>
+    </tr>
+    <tr>
+        <td>Request Content-Type</td>
+        <td>none</td>
+    </tr>
+    <tr>
+        <td>Required Request Parameters</td>
+        <td>none</td>
+    </tr>
+    <tr>
+        <td>Optional Parameters</td>
+        <td>none</td>
+    </tr>
+    <tr>
+        <td>Requires role</td>
+        <td><strong>VOTER</strong> or <strong>ADMIN</strong></td>
+    </tr>
+</table>
+
+###### Request Parameters
+ * **pollId** ID of existing Poll in the area of an authenticated user
+###### Response
+<ul>
+     <li>HTTP Status 200 Ok</li>
+     <li>JSON object with fields <code>id, menuDate, timeConstraint, pollItems</code><br>
+         <code>timeConstraint</code> is an object with fields <code>startTime, endTime, voteChangeThreshold</code><br>
+             <code>pollItems</code> is an array of objects with fields <code>id, position, itemId</code>, where <code>itemId</code>
+             refers to a {@link ua.belozorov.lunchvoting.model.lunchplace.LunchPlace} object</li>
+</ul>
+
+###### Response on failure
+<ul>
+    <li>HTTP Status 404 Not_Found is returned if <code>pollId</code> refers to non-existent object
+    in the authenticated user's Area</li>
+</ul>
+
+---
+<p>Returns a list of Poll objects in the area.</p>
+
+###### Summary
+<table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px; padding:3px;">
+    <tr>
+        <td>HTTP Request</td>
+        <td><font style="color:green"><code>HTTP GET /api/areas/{areaId}/polls 200</code></font><br>
+            <b>{areaId}</b> existing Area ID<br>
+        </td>
+    </tr>
+    <tr>
+        <td>Request Content-Type</td>
+        <td>none</td>
+    </tr>
+    <tr>
+        <td>Required Request Parameters</td>
+        <td>none</td>
+    </tr>
+    <tr>
+        <td>Optional Parameters</td>
+        <td>none</td>
+    </tr>
+    <tr>
+        <td>Requires role</td>
+        <td><strong>VOTER</strong> or <strong>ADMIN</strong></td>
+    </tr>
+</table>
+
+###### Request Parameters
+None
+###### Response
+<ul>
+     <li>HTTP Status 200 Ok</li>
+     <li>JSON array where each object contains fields <code>id, menuDate, timeConstraint, pollItems</code><br>
+         <code>timeConstraint</code> is an object with fields <code>startTime, endTime, voteChangeThreshold</code><br>
+             <code>pollItems</code> is an array of objects with fields <code>id, position, itemId</code>, where <code>itemId</code>
+             refers to a {@link ua.belozorov.lunchvoting.model.lunchplace.LunchPlace} object</li>
+</ul>
+
+###### Response on failure
+No standard failure scenarios
+
+---
+<p>Returns a list of Poll objects in the area filtered by their start or/and end time.</p>
+
+###### Summary
+<table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px; padding:3px;">
+    <tr>
+        <td>HTTP Request</td>
+        <td><font style="color:green"><code>HTTP GET /api/areas/{areaId}/polls 200</code></font><br>
+            <b>{areaId}</b> existing Area ID
+        </td>
+    </tr>
+    <tr>
+        <td>Request Content-Type</td>
+        <td>none</td>
+    </tr>
+    <tr>
+        <td>Required Request Parameters</td>
+        <td>none</td>
+    </tr>
+    <tr>
+        <td>Optional Parameters</td>
+        <td><code>start<br>end</code></td>
+    </tr>
+    <tr>
+        <td>Requires role</td>
+        <td><strong>VOTER</strong> or <strong>ADMIN</strong></td>
+    </tr>
+</table>
+
+###### Request Parameters
+ * **start** a start of filtering range for poll active time. If null, it's set to 1900/1/1 00:00:00
+ * **end** an end of filtering range for poll active time. If null, it's set to 7777/1/1 00:00:00
+###### Response
+ <li>HTTP Status 200 Ok</li>
+ <li>JSON array where each object contains fields <code>id, menuDate, timeConstraint, pollItems</code><br>
+     <code>timeConstraint</code> is an object with fields <code>startTime, endTime, voteChangeThreshold</code><br>
+     <code>pollItems</code> is an array of objects with fields <code>id, position, itemId</code>, where <code>itemId</code>
+     refers to a LunchPlace object
+</li>
+
+###### Response on failure
+No standard failure scenarios
+
+---
+<p>Returns a list of polls in the area which have ended.</p>
+
+###### Summary
+<table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px; padding:3px;">
+    <tr>
+        <td>HTTP Request</td>
+        <td><font style="color:green"><code>HTTP GET /api/areas/{areaId}/polls/past 200</code></font><br>
+            <b>{areaId}</b> existing Area ID
+        </td>
+    </tr>
+    <tr>
+        <td>Request Content-Type</td>
+        <td>none</td>
+    </tr>
+    <tr>
+        <td>Required Request Parameters</td>
+        <td>none</td>
+    </tr>
+    <tr>
+        <td>Optional Parameters</td>
+        <td>none</td>
+    </tr>
+    <tr>
+        <td>Requires role</td>
+        <td><strong>VOTER</strong> or <strong>ADMIN</strong></td>
+    </tr>
+</table>
+
+###### Request Parameters
+None
+###### Response
+<ul>
+     <li>HTTP Status 200 Ok</li>
+     <li>JSON array where each object contains fields <code>id, menuDate, timeConstraint, pollItems</code><br>
+         <code>timeConstraint</code> is an object with fields <code>startTime, endTime, voteChangeThreshold</code><br>
+         <code>pollItems</code> is an array of objects with fields <code>id, position, itemId</code>, where <code>itemId</code>
+         refers to a LunchPlace object</li>
+</ul>
+
+###### Response on failure
+No standard failure scenarios
+
+---
+<p>Returns a list of polls in the area which are active for the moment of the request.</p>
+
+###### Summary
+<table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px; padding:3px;">
+    <tr>
+        <td>HTTP Request</td>
+        <td><font style="color:green"><code>HTTP GET /api/areas/{areaId}/polls/active 200</code></font><br>
+            <b>{areaId}</b> existing Area ID
+        </td>
+    </tr>
+    <tr>
+        <td>Request Content-Type</td>
+        <td>none</td>
+    </tr>
+    <tr>
+        <td>Required Request Parameters</td>
+        <td>none</td>
+    </tr>
+    <tr>
+        <td>Optional Parameters</td>
+        <td>none</td>
+    </tr>
+    <tr>
+        <td>Requires role</td>
+        <td><strong>VOTER</strong> or <strong>ADMIN</strong></td>
+    </tr>
+</table>
+
+###### Request Parameters
+None
+###### Response
+<ul>
+     <li>HTTP Status 200 Ok</li>
+     <li>JSON array where each object contains fields <code>id, menuDate, timeConstraint, pollItems</code><br>
+         <code>timeConstraint</code> is an object with fields <code>startTime, endTime, voteChangeThreshold</code><br>
+         <code>pollItems</code> is an array of objects with fields <code>id, position, itemId</code>, where <code>itemId</code>
+         refers to a LunchPlace object</li>
+</ul>
+
+###### Response on failure
+No standard failure scenarios
+
+---
+<p>Returns a list of polls in the area which are scheduled for some time in the future.</p>
+
+###### Summary
+<table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px; padding:3px;">
+    <tr>
+        <td>HTTP Request</td>
+        <td><font style="color:green"><code>HTTP GET /api/areas/{areaId}/polls/future 200</code></font><br>
+            <b>{areaId}</b> existing Area ID
+        </td>
+    </tr>
+    <tr>
+        <td>Request Content-Type</td>
+        <td>none</td>
+    </tr>
+    <tr>
+        <td>Required Request Parameters</td>
+        <td>none</td>
+    </tr>
+    <tr>
+        <td>Optional Parameters</td>
+        <td>none</td>
+    </tr>
+    <tr>
+        <td>Requires role</td>
+        <td><strong>VOTER</strong> or <strong>ADMIN</strong></td>
+    </tr>
+</table>
+
+###### Request Parameters
+None
+###### Response
+<ul>
+     <li>HTTP Status 200 Ok</li>
+     <li>JSON array where each object contains fields <code>id, menuDate, timeConstraint, pollItems</code><br>
+         <code>timeConstraint</code> is an object with fields <code>startTime, endTime, voteChangeThreshold</code><br>
+         <code>pollItems</code> is an array of objects with fields <code>id, position, itemId</code>, where <code>itemId</code>
+         refers to a {@link ua.belozorov.lunchvoting.model.lunchplace.LunchPlace} object</li>
+ </ul>
+
+###### Response on failure
+No standard failure scenarios
+
+---
+<p>Provides an information whether a poll is active for the moment of the request.</p>
+
+###### Summary
+<table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px; padding:3px;">
+    <tr>
+        <td>HTTP Request</td>
+        <td><font style="color:green"><code>HTTP GET /api/areas/{areaId}/polls/active 200</code></font><br>
+            <b>{areaId}</b> existing Area ID
+        </td>
+    </tr>
+    <tr>
+        <td>Request Content-Type</td>
+        <td>none</td>
+    </tr>
+    <tr>
+        <td>Required Request Parameters</td>
+        <td><code>pollId</code></td>
+    </tr>
+    <tr>
+        <td>Optional Parameters</td>
+        <td>none</td>
+    </tr>
+    <tr>
+        <td>Requires role</td>
+        <td><strong>VOTER</strong> or <strong>ADMIN</strong></td>
+    </tr>
+</table>
+
+###### Request Parameters
+ * **pollId** ID of LunchPlacePoll in the area of authenticated user
+###### Response
+<ul>
+     <li>HTTP Status 200 Ok</li>
+     <li>a JSON object with a fields:
+         <ul>
+             <li><code>pollId</code> specifies requested poll ID</li>
+             <li><code>active</code> specifies the poll state as <code>true</code> or <code>false</code></li>
+         </ul>
+     </li>
+ </ul>
+
+###### Response on failure
+<ul>
+    <li>HTTP Status 404, if <code>pollId</code> refers to a non-existent Poll in the area of
+    authenticated user</li>
+</ul>
+
+---
+<p>Deletes a poll with a given ID.</p>
+
+###### Summary
+<table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px; padding:3px;">
+    <tr>
+        <td>HTTP Request</td>
+        <td><font style="color:green"><code>HTTP DELETE /api/areas/{areaId}/polls/{pollId} 204</code></font><br>
+            <b>{areaId}</b> existing Area ID
+        </td>
+    </tr>
+    <tr>
+        <td>Request Content-Type</td>
+        <td>none</td>
+    </tr>
+    <tr>
+        <td>Required Request Parameters</td>
+        <td>none</td>
+    </tr>
+    <tr>
+        <td>Optional Parameters</td>
+        <td>none</td>
+    </tr>
+    <tr>
+        <td>Requires role</td>
+        <td><strong>ADMIN</strong></td>
+    </tr>
+</table>
+
+###### Request Parameters
+ * **pollId** ID of LunchPlacePoll in the area of authenticated user
+###### Response
+<ul>
+     <li>HTTP Status 204 Ok</li>
+</ul>
+
+###### Response on failure
+<ul>
+    <li>HTTP Status 404, if <code>pollId</code> refers to a non-existent Poll in the area of
+    authenticated user</li>
+</ul>
+
+---
+<p>Accepts and review a vote from an authenticated user.</p>
+<p>Voter can vote for a poll when the poll is active. Only one vote per poll is accepted.
+Voter can change his/her mind before poll's voteChange time. In that case the previous vote is deleted and a new
+vote is accepted</p>
+
+###### Summary
+<table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px; padding:3px;">
+    <tr>
+        <td>HTTP Request</td>
+        <td><font style="color:green"><code>HTTP POST /api/areas/{areaId}/votes 201</code></font><br>
+            <b>{areaId}</b> existing Area ID
+        </td>
+    </tr>
+    <tr>
+        <td>Request Content-Type</td>
+        <td><code>application/x-www-form-urlencoded</code></td>
+    </tr>
+    <tr>
+        <td>Required Request Parameters</td>
+        <td><code>pollId, pollItemId</code></td>
+    </tr>
+    <tr>
+        <td>Optional Parameters</td>
+        <td>none</td>
+    </tr>
+    <tr>
+        <td>Requires role</td>
+        <td><strong>VOTER</strong> or <strong>ADMIN</strong></td>
+    </tr>
+</table>
+
+###### Request Parameters
+ * **pollId** ID of existing Poll in the area of an authenticated user
+ * **pollItemId** ID of existing Poll in the area of an authenticated user
+###### Response
+<ul>
+     <li>HTTP Status 201 Created</li>
+     <li>a JSON object with fields <code>id, voterId, pollId, itemId</code></li>
+</ul>
+
+###### Response on failure
+<ul>
+    <li>HTTP Status 404 Not_Found, if <code>pollId</code> or <code>pollItemId</code> refers to a non-existent object
+    in the area of an authenticated user</li>
+    <li>HTTP Status 422 Unprocessable_Entity, if:
+        <ul>
+            <li>the poll is not active</li>
+            <li>vote change attempt is made after the
+                corresponding time threshold</li>
+            <li>2nd and subsequent attempt to vote for the same item is made</li>
+        </ul>
+    </li>
+</ul>
+
+---
+<p>Returns all Vote objects made for a specified poll.</p>
+
+###### Summary
+<table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px; padding:3px;">
+    <tr>
+        <td>HTTP Request</td>
+        <td><font style="color:green"><code>HTTP GET /api/areas/{areaId}/votes 200</code></font><br>
+            <b>{areaId}</b> existing Area ID
+        </td>
+    </tr>
+    <tr>
+        <td>Request Content-Type</td>
+        <td>none</td>
+    </tr>
+    <tr>
+        <td>Required Request Parameters</td>
+        <td><code>pollId</code></td>
+    </tr>
+    <tr>
+        <td>Optional Parameters</td>
+        <td>none</td>
+    </tr>
+    <tr>
+        <td>Requires role</td>
+        <td><strong>VOTER</strong> or <strong>ADMIN</strong></td>
+    </tr>
+</table>
+
+###### Request Parameters
+ * **pollId** ID of existing Poll in the area of an authenticated user
+###### Response
+<ul>
+     <li>HTTP Status 200</li>
+     <li>a JSON object with fields:
+         <ul>
+             <li><code>pollId</code></li>
+             <li><code>votes</code> a JSON array of Vote objects with fields <code>id, voterId, itemId</code></li>
+         </ul>
+     </li>
+</ul>
+
+###### Response on failure
+<ul>
+    <li>HTTP Status 404 Not_Found, if <code>pollId</code> refers to a non-existent object
+    in the area of an authenticated user</li>
+</ul>
+
+---
+<p>Returns the result of voting for a poll grouped by an item</p>
+
+###### Summary
+<table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px; padding:3px;">
+    <tr>
+        <td>HTTP Request</td>
+        <td><font style="color:green"><code>HTTP GET /api/areas/{areaId}/votes 200</code></font><br>
+            <b>{areaId}</b> existing Area ID
+        </td>
+    </tr>
+    <tr>
+        <td>Request Content-Type</td>
+        <td>none</td>
+    </tr>
+    <tr>
+        <td>Required Request Parameters</td>
+        <td><code>type</code></td>
+    </tr>
+    <tr>
+        <td>Optional Parameters</td>
+        <td>none</td>
+    </tr>
+    <tr>
+        <td>Requires role</td>
+        <td><strong>VOTER</strong> or <strong>ADMIN</strong></td>
+    </tr>
+</table>
+
+###### Request Parameters
+ * **pollId** ID of an existing Poll in the area of an authenticated user
+###### Response
+<ul>
+     <li>HTTP Status 200</li>
+     <li>a JSON object with fields
+         <ul>
+             <li><code>pollId</code></li>
+             <li><code>result</code> a JSON object representing a poll result.
+             Contains fields <code>pollItemId, itemId, count</code>, where <code>itemId </code> refers to
+             an ID of LunchPlace</li>
+         </ul>
+     </li>
+</ul>
+
+###### Response on failure
+<ul>
+    <li>HTTP Status 400, if parameter validation fails</li>
+    <li>HTTP Status 404 Not_Found, if <code>pollId</code> refers to a non-existent object
+    in the area of an authenticated user</li>
+</ul>
+
+---
+<p>Returns a list of item ID that an authenticated user has voted for.</p>
+
+###### Summary
+<table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px; padding:3px;">
+    <tr>
+        <td>HTTP Request</td>
+        <td><font style="color:green"><code>HTTP GET /api/areas/{areaId}/votes 200</code></font>
+        </td>
+    </tr>
+    <tr>
+        <td>Request Content-Type</td>
+        <td>none</td>
+    </tr>
+    <tr>
+        <td>Required Request Parameters</td>
+        <td><code>filterBy, pollId</code></td>
+    </tr>
+    <tr>
+        <td>Optional Parameters</td>
+        <td>none</td>
+    </tr>
+    <tr>
+        <td>Requires role</td>
+        <td><strong>VOTER</strong> or <strong>ADMIN</strong></td>
+    </tr>
+</table>
+
+###### Request Parameters
+ * **pollId** ID of an existing Poll in the area of an authenticated user
+###### Response
+<ul>
+     <li>HTTP Status </li>
+</ul>
+
+###### Response on failure
+<ul>
+    <li>HTTP Status 400, if parameter validation fails</li>
+    <li>HTTP Status 404 Not_Found, if <code>pollId</code> refers to a non-existent object
+    in the area of an authenticated user</li>
+</ul>
+
+---
+<p>Revokes a user vote.</p>
+
+###### Summary
+<table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px; padding:3px;">
+    <tr>
+        <td>HTTP Request</td>
+        <td><font style="color:green"><code>HTTP DELETE /api/areas/{areaId}/votes 204</code></font>
+        </td>
+    </tr>
+    <tr>
+        <td>Request Content-Type</td>
+        <td>none</td>
+    </tr>
+    <tr>
+        <td>Required Request Parameters</td>
+        <td>none</td>
+    </tr>
+    <tr>
+        <td>Optional Parameters</td>
+        <td>none</td>
+    </tr>
+    <tr>
+        <td>Requires role</td>
+        <td><strong>VOTER</strong> or <strong>ADMIN</strong></td>
+    </tr>
+</table>
+
+###### Request Parameters
+ * **voteId** ID of an existing vote which was made by an authenticated user.
+
+###### Response
+<ul>
+     <li>HTTP Status 204 No_Content</li>
+</ul>
+
+###### Response on failure
+<ul>
+    <li>HTTP Status 404 Not_Found, if <code>voteId</code> refers to a non-existent object or the vote has been
+    made by another voter.</li>
+</ul>

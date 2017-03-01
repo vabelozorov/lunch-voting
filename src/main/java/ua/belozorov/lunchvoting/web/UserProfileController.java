@@ -65,19 +65,14 @@ public class UserProfileController {
      *     </tr>
      * </table>
      *
-     * <p>The {@link User}  must belong to the same {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea}
-     * as the {@link User} whose credentials were submitted.<br>
-     * </p>
-     * Three non-empty parameters must be present in the JSON object:
+     * @param userTo Three non-empty parameters must be present in the JSON object:
      * <ul>
      *  <li><strong>name</strong>  name of the User, must be between 2 and 100 characters long</li>
      *  <li><strong> password</strong>  password of the User, must be between 6 and 30 characters long</li>
      *  <li><strong>email</strong>  email of the User. The application enforces a unique constraint on this value and
      *  <code>DuplicateDataException</code> is thrown if value happens to be not unique</li>
      * </ul>
-     * Other parameters are ignored.
      *
-     * @param userTo represents request parameters and must contain non-empty <code>name, password, email</code> fields
      * @return ResponseEntity instance with the following values upon success:
      *  <ul>
      *      <li>An HTTP Status 201 Created </li>
@@ -130,18 +125,16 @@ public class UserProfileController {
      *     </tr>
      * </table>
      *
-     * <p>Three non-empty parameters must be present in the JSON object:</p>
+     *
+     * If a certain {@link User}  property is not changed, its old value should be included in the request.
+     * @param userId  existing {@link User} ID
+     * @param userTo three non-empty parameters must be present in the JSON object:
      * <ul>
      *  <li><strong>name</strong>  new name of the User, must be between 2 and 100 characters long</li>
      *  <li><strong> password</strong>  new password of the User, must be between 6 and 30 characters long</li>
      *  <li><strong>email</strong>  new email of the User. The application enforces a unique constraint on this value and
      *  <code>DuplicateDataException</code> is thrown if value happens to be not unique</li>
      * </ul>
-     * Other parameters are ignored.
-     *
-     * If a certain {@link User}  property is not changed, its old value should be included in the request.
-     * @param userId  existing {@link User} ID
-     * @param userTo  represents request parameters and must contain non-empty <code>name, password, email</code> fields
      * @return ResponseEntity instance with the following values upon success:
      *  <ul>
      *      <li>HTTP Status 204 No_Content</li>

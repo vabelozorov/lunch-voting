@@ -324,8 +324,8 @@ public class PollController {
      *      <li>HTTP Status 200 Ok</li>
      *      <li>JSON array where each object contains fields <code>id, menuDate, timeConstraint, pollItems</code><br>
      *          <code>timeConstraint</code> is an object with fields <code>startTime, endTime, voteChangeThreshold</code><br>
-     *              <code>pollItems</code> is an array of objects with fields <code>id, position, itemId</code>, where <code>itemId</code>
-     *              refers to a {@link ua.belozorov.lunchvoting.model.lunchplace.LunchPlace} object</li>
+     *          <code>pollItems</code> is an array of objects with fields <code>id, position, itemId</code>, where <code>itemId</code>
+     *          refers to a {@link ua.belozorov.lunchvoting.model.lunchplace.LunchPlace} object</li>
      *  </ul>
      */
     @GetMapping(value = "/future", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -364,6 +364,7 @@ public class PollController {
      *         <td><strong>VOTER</strong> or <strong>ADMIN</strong></td>
      *     </tr>
      * </table>
+     *
      * @param pollId ID of {@link LunchPlacePoll} in the area of authenticated user
      * @return ResponseEntity instance with the following values upon success:
      * <ul>

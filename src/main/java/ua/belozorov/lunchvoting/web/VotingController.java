@@ -45,7 +45,7 @@ public class VotingController {
     }
 
     /**
-     * <p>Accepts and review a vote from an authenticated user.</p>
+     * <p>Accepts and reviews a vote from an authenticated user.</p>
      *
      * <table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px; padding:3px;">
      *     <tr>
@@ -93,7 +93,7 @@ public class VotingController {
      *              <li>the poll is not active</li>
      *              <li>vote change attempt is made after the
      *                  corresponding time threshold</li>
-     *              <li>2nd and subsequent attemp to vote for the same item is made</li>
+     *              <li>2nd and subsequent attempt to vote for the same item is made</li>
      *          </ul>
      *      </li>
      *  </ul>
@@ -192,6 +192,7 @@ public class VotingController {
      *         <td><strong>VOTER</strong> or <strong>ADMIN</strong></td>
      *     </tr>
      * </table>
+     *
      * @param pollId ID of an existing {@link ua.belozorov.lunchvoting.model.voting.polling.LunchPlacePoll} in the area
      *               of an authenticated user
      * @return ResponseEntity instance with the following values upon success:
@@ -247,6 +248,7 @@ public class VotingController {
      *         <td><strong>VOTER</strong> or <strong>ADMIN</strong></td>
      *     </tr>
      * </table>
+     *
      * @param pollId ID of an existing {@link ua.belozorov.lunchvoting.model.voting.polling.LunchPlacePoll} in the area
      *               of an authenticated user
      * @return ResponseEntity instance with the following values upon success:
