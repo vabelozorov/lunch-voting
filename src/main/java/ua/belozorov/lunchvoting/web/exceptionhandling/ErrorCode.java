@@ -19,7 +19,8 @@ public enum ErrorCode {
     NO_VOTE_POLICY_MATCH("error.model.lunchplacepoll.no_policy_match"),
     POLL_NOT_ACTIVE("error.model.commonpolicy.poll_not_active"),
     TIMECONSTRAINT_END_BEFORE_START("error.model.timecontraint.end_before_start"),
-    VOTECHANGETHRESHOLD_INVALID("error.model.timecontraint.vote_change_threshold_invalid");
+    VOTECHANGETHRESHOLD_INVALID("error.model.timecontraint.vote_change_threshold_invalid"),
+    JAR_REQUESTER_ALREADY_IN_AREA("error.model.jar.requester_already_in_area");
 
     private final String messageCode;
 

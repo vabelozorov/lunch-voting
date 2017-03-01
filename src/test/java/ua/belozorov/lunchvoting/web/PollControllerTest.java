@@ -21,7 +21,6 @@ import java.util.stream.Stream;
 import static org.hamcrest.Matchers.contains;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static ua.belozorov.lunchvoting.DateTimeFormatters.DATE_FORMATTER;
@@ -68,7 +67,7 @@ public class PollControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    public void testGet() throws Exception {
+    public void getOnePoll() throws Exception {
         String activePollId = activePoll.getId();
 
         when(pollService.getWithPollItems(areaId, activePollId)).thenReturn(testPolls.getActivePoll());
@@ -243,8 +242,7 @@ public class PollControllerTest extends AbstractControllerTest {
 
         mockMvc.perform(
                 delete(REST_URL + "/{pollId}", areaId, id)
-                .with(csrf())
-                .with(god())
+                                .with(god())
         )
         .andExpect(status().isNoContent());
         verify(pollService).delete(areaId, id);

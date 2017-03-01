@@ -16,6 +16,7 @@ import ua.belozorov.lunchvoting.service.voting.PollService;
 import ua.belozorov.lunchvoting.service.voting.VotingService;
 
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.withSettings;
 
 /**
 
@@ -63,5 +64,6 @@ public class ServicesTestConfig {
     @Bean
     public EatingAreaService eatingAreaService() {
         return mock(EatingAreaService.class);
+//        return mock(EatingAreaService.class, withSettings().verboseLogging());
     }
 }

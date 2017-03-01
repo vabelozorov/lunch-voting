@@ -70,7 +70,6 @@ public class JoinAreaRequestControllerTest extends AbstractControllerTest {
                 .perform(
                         post(REST_URL, areaId)
                         .accept(MediaType.APPLICATION_JSON)
-                        .with(csrf())
                         .with(alien())
                 )
                 .andExpect(status().isCreated())
@@ -100,7 +99,6 @@ public class JoinAreaRequestControllerTest extends AbstractControllerTest {
                 .perform(
                         get(REST_URL + "/{id}", areaId, madeRequest.getId())
                         .accept(MediaType.APPLICATION_JSON)
-                        .with(csrf())
                         .with(alien())
                 )
                 .andExpect(status().isOk())
@@ -131,7 +129,6 @@ public class JoinAreaRequestControllerTest extends AbstractControllerTest {
                         get(REST_URL, areaId)
                         .param("status", "PENDING")
                         .accept(MediaType.APPLICATION_JSON)
-                        .with(csrf())
                         .with(god())
                 )
                 .andExpect(status().isOk())
@@ -153,24 +150,23 @@ public class JoinAreaRequestControllerTest extends AbstractControllerTest {
     @Test
     public void requesterGetsItsOwnRequests() throws Exception {
         EatingArea area = testAreas.getFirstArea();
-        JoinAreaRequest request1 = new JoinAreaRequest(VOTER, area).cancel();
-        JoinAreaRequest request2 = new JoinAreaRequest(VOTER, area);
-        JoinAreaRequest request3 = new JoinAreaRequest(ALIEN_USER2, area);
-        List<JoinAreaRequest> expectedRequests = Arrays.asList(request2, request1);
+        JoinAreaRequest request1 = new JoinAreaRequest(A2_USER1, area);
+        JoinAreaRequest request2 = new JoinAreaRequest(ALIEN_USER1, area).cancel();
+        JoinAreaRequest request3 = new JoinAreaRequest(ALIEN_USER1, area);
+        List<JoinAreaRequest> expectedRequests = Arrays.asList(request3, request2);
 
-        when(requestService.getByRequester(VOTER)).thenReturn(expectedRequests);
+        when(requestService.getByRequester(ALIEN_USER1)).thenReturn(expectedRequests);
 
         String actual = mockMvc
                 .perform(
                         get(REST_URL, areaId)
                         .accept(MediaType.APPLICATION_JSON)
-                        .with(csrf())
-                        .with(voter())
+                        .with(alien())
                 )
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
 
-        verify(requestService).getByRequester(VOTER);
+        verify(requestService).getByRequester(ALIEN_USER1);
 
         List<Map<String, Object>> objectProperties = this.converter.convert(expectedRequests);
         String expected = jsonUtils.toJson(objectProperties);
@@ -187,7 +183,6 @@ public class JoinAreaRequestControllerTest extends AbstractControllerTest {
                         .param("status", JoinAreaRequest.JoinStatus.APPROVED.name())
                         .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                         .accept(MediaType.APPLICATION_JSON)
-                        .with(csrf())
                         .with(god())
                 )
                 .andExpect(status().isNoContent());
@@ -203,7 +198,6 @@ public class JoinAreaRequestControllerTest extends AbstractControllerTest {
                         put(REST_URL + "/{id}", areaId, requestId)
                         .param("status", JoinAreaRequest.JoinStatus.REJECTED.name())
                         .contentType(MediaType.APPLICATION_FORM_URLENCODED).accept(MediaType.APPLICATION_JSON)
-                        .with(csrf())
                         .with(god())
                 )
                 .andExpect(status().isNoContent());
@@ -221,7 +215,6 @@ public class JoinAreaRequestControllerTest extends AbstractControllerTest {
                         .param("status", JoinAreaRequest.JoinStatus.CANCELLED.name())
                         .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                         .accept(MediaType.APPLICATION_JSON)
-                        .with(csrf())
                         .with(alien())
                         )
                 .andExpect(status().isNoContent());

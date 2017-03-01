@@ -84,7 +84,7 @@ public final class ExceptionInfoHandler {
     }
 
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)  //422
-    @ExceptionHandler({NoAreaAdminException.class, PollException.class, VotePolicyException.class})
+    @ExceptionHandler({NoAreaAdminException.class, PollException.class, VotePolicyException.class, JoinRequestException.class})
     @ResponseBody
     public ErrorInfo handleFor422(HttpServletRequest req, ApplicationException ex) {
         return this.logAndCreate(req, ex);

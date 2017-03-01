@@ -126,8 +126,7 @@ public class UserManagementControllerTest extends AbstractControllerTest {
                 .perform(
                         delete(REST_URL + "/{voter}", testAreas.getFirstAreaId(), VOTER_ID)
                         .with(god())
-                        .with(csrf())
-                )
+                                        )
                 .andExpect(status().isNoContent());
         verify(userService).delete(areaId, VOTER_ID);
     }
@@ -139,8 +138,7 @@ public class UserManagementControllerTest extends AbstractControllerTest {
                 .param("activated", "false")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .with(god())
-                .with(csrf())
-        )
+                        )
         .andExpect(status().isNoContent());
 
         verify(userService).activate(areaId, VOTER_ID, false);
@@ -156,8 +154,7 @@ public class UserManagementControllerTest extends AbstractControllerTest {
                 .param("roles", rolesString)
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .with(god())
-                .with(csrf())
-        )
+                        )
         .andExpect(status().isNoContent());
 
         verify(userService).setRoles(areaId, VOTER_ID, expectedRoles);

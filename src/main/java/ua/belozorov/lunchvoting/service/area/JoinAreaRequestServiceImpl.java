@@ -49,7 +49,7 @@ public final class JoinAreaRequestServiceImpl implements JoinAreaRequestService 
     @Override
     @Transactional
     public JoinAreaRequest make(User requester, String areaId) {
-        EatingArea area = areaRepository.getArea(areaId);
+        EatingArea area = areaService.getArea(areaId);
         JoinAreaRequest request = new JoinAreaRequest(requester, area);
         return areaRepository.save(request);
     }

@@ -2,11 +2,14 @@ package ua.belozorov.lunchvoting;
 
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.filter.HttpPutFormContentFilter;
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 import ua.belozorov.lunchvoting.config.RootConfig;
 import ua.belozorov.lunchvoting.config.ServiceBeansConfig;
 import ua.belozorov.lunchvoting.config.WebConfig;
 import ua.belozorov.lunchvoting.config.WebSecurityConfig;
+
+import javax.servlet.Filter;
 
 /**
  * Application Initializer class
@@ -29,6 +32,11 @@ public class LunchVotingApplication extends AbstractAnnotationConfigDispatcherSe
     @Override
     protected String[] getServletMappings() {
         return new String[] {"/"};
+    }
+
+    @Override
+    protected Filter[] getServletFilters() {
+        return new Filter[]{new HttpPutFormContentFilter()};
     }
 
     @Override

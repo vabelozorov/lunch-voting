@@ -36,8 +36,7 @@ public class MenuControllerValidationTest extends AbstractControllerTest {
                         post(REST_URL, "any", "any")
                                 .content( jsonUtils.toJson(sent))
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .with(csrf())
-                                .with(god())
+                                                                .with(god())
                 )
                 .andExpect(status().isBadRequest())
                 .andReturn();

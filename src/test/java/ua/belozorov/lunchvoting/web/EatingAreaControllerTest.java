@@ -21,7 +21,6 @@ import ua.belozorov.lunchvoting.model.voting.polling.TimeConstraint;
 import ua.belozorov.lunchvoting.service.area.EatingAreaService;
 import ua.belozorov.lunchvoting.service.lunchplace.LunchPlaceService;
 import ua.belozorov.lunchvoting.service.voting.PollService;
-import ua.belozorov.lunchvoting.to.LunchPlaceTo;
 import ua.belozorov.lunchvoting.to.PollTo;
 import ua.belozorov.lunchvoting.to.UserTo;
 import ua.belozorov.lunchvoting.util.ControllerUtils;
@@ -39,7 +38,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static ua.belozorov.lunchvoting.DateTimeFormatters.DATE_FORMATTER;
 import static ua.belozorov.lunchvoting.model.UserTestData.*;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
 
 /**
 
@@ -104,8 +102,7 @@ public class EatingAreaControllerTest extends AbstractControllerTest {
                         post(REST_URL).param("name", name)
                         .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                         .accept(MediaType.APPLICATION_JSON)
-                        .with(csrf())
-                        .with(voter())
+                                                .with(voter())
                 )
                 .andExpect(status().isCreated())
                 .andReturn();
@@ -132,8 +129,7 @@ public class EatingAreaControllerTest extends AbstractControllerTest {
                         post(REST_URL).param("name", tooShortName)
                                 .accept(MediaType.APPLICATION_JSON)
                                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                                .with(csrf())
-                                .with(voter())
+                                                                .with(voter())
                 )
                 .andExpect(status().isBadRequest())
                 .andReturn();
@@ -150,8 +146,7 @@ public class EatingAreaControllerTest extends AbstractControllerTest {
                         post(REST_URL).param("name", duplicateName)
                         .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                         .accept(MediaType.APPLICATION_JSON)
-                        .with(csrf())
-                        .with(voter())
+                                                .with(voter())
                 )
                 .andExpect(status().isConflict())
                 .andReturn();
@@ -179,8 +174,7 @@ public class EatingAreaControllerTest extends AbstractControllerTest {
                         .content(jsonUtils.toJson(VOTER))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
-                        .with(csrf())
-                        .with(god())
+                                                .with(god())
                 )
                 .andExpect(status().isCreated())
                 .andReturn();
@@ -208,8 +202,7 @@ public class EatingAreaControllerTest extends AbstractControllerTest {
                                 .content(jsonUtils.toJson(userTo))
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .with(god())
-                                .with(csrf())
-                )
+                                                )
                 .andExpect(status().isBadRequest())
                 .andReturn();
         ErrorInfo errorInfo = new ErrorInfo(
@@ -232,8 +225,7 @@ public class EatingAreaControllerTest extends AbstractControllerTest {
                         .content(jsonUtils.toJson(VOTER))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
-                        .with(csrf())
-                        .with(god())
+                                                .with(god())
                 )
                 .andExpect(status().isConflict())
                 .andReturn();
@@ -250,26 +242,26 @@ public class EatingAreaControllerTest extends AbstractControllerTest {
 
     @Test
     public void createPlaceInArea() throws Exception {
-        Set<String> phones = ImmutableSet.of("0661234567", "0441234567");
-        LunchPlaceTo dto = new LunchPlaceTo("New PLace", null, null, phones);
-        LunchPlace place = new LunchPlace(dto.getName());
+        Map<String, Object> jsonValues = getNewLunchPlaceMap();
+        LunchPlace place = new LunchPlace((String)jsonValues.get("name"));
 
-        when(areaService.createPlaceInArea(areaId, null, dto.getName(), null, null, phones))
-                .thenReturn(place);
+        when(areaService.createPlaceInArea(areaId, null, (String)jsonValues.get("name"),
+                (String)jsonValues.get("address"), (String)jsonValues.get("description"), (Set<String>) jsonValues.get("phones")
+        )).thenReturn(place);
 
         MvcResult result = mockMvc
                 .perform(
                         post(REST_URL + "/{areaId}/places", testAreas.getFirstAreaId())
-                        .content(jsonUtils.toJson(dto))
+                        .content(jsonUtils.toJson(jsonValues))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
-                        .with(csrf())
-                        .with(god())
+                                                .with(god())
                 )
                 .andExpect(status().isCreated())
                 .andReturn();
-
-        verify(areaService).createPlaceInArea(areaId, null, dto.getName(), null, null, phones);
+        verify(areaService).createPlaceInArea(
+                areaId, null, (String)jsonValues.get("name"),
+                (String)jsonValues.get("address"), (String)jsonValues.get("description"), (Set<String>) jsonValues.get("phones"));
 
         String uri = jsonUtils.locationFromMvcResult(result);
         String id = getCreatedId(uri);
@@ -277,6 +269,16 @@ public class EatingAreaControllerTest extends AbstractControllerTest {
         when(placeService.getMultiple(areaId, Collections.singleton(id))).thenReturn(Arrays.asList(place));
 
         mockMvc.perform(get(uri).with(voter()).accept(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
+    }
+
+    private Map<String, Object> getNewLunchPlaceMap() {
+        Set<String> phones = ImmutableSet.of("0661234567", "0441234567");
+        Map<String, Object> jsonValues = new HashMap<>();
+        jsonValues.put("name", "Дача");
+        jsonValues.put("address", "Французский бул., 85");
+        jsonValues.put("description", "Приходите к закату");
+        jsonValues.put("phones", phones);
+        return jsonValues;
     }
 
     @Test
@@ -292,8 +294,7 @@ public class EatingAreaControllerTest extends AbstractControllerTest {
                         .param("menuDate", date)
                         .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                         .accept(MediaType.APPLICATION_JSON)
-                        .with(csrf())
-                        .with(god())
+                                                .with(god())
                 )
                 .andExpect(status().isCreated())
                 .andReturn();
@@ -304,7 +305,6 @@ public class EatingAreaControllerTest extends AbstractControllerTest {
         String id = getCreatedId(location);
 
         when(pollService.getWithPollItems(areaId, id)).thenReturn(testPolls.getActivePoll());
-
 
         String expected = mockMvc.perform(get(location).with(voter()).accept(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse().getContentAsString();
@@ -323,8 +323,7 @@ public class EatingAreaControllerTest extends AbstractControllerTest {
                         put(REST_URL)
                         .param("name", "NEW_AWESOME_NAME")
                         .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                        .with(csrf())
-                        .with(god())
+                                                .with(god())
                 )
                 .andExpect(status().isNoContent());
 
@@ -342,8 +341,7 @@ public class EatingAreaControllerTest extends AbstractControllerTest {
                         put(REST_URL)
                                 .param("name", duplicateName)
                                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                                .with(csrf())
-                                .with(god())
+                                                                .with(god())
                 )
                 .andExpect(status().isConflict())
                 .andReturn();
@@ -430,8 +428,7 @@ public class EatingAreaControllerTest extends AbstractControllerTest {
     @Test
     public void testDelete() throws Exception {
         mockMvc.perform(delete(REST_URL)
-                .with(csrf())
-                .with(god())
+                                .with(god())
         )
         .andExpect(status().isNoContent());
 

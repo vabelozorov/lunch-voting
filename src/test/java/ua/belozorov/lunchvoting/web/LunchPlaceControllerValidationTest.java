@@ -38,8 +38,7 @@ public class LunchPlaceControllerValidationTest extends AbstractControllerTest {
                         put(REST_URL + "/{id}", areaId, PLACE4_ID)
                         .content(jsonUtils.toJson(to))
                         .contentType(MediaType.APPLICATION_JSON)
-                        .with(csrf())
-                        .with(god())
+                                                .with(god())
                 )
                 .andExpect(status().isBadRequest())
                 .andReturn();

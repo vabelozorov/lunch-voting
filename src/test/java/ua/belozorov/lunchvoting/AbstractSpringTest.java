@@ -18,7 +18,7 @@ import javax.sql.DataSource;
  * Created on 14.01.17.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ActiveProfiles({SPRING_PROFILES.DB.HSQL, SPRING_PROFILES.SQL_DEBUG})
+@ActiveProfiles({SPRING_PROFILES.DB.HSQL, SPRING_PROFILES.SQL_DEBUG}) //Keep second one to pass the sql query count asserts!
 @ContextConfiguration(classes = {RootConfig.class})
 public abstract class AbstractSpringTest extends AbstractTest {
 

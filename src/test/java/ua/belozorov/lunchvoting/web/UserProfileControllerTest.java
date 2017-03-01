@@ -53,7 +53,6 @@ public class UserProfileControllerTest extends AbstractControllerTest {
                         post(REST_URL)
                         .content(jsonUtils.toJson(userTo))
                         .contentType(MediaType.APPLICATION_JSON)
-                        .with(csrf())
                 )
                 .andExpect(status().isCreated())
                 .andReturn();
@@ -74,8 +73,7 @@ public class UserProfileControllerTest extends AbstractControllerTest {
                 put(REST_URL + "/{userId}", VOTER_ID)
                 .content(jsonUtils.toJson(userTo))
                 .contentType(MediaType.APPLICATION_JSON)
-                .with(csrf())
-                .with(voter())
+                                .with(voter())
         )
         .andExpect(status().isNoContent());
         verify(profileService).updateMainInfo(VOTER_ID, VOTER.getName(), "newEmail@email.com", "newPassword");
@@ -86,7 +84,6 @@ public class UserProfileControllerTest extends AbstractControllerTest {
         String actual = mockMvc
                 .perform(
                         get(REST_URL)
-                        .with(csrf())
                         .with(voter())
                 )
                 .andExpect(status().isOk())

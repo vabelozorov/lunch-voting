@@ -55,8 +55,7 @@ public class LunchPlaceControllerTest extends AbstractControllerTest {
                 put(REST_URL + "/{id}",  areaId, PLACE4_ID)
                 .content(jsonUtils.toJson(to))
                 .contentType(MediaType.APPLICATION_JSON)
-                .with(csrf())
-                .with(god())
+                                .with(god())
         )
         .andExpect(status().isNoContent());
 
@@ -82,8 +81,7 @@ public class LunchPlaceControllerTest extends AbstractControllerTest {
                         .content(jsonUtils.toJson(to))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
-                        .with(csrf())
-                        .with(god())
+                                                .with(god())
                 )
                 .andExpect(status().isConflict()).andReturn();
         ErrorInfo errorInfo = new ErrorInfo(
@@ -346,8 +344,7 @@ public class LunchPlaceControllerTest extends AbstractControllerTest {
     public void testDelete() throws Exception {
         mockMvc.perform(
                 delete(REST_URL + "/{id}", areaId, PLACE4_ID)
-                        .with(csrf())
-                        .with(god())
+                                                .with(god())
         )
                 .andExpect(status().isNoContent());
 

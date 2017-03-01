@@ -27,6 +27,8 @@ import java.net.URI;
 import java.time.LocalDate;
 import java.util.Collections;
 
+import static ua.belozorov.lunchvoting.util.ControllerUtils.toMap;
+
 /**
  * A controller to manage {@link Menu} objects
  *
@@ -119,7 +121,7 @@ public class MenuController {
         Menu created = placeService.addMenu(areaId, placeId, menuTo.getEffectiveDate(), menuTo.getDishes());
         URI uri = ServletUriComponentsBuilder.fromCurrentContextPath().path(REST_URL + "/{id}")
                 .buildAndExpand(areaId, placeId, created.getId()).toUri();
-        return ResponseEntity.created(uri).build();
+        return ResponseEntity.created(uri).body(toMap("menuId", created.getId()));
     }
 
     /**

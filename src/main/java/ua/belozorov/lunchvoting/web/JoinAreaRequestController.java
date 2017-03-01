@@ -32,7 +32,7 @@ import static ua.belozorov.lunchvoting.util.ControllerUtils.toMap;
 @RestController
 @RequestMapping(JoinAreaRequestController.REST_URL)
 public class JoinAreaRequestController {
-    static final String REST_URL = "/api/{areaId}/requests";
+    static final String REST_URL = "/api/areas/{areaId}/requests";
 
     private final JoinAreaRequestService requestService;
 
@@ -56,7 +56,7 @@ public class JoinAreaRequestController {
      * <table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px; padding:3px;">
      *     <tr>
      *         <td>HTTP Request</td>
-     *         <td><font style="color:green"><code>HTTP POST /api/{areaId}/requests 201</code></font><br>
+     *         <td><font style="color:green"><code>HTTP POST /api/areas/{areaId}/requests 201</code></font><br>
      *             <b>{areaId}</b> existing {@link EatingArea} ID<br>
      *         </td>
      *     </tr>
@@ -97,7 +97,7 @@ public class JoinAreaRequestController {
     public ResponseEntity makeRequest(@PathVariable("areaId") String areaId) {
         JoinAreaRequest request = requestService.make(AuthorizedUser.get(), areaId);
         URI uri = ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path("{base}/{id}").buildAndExpand(REST_URL, request.getId()).toUri();
+                .path(REST_URL + "/{id}").buildAndExpand(areaId, request.getId()).toUri();
         return ResponseEntity.created(uri).body(toMap("id", request.getId()));
     }
 
@@ -107,7 +107,7 @@ public class JoinAreaRequestController {
      * <table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px; padding:3px;">
      *     <tr>
      *         <td>HTTP Request</td>
-     *         <td><font style="color:green"><code>HTTP GET /api/{areaId}/requests/{requestId} 200</code></font><br>
+     *         <td><font style="color:green"><code>HTTP GET /api/areas/{areaId}/requests/{requestId} 200</code></font><br>
      *             <b>{areaId}</b> existing {@link EatingArea} ID<br>
      *             <b>{areaId}</b> existing {@link JoinAreaRequest} ID<br>
      *         </td>
@@ -156,7 +156,7 @@ public class JoinAreaRequestController {
      * <table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px; padding:3px;">
      *     <tr>
      *         <td>HTTP Request</td>
-     *         <td><font style="color:green"><code>HTTP GET /api/{areaId}/requests 200</code></font><br>
+     *         <td><font style="color:green"><code>HTTP GET /api/areas/{areaId}/requests 200</code></font><br>
      *             <b>{areaId}</b> existing {@link EatingArea} ID<br>
      *         </td>
      *     </tr>
@@ -204,7 +204,7 @@ public class JoinAreaRequestController {
      * <table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px; padding:3px;">
      *     <tr>
      *         <td>HTTP Request</td>
-     *         <td><font style="color:green"><code>HTTP GET /api/{areaId}/requests 200</code></font><br>
+     *         <td><font style="color:green"><code>HTTP GET /api/areas/{areaId}/requests 200</code></font><br>
      *             <b>{areaId}</b> existing {@link EatingArea} ID<br>
      *         </td>
      *     </tr>
@@ -245,7 +245,7 @@ public class JoinAreaRequestController {
      * <table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px; padding:3px;">
      *     <tr>
      *         <td>HTTP Request</td>
-     *         <td><font style="color:green"><code>HTTP PUT /api/{areaId}/requests/{requestId} 204</code></font><br>
+     *         <td><font style="color:green"><code>HTTP PUT /api/areas/{areaId}/requests/{requestId} 204</code></font><br>
      *             <b>{areaId}</b> existing {@link EatingArea} ID<br>
      *             <b>{requestId}</b> existing {@link JoinAreaRequest} ID
      *         </td>
@@ -301,7 +301,7 @@ public class JoinAreaRequestController {
      * <table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px; padding:3px;">
      *     <tr>
      *         <td>HTTP Request</td>
-     *         <td><font style="color:green"><code>HTTP PUT /api/{areaId}/requests/{requestId} 204</code></font><br>
+     *         <td><font style="color:green"><code>HTTP PUT /api/areas/{areaId}/requests/{requestId} 204</code></font><br>
      *             <b>{areaId}</b> existing {@link EatingArea} ID<br>
      *             <b>{requestId}</b> existing {@link JoinAreaRequest} ID
      *         </td>
@@ -350,7 +350,7 @@ public class JoinAreaRequestController {
      * <table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px; padding:3px;">
      *     <tr>
      *         <td>HTTP Request</td>
-     *         <td><font style="color:green"><code>HTTP PUT /api/{areaId}/requests/{requestId} 204</code></font><br>
+     *         <td><font style="color:green"><code>HTTP PUT /api/areas/{areaId}/requests/{requestId} 204</code></font><br>
      *             <b>{areaId}</b> existing {@link EatingArea} ID<br>
      *             <b>{requestId}</b> existing {@link JoinAreaRequest} ID
      *         </td>

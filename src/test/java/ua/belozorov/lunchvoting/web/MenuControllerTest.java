@@ -60,8 +60,7 @@ public class MenuControllerTest extends AbstractControllerTest {
                         post(REST_URL, areaId, "placeId")
                         .content( jsonUtils.toJson(sent))
                         .contentType(MediaType.APPLICATION_JSON)
-                        .with(csrf())
-                        .with(god())
+                                                .with(god())
                 )
                 .andExpect(status().isCreated())
                 .andReturn();
@@ -76,7 +75,6 @@ public class MenuControllerTest extends AbstractControllerTest {
         mockMvc.perform(get(uri).with(voter()).accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
-
 
     @Test
     public void getMenuWithDishes() throws Exception {
@@ -105,8 +103,7 @@ public class MenuControllerTest extends AbstractControllerTest {
     public void testDelete() throws Exception {
         mockMvc.perform(
                 delete(REST_URL + "/{menuId}", areaId, "placeId", "menuId")
-                .with(csrf())
-                .with(god())
+                                .with(god())
         )
         .andExpect(status().isNoContent());
         verify(placeService).deleteMenu(areaId, "placeId","menuId");

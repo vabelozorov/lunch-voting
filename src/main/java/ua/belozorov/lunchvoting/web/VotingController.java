@@ -171,7 +171,7 @@ public class VotingController {
      * <table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px; padding:3px;">
      *     <tr>
      *         <td>HTTP Request</td>
-     *         <td><font style="color:green"><code>HTTP GET /api/areas/{areaId}/votes 200</code></font><br>
+     *         <td><font style="color:green"><code>HTTP GET /api/areas/{areaId}/votes/results 200</code></font><br>
      *             <b>{areaId}</b> existing {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea} ID
      *         </td>
      *     </tr>
@@ -181,7 +181,7 @@ public class VotingController {
      *     </tr>
      *     <tr>
      *         <td>Required Request Parameters</td>
-     *         <td><code>type</code></td>
+     *         <td><code>type=item,pollId</code></td>
      *     </tr>
      *     <tr>
      *         <td>Optional Parameters</td>
@@ -237,7 +237,7 @@ public class VotingController {
      *     </tr>
      *     <tr>
      *         <td>Required Request Parameters</td>
-     *         <td><code>filterBy, pollId</code></td>
+     *         <td><code>filterBy=voter, pollId</code></td>
      *     </tr>
      *     <tr>
      *         <td>Optional Parameters</td>

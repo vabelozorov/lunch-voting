@@ -2,12 +2,15 @@ package ua.belozorov.lunchvoting.model.lunchplace;
 
 import lombok.Builder;
 import lombok.Getter;
+import ua.belozorov.lunchvoting.exceptions.JoinRequestException;
 import ua.belozorov.lunchvoting.model.User;
 import ua.belozorov.lunchvoting.model.base.AbstractPersistableObject;
 import ua.belozorov.lunchvoting.util.ExceptionUtils;
+import ua.belozorov.lunchvoting.web.exceptionhandling.ErrorCode;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 import static ua.belozorov.lunchvoting.util.ExceptionUtils.NOT_CHECK;
 
@@ -71,6 +74,10 @@ public final class JoinAreaRequest extends AbstractPersistableObject {
         super(id, version);
 
         ExceptionUtils.checkParamsNotNull(NOT_CHECK, NOT_CHECK, requester, area, created, NOT_CHECK, status);
+
+        if (Objects.equals(area.getId(), requester.getAreaId())) {
+            throw new JoinRequestException(ErrorCode.JAR_REQUESTER_ALREADY_IN_AREA);
+        }
 
         this.requester = requester;
         this.area = area;

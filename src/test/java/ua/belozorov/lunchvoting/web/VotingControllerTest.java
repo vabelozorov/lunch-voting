@@ -54,8 +54,7 @@ public class VotingControllerTest extends AbstractControllerTest {
                     .param("pollItemId", itemId)
                     .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                     .accept(MediaType.APPLICATION_JSON)
-                    .with(csrf())
-                    .with(god()) // actually VOTER right is enough, but GOD is the only who hasn't voted
+                                        .with(god()) // actually VOTER right is enough, but GOD is the only who hasn't voted
                 )
                 .andExpect(status().isCreated())
                 .andReturn()
@@ -155,7 +154,6 @@ public class VotingControllerTest extends AbstractControllerTest {
                 .perform(
                         delete(REST_URL + "/{voteId}", areaId, voteId)
                         .accept(MediaType.APPLICATION_JSON)
-                        .with(csrf())
                         .with(voter())
                 )
                 .andExpect(status().isNoContent())

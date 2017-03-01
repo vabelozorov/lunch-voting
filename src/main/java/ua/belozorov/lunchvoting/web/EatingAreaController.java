@@ -241,7 +241,7 @@ public class EatingAreaController {
                 new DuplicateDataException(ErrorCode.DUPLICATE_PLACE_NAME, new Object[]{dto.getName()})
         );
         URI uri = ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path("{base}/{id}").buildAndExpand(LunchPlaceController.REST_URL, created.getId()).toUri();
+                .path(LunchPlaceController.REST_URL + "/{id}").buildAndExpand(areaId, created.getId()).toUri();
         return ResponseEntity.created(uri).body(toMap("id", created.getId()));
     }
 
@@ -309,7 +309,7 @@ public class EatingAreaController {
         LunchPlacePoll poll = areaService.createPollInArea(areaId, menuDate, start, end, change);
         URI uri = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path(PollController.REST_URL + "/{id}").buildAndExpand(areaId, poll.getId()).toUri();
-        return ResponseEntity.created(uri).build();
+        return ResponseEntity.created(uri).body(toMap("pollId", poll.getId()));
     }
 
     /**
