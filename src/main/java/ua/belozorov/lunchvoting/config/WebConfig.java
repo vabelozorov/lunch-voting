@@ -18,6 +18,7 @@ import org.springframework.format.FormatterRegistry;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.validation.Validator;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
@@ -33,6 +34,7 @@ import java.util.List;
  */
 @Configuration
 @EnableWebMvc
+@EnableGlobalMethodSecurity(securedEnabled = true)
 @ComponentScan({"ua.belozorov.lunchvoting.web"})
 public class WebConfig extends WebMvcConfigurerAdapter {
 

@@ -5,6 +5,7 @@ import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.ContextHierarchy;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
@@ -13,9 +14,11 @@ import org.springframework.web.context.WebApplicationContext;
 import ua.belozorov.lunchvoting.AbstractSpringTest;
 import ua.belozorov.lunchvoting.JsonUtils;
 import ua.belozorov.lunchvoting.TestConfig;
+import ua.belozorov.lunchvoting.config.RootConfig;
+import ua.belozorov.lunchvoting.config.ServiceBeansConfig;
 import ua.belozorov.lunchvoting.config.WebConfig;
 import ua.belozorov.lunchvoting.config.WebSecurityConfig;
-import ua.belozorov.lunchvoting.mocks.ServicesTestConfig;
+import ua.belozorov.lunchvoting.mocks.TestServiceBeansConfig;
 
 import java.util.Arrays;
 
@@ -23,14 +26,15 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static ua.belozorov.lunchvoting.model.UserTestData.*;
 
-//import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
-
 /**
  * Created by vabelozorov on 15.11.16.
  */
-@ContextConfiguration(classes =
-        {WebConfig.class, ServicesTestConfig.class, WebSecurityConfig.class, TestConfig.class}
-)
+@ContextHierarchy({
+        @ContextConfiguration(classes = {RootConfig.class, TestServiceBeansConfig.class, WebSecurityConfig.class}),
+        @ContextConfiguration(classes = {
+                WebConfig.class, TestConfig.class, TestConfig.class
+        })
+})
 @WebAppConfiguration
 public abstract class AbstractControllerTest extends AbstractSpringTest {
 

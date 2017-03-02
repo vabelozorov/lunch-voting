@@ -16,7 +16,7 @@ import javax.sql.DataSource;
 @Configuration
 @PropertySource("classpath:db/hsql.properties")
 @Profile({SPRING_PROFILES.DB.HSQL})
-public class HsqlDataSource {
+public class HsqlDataSourceConfig {
 
     @Autowired
     private Environment env;

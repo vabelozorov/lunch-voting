@@ -7,13 +7,15 @@ import org.springframework.jdbc.datasource.init.DatabasePopulatorUtils;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.test.context.ContextConfiguration;
 import ua.belozorov.lunchvoting.AbstractSpringTest;
+import ua.belozorov.lunchvoting.config.RootConfig;
 import ua.belozorov.lunchvoting.config.ServiceBeansConfig;
+import ua.belozorov.lunchvoting.config.WebSecurityConfig;
 
 /**
  *
  * Created on 17.11.16.
  */
-@ContextConfiguration(classes = ServiceBeansConfig.class)
+@ContextConfiguration(classes = {RootConfig.class, ServiceBeansConfig.class, WebSecurityConfig.class})
 public abstract class AbstractServiceTest extends AbstractSpringTest {
 
     private final ResourceDatabasePopulator populator = new ResourceDatabasePopulator(

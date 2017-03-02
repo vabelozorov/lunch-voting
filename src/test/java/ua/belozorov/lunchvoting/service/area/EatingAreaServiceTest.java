@@ -10,7 +10,6 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 import ua.belozorov.lunchvoting.exceptions.DuplicateDataException;
 import ua.belozorov.lunchvoting.exceptions.NoAreaAdminException;
-import ua.belozorov.lunchvoting.exceptions.NotFoundException;
 import ua.belozorov.lunchvoting.model.User;
 import ua.belozorov.lunchvoting.model.UserRole;
 import ua.belozorov.lunchvoting.model.lunchplace.AreaTestData;
@@ -91,7 +90,7 @@ public class EatingAreaServiceTest extends AbstractServiceTest {
         ExceptionUtils.executeAndUnwrapException(
                 () -> areaService.create(testAreas.getFirstAreaName(), creator),
                 ConstraintViolationException.class,
-                new DuplicateDataException(ErrorCode.DUPLICATE_AREA_NAME, new Object[]{testAreas.getFirstAreaName()})
+                new DuplicateDataException(ErrorCode.AREA_DUPLICATE_NAME, new Object[]{testAreas.getFirstAreaName()})
         );
     }
 

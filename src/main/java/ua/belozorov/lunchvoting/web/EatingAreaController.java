@@ -104,7 +104,7 @@ public class EatingAreaController {
         EatingArea area = ExceptionUtils.executeAndUnwrapException(
                 () -> areaService.create(name, AuthorizedUser.get()),
                 ConstraintViolationException.class,
-                new DuplicateDataException(ErrorCode.DUPLICATE_AREA_NAME, new Object[]{name})
+                new DuplicateDataException(ErrorCode.AREA_DUPLICATE_NAME, new Object[]{name})
         );
         URI uri = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path("{base}/{id}").buildAndExpand(REST_URL, area.getId()).toUri();
@@ -358,7 +358,7 @@ public class EatingAreaController {
         ExceptionUtils.executeAndUnwrapException(
                 () -> {areaService.updateAreaName(name, AuthorizedUser.get()); return null; },
                 ConstraintViolationException.class,
-                new DuplicateDataException(ErrorCode.DUPLICATE_AREA_NAME, new Object[]{name})
+                new DuplicateDataException(ErrorCode.AREA_DUPLICATE_NAME, new Object[]{name})
         );
         return ResponseEntity.noContent().build();
     }

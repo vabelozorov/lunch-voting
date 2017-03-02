@@ -5,7 +5,7 @@
     <!--<jmxConfigurator/>-->
 
     <!--<appender name="file" class="ch.qos.logback.core.FileAppender">-->
-        <!--<file>${LV_ROOT}/log/topjava.log</file>-->
+        <!--<file>/tmp/log/lv.log</file>-->
 
         <!--<encoder>-->
             <!--<charset>UTF-8</charset>-->
@@ -20,7 +20,7 @@
         </encoder>
     </appender>
 
-    <logger name="org.springframework.web" level="info"/>
+    <logger name="org.springframework.web" level="ERROR"/>
     <logger name="org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver" level="debug"/>
     <!--<logger name="org.springframework.security" level="debug"/>-->
     <logger name="ua.belozorov.lunchvoting" level="debug"/>

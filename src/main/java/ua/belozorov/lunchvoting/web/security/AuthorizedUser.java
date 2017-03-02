@@ -2,7 +2,11 @@ package ua.belozorov.lunchvoting.web.security;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import ua.belozorov.lunchvoting.exceptions.AuthenticationException;
 import ua.belozorov.lunchvoting.model.User;
+import ua.belozorov.lunchvoting.web.exceptionhandling.ErrorCode;
+
+import static java.util.Optional.ofNullable;
 
 /**
  *
@@ -11,19 +15,12 @@ import ua.belozorov.lunchvoting.model.User;
 public class AuthorizedUser {
 
     public static User get() {
-        return get(true);
-    }
-
-    public static User get(boolean requiresNonNull) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (requiresNonNull && authentication == null) {
-            throw new IllegalStateException("Authentication object expected, but got none");
-        }
-        User principal = (User) authentication.getPrincipal();
-        if (requiresNonNull && principal == null) {
-            throw new IllegalStateException("Authenticated user expected, but got none");
-        }
-        return principal;
+        return ofNullable(authentication)
+                .map(Authentication::getPrincipal)
+                .filter(principal -> principal instanceof User)
+                .map(principal -> (User) principal)
+                .orElseThrow(() -> new AuthenticationException(ErrorCode.AUTH_CREDENTIALS_NOT_FOUND));
     }
 
     public static String getId() {
@@ -37,7 +34,7 @@ public class AuthorizedUser {
     public static String getAreaId(boolean requiresNotNull) {
         String areaId = get().getAreaId();
         if ( requiresNotNull && areaId == null) {
-            throw new IllegalStateException("User" + getId() + " is not assigned to any area, but method expects this");
+            throw new AuthenticationException(ErrorCode.AUTH_AREA_NOT_ASSIGNED);
         }
         return areaId;
     }

@@ -5,18 +5,14 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MvcResult;
-import ua.belozorov.lunchvoting.mocks.ServicesTestConfig;
 import ua.belozorov.lunchvoting.model.User;
 import ua.belozorov.lunchvoting.service.user.UserProfileService;
 import ua.belozorov.lunchvoting.to.UserTo;
-import ua.belozorov.lunchvoting.util.ControllerUtils;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -70,10 +66,10 @@ public class UserProfileControllerTest extends AbstractControllerTest {
         UserTo userTo = new UserTo(VOTER.getName(), "newEmail@email.com", "newPassword");
 
         mockMvc.perform(
-                put(REST_URL + "/{userId}", VOTER_ID)
+                put(REST_URL)
                 .content(jsonUtils.toJson(userTo))
                 .contentType(MediaType.APPLICATION_JSON)
-                                .with(voter())
+                .with(voter())
         )
         .andExpect(status().isNoContent());
         verify(profileService).updateMainInfo(VOTER_ID, VOTER.getName(), "newEmail@email.com", "newPassword");

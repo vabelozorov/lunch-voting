@@ -1,5 +1,7 @@
 package ua.belozorov.lunchvoting;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.filter.HttpPutFormContentFilter;
@@ -18,6 +20,11 @@ import javax.servlet.Filter;
  */
 
 public class LunchVotingApplication extends AbstractAnnotationConfigDispatcherServletInitializer {
+    private final static Logger logger = LoggerFactory.getLogger(LunchVotingApplication.class);
+
+    public LunchVotingApplication() {
+        logger.debug("Initializing primary application class...");
+    }
 
     @Override
     protected Class<?>[] getRootConfigClasses() {

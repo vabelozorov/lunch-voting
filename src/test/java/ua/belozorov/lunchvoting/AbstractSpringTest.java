@@ -4,9 +4,14 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.ContextHierarchy;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.PlatformTransactionManager;
 import ua.belozorov.lunchvoting.config.RootConfig;
+import ua.belozorov.lunchvoting.config.ServiceBeansConfig;
+import ua.belozorov.lunchvoting.config.WebConfig;
+import ua.belozorov.lunchvoting.config.WebSecurityConfig;
+import ua.belozorov.lunchvoting.mocks.TestServiceBeansConfig;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -19,7 +24,6 @@ import javax.sql.DataSource;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ActiveProfiles({SPRING_PROFILES.DB.HSQL, SPRING_PROFILES.SQL_DEBUG}) //Keep second one to pass the sql query count asserts!
-@ContextConfiguration(classes = {RootConfig.class})
 public abstract class AbstractSpringTest extends AbstractTest {
 
     @Autowired

@@ -140,7 +140,7 @@ public class EatingAreaControllerTest extends AbstractControllerTest {
     public void e409AndMessageOnCreateAreaWithDuplicateName() throws Exception {
         String duplicateName = "name";
         when(areaService.create(duplicateName, VOTER))
-                .thenThrow(new DuplicateDataException(ErrorCode.DUPLICATE_AREA_NAME, new Object[]{duplicateName}));
+                .thenThrow(new DuplicateDataException(ErrorCode.AREA_DUPLICATE_NAME, new Object[]{duplicateName}));
         MvcResult result = mockMvc
                 .perform(
                         post(REST_URL).param("name", duplicateName)
@@ -152,7 +152,7 @@ public class EatingAreaControllerTest extends AbstractControllerTest {
                 .andReturn();
         ErrorInfo errorInfo = new ErrorInfo(
                 result.getRequest().getRequestURL(),
-                ErrorCode.DUPLICATE_AREA_NAME,
+                ErrorCode.AREA_DUPLICATE_NAME,
                 "Area name " + duplicateName + " already exists"
         );
         assertJson(
@@ -333,7 +333,7 @@ public class EatingAreaControllerTest extends AbstractControllerTest {
     @Test
     public void failsToUpdateAreaNameWhenNameExists() throws Exception {
         String duplicateName = "NEW_AWESOME_NAME";
-        doThrow(new DuplicateDataException(ErrorCode.DUPLICATE_AREA_NAME, new Object[]{duplicateName}))
+        doThrow(new DuplicateDataException(ErrorCode.AREA_DUPLICATE_NAME, new Object[]{duplicateName}))
                 .when(areaService).updateAreaName(duplicateName, GOD);
 
         MvcResult result = mockMvc
@@ -347,7 +347,7 @@ public class EatingAreaControllerTest extends AbstractControllerTest {
                 .andReturn();
         ErrorInfo errorInfo = new ErrorInfo(
                 result.getRequest().getRequestURL(),
-                ErrorCode.DUPLICATE_AREA_NAME,
+                ErrorCode.AREA_DUPLICATE_NAME,
                 "Area name " + duplicateName + " already exists"
         );
         assertJson(
@@ -433,5 +433,23 @@ public class EatingAreaControllerTest extends AbstractControllerTest {
         .andExpect(status().isNoContent());
 
         verify(areaService).delete(areaId);
+    }
+
+    @Test
+    public void failsToDeleteAreaWithoutAdminRight() throws Exception {
+        MvcResult result = mockMvc.perform(delete(REST_URL)
+                .with(voter())
+        )
+                .andExpect(status().isUnauthorized())
+                .andReturn();
+        ErrorInfo errorInfo = new ErrorInfo(
+                result.getRequest().getRequestURL(),
+                ErrorCode.AUTH_NO_PERMISSIONS,
+                ErrorCode.AUTH_NO_PERMISSIONS.name().toLowerCase()
+        );
+        assertJson(
+                jsonUtils.toJson(errorInfo),
+                result.getResponse().getContentAsString()
+        );
     }
 }

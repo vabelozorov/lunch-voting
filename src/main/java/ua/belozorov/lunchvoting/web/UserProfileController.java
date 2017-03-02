@@ -103,8 +103,7 @@ public class UserProfileController {
      * <table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px; padding:3px;">
      *     <tr>
      *         <td>HTTP Request</td>
-     *         <td><font style="color:green"><code>HTTP PUT /api/profile/{userId} 204</code></font><br>
-     *             <b>{userId}</b> existing {@link User} ID
+     *         <td><font style="color:green"><code>HTTP PUT /api/profile 204</code></font><br>
      *         </td>
      *     </tr>
      *     <tr>
@@ -127,7 +126,6 @@ public class UserProfileController {
      *
      *
      * If a certain {@link User}  property is not changed, its old value should be included in the request.
-     * @param userId  existing {@link User} ID
      * @param userTo three non-empty parameters must be present in the JSON object:
      * <ul>
      *  <li><strong>name</strong>  new name of the User, must be between 2 and 100 characters long</li>
@@ -143,13 +141,12 @@ public class UserProfileController {
      *  <ul>
      *      <li>HTTP Status 400 Bad_Syntax is returned if parameter validation fails</li>
      *      <li>HTTP Status 409 Conflict is returned if the submitted email value is not unique</li>
-     *      <li>HTTP Status 404 Not_Found is returned if a {@link User}  with the given ID does not exist</li>
      *  </ul>
      */
-    @PutMapping("/{userId}")
+    @PutMapping
     @IsAdminOrVoter
-    public ResponseEntity update(@PathVariable String userId,
-                                 @RequestBody @Validated(UserTo.Update.class)UserTo userTo) {
+    public ResponseEntity update(@RequestBody @Validated(UserTo.Update.class)UserTo userTo) {
+        String userId = AuthorizedUser.getId();
         ExceptionUtils.executeAndUnwrapException(
                 () -> {
                     profileService.updateMainInfo(userId, userTo.getName(), userTo.getEmail(), userTo.getPassword());
