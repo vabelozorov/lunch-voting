@@ -2,7 +2,7 @@ package ua.belozorov.lunchvoting.web.security;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import ua.belozorov.lunchvoting.exceptions.AuthenticationException;
+import ua.belozorov.lunchvoting.exceptions.CannotIdentifyException;
 import ua.belozorov.lunchvoting.model.User;
 import ua.belozorov.lunchvoting.web.exceptionhandling.ErrorCode;
 
@@ -20,7 +20,7 @@ public class AuthorizedUser {
                 .map(Authentication::getPrincipal)
                 .filter(principal -> principal instanceof User)
                 .map(principal -> (User) principal)
-                .orElseThrow(() -> new AuthenticationException(ErrorCode.AUTH_CREDENTIALS_NOT_FOUND));
+                .orElseThrow(() -> new CannotIdentifyException(ErrorCode.AUTH_CREDENTIALS_NOT_FOUND));
     }
 
     public static String getId() {
@@ -34,7 +34,7 @@ public class AuthorizedUser {
     public static String getAreaId(boolean requiresNotNull) {
         String areaId = get().getAreaId();
         if ( requiresNotNull && areaId == null) {
-            throw new AuthenticationException(ErrorCode.AUTH_AREA_NOT_ASSIGNED);
+            throw new CannotIdentifyException(ErrorCode.AUTH_AREA_NOT_ASSIGNED);
         }
         return areaId;
     }

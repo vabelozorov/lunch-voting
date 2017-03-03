@@ -2,16 +2,23 @@ package ua.belozorov.lunchvoting.web.exceptionhandling;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.TypeMismatchException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
+import org.springframework.web.HttpMediaTypeNotAcceptableException;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.support.MissingServletRequestPartException;
 import ua.belozorov.lunchvoting.exceptions.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -19,16 +26,27 @@ import javax.validation.ConstraintViolationException;
 import java.util.stream.Collectors;
 
 /**
-
+ * Strategy is the following:
+ * <ul>
+ *     <li>Application-specific exception implements {@link ApplicationException}. This interface provides
+ *     a consistent way to build a meaningful response to a client error through {@link ErrorInfo} /li>
+ *     <li>A number of Spring-specific exceptions, e.g. validation-related ones, are processed in a way which
+ *     adapts them to {@link ErrorInfo}</li>
+ *     <li>Other Spring MVC exceptions are handled via {@link ExceptionHandler} to prevent Tomcat from generating
+ *     an HTML error page, but retain original response codes. </li>
+ *     <li>All other exceptions are logged and a client are sent a status code 500</li>
+ * </ul>
  *
  * Created on 07.02.17.
  */
 @ControllerAdvice(annotations = RestController.class)
 public final class ExceptionInfoHandler {
     private final Logger LOG = LoggerFactory.getLogger(ExceptionInfoHandler.class);
+
     private static final String ERROR_MESSAGE_TEMPLATE = "field '%s', rejected value '%s', reason: %s";
 
     private final MessageSource messageSource;
+
     private final ErrorInfoFactory errorInfoFactory;
 
     @Autowired
@@ -46,7 +64,7 @@ public final class ExceptionInfoHandler {
                 .map(fe -> String.format(ERROR_MESSAGE_TEMPLATE,
                         fe.getField(),
                         fe.getRejectedValue(),
-                        this.composeMessage(fe))
+                        this.composeMessageFromMessageSource(fe))
                 )
                 .collect(Collectors.joining("\n"));
         ErrorInfo errorInfo = new ErrorInfo(req.getRequestURL(), ErrorCode.PARAMS_VALIDATION_FAILED, msg);
@@ -54,7 +72,7 @@ public final class ExceptionInfoHandler {
     }
 
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)  // 400
-    @ExceptionHandler(ConstraintViolationException.class)
+    @ExceptionHandler({ConstraintViolationException.class})
     @ResponseBody
     public ErrorInfo handleValidationFailure(HttpServletRequest req, ConstraintViolationException ex) {
         String msg = ex.getConstraintViolations().stream()
@@ -62,31 +80,34 @@ public final class ExceptionInfoHandler {
                         "unknown", //TODO fix error message for Spring method parameter validation
                         cv.getInvalidValue(),
                         cv.getMessage())
-                ).collect(Collectors.joining("\n"));
-
+                )
+                .collect(Collectors.joining("\n"));
         ErrorInfo errorInfo = new ErrorInfo(req.getRequestURL(), ErrorCode.PARAMS_VALIDATION_FAILED, msg);
         return this.logAndCreate(errorInfo);
     }
 
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)  //401
-    @ExceptionHandler({AuthenticationException.class})
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)  // 400
+    @ExceptionHandler({BindException.class ,HttpMessageNotReadableException.class,
+            MissingServletRequestParameterException.class, MissingServletRequestPartException.class,
+            TypeMismatchException.class
+    })
     @ResponseBody
-    public ErrorInfo handle401NoCredentials(HttpServletRequest req, AuthenticationException ex) {
+    public void handle400Others(HttpServletRequest req, Exception ex) {
+        this.log(req, ex);
+    }
+
+    //case when no credentials were submitted or no user's areaId when it's required by a calling method
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)  //401
+    @ExceptionHandler({CannotIdentifyException.class})
+    @ResponseBody
+    public ErrorInfo handle401NoUserIdInfo(HttpServletRequest req, CannotIdentifyException ex) {
         return this.logAndCreate(req, ex);
     }
 
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)  //401
-    @ExceptionHandler({UsernameNotFoundException.class})
-    @ResponseBody
-    public ErrorInfo handle401BadCredentials(HttpServletRequest req, UsernameNotFoundException ex) {
-        ErrorInfo errorInfo = new ErrorInfo(req.getRequestURL(), ErrorCode.AUTH_BAD_CREDENTIALS);
-        return this.logAndCreate(errorInfo);
-    }
-
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)  //401
+    @ResponseStatus(HttpStatus.FORBIDDEN)  //403
     @ExceptionHandler({AccessDeniedException.class})
     @ResponseBody
-    public ErrorInfo handle401Unauthorized(HttpServletRequest req, AccessDeniedException ex) {
+    public ErrorInfo handle403(HttpServletRequest req, AccessDeniedException ex) {
         ErrorInfo errorInfo = new ErrorInfo(req.getRequestURL(), ErrorCode.AUTH_NO_PERMISSIONS);
         return this.logAndCreate(errorInfo);
     }
@@ -98,15 +119,44 @@ public final class ExceptionInfoHandler {
         return this.logAndCreate(req, ex);
     }
 
+    @ResponseStatus(value = HttpStatus.NOT_FOUND)  // 404
+    @ExceptionHandler({TypeMismatchException.class})
+    @ResponseBody
+    public void handle404Others(HttpServletRequest req, TypeMismatchException ex) {
+        this.log(req, ex);
+    }
+
+    @ResponseStatus(value = HttpStatus.METHOD_NOT_ALLOWED)  // 405
+    @ExceptionHandler({HttpRequestMethodNotSupportedException.class})
+    @ResponseBody
+    public void handle405(HttpServletRequest req, HttpRequestMethodNotSupportedException ex) {
+        this.log(req, ex);
+    }
+
+    @ResponseStatus(value = HttpStatus.NOT_ACCEPTABLE)  // 406
+    @ExceptionHandler({HttpMediaTypeNotAcceptableException.class})
+    @ResponseBody
+    public void handleFor406(HttpServletRequest req, HttpMediaTypeNotAcceptableException ex) {
+        this.log(req, ex);
+    }
+
     @ResponseStatus(HttpStatus.CONFLICT)  // 409
     @ExceptionHandler(DuplicateDataException.class)
     @ResponseBody
     public ErrorInfo handleFor409(HttpServletRequest req, ApplicationException ex) {
-        return errorInfoFactory.create(req, ex);
+        return this.logAndCreate(req, ex);
+    }
+
+    @ResponseStatus(HttpStatus.UNSUPPORTED_MEDIA_TYPE)  // 415
+    @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
+    @ResponseBody
+    public void handleFor415(HttpServletRequest req, HttpMediaTypeNotSupportedException ex) {
+        this.log(req, ex);
     }
 
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)  //422
-    @ExceptionHandler({NoAreaAdminException.class, PollException.class, VotePolicyException.class, JoinRequestException.class})
+    @ExceptionHandler({NoAreaAdminException.class, PollException.class, VotePolicyException.class,
+            JoinRequestException.class})
     @ResponseBody
     public ErrorInfo handleFor422(HttpServletRequest req, ApplicationException ex) {
         return this.logAndCreate(req, ex);
@@ -115,7 +165,7 @@ public final class ExceptionInfoHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)  //500
     @ExceptionHandler(Exception.class)
     public void handleOther(HttpServletRequest req, Exception ex) throws Exception {
-        LOG.error(this.composeGeneralExceptionMessage(req, ex));
+        this.log(req, ex);
     }
 
     private ErrorInfo logAndCreate(HttpServletRequest req, ApplicationException ex) {
@@ -128,6 +178,10 @@ public final class ExceptionInfoHandler {
         return errorInfo;
     }
 
+    private void log(HttpServletRequest req, Exception ex) {
+        LOG.debug(this.composeGeneralExceptionMessage(req, ex));
+    }
+
     private String composeGeneralExceptionMessage(HttpServletRequest req, Exception ex) {
         int lineNumber = ex.getStackTrace()[0].getLineNumber();
         String className = ex.getStackTrace()[0].getClassName();
@@ -137,10 +191,14 @@ public final class ExceptionInfoHandler {
                 className, methodName, lineNumber, message);
     }
 
-    private String composeMessage(FieldError fe) {
+    private String composeMessageFromMessageSource(FieldError fe) {
         String code = fe.getCode();
         if (code.startsWith("error.")) {
-            return messageSource.getMessage(code, fe.getArguments(), LocaleContextHolder.getLocale());
+            String message = messageSource.getMessage(code, fe.getArguments(), code, LocaleContextHolder.getLocale());
+            if (message.equals(code)) {
+                LOG.warn("no message for error code " + code);
+            }
+            return message;
         } else {
             return fe.getDefaultMessage();
         }
