@@ -26,7 +26,7 @@ Spring Testing, JUnit, Mockito, Db Utilities, P6Spy, datasource-proxy
 
 **Numbers**
 
-Almost 9000 lines of Java source code, 160+ tests, 40+ REST API endpoints, 30+ direct Maven dependencies
+9000+ lines of Java source code, 160+ tests, 40+ REST API endpoints, 30+ direct Maven dependencies
 
 ## API
 ### Components Overview
