@@ -3,7 +3,7 @@ package ua.belozorov.lunchvoting.model.voting.polling;
 import lombok.Getter;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
-import ua.belozorov.lunchvoting.EqualsComparator;
+import ua.belozorov.lunchvoting.matching.EqualsComparator;
 import ua.belozorov.objtosql.DateTimeSqlColumn;
 import ua.belozorov.objtosql.SimpleObjectToSqlConverter;
 import ua.belozorov.objtosql.StringSqlColumn;

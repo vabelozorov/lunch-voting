@@ -2,10 +2,9 @@ package ua.belozorov.lunchvoting.model.voting.polling;
 
 import org.junit.Test;
 import ua.belozorov.lunchvoting.AbstractTest;
-import ua.belozorov.lunchvoting.exceptions.*;
+import ua.belozorov.lunchvoting.web.exceptionhandling.exceptions.*;
 import ua.belozorov.lunchvoting.model.lunchplace.LunchPlace;
 import ua.belozorov.lunchvoting.model.lunchplace.LunchPlaceTestData;
-import ua.belozorov.lunchvoting.model.lunchplace.Menu;
 import ua.belozorov.lunchvoting.model.voting.polling.votedecisions.VotePolicyDecision;
 
 import java.util.*;

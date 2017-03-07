@@ -3,15 +3,8 @@ package ua.belozorov.lunchvoting;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.ContextHierarchy;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.PlatformTransactionManager;
-import ua.belozorov.lunchvoting.config.RootConfig;
-import ua.belozorov.lunchvoting.config.ServiceBeansConfig;
-import ua.belozorov.lunchvoting.config.WebConfig;
-import ua.belozorov.lunchvoting.config.WebSecurityConfig;
-import ua.belozorov.lunchvoting.mocks.TestServiceBeansConfig;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;

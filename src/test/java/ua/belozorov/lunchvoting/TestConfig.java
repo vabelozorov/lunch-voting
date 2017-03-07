@@ -3,9 +3,7 @@ package ua.belozorov.lunchvoting;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import ua.belozorov.lunchvoting.repository.user.UserRepository;
-import ua.belozorov.lunchvoting.service.user.UserServiceImpl;
+import ua.belozorov.lunchvoting.misc.JsonUtils;
 
 /**
 

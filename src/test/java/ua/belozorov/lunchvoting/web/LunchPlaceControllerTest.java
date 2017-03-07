@@ -7,9 +7,9 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
-import ua.belozorov.lunchvoting.DateTimeFormatters;
-import ua.belozorov.lunchvoting.exceptions.DuplicateDataException;
-import ua.belozorov.lunchvoting.exceptions.NotFoundException;
+import ua.belozorov.lunchvoting.util.DateTimeFormatters;
+import ua.belozorov.lunchvoting.web.exceptionhandling.exceptions.DuplicateDataException;
+import ua.belozorov.lunchvoting.web.exceptionhandling.exceptions.NotFoundException;
 import ua.belozorov.lunchvoting.model.lunchplace.LunchPlace;
 import ua.belozorov.lunchvoting.model.lunchplace.Menu;
 import ua.belozorov.lunchvoting.service.lunchplace.LunchPlaceService;
@@ -26,7 +26,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -332,7 +331,7 @@ public class LunchPlaceControllerTest extends AbstractControllerTest {
         ErrorInfo errorInfo = new ErrorInfo(
                 result.getRequest().getRequestURL(),
                 ErrorCode.ENTITY_NOT_FOUND,
-                "entity(-ies) not found: [I_DO_NOT_EXIST]"
+                "resource(s) not found: [I_DO_NOT_EXIST]"
         );
         assertJson(
                 jsonUtils.toJson(errorInfo),

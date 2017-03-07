@@ -1,14 +1,10 @@
 package ua.belozorov.lunchvoting.model.voting.polling;
 
-import org.junit.Assert;
 import org.junit.Test;
 import ua.belozorov.lunchvoting.AbstractTest;
-import ua.belozorov.lunchvoting.exceptions.PollException;
-import ua.belozorov.lunchvoting.model.voting.polling.TimeConstraint;
+import ua.belozorov.lunchvoting.web.exceptionhandling.exceptions.PollException;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.junit.Assert.*;
 

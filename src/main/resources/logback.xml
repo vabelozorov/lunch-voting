@@ -4,14 +4,14 @@
     <!-- To enable JMX Management -->
     <!--<jmxConfigurator/>-->
 
-    <appender name="file" class="ch.qos.logback.core.FileAppender">
-        <file>/tmp/log/lv.log</file>
+    <!--<appender name="file" class="ch.qos.logback.core.FileAppender">-->
+        <!--<file>/tmp/log/lv2.log</file>-->
 
-        <encoder>
-            <charset>UTF-8</charset>
-            <pattern>%date %-5level %logger{0} [%file:%line] %msg%n</pattern>
-        </encoder>
-    </appender>
+        <!--<encoder>-->
+            <!--<charset>UTF-8</charset>-->
+            <!--<pattern>%date %-5level %logger{0} [%file:%line] %msg%n</pattern>-->
+        <!--</encoder>-->
+    <!--</appender>-->
 
     <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
@@ -20,13 +20,14 @@
         </encoder>
     </appender>
 
-    <logger name="org.springframework.web" level="ERROR"/>
-    <logger name="org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver" level="debug"/>
-    <!--<logger name="org.springframework.security" level="debug"/>-->
+    <logger name="org.springframework.web" level="error"/>
+    <!--<logger name="org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver" level="debug"/>-->
+    <!--<logger name="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping" level="debug"/>-->
+    <logger name="org.springframework.security" level="debug"/>
     <logger name="ua.belozorov.lunchvoting" level="debug"/>
 
     <root level="INFO">
-        <appender-ref ref="file"/>
+        <!--<appender-ref ref="file"/>-->
         <appender-ref ref="console"/>
     </root>
 </configuration>

@@ -8,10 +8,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import ua.belozorov.lunchvoting.exceptions.DuplicateDataException;
+import ua.belozorov.lunchvoting.web.exceptionhandling.exceptions.DuplicateDataException;
 import ua.belozorov.lunchvoting.web.security.AuthorizedUser;
 import ua.belozorov.lunchvoting.model.User;
-import ua.belozorov.lunchvoting.model.lunchplace.EatingArea;
+import ua.belozorov.lunchvoting.model.area.EatingArea;
 import ua.belozorov.lunchvoting.model.lunchplace.LunchPlace;
 import ua.belozorov.lunchvoting.model.voting.polling.LunchPlacePoll;
 import ua.belozorov.lunchvoting.service.area.EatingAreaService;
@@ -119,7 +119,7 @@ public class EatingAreaController {
      *     <tr>
      *         <td>HTTP Request</td>
      *         <td><font style="color:green"><code>HTTP POST /api/areas/{areaId}/members/ 201</code></font><br>
-     *              <b>{areaId}</b> existing {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea} ID
+     *              <b>{areaId}</b> existing {@link EatingArea} ID
      *        </td>
      *     </tr>
      *     <tr>
@@ -184,7 +184,7 @@ public class EatingAreaController {
      *     <tr>
      *         <td>HTTP Request</td>
      *         <td><font style="color:green"><code>HTTP POST /api/areas/{areaId}/places 201</code></font><br>
-     *             <b>{areaId}</b> existing {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea} ID
+     *             <b>{areaId}</b> existing {@link EatingArea} ID
      *         </td>
      *     </tr>
      *     <tr>
@@ -252,7 +252,7 @@ public class EatingAreaController {
      *     <tr>
      *         <td>HTTP Request</td>
      *         <td><font style="color:green"><code>HTTP POST /api/areas/{areaId}/polls 201</code></font><br>
-     *             <b>{areaId}</b> existing {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea} ID
+     *             <b>{areaId}</b> existing {@link EatingArea} ID
      *         </td>
      *     </tr>
      *     <tr>
@@ -319,7 +319,7 @@ public class EatingAreaController {
      *     <tr>
      *         <td>HTTP Request</td>
      *         <td><font style="color:green"><code>HTTP PUT /api/areas/{areaId} 204</code></font><br>
-     *             <b>{areaId}</b> existing {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea} ID
+     *             <b>{areaId}</b> existing {@link EatingArea} ID
      *         </td>
      *     </tr>
      *     <tr>
@@ -370,7 +370,7 @@ public class EatingAreaController {
      *     <tr>
      *         <td>HTTP Request</td>
      *         <td><font style="color:green"><code>HTTP GET /api/areas/{areaId} 200</code></font><br>
-     *             <b>{areaId}</b> existing {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea} ID
+     *             <b>{areaId}</b> existing {@link EatingArea} ID
      *         </td>
      *     </tr>
      *     <tr>
@@ -425,7 +425,7 @@ public class EatingAreaController {
      *     <tr>
      *         <td>HTTP Request</td>
      *         <td><font style="color:green"><code>HTTP GET /api/areas 200</code></font><br>
-     *             <b>{areaId}</b> existing {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea} ID
+     *             <b>{areaId}</b> existing {@link EatingArea} ID
      *         </td>
      *     </tr>
      *     <tr>
@@ -472,7 +472,7 @@ public class EatingAreaController {
      *     <tr>
      *         <td>HTTP Request</td>
      *         <td><font style="color:green"><code>HTTP DELETE /api/areas 204</code></font><br>
-     *             <b>{areaId}</b> existing {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea} ID
+     *             <b>{areaId}</b> existing {@link EatingArea} ID
      *         </td>
      *     </tr>
      *     <tr>

@@ -1,9 +1,7 @@
 package ua.belozorov.lunchvoting.service.area;
 
 import ua.belozorov.lunchvoting.model.User;
-import ua.belozorov.lunchvoting.model.lunchplace.JoinAreaRequest;
-import ua.belozorov.lunchvoting.web.security.IsAdmin;
-import ua.belozorov.lunchvoting.web.security.IsAdminOrVoter;
+import ua.belozorov.lunchvoting.model.area.JoinAreaRequest;
 
 import java.util.List;
 

@@ -3,13 +3,11 @@ package ua.belozorov.lunchvoting.service.user;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
-import ua.belozorov.lunchvoting.WithMockAdmin;
-import ua.belozorov.lunchvoting.WithMockVoter;
-import ua.belozorov.lunchvoting.exceptions.DuplicateDataException;
-import ua.belozorov.lunchvoting.exceptions.NotFoundException;
+import ua.belozorov.lunchvoting.securitymocking.WithMockAdmin;
+import ua.belozorov.lunchvoting.web.exceptionhandling.exceptions.DuplicateDataException;
+import ua.belozorov.lunchvoting.web.exceptionhandling.exceptions.NotFoundException;
 import ua.belozorov.lunchvoting.util.ExceptionUtils;
 import ua.belozorov.lunchvoting.web.exceptionhandling.ErrorCode;
-import ua.belozorov.lunchvoting.web.security.AuthorizedUser;
 import ua.belozorov.lunchvoting.model.User;
 import ua.belozorov.lunchvoting.model.UserRole;
 import ua.belozorov.lunchvoting.service.AbstractServiceTest;
@@ -21,8 +19,8 @@ import static com.vladmihalcea.sql.SQLStatementCountValidator.*;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.contains;
 import static org.junit.Assert.*;
-import static ua.belozorov.lunchvoting.MatcherUtils.matchCollection;
-import static ua.belozorov.lunchvoting.MatcherUtils.matchSingle;
+import static ua.belozorov.lunchvoting.matching.MatcherUtils.matchCollection;
+import static ua.belozorov.lunchvoting.matching.MatcherUtils.matchSingle;
 import static ua.belozorov.lunchvoting.model.UserTestData.*;
 
 /**

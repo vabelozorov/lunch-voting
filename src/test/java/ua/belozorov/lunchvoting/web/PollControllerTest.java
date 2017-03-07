@@ -23,8 +23,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static ua.belozorov.lunchvoting.DateTimeFormatters.DATE_FORMATTER;
-import static ua.belozorov.lunchvoting.DateTimeFormatters.DATE_TIME_FORMATTER;
+import static ua.belozorov.lunchvoting.util.DateTimeFormatters.DATE_FORMATTER;
+import static ua.belozorov.lunchvoting.util.DateTimeFormatters.DATE_TIME_FORMATTER;
 
 /**
 

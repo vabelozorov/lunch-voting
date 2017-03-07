@@ -1,6 +1,7 @@
 package ua.belozorov.lunchvoting;
 
-import ua.belozorov.lunchvoting.config.HsqlDataSourceConfig;
+import ua.belozorov.lunchvoting.config.datasource.HsqlDataSourceConfig;
+import ua.belozorov.lunchvoting.config.datasource.PostgresDataSourceConfig;
 
 /**
  * Class-container for the constants that name Spring profiles
@@ -20,7 +21,7 @@ public final class SPRING_PROFILES {
 
     /**
      * Switches between databases. For configuration see {@link HsqlDataSourceConfig}
-     * and {@link ua.belozorov.lunchvoting.config.PostgresDataSourceConfig}
+     * and {@link PostgresDataSourceConfig}
      * Only one of them should be used, obviously.
      */
     public static class DB {

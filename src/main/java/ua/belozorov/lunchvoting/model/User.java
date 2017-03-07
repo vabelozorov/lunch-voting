@@ -6,6 +6,7 @@ import org.hibernate.annotations.DynamicUpdate;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import ua.belozorov.lunchvoting.model.area.EatingArea;
 import ua.belozorov.lunchvoting.model.base.AbstractPersistableObject;
 import ua.belozorov.lunchvoting.util.ExceptionUtils;
 import ua.belozorov.lunchvoting.util.hibernate.RolesToIntegerConverter;
@@ -89,7 +90,7 @@ public final class User extends AbstractPersistableObject implements Comparable<
      * @param roles
      * @param registeredDate
      * @param activated
-     * @param areaId ID of an existing {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea} or null
+     * @param areaId ID of an existing {@link EatingArea} or null
      */
     public User(@Nullable String id, String name, String email, String password, Set<UserRole> roles,
                 LocalDateTime registeredDate, boolean activated, @Nullable String areaId) {
@@ -106,7 +107,7 @@ public final class User extends AbstractPersistableObject implements Comparable<
      * @param roles
      * @param registeredDate
      * @param activated
-     * @param areaId ID of an existing {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea} or null
+     * @param areaId ID of an existing {@link EatingArea} or null
      */
     private User(@Nullable String id, @Nullable Integer version, String name, String email, String password, Set<UserRole> roles,
                 LocalDateTime registeredDate, boolean activated, @Nullable String areaId) {

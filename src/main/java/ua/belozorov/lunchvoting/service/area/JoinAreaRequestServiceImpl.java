@@ -3,10 +3,10 @@ package ua.belozorov.lunchvoting.service.area;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ua.belozorov.lunchvoting.exceptions.NotFoundException;
+import ua.belozorov.lunchvoting.web.exceptionhandling.exceptions.NotFoundException;
 import ua.belozorov.lunchvoting.model.User;
-import ua.belozorov.lunchvoting.model.lunchplace.EatingArea;
-import ua.belozorov.lunchvoting.model.lunchplace.JoinAreaRequest;
+import ua.belozorov.lunchvoting.model.area.EatingArea;
+import ua.belozorov.lunchvoting.model.area.JoinAreaRequest;
 import ua.belozorov.lunchvoting.repository.lunchplace.EatingAreaRepository;
 
 import java.util.List;

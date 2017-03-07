@@ -7,7 +7,7 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
-import ua.belozorov.lunchvoting.exceptions.NotFoundException;
+import ua.belozorov.lunchvoting.web.exceptionhandling.exceptions.NotFoundException;
 import ua.belozorov.lunchvoting.model.User;
 import ua.belozorov.lunchvoting.model.UserRole;
 import ua.belozorov.lunchvoting.service.user.UserService;
@@ -90,7 +90,7 @@ public class UserManagementControllerTest extends AbstractControllerTest {
         ErrorInfo errorInfo = new ErrorInfo(
                 result.getRequest().getRequestURL(),
                 ErrorCode.ENTITY_NOT_FOUND,
-                "entity(-ies) not found: I_DO_NOT_EXIST"
+                "resource(s) not found: I_DO_NOT_EXIST"
         );
         assertJson(
                 jsonUtils.toJson(errorInfo),

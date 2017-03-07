@@ -1,10 +1,8 @@
 package ua.belozorov.lunchvoting.model.voting.polling.votepolicies;
 
 import com.google.common.collect.ImmutableSet;
-import ua.belozorov.lunchvoting.exceptions.PollException;
-import ua.belozorov.lunchvoting.exceptions.VotePolicyException;
+import ua.belozorov.lunchvoting.web.exceptionhandling.exceptions.VotePolicyException;
 import ua.belozorov.lunchvoting.model.voting.polling.TimeConstraint;
-import ua.belozorov.lunchvoting.model.voting.polling.Vote;
 import ua.belozorov.lunchvoting.model.voting.polling.VoteIntention;
 import ua.belozorov.lunchvoting.model.voting.polling.votedecisions.ContinueCheckDecision;
 import ua.belozorov.lunchvoting.model.voting.polling.votedecisions.VotePolicyDecision;

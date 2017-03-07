@@ -8,13 +8,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
 import ua.belozorov.*;
-import ua.belozorov.lunchvoting.exceptions.DuplicateDataException;
+import ua.belozorov.lunchvoting.web.exceptionhandling.exceptions.DuplicateDataException;
 import ua.belozorov.lunchvoting.model.lunchplace.LunchPlace;
 import ua.belozorov.lunchvoting.service.user.UserService;
 import ua.belozorov.lunchvoting.to.AreaTo;
 import ua.belozorov.lunchvoting.model.User;
 import ua.belozorov.lunchvoting.model.lunchplace.AreaTestData;
-import ua.belozorov.lunchvoting.model.lunchplace.EatingArea;
+import ua.belozorov.lunchvoting.model.area.EatingArea;
 import ua.belozorov.lunchvoting.model.voting.polling.LunchPlacePoll;
 import ua.belozorov.lunchvoting.model.voting.polling.PollItem;
 import ua.belozorov.lunchvoting.model.voting.polling.TimeConstraint;
@@ -36,7 +36,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static ua.belozorov.lunchvoting.DateTimeFormatters.DATE_FORMATTER;
+import static ua.belozorov.lunchvoting.util.DateTimeFormatters.DATE_FORMATTER;
 import static ua.belozorov.lunchvoting.model.UserTestData.*;
 
 /**
@@ -440,7 +440,7 @@ public class EatingAreaControllerTest extends AbstractControllerTest {
         MvcResult result = mockMvc.perform(delete(REST_URL)
                 .with(voter())
         )
-                .andExpect(status().isUnauthorized())
+                .andExpect(status().isForbidden())
                 .andReturn();
         ErrorInfo errorInfo = new ErrorInfo(
                 result.getRequest().getRequestURL(),

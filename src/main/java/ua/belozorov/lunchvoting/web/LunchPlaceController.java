@@ -8,8 +8,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ua.belozorov.lunchvoting.exceptions.DuplicateDataException;
-import ua.belozorov.lunchvoting.model.User;
+import ua.belozorov.lunchvoting.model.area.EatingArea;
+import ua.belozorov.lunchvoting.web.exceptionhandling.exceptions.DuplicateDataException;
 import ua.belozorov.lunchvoting.web.security.AuthorizedUser;
 import ua.belozorov.lunchvoting.model.lunchplace.LunchPlace;
 import ua.belozorov.lunchvoting.service.lunchplace.LunchPlaceService;
@@ -21,7 +21,6 @@ import ua.belozorov.lunchvoting.web.queries.LunchPlaceQueryParams;
 import ua.belozorov.lunchvoting.web.security.IsAdmin;
 import ua.belozorov.lunchvoting.web.security.IsAdminOrVoter;
 
-import javax.validation.Valid;
 import java.util.*;
 
 /**
@@ -58,7 +57,7 @@ public class LunchPlaceController  {
      *     <tr>
      *         <td>HTTP Request</td>
      *         <td><font style="color:green"><code>HTTP PUT /api/areas/{areaId}/places/{placeId} 204</code></font><br>
-     *             <b>{areaId}</b> existing {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea} ID<br>
+     *             <b>{areaId}</b> existing {@link EatingArea} ID<br>
      *             <b>{placeId}</b> existing {@link LunchPlace} ID
      *         </td>
      *     </tr>
@@ -122,7 +121,7 @@ public class LunchPlaceController  {
      *     <tr>
      *         <td>HTTP Request</td>
      *         <td><font style="color:green"><code>HTTP GET /api/areas/{areaId}/places/{placeId} 200</code></font><br>
-     *             <b>{areaId}</b> existing {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea} ID<br>
+     *             <b>{areaId}</b> existing {@link EatingArea} ID<br>
      *             <b>{placeId}</b> existing {@link LunchPlace} ID
      *         </td>
      *     </tr>
@@ -189,7 +188,7 @@ public class LunchPlaceController  {
      *     <tr>
      *         <td>HTTP Request</td>
      *         <td><font style="color:green"><code>HTTP GET /api/areas/{areaId}/places 200</code></font><br>
-     *             <b>{areaId}</b> existing {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea} ID
+     *             <b>{areaId}</b> existing {@link EatingArea} ID
      *         </td>
      *     </tr>
      *     <tr>
@@ -236,7 +235,7 @@ public class LunchPlaceController  {
      *      <li>HTTP Status 400 Bad_Syntax is returned if parameter validation fails</li>
      *      <li>HTTP Status 404 Not_Found is returned if a provided <code>ids</code> parameter refers to
      *      non-existing {@link LunchPlace} in the currently authenticated user's
-     *      {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea}</li>
+     *      {@link EatingArea}</li>
      *  </ul>
      */
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
@@ -268,7 +267,7 @@ public class LunchPlaceController  {
      *     <tr>
      *         <td>HTTP Request</td>
      *         <td><font style="color:green">HTTP DELETE /api/areas/{areaId}/places/{placeId} 204</font><br>
-     *             <b>{areaId}</b> existing {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea} ID<br>
+     *             <b>{areaId}</b> existing {@link EatingArea} ID<br>
      *             <b>{placeId}</b> existing {@link LunchPlace} ID
      *         </td>
      *     </tr>
@@ -298,7 +297,7 @@ public class LunchPlaceController  {
      *  If the request fails:
      *  <ul>
      *      <li>HTTP Status 404 Not_Found is returned if <code>ID</code> refers to non-existent {@link LunchPlace}
-     *      in the authenticated user's {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea}</li>
+     *      in the authenticated user's {@link EatingArea}</li>
      *  </ul>
      */
     @DeleteMapping("/{id}")

@@ -2,8 +2,7 @@ package ua.belozorov.lunchvoting.model.voting.polling;
 
 import lombok.AccessLevel;
 import lombok.Getter;
-import ua.belozorov.lunchvoting.exceptions.PollException;
-import ua.belozorov.lunchvoting.util.ExceptionUtils;
+import ua.belozorov.lunchvoting.web.exceptionhandling.exceptions.PollException;
 import ua.belozorov.lunchvoting.web.exceptionhandling.ErrorCode;
 
 import javax.persistence.Column;
@@ -11,7 +10,6 @@ import javax.persistence.Embeddable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.Objects;
 
 /**
  *

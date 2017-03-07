@@ -7,7 +7,7 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.RestController;
-import ua.belozorov.lunchvoting.exceptions.InSecuredControllerMethodException;
+import ua.belozorov.lunchvoting.web.exceptionhandling.exceptions.InSecuredControllerMethodException;
 import ua.belozorov.lunchvoting.web.security.InSecure;
 
 import java.lang.reflect.Method;

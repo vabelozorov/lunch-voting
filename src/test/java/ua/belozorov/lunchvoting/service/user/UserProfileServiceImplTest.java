@@ -2,12 +2,12 @@ package ua.belozorov.lunchvoting.service.user;
 
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import ua.belozorov.lunchvoting.WithMockVoter;
+import ua.belozorov.lunchvoting.securitymocking.WithMockVoter;
 import ua.belozorov.lunchvoting.model.User;
 import ua.belozorov.lunchvoting.service.AbstractServiceTest;
 
 import static org.junit.Assert.*;
-import static ua.belozorov.lunchvoting.MatcherUtils.matchSingle;
+import static ua.belozorov.lunchvoting.matching.MatcherUtils.matchSingle;
 import static ua.belozorov.lunchvoting.model.UserTestData.USER_COMPARATOR;
 import static ua.belozorov.lunchvoting.model.UserTestData.VOTER;
 import static ua.belozorov.lunchvoting.model.UserTestData.VOTER_ID;

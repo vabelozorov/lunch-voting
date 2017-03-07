@@ -1,17 +1,14 @@
 package ua.belozorov.lunchvoting.service.area;
 
 import org.jetbrains.annotations.Nullable;
-import org.springframework.transaction.annotation.Transactional;
 import ua.belozorov.lunchvoting.model.User;
-import ua.belozorov.lunchvoting.model.lunchplace.EatingArea;
+import ua.belozorov.lunchvoting.model.area.EatingArea;
 import ua.belozorov.lunchvoting.model.lunchplace.LunchPlace;
 import ua.belozorov.lunchvoting.model.voting.polling.LunchPlacePoll;
 import ua.belozorov.lunchvoting.model.voting.polling.TimeConstraint;
 import ua.belozorov.lunchvoting.repository.lunchplace.EatingAreaRepository;
 import ua.belozorov.lunchvoting.repository.lunchplace.EatingAreaRepositoryImpl;
 import ua.belozorov.lunchvoting.to.AreaTo;
-import ua.belozorov.lunchvoting.web.security.IsAdmin;
-import ua.belozorov.lunchvoting.web.security.IsAdminOrVoter;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

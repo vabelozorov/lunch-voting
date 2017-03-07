@@ -4,7 +4,7 @@ import com.google.common.collect.ImmutableSet;
 import lombok.Getter;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
-import ua.belozorov.lunchvoting.EqualsComparator;
+import ua.belozorov.lunchvoting.matching.EqualsComparator;
 import ua.belozorov.lunchvoting.util.hibernate.PhonesToStringConverter;
 import ua.belozorov.objtosql.SimpleObjectToSqlConverter;
 import ua.belozorov.objtosql.StringSqlColumn;

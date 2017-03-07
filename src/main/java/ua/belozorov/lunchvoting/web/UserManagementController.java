@@ -8,7 +8,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ua.belozorov.lunchvoting.exceptions.DuplicateDataException;
+import ua.belozorov.lunchvoting.model.area.EatingArea;
+import ua.belozorov.lunchvoting.web.exceptionhandling.exceptions.DuplicateDataException;
 import ua.belozorov.lunchvoting.model.UserRole;
 import ua.belozorov.lunchvoting.web.security.AuthorizedUser;
 import ua.belozorov.lunchvoting.model.User;
@@ -51,7 +52,7 @@ public class UserManagementController {
      *     <tr>
      *         <td>HTTP Request</td>
      *         <td><font style="color:green"><code>HTTP PUT /api/areas/{areaId}/members/{userId} 204</code></font><br>
-     *             <b>{areaId}</b> existing {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea} ID<br>
+     *             <b>{areaId}</b> existing {@link EatingArea} ID<br>
      *             <b>{userId}</b> existing {@link User} ID
      *         </td>
      *     </tr>
@@ -117,7 +118,7 @@ public class UserManagementController {
      *     <tr>
      *         <td>HTTP Request</td>
      *         <td><font style="color:green"><code>HTTP GET /api/areas/{areaId}/members/{userId} 200</code></font><br>
-     *             <b>{areaId}</b> existing {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea} ID<br>
+     *             <b>{areaId}</b> existing {@link EatingArea} ID<br>
      *             <b>{userId}</b> existing {@link User} ID
      *        </td>
      *     </tr>
@@ -158,13 +159,13 @@ public class UserManagementController {
     }
 
     /**
-     * <p>Retrieves all {@link User} objects in the {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea}.</p>
+     * <p>Retrieves all {@link User} objects in the {@link EatingArea}.</p>
      *
      * <table summary="" rules="all" style="border:1px solid black; border-collapse:collapse; width:700px;">
      *     <tr>
      *         <td>HTTP Request</td>
      *         <td><font style="color:green"><code>HTTP GET /api/areas/{areaId}/members 200</code></font><br>
-     *             <b>{areaId}</b> existing {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea} ID
+     *             <b>{areaId}</b> existing {@link EatingArea} ID
      *             </td>
      *     </tr>
      *     <tr>
@@ -209,7 +210,7 @@ public class UserManagementController {
      *     <tr>
      *         <td>HTTP Request</td>
      *         <td><font style="color:green"><code>HTTP DELETE /api/areas/{areaId}/members/{userId} 204</code></font><br>
-     *             <b>{areaId}</b> existing {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea} ID<br>
+     *             <b>{areaId}</b> existing {@link EatingArea} ID<br>
      *             <b>{userId}</b> existing {@link User} ID
      *             </td>
      *     </tr>
@@ -239,7 +240,7 @@ public class UserManagementController {
      *  If the request fails:
      *  <ul>
      *      <li>HTTP Status 404 Not_Found is returned if a {@link User} with the given ID does not exist
-     *      in the {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea}</li>
+     *      in the {@link EatingArea}</li>
      *  </ul>
      *  */
     @DeleteMapping("/{userId}")
@@ -255,7 +256,7 @@ public class UserManagementController {
      *     <tr>
      *         <td>HTTP Request</td>
      *         <td><font style="color:green"><code>HTTP PUT /api/areas/{areaId}/members/{userId} 204</code></font><br>
-     *             <b>{areaId}</b> existing {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea} ID<br>
+     *             <b>{areaId}</b> existing {@link EatingArea} ID<br>
      *             <b>{userId}</b> existing {@link User} ID
      *             </td>
      *     </tr>
@@ -303,7 +304,7 @@ public class UserManagementController {
      *     <tr>
      *         <td>HTTP Request</td>
      *         <td><font style="color:green"><code>HTTP PUT /api/areas/{areaId}/members/{userId} 204</code></font><br>
-     *             <b>{areaId}</b> existing {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea} ID<br>
+     *             <b>{areaId}</b> existing {@link EatingArea} ID<br>
      *             <b>{userId}</b> existing {@link User} ID
      *             </td>
      *     </tr>

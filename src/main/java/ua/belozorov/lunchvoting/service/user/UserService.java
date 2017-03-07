@@ -1,9 +1,7 @@
 package ua.belozorov.lunchvoting.service.user;
 
-import org.springframework.security.access.annotation.Secured;
 import ua.belozorov.lunchvoting.model.User;
 import ua.belozorov.lunchvoting.model.UserRole;
-import ua.belozorov.lunchvoting.web.security.IsAdmin;
 
 import java.util.Collection;
 import java.util.List;
@@ -33,7 +31,7 @@ public interface UserService {
      * @param name non-null, not-empty username
      * @param email non-null, not-empty user email
      * @param password non-null, not-empty user password
-     * @throws ua.belozorov.lunchvoting.exceptions.NotFoundException if there is no entity with such ID
+     * @throws ua.belozorov.lunchvoting.web.exceptionhandling.exceptions.NotFoundException if there is no entity with such ID
      * in the specified area
      */
     void updateMainInfo(String areaId, String id, String name, String email, String password);
@@ -42,7 +40,7 @@ public interface UserService {
      * Updates a User entity by merging a given instance over its persisted version
      * @param areaId
      * @param user User instance which will override an existing entity
-     * @throws ua.belozorov.lunchvoting.exceptions.NotFoundException if there is no entity with such ID
+     * @throws ua.belozorov.lunchvoting.web.exceptionhandling.exceptions.NotFoundException if there is no entity with such ID
      * in the specified area
      */
     void update(String areaId, User user);
@@ -54,7 +52,7 @@ public interface UserService {
      * @param areaId existing non-null EatingArea#id
      * @param userId existing non-null User#id
      * @return User entity
-     * @throws ua.belozorov.lunchvoting.exceptions.NotFoundException if there is no entity with such ID
+     * @throws ua.belozorov.lunchvoting.web.exceptionhandling.exceptions.NotFoundException if there is no entity with such ID
      * in the specified area
      */
     User get(String areaId, String userId);

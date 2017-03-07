@@ -8,10 +8,10 @@ import org.springframework.util.StringUtils;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import ua.belozorov.lunchvoting.model.area.EatingArea;
 import ua.belozorov.lunchvoting.model.lunchplace.LunchPlace;
 import ua.belozorov.lunchvoting.web.security.AuthorizedUser;
 import ua.belozorov.lunchvoting.model.lunchplace.Dish;
@@ -24,8 +24,6 @@ import ua.belozorov.lunchvoting.web.security.IsAdminOrVoter;
 
 import javax.validation.Valid;
 import java.net.URI;
-import java.time.LocalDate;
-import java.util.Collections;
 
 import static ua.belozorov.lunchvoting.util.ControllerUtils.toMap;
 
@@ -67,7 +65,7 @@ public class MenuController {
      *     <tr>
      *         <td>HTTP Request</td>
      *         <td><font style="color:green"><code>HTTP POST /api/areas/{areaId}/places/{placeId}/menus 201 </code></font>
-     *             <b>{areaId}</b> existing {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea} ID<br>
+     *             <b>{areaId}</b> existing {@link EatingArea} ID<br>
      *             <b>{placeId}</b> existing {@link LunchPlace} ID
      *          </td>
      *     </tr>

@@ -11,14 +11,14 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.servlet.DispatcherServlet;
 import ua.belozorov.lunchvoting.AbstractSpringTest;
-import ua.belozorov.lunchvoting.JsonUtils;
+import ua.belozorov.lunchvoting.misc.JsonUtils;
 import ua.belozorov.lunchvoting.TestConfig;
 import ua.belozorov.lunchvoting.config.RootConfig;
-import ua.belozorov.lunchvoting.config.ServiceBeansConfig;
 import ua.belozorov.lunchvoting.config.WebConfig;
 import ua.belozorov.lunchvoting.config.WebSecurityConfig;
-import ua.belozorov.lunchvoting.mocks.TestServiceBeansConfig;
+import ua.belozorov.lunchvoting.TestServiceBeansConfig;
 
 import java.util.Arrays;
 
@@ -32,7 +32,7 @@ import static ua.belozorov.lunchvoting.model.UserTestData.*;
 @ContextHierarchy({
         @ContextConfiguration(classes = {RootConfig.class, TestServiceBeansConfig.class, WebSecurityConfig.class}),
         @ContextConfiguration(classes = {
-                WebConfig.class, TestConfig.class, TestConfig.class
+                WebConfig.class, TestConfig.class
         })
 })
 @WebAppConfiguration

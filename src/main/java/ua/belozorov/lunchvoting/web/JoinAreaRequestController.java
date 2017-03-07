@@ -6,11 +6,11 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import ua.belozorov.lunchvoting.model.lunchplace.EatingArea;
-import ua.belozorov.lunchvoting.model.lunchplace.JoinAreaRequest.JoinStatus;
+import ua.belozorov.lunchvoting.model.area.EatingArea;
+import ua.belozorov.lunchvoting.model.area.JoinAreaRequest.JoinStatus;
 import ua.belozorov.lunchvoting.web.security.AuthorizedUser;
 import ua.belozorov.lunchvoting.model.User;
-import ua.belozorov.lunchvoting.model.lunchplace.JoinAreaRequest;
+import ua.belozorov.lunchvoting.model.area.JoinAreaRequest;
 import ua.belozorov.lunchvoting.service.area.JoinAreaRequestService;
 import ua.belozorov.lunchvoting.to.JoinRequestTo;
 import ua.belozorov.lunchvoting.web.security.IsAdmin;
@@ -270,7 +270,7 @@ public class JoinAreaRequestController {
      *
      * <p>The request can be approved regardless of the membership or its absence in a certain area. The requester can be
      * a voter or an admin in an area. However, if the requester is the last user with <strong>ADMIN</strong> right in
-     * his current area, approval for such request fails and {@link ua.belozorov.lunchvoting.exceptions.NoAreaAdminException}
+     * his current area, approval for such request fails and {@link ua.belozorov.lunchvoting.web.exceptionhandling.exceptions.NoAreaAdminException}
      * is thrown.</p>
      *
      * @param requestId  ID of {@link JoinAreaRequest} in the area of approving user

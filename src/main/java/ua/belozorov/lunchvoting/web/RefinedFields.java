@@ -8,7 +8,7 @@ import java.util.Set;
  *
  * Created on 31.12.16.
  */
-interface RefinedFields {
+public interface RefinedFields {
 
     /**
      * @return Returns a set of object fields as String objects after refining

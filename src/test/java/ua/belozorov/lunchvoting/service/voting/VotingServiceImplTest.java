@@ -1,11 +1,9 @@
 package ua.belozorov.lunchvoting.service.voting;
 
-import com.vladmihalcea.sql.SQLStatementCountValidator;
-import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import ua.belozorov.lunchvoting.WithMockVoter;
-import ua.belozorov.lunchvoting.exceptions.NotFoundException;
+import ua.belozorov.lunchvoting.securitymocking.WithMockVoter;
+import ua.belozorov.lunchvoting.web.exceptionhandling.exceptions.NotFoundException;
 import ua.belozorov.lunchvoting.model.voting.VotingResult;
 import ua.belozorov.lunchvoting.model.voting.polling.LunchPlacePoll;
 import ua.belozorov.lunchvoting.model.voting.polling.PollItem;
@@ -19,7 +17,7 @@ import java.util.stream.Collectors;
 import static com.vladmihalcea.sql.SQLStatementCountValidator.*;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
-import static ua.belozorov.lunchvoting.MatcherUtils.*;
+import static ua.belozorov.lunchvoting.matching.MatcherUtils.*;
 import static ua.belozorov.lunchvoting.model.UserTestData.*;
 import static ua.belozorov.lunchvoting.model.voting.polling.VoteTestData.VOTE_COMPARATOR;
 

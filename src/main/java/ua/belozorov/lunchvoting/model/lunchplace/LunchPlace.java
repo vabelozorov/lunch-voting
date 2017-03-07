@@ -2,10 +2,10 @@ package ua.belozorov.lunchvoting.model.lunchplace;
 
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Sets;
-import lombok.Builder;
 import lombok.Getter;
 import org.hibernate.annotations.*;
 import org.jetbrains.annotations.Nullable;
+import ua.belozorov.lunchvoting.model.area.EatingArea;
 import ua.belozorov.lunchvoting.model.base.AbstractPersistableObject;
 import ua.belozorov.lunchvoting.util.ExceptionUtils;
 import ua.belozorov.lunchvoting.util.hibernate.PhonesToStringConverter;

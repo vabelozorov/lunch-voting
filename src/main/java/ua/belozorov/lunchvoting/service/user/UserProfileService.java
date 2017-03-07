@@ -19,7 +19,7 @@ public interface UserProfileService {
      * @param name non-null, not-empty username
      * @param email non-null, not-empty user email
      * @param password non-null, not-empty user password
-     * @throws ua.belozorov.lunchvoting.exceptions.NotFoundException if there is no entity with such ID
+     * @throws ua.belozorov.lunchvoting.web.exceptionhandling.exceptions.NotFoundException if there is no entity with such ID
      */
 
     void updateMainInfo(String id, String name, String email, String password);
@@ -27,7 +27,7 @@ public interface UserProfileService {
     /**
      * Updates a User entity by merging a given instance over its persisted version
      * @param user User instance which will override an existing entity
-     * @throws ua.belozorov.lunchvoting.exceptions.NotFoundException if there is no entity with such ID
+     * @throws ua.belozorov.lunchvoting.web.exceptionhandling.exceptions.NotFoundException if there is no entity with such ID
      */
 
     void update(User user);
@@ -38,7 +38,7 @@ public interface UserProfileService {
      * by specifying EatingArea#id
      * @param id existing non-null User#id
      * @return User entity
-     * @throws ua.belozorov.lunchvoting.exceptions.NotFoundException if there is no entity with such ID
+     * @throws ua.belozorov.lunchvoting.web.exceptionhandling.exceptions.NotFoundException if there is no entity with such ID
      */
 
     User get(String id);

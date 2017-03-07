@@ -1,12 +1,13 @@
 package ua.belozorov.lunchvoting.web.exceptionhandling;
 
-import ua.belozorov.lunchvoting.exceptions.ApplicationException;
+import lombok.Getter;
 
 /**
 
  *
  * Created on 07.02.17.
  */
+@Getter
 public class ErrorInfo {
     private final CharSequence url;
     private final ErrorCode code;

@@ -4,19 +4,13 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
-import ua.belozorov.lunchvoting.WithMockAdmin;
-import ua.belozorov.lunchvoting.WithMockVoter;
-import ua.belozorov.lunchvoting.exceptions.DuplicateDataException;
-import ua.belozorov.lunchvoting.exceptions.NotFoundException;
+import ua.belozorov.lunchvoting.web.exceptionhandling.exceptions.NotFoundException;
 import ua.belozorov.lunchvoting.model.lunchplace.LunchPlace;
 import ua.belozorov.lunchvoting.model.lunchplace.Menu;
 import ua.belozorov.lunchvoting.repository.lunchplace.LunchPlaceRepository;
 import ua.belozorov.lunchvoting.repository.lunchplace.MenuRepository;
 import ua.belozorov.lunchvoting.repository.lunchplace.MenuRepositoryImpl;
 import ua.belozorov.lunchvoting.service.AbstractServiceTest;
-import ua.belozorov.lunchvoting.util.ExceptionUtils;
-import ua.belozorov.lunchvoting.web.exceptionhandling.ErrorCode;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -25,7 +19,7 @@ import static com.vladmihalcea.sql.SQLStatementCountValidator.reset;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.*;
-import static ua.belozorov.lunchvoting.MatcherUtils.*;
+import static ua.belozorov.lunchvoting.matching.MatcherUtils.*;
 import static ua.belozorov.lunchvoting.model.lunchplace.LunchPlaceTestData.*;
 
 /**

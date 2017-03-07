@@ -13,20 +13,27 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.*;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
-import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.format.FormatterRegistry;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
-import org.springframework.validation.Validator;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.servlet.DispatcherServlet;
+import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
-import ua.belozorov.lunchvoting.DateTimeFormatters;
-import ua.belozorov.lunchvoting.web.exceptionhandling.ErrorInfoFactory;
+import org.springframework.web.servlet.handler.HandlerExceptionResolverComposite;
+import org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver;
+import ua.belozorov.lunchvoting.util.DateTimeFormatters;
+import ua.belozorov.lunchvoting.web.exceptionhandling.AppHandlerExceptionResolver;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -37,6 +44,9 @@ import java.util.List;
 @EnableGlobalMethodSecurity(securedEnabled = true)
 @ComponentScan({"ua.belozorov.lunchvoting.web"})
 public class WebConfig extends WebMvcConfigurerAdapter {
+
+    @Autowired
+    private WebMvcConfigurationSupport webMvcConfiguration;
 
     @Bean
     @Primary
@@ -54,7 +64,12 @@ public class WebConfig extends WebMvcConfigurerAdapter {
 
     @Override
     public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
-        converters.add(new MappingJackson2HttpMessageConverter(objectMapper()));
+        converters.addAll(createConverters());
+    }
+
+    @Bean
+    public List<HttpMessageConverter<?>> createConverters() {
+        return Collections.singletonList(new MappingJackson2HttpMessageConverter(objectMapper()));
     }
 
     @Bean
@@ -75,8 +90,6 @@ public class WebConfig extends WebMvcConfigurerAdapter {
         registry.addFormatter(new DateTimeFormatters.LocalDateTimeFormatter());
     }
 
-
-
     @Bean("messageSource")
     @Primary
     public MessageSource messageSource() {
@@ -96,12 +109,28 @@ public class WebConfig extends WebMvcConfigurerAdapter {
     }
 
     @Bean
-    public ErrorInfoFactory errorInfoFactory() {
-        return new ErrorInfoFactory(messageSource());
+    public MethodValidationPostProcessor methodValidationPostProcessor() {
+        return new MethodValidationPostProcessor();
+    }
+
+    @Override
+    public void configureHandlerExceptionResolvers(List<HandlerExceptionResolver> exceptionResolvers) {
+        exceptionResolvers.add(exceptionHandlerExceptionResolver());
+        exceptionResolvers.add(appHandlerExceptionResolver());
     }
 
     @Bean
-    public MethodValidationPostProcessor methodValidationPostProcessor() {
-        return new MethodValidationPostProcessor();
+    public ExceptionHandlerExceptionResolver exceptionHandlerExceptionResolver() {
+        ExceptionHandlerExceptionResolver resolver = new ExceptionHandlerExceptionResolver();
+        resolver.setOrder(1);
+        resolver.setMessageConverters(createConverters());
+        return resolver;
+    }
+
+    @Bean
+    public AppHandlerExceptionResolver appHandlerExceptionResolver() {
+        AppHandlerExceptionResolver resolver = new AppHandlerExceptionResolver(objectMapper());
+        resolver.setOrder(2);
+        return resolver;
     }
 }

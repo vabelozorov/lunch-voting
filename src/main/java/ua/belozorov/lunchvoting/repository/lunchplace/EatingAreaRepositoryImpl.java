@@ -3,8 +3,8 @@ package ua.belozorov.lunchvoting.repository.lunchplace;
 import org.hibernate.Hibernate;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Repository;
-import ua.belozorov.lunchvoting.model.lunchplace.EatingArea;
-import ua.belozorov.lunchvoting.model.lunchplace.JoinAreaRequest;
+import ua.belozorov.lunchvoting.model.area.EatingArea;
+import ua.belozorov.lunchvoting.model.area.JoinAreaRequest;
 import ua.belozorov.lunchvoting.repository.BaseRepository;
 import ua.belozorov.lunchvoting.to.AreaTo;
 

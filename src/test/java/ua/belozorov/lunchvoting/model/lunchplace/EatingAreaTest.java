@@ -2,6 +2,7 @@ package ua.belozorov.lunchvoting.model.lunchplace;
 
 import org.junit.Test;
 import ua.belozorov.lunchvoting.AbstractTest;
+import ua.belozorov.lunchvoting.model.area.EatingArea;
 
 import static org.junit.Assert.*;
 import static ua.belozorov.lunchvoting.model.UserTestData.ALIEN_USER1;

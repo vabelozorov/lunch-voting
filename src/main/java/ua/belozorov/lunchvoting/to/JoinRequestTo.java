@@ -1,7 +1,7 @@
 package ua.belozorov.lunchvoting.to;
 
 import lombok.Getter;
-import ua.belozorov.lunchvoting.model.lunchplace.JoinAreaRequest;
+import ua.belozorov.lunchvoting.model.area.JoinAreaRequest;
 
 import java.time.LocalDateTime;
 

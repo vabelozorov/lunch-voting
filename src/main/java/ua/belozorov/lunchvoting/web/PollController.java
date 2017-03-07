@@ -5,9 +5,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
-import ua.belozorov.lunchvoting.model.User;
+import ua.belozorov.lunchvoting.model.area.EatingArea;
 import ua.belozorov.lunchvoting.web.security.AuthorizedUser;
 import ua.belozorov.lunchvoting.model.voting.polling.LunchPlacePoll;
 import ua.belozorov.lunchvoting.model.voting.polling.PollItem;
@@ -59,7 +58,7 @@ public class PollController {
      *     <tr>
      *         <td>HTTP Request</td>
      *         <td><font style="color:green"><code>HTTP GET /api/areas/{areaId}/polls/{pollId} 200</code></font><br>
-     *             <b>{areaId}</b> existing {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea} ID<br>
+     *             <b>{areaId}</b> existing {@link EatingArea} ID<br>
      *             <b>{pollId}</b> existing {@link LunchPlacePoll} ID
      *         </td>
      *     </tr>
@@ -93,7 +92,7 @@ public class PollController {
      *  If the request fails:
      *  <ul>
      *      <li>HTTP Status 404 Not_Found is returned if <code>pollId</code> refers to non-existent {@link LunchPlacePoll}
-     *      in the authenticated user's {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea}</li>
+     *      in the authenticated user's {@link EatingArea}</li>
      *  </ul>
      */
     @GetMapping(value = "/{pollId}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -112,7 +111,7 @@ public class PollController {
      *     <tr>
      *         <td>HTTP Request</td>
      *         <td><font style="color:green"><code>HTTP GET /api/areas/{areaId}/polls 200</code></font><br>
-     *             <b>{areaId}</b> existing {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea} ID<br>
+     *             <b>{areaId}</b> existing {@link EatingArea} ID<br>
      *         </td>
      *     </tr>
      *     <tr>
@@ -158,7 +157,7 @@ public class PollController {
      *     <tr>
      *         <td>HTTP Request</td>
      *         <td><font style="color:green"><code>HTTP GET /api/areas/{areaId}/polls 200</code></font><br>
-     *             <b>{areaId}</b> existing {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea} ID
+     *             <b>{areaId}</b> existing {@link EatingArea} ID
      *         </td>
      *     </tr>
      *     <tr>
@@ -206,7 +205,7 @@ public class PollController {
      *     <tr>
      *         <td>HTTP Request</td>
      *         <td><font style="color:green"><code>HTTP GET /api/areas/{areaId}/polls/past 200</code></font><br>
-     *             <b>{areaId}</b> existing {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea} ID
+     *             <b>{areaId}</b> existing {@link EatingArea} ID
      *         </td>
      *     </tr>
      *     <tr>
@@ -252,7 +251,7 @@ public class PollController {
      *     <tr>
      *         <td>HTTP Request</td>
      *         <td><font style="color:green"><code>HTTP GET /api/areas/{areaId}/polls/active 200</code></font><br>
-     *             <b>{areaId}</b> existing {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea} ID
+     *             <b>{areaId}</b> existing {@link EatingArea} ID
      *         </td>
      *     </tr>
      *     <tr>
@@ -298,7 +297,7 @@ public class PollController {
      *     <tr>
      *         <td>HTTP Request</td>
      *         <td><font style="color:green"><code>HTTP GET /api/areas/{areaId}/polls/future 200</code></font><br>
-     *             <b>{areaId}</b> existing {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea} ID
+     *             <b>{areaId}</b> existing {@link EatingArea} ID
      *         </td>
      *     </tr>
      *     <tr>
@@ -344,7 +343,7 @@ public class PollController {
      *     <tr>
      *         <td>HTTP Request</td>
      *         <td><font style="color:green"><code>HTTP GET /api/areas/{areaId}/polls/active 200</code></font><br>
-     *             <b>{areaId}</b> existing {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea} ID
+     *             <b>{areaId}</b> existing {@link EatingArea} ID
      *         </td>
      *     </tr>
      *     <tr>
@@ -399,7 +398,7 @@ public class PollController {
      *     <tr>
      *         <td>HTTP Request</td>
      *         <td><font style="color:green"><code>HTTP DELETE /api/areas/{areaId}/polls/{pollId} 204</code></font><br>
-     *             <b>{areaId}</b> existing {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea} ID
+     *             <b>{areaId}</b> existing {@link EatingArea} ID
      *         </td>
      *     </tr>
      *     <tr>

@@ -4,7 +4,7 @@ import lombok.Getter;
 import org.mockito.ArgumentMatcher;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
-import ua.belozorov.lunchvoting.EqualsComparator;
+import ua.belozorov.lunchvoting.matching.EqualsComparator;
 import ua.belozorov.lunchvoting.util.hibernate.RolesToIntegerConverter;
 import ua.belozorov.objtosql.*;
 

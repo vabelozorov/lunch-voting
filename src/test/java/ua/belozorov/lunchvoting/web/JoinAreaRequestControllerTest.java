@@ -9,8 +9,8 @@ import org.springframework.test.web.servlet.MvcResult;
 import ua.belozorov.FieldMappingEntry;
 import ua.belozorov.ObjectToMapConverter;
 import ua.belozorov.SimpleObjectToMapConverter;
-import ua.belozorov.lunchvoting.model.lunchplace.EatingArea;
-import ua.belozorov.lunchvoting.model.lunchplace.JoinAreaRequest;
+import ua.belozorov.lunchvoting.model.area.EatingArea;
+import ua.belozorov.lunchvoting.model.area.JoinAreaRequest;
 import ua.belozorov.lunchvoting.service.area.JoinAreaRequestService;
 
 import java.util.Arrays;

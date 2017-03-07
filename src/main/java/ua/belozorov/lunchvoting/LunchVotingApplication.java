@@ -5,6 +5,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.filter.HttpPutFormContentFilter;
+import org.springframework.web.servlet.DispatcherServlet;
+import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 import ua.belozorov.lunchvoting.config.RootConfig;
 import ua.belozorov.lunchvoting.config.ServiceBeansConfig;
@@ -52,5 +54,13 @@ public class LunchVotingApplication extends AbstractAnnotationConfigDispatcherSe
         ((ConfigurableEnvironment)rootApplicationContext.getEnvironment()).setActiveProfiles(
                 SPRING_PROFILES.DB.HSQL);
         return rootApplicationContext;
+    }
+
+    @Override
+    protected DispatcherServlet createDispatcherServlet(WebApplicationContext servletAppContext) {
+        DispatcherServlet dispatcherServlet = (DispatcherServlet) super.createDispatcherServlet(servletAppContext);
+        dispatcherServlet.setThrowExceptionIfNoHandlerFound(true);
+        dispatcherServlet.setDetectAllHandlerExceptionResolvers(false);
+        return dispatcherServlet;
     }
 }

@@ -2,8 +2,10 @@ package ua.belozorov.lunchvoting.web;
 
 import com.google.common.collect.ImmutableSet;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.web.servlet.DispatcherServlet;
 import ua.belozorov.lunchvoting.model.lunchplace.Dish;
 import ua.belozorov.lunchvoting.to.MenuTo;
 import ua.belozorov.lunchvoting.web.AbstractControllerTest;

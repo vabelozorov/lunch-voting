@@ -1,9 +1,0 @@
-DELETE FROM dishes;
-DELETE FROM votes;
-DELETE FROM menus;
-DELETE FROM poll_items;
-DELETE FROM places;
-DELETE FROM join_requests;
-DELETE FROM users;
-DELETE FROM polls;
-DELETE FROM areas;

@@ -24,7 +24,10 @@ public enum ErrorCode {
     AUTH_CREDENTIALS_NOT_FOUND("error.auth.credentials_not_found"),
     AUTH_AREA_NOT_ASSIGNED("error.auth.area_not_assigned"),
     AUTH_NO_PERMISSIONS(""),
-    AUTH_BAD_CREDENTIALS("");
+    AUTH_BAD_CREDENTIALS(""),
+    URL_NOT_FOUND(""),
+    METHOD_NOT_ALLOWED(""),
+    UNEXPECTED_CONTENT("");
 
     private final String messageCode;
 

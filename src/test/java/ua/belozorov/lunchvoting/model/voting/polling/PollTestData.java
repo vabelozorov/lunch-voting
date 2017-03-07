@@ -4,11 +4,10 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
-import ua.belozorov.lunchvoting.EqualsComparator;
+import ua.belozorov.lunchvoting.matching.EqualsComparator;
 import ua.belozorov.lunchvoting.model.lunchplace.LunchPlaceTestData;
 import ua.belozorov.objtosql.*;
 
-import java.sql.Time;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;

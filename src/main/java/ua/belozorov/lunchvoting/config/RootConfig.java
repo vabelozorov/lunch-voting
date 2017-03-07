@@ -1,11 +1,11 @@
 package ua.belozorov.lunchvoting.config;
 
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
-import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.*;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
-import ua.belozorov.lunchvoting.util.PrintBeans;
+import org.springframework.security.web.AuthenticationEntryPoint;
+import ua.belozorov.lunchvoting.config.datasource.DataSourceConfig;
 import ua.belozorov.lunchvoting.util.SecurityEnforcerBeanFactoryPostProcessor;
+import ua.belozorov.lunchvoting.web.security.RestAuthenticationEntryPoint;
 
 
 /**
@@ -21,6 +21,11 @@ public class RootConfig {
     @Bean
     public static BeanFactoryPostProcessor securityEnforcer() {
         return new SecurityEnforcerBeanFactoryPostProcessor();
+    }
+
+    @Bean
+    public AuthenticationEntryPoint restAuthenticationEntryPoint() {
+        return new RestAuthenticationEntryPoint();
     }
 
 //    @Bean

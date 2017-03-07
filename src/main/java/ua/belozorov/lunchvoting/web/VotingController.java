@@ -5,6 +5,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import ua.belozorov.lunchvoting.model.area.EatingArea;
 import ua.belozorov.lunchvoting.web.security.AuthorizedUser;
 import ua.belozorov.lunchvoting.model.User;
 import ua.belozorov.lunchvoting.model.voting.VotingResult;
@@ -51,7 +52,7 @@ public class VotingController {
      *     <tr>
      *         <td>HTTP Request</td>
      *         <td><font style="color:green"><code>HTTP POST /api/areas/{areaId}/votes 201</code></font><br>
-     *             <b>{areaId}</b> existing {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea} ID
+     *             <b>{areaId}</b> existing {@link EatingArea} ID
      *         </td>
      *     </tr>
      *     <tr>
@@ -116,7 +117,7 @@ public class VotingController {
      *     <tr>
      *         <td>HTTP Request</td>
      *         <td><font style="color:green"><code>HTTP GET /api/areas/{areaId}/votes 200</code></font><br>
-     *             <b>{areaId}</b> existing {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea} ID
+     *             <b>{areaId}</b> existing {@link EatingArea} ID
      *         </td>
      *     </tr>
      *     <tr>
@@ -172,7 +173,7 @@ public class VotingController {
      *     <tr>
      *         <td>HTTP Request</td>
      *         <td><font style="color:green"><code>HTTP GET /api/areas/{areaId}/votes/results 200</code></font><br>
-     *             <b>{areaId}</b> existing {@link ua.belozorov.lunchvoting.model.lunchplace.EatingArea} ID
+     *             <b>{areaId}</b> existing {@link EatingArea} ID
      *         </td>
      *     </tr>
      *     <tr>

@@ -1,15 +1,13 @@
 package ua.belozorov.lunchvoting.web;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.MessageSource;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import ua.belozorov.lunchvoting.exceptions.DuplicateDataException;
+import ua.belozorov.lunchvoting.web.exceptionhandling.exceptions.DuplicateDataException;
 import ua.belozorov.lunchvoting.model.User;
 import ua.belozorov.lunchvoting.service.user.UserProfileService;
 import ua.belozorov.lunchvoting.to.UserTo;
@@ -20,8 +18,6 @@ import ua.belozorov.lunchvoting.web.security.InSecure;
 import ua.belozorov.lunchvoting.web.security.IsAdminOrVoter;
 
 import java.net.URI;
-
-import static ua.belozorov.lunchvoting.util.ControllerUtils.toMap;
 
 /**
  * A controller that manages user requests about updating user's own profile.

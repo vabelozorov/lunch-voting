@@ -3,7 +3,8 @@ package ua.belozorov.lunchvoting.web.exceptionhandling;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
-import ua.belozorov.lunchvoting.exceptions.ApplicationException;
+import org.springframework.stereotype.Component;
+import ua.belozorov.lunchvoting.web.exceptionhandling.exceptions.ApplicationException;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -12,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
  *
  * Created on 17.02.17.
  */
+@Component
 public class ErrorInfoFactory {
 
     private final MessageSource messageSource;

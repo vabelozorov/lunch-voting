@@ -1,6 +1,6 @@
 package ua.belozorov.lunchvoting.model.voting.polling.votepolicies;
 
-import ua.belozorov.lunchvoting.exceptions.VotePolicyException;
+import ua.belozorov.lunchvoting.web.exceptionhandling.exceptions.VotePolicyException;
 import ua.belozorov.lunchvoting.model.voting.polling.TimeConstraint;
 import ua.belozorov.lunchvoting.model.voting.polling.Vote;
 import ua.belozorov.lunchvoting.model.voting.polling.VoteIntention;

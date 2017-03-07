@@ -2,7 +2,7 @@ package ua.belozorov.lunchvoting.web.security;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import ua.belozorov.lunchvoting.exceptions.CannotIdentifyException;
+import ua.belozorov.lunchvoting.web.exceptionhandling.exceptions.CannotIdentifyException;
 import ua.belozorov.lunchvoting.model.User;
 import ua.belozorov.lunchvoting.web.exceptionhandling.ErrorCode;
 
